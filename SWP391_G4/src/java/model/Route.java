@@ -7,6 +7,9 @@ public class Route {
     private double distance;
     private double basePrice;
 
+    public Route() {
+    }
+
     // Getters and Setters
     public int getRouteID() {
         return routeID;

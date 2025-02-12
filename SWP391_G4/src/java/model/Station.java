@@ -4,6 +4,9 @@ public class Station {
     private String stationName;
     private String address;
 
+    public Station() {
+    }
+
     // Getters and Setters
     public int getStationID() {
         return stationID;
