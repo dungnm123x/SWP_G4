@@ -7,6 +7,9 @@ public class Seat {
     private String seatType;
     private Carriage carriage;
 
+    public Seat() {
+    }
+
     // Getters and Setters
     public int getSeatID() {
         return seatID;
