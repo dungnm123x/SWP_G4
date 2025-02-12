@@ -17,12 +17,6 @@ public class Ticket {
     private String bookingDate;
     private double ticketPrice;
 
-<<<<<<< HEAD
-=======
-    public Ticket() {
-    }
-
->>>>>>> main
     // Constructor
     public Ticket(int ticketID, int userID, int seatID, int tripID, String ticketStatus, String bookingDate, double ticketPrice) {
         this.ticketID = ticketID;
@@ -96,7 +90,4 @@ public class Ticket {
         return "Ticket [ticketID=" + ticketID + ", userID=" + userID + ", seatID=" + seatID + ", tripID=" + tripID + ", ticketStatus=" + ticketStatus + ", bookingDate=" + bookingDate + ", ticketPrice=" + ticketPrice + "]";
     }
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> main
