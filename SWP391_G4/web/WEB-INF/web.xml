@@ -4,8 +4,32 @@
         <servlet-name>listTrainController</servlet-name>
         <servlet-class>controller.TrainsListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>GetCarriageSeatsServlet</servlet-name>
+        <servlet-class>controller.GetCarriageSeatsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ScheduleServlet</servlet-name>
+        <servlet-class>controller.ScheduleServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SearchTicketServlet</servlet-name>
+        <servlet-class>controller.SearchTicketServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/listtrain</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GetCarriageSeatsServlet</servlet-name>
+        <url-pattern>/getcarriageseats</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ScheduleServlet</servlet-name>
+        <url-pattern>/schedule</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchTicketServlet</servlet-name>
+        <url-pattern>/searchticket</url-pattern>
     </servlet-mapping>
 </web-app>

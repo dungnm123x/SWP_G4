@@ -1,0 +1,226 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 13, 2025, 12:46:00 AM
+    Author     : Admin
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Nền tổng thể */
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Tiêu đề */
+h2 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+/* Container chính */
+.center-wrap {
+    max-width: 750px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Form Tìm kiếm vé */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+label {
+    font-weight: 600;
+    color: #444;
+}
+
+select, input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: border 0.3s ease;
+}
+
+select:focus, input[type="date"]:focus {
+    border: 1px solid #007bff;
+    outline: none;
+}
+
+button {
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Bảng hiển thị lịch trình */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Thanh Navigation */
+nav {
+    background-color: #007bff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 15px;
+    transition: background 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #0056b3;
+    border-radius: 5px;
+}
+/* Container của mỗi toa tàu */
+.carriage-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
+/* Tiêu đề mỗi toa */
+.carriage-header {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Container chứa danh sách toa và ghế */
+.train-details-container {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: none; /* Mặc định ẩn */
+}
+
+/* Bố cục ghế theo dạng lưới */
+.seat-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px;
+}
+
+/* Kiểu dáng của mỗi ghế */
+.seat {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    line-height: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    border: 1px solid #000; /* Viền đen để rõ hơn */
+}
+
+/* Màu sắc ghế theo trạng thái */
+.seat-available {
+    background-color: #28a745;
+    color: white;
+} /* Xanh lá */
+.seat-booked {
+    background-color: #dc3545;
+    color: white;
+} /* Đỏ */
+.seat-reserved {
+    background-color: #ffc107;
+    color: black;
+} /* Vàng */
+.seat-outofservice {
+    background-color: #6c757d;
+    color: white;
+} /* Xám */
+
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .center-wrap {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+    nav ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+}
