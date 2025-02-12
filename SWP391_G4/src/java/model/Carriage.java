@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -22,6 +23,18 @@ public class Carriage {
         this.carriageType = carriageType;
         this.trainID = trainID;
         this.capacity = capacity;
+=======
+package model;
+
+public class Carriage {
+    private int carriageID;
+    private String carriageNumber;
+    private String carriageType;
+    private Train train;
+    private int capacity;
+
+    public Carriage() {
+>>>>>>> main
     }
 
     // Getters and Setters
@@ -33,11 +46,19 @@ public class Carriage {
         this.carriageID = carriageID;
     }
 
+<<<<<<< HEAD
     public int getCarriageNumber() {
         return carriageNumber;
     }
 
     public void setCarriageNumber(int carriageNumber) {
+=======
+    public String getCarriageNumber() {
+        return carriageNumber;
+    }
+
+    public void setCarriageNumber(String carriageNumber) {
+>>>>>>> main
         this.carriageNumber = carriageNumber;
     }
 
@@ -49,12 +70,21 @@ public class Carriage {
         this.carriageType = carriageType;
     }
 
+<<<<<<< HEAD
     public int getTrainID() {
         return trainID;
     }
 
     public void setTrainID(int trainID) {
         this.trainID = trainID;
+=======
+    public Train getTrain() {
+        return train;
+    }
+
+    public void setTrain(Train train) {
+        this.train = train;
+>>>>>>> main
     }
 
     public int getCapacity() {
@@ -64,6 +94,7 @@ public class Carriage {
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
+<<<<<<< HEAD
 
     @Override
     public String toString() {
@@ -71,3 +102,6 @@ public class Carriage {
     }
 }
 
+=======
+}
+>>>>>>> main

@@ -18,6 +18,12 @@ public class Booking {
     private String paymentStatus;
     private String bookingStatus;
 
+<<<<<<< HEAD
+=======
+    public Booking() {
+    }
+
+>>>>>>> main
     // Constructor
     public Booking(int bookingID, int userID, Date bookingDate, double totalPrice, String paymentStatus, String bookingStatus) {
         this.bookingID = bookingID;

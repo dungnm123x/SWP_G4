@@ -15,6 +15,12 @@ public class OrderDetail {
     private int quantity;
     private double totalPrice;
 
+<<<<<<< HEAD
+=======
+    public OrderDetail() {
+    }
+
+>>>>>>> main
     // Constructor
     public OrderDetail(int orderDetailID, int orderID, int ticketID, int quantity, double totalPrice) {
         this.orderDetailID = orderDetailID;

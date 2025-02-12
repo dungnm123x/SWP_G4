@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -22,6 +23,21 @@ public class Trip {
         this.routeID = routeID;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
+=======
+package model;
+
+import java.util.Date;
+
+public class Trip {
+    private int tripID;
+    private Train train;
+    private Route route;
+    private Date departureTime;
+    private Date arrivalTime;
+    private String tripStatus;
+
+    public Trip() {
+>>>>>>> main
     }
 
     // Getters and Setters
@@ -33,6 +49,7 @@ public class Trip {
         this.tripID = tripID;
     }
 
+<<<<<<< HEAD
     public int getTrainID() {
         return trainID;
     }
@@ -71,3 +88,45 @@ public class Trip {
     }
 }
 
+=======
+    public Train getTrain() {
+        return train;
+    }
+
+    public void setTrain(Train train) {
+        this.train = train;
+    }
+
+    public Route getRoute() {
+        return route;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
+    }
+
+    public Date getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(Date departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    public Date getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(Date arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public String getTripStatus() {
+        return tripStatus;
+    }
+
+    public void setTripStatus(String tripStatus) {
+        this.tripStatus = tripStatus;
+    }
+}
+>>>>>>> main

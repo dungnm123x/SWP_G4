@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -22,6 +23,18 @@ public class Route {
         this.arrivalStationID = arrivalStationID;
         this.distance = distance;
         this.basePrice = basePrice;
+=======
+
+package model;
+public class Route {
+    private int routeID;
+    private Station departureStation;
+    private Station arrivalStation;
+    private double distance;
+    private double basePrice;
+
+    public Route() {
+>>>>>>> main
     }
 
     // Getters and Setters
@@ -33,6 +46,7 @@ public class Route {
         this.routeID = routeID;
     }
 
+<<<<<<< HEAD
     public int getDepartureStationID() {
         return departureStationID;
     }
@@ -54,6 +68,29 @@ public class Route {
     }
 
     public void setDistance(int distance) {
+=======
+    public Station getDepartureStation() {
+        return departureStation;
+    }
+
+    public void setDepartureStation(Station departureStation) {
+        this.departureStation = departureStation;
+    }
+
+    public Station getArrivalStation() {
+        return arrivalStation;
+    }
+
+    public void setArrivalStation(Station arrivalStation) {
+        this.arrivalStation = arrivalStation;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+>>>>>>> main
         this.distance = distance;
     }
 
@@ -64,6 +101,7 @@ public class Route {
     public void setBasePrice(double basePrice) {
         this.basePrice = basePrice;
     }
+<<<<<<< HEAD
 
     @Override
     public String toString() {
@@ -71,3 +109,6 @@ public class Route {
     }
 }
 
+=======
+}
+>>>>>>> main

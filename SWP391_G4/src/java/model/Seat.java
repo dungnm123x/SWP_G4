@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -22,6 +23,18 @@ public class Seat {
         this.status = status;
         this.seatType = seatType;
         this.carriageID = carriageID;
+=======
+package model;
+
+public class Seat {
+    private int seatID;
+    private String seatNumber;
+    private String status;
+    private String seatType;
+    private Carriage carriage;
+
+    public Seat() {
+>>>>>>> main
     }
 
     // Getters and Setters
@@ -33,11 +46,19 @@ public class Seat {
         this.seatID = seatID;
     }
 
+<<<<<<< HEAD
     public int getSeatNumber() {
         return seatNumber;
     }
 
     public void setSeatNumber(int seatNumber) {
+=======
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+
+    public void setSeatNumber(String seatNumber) {
+>>>>>>> main
         this.seatNumber = seatNumber;
     }
 
@@ -57,6 +78,7 @@ public class Seat {
         this.seatType = seatType;
     }
 
+<<<<<<< HEAD
     public int getCarriageID() {
         return carriageID;
     }
@@ -71,3 +93,13 @@ public class Seat {
     }
 }
 
+=======
+    public Carriage getCarriage() {
+        return carriage;
+    }
+
+    public void setCarriage(Carriage carriage) {
+        this.carriage = carriage;
+    }
+}
+>>>>>>> main

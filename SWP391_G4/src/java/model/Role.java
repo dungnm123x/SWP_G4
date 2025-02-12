@@ -9,10 +9,19 @@ package model;
  * @author dung9
  */
 public class Role {
+<<<<<<< HEAD
 
     private int roleID;
     private String roleName;
 
+=======
+    private int roleID;
+    private String roleName;
+
+    public Role() {
+    }
+
+>>>>>>> main
     // Constructor
     public Role(int roleID, String roleName) {
         this.roleID = roleID;
