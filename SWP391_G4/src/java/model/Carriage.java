@@ -7,6 +7,9 @@ public class Carriage {
     private Train train;
     private int capacity;
 
+    public Carriage() {
+    }
+
     // Getters and Setters
     public int getCarriageID() {
         return carriageID;

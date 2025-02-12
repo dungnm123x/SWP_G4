@@ -10,6 +10,9 @@ public class Trip {
     private Date arrivalTime;
     private String tripStatus;
 
+    public Trip() {
+    }
+
     // Getters and Setters
     public int getTripID() {
         return tripID;

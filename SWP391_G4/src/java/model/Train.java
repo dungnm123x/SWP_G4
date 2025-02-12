@@ -9,6 +9,9 @@ public class Train {
     private int trainID;
     private String trainName;
 
+    public Train() {
+    }
+
     public int getTrainID() {
         return trainID;
     }
