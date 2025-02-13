@@ -16,7 +16,7 @@ public class Train {
         this.trainID = trainID;
         this.trainName = trainName;
     }
-    asasa
+    
 
     public int getTrainID() {
         return trainID;
