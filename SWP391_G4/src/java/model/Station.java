@@ -1,5 +1,7 @@
 package model;
+
 public class Station {
+
     private int stationID;
     private String stationName;
     private String address;
@@ -7,7 +9,12 @@ public class Station {
     public Station() {
     }
 
-    // Getters and Setters
+    public Station(int stationID, String stationName, String address) {
+        this.stationID = stationID;
+        this.stationName = stationName;
+        this.address = address;
+    }
+
     public int getStationID() {
         return stationID;
     }

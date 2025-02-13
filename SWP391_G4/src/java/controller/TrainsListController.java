@@ -22,7 +22,7 @@ public class TrainsListController extends HttpServlet {
         ArrayList<TrainDTO> train = trainDB.getTrains();
 
         request.setAttribute("trains", train);
-        request.getRequestDispatcher("view/train/main.jsp").forward(request, response);
+        request.getRequestDispatcher("view/employee/main.jsp").forward(request, response);
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
