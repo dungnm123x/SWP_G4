@@ -226,12 +226,25 @@ form {
     margin-bottom: 20px;
     margin-top: 20px;
 }
-.edit-btn {
-    background-color: #ffc107;
-    color: black;
-}
+
 
 .delete-btn {
     background-color: #dc3545;
     color: white;
+}
+
+.edit-link {
+    display: inline-block;
+    background-color: #89AAF0;
+    color: white;
+    text-decoration: none;
+     padding: 8px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+}
+
+.edit-link:hover {
+   opacity: 0.8;
 }

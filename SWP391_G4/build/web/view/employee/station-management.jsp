@@ -55,7 +55,7 @@
                         <td>${station.stationName}</td>
                         <td>${station.address}</td>
                         <td>
-                            <button class="edit-btn" onclick="editStation(${station.stationID}, '${station.stationName}', '${station.address}')">Sửa</button>
+                            <a href="editstation?action=edit&stationID=${station.stationID}" class="edit-link">Sửa</a>
                             <button class="delete-btn" onclick="deleteStation(${station.stationID})">Xóa</button>
                         </td>
                     </tr>
@@ -65,12 +65,6 @@
         </div>
 
         <script>
-            function editStation(id, name, address) {
-                document.getElementById("action").value = "edit";
-                document.getElementById("stationID").value = id;
-                document.getElementById("stationName").value = name;
-                document.getElementById("address").value = address;
-            }
 
             function deleteStation(id) {
                 if (confirm("Chắc chưa?")) {
