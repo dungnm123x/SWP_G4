@@ -1,1 +1,12 @@
 /SWP391_G4/nbproject/private/
+SWP391_G4/build/web/WEB-INF/classes/controller/GetCarriageSeatsServlet.class
+SWP391_G4/build/web/WEB-INF/classes/controller/ScheduleServlet.class
+SWP391_G4/build/web/WEB-INF/classes/controller/SearchTicketServlet.class
+SWP391_G4/build/web/WEB-INF/classes/dal/CarriageDAO.class
+SWP391_G4/build/web/WEB-INF/classes/dal/SeatDAO.class
+SWP391_G4/build/web/WEB-INF/classes/dal/StationDAO.class
+SWP391_G4/build/web/WEB-INF/classes/dal/TrainDAO.class
+SWP391_G4/build/web/WEB-INF/classes/dal/TicketDAO.class
+SWP391_G4/build/web/WEB-INF/classes/dal/TripDAO.class
+SWP391_G4/build/web/WEB-INF/classes/dto/RailwayDTO.class
+SWP391_G4/dist/SWP391_G4.war
