@@ -4,8 +4,16 @@
         <servlet-name>listTrainController</servlet-name>
         <servlet-class>controller.TrainsListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>FilterController</servlet-name>
+        <servlet-class>controller.TrainController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/listtrain</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FilterController</servlet-name>
+        <url-pattern>/filter</url-pattern>
     </servlet-mapping>
 </web-app>
