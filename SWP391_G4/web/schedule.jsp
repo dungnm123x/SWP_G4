@@ -25,7 +25,7 @@
                     <div class="center-wrap">
                         <nav>
                             <ul id="menu-main-nav">
-                                <li class="menu-item"><a href="index.jsp">Trang chủ</a></li>
+                                <li class="menu-item"><a href="home.jsp">Trang chủ</a></li>
                                 <li class="menu-item"><a href="searchticket">Tìm Kiếm Vé</a></li>
                             </ul>
                         </nav>
