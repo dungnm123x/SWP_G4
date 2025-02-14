@@ -8,16 +8,68 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DAOAdmin extends DBContext {
+    // Tìm kiếm nhân viên theo Username, FullName, Email hoặc PhoneNumber
 
-    public int getMaxUserId() throws SQLException {
-        String sql = "SELECT MAX(UserID) FROM [User]";
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+    public List<User> searchEmployees(String keyword) throws SQLException {
+        List<User> employees = new ArrayList<>();
+        String query = "SELECT * FROM [User] WHERE RoleID = 3 AND (Username LIKE ? OR FullName LIKE ? OR Email LIKE ? OR PhoneNumber LIKE ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+            stmt.setString(4, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getInt("RoleID")));
+                }
             }
         }
-        return 0; // Nếu bảng rỗng, bắt đầu từ 1
+        return employees;
     }
+
+// Tìm kiếm khách hàng tương tự
+    public List<User> searchCustomers(String keyword) throws SQLException {
+        List<User> customers = new ArrayList<>();
+        String query = "SELECT * FROM [User] WHERE RoleID = 2 AND (Username LIKE ? OR FullName LIKE ? OR Email LIKE ? OR PhoneNumber LIKE ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+            stmt.setString(4, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getInt("RoleID")));
+                }
+            }
+        }
+        return customers;
+    }
+
+// Tìm kiếm tàu theo tên hoặc ID
+    public List<Train> searchTrains(String keyword) throws SQLException {
+        List<Train> trains = new ArrayList<>();
+        String query = "SELECT * FROM Train WHERE TrainID LIKE ? OR TrainName LIKE ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    trains.add(new Train(rs.getInt("TrainID"), rs.getString("TrainName")));
+                }
+            }
+        }
+        return trains;
+    }
+
+    
 
     // View all employees
     public List<User> getAllEmployees() throws SQLException {
@@ -34,21 +86,19 @@ public class DAOAdmin extends DBContext {
 
     // Thêm nhân viên mới
     public boolean insertEmployee(User user) {
-        
-        String insertQuery = "INSERT INTO [User] (UserID, Username, Password, FullName, Email, PhoneNumber, RoleID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        String insertQuery = "INSERT INTO [User] ( Username, Password, FullName, Email, PhoneNumber, RoleID) VALUES ( ?, ?, ?, ?, ?, ?)";
 
         try {
-            
 
             // Chèn dữ liệu nhân viên mới
             try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
-                ps.setInt(1, user.getUserId());  // Gán UserID mới
-                ps.setString(2, user.getUsername());
-                ps.setString(3, user.getPassword()); // Cần mã hóa mật khẩu nếu cần bảo mật
-                ps.setString(4, user.getFullName());
-                ps.setString(5, user.getEmail());
-                ps.setString(6, user.getPhoneNumber());
-                ps.setInt(7, user.getRoleID()); // RoleID = 3 là nhân viên
+                ps.setString(1, user.getUsername());
+                ps.setString(2, user.getPassword()); // Cần mã hóa mật khẩu nếu cần bảo mật
+                ps.setString(3, user.getFullName());
+                ps.setString(4, user.getEmail());
+                ps.setString(5, user.getPhoneNumber());
+                ps.setInt(6, user.getRoleID()); // RoleID = 3 là nhân viên
 
                 return ps.executeUpdate() > 0;
             }

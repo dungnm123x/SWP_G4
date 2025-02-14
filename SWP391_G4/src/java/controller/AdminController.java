@@ -18,33 +18,41 @@ public class AdminController extends HttpServlet {
             throws ServletException, IOException {
         DAOAdmin dao = new DAOAdmin();
         String view = request.getParameter("view");
+        String search = request.getParameter("search");
 
         try {
             if ("addEmployee".equals(view)) {
                 request.getRequestDispatcher("/view/adm/addEmployees.jsp").forward(request, response);
-            } else if ("employees".equals(view)) {
-                List<User> employees = dao.getAllEmployees();
+                return;
+            }
+
+            if ("employees".equals(view)) {
+                List<User> employees = (search == null || search.isEmpty())
+                        ? dao.getAllEmployees()
+                        : dao.searchEmployees(search);
                 request.setAttribute("list", employees);
                 request.setAttribute("type", "employees");
             } else if ("customers".equals(view)) {
-                List<User> customers = dao.getAllCustomers();
+                List<User> customers = (search == null || search.isEmpty())
+                        ? dao.getAllCustomers()
+                        : dao.searchCustomers(search);
                 request.setAttribute("list", customers);
                 request.setAttribute("type", "customers");
             } else if ("trains".equals(view)) {
-                List<Train> trains = dao.getAllTrains();
+                List<Train> trains = (search == null || search.isEmpty())
+                        ? dao.getAllTrains()
+                        : dao.searchTrains(search);
                 request.setAttribute("list", trains);
                 request.setAttribute("type", "trains");
             }
+
             request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
         }
     }
 
-    private int getNextUserId(DAOAdmin dao) throws SQLException {
-        int maxId = dao.getMaxUserId(); // Lấy UserID lớn nhất từ DAO
-        return maxId + 1; // Tăng lên 1
-    }
+    
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -71,10 +79,8 @@ public class AdminController extends HttpServlet {
                 String fullName = request.getParameter("fullName");
                 String email = request.getParameter("email");
                 String phone = request.getParameter("phone");
-                
-                // Không truyền UserID, DB sẽ tự tạo ID mới
-                int newUserId = getNextUserId(dao);
-                User newUser = new User(newUserId,username, password, fullName, email, phone, 3);
+
+                User newUser = new User(Integer.parseInt(request.getParameter("userID")), username, password, fullName, email, phone, 3);
                 boolean success = dao.insertEmployee(newUser);
 
                 if (success) {
