@@ -10,7 +10,9 @@
 
         <div class="container">
             <div class="sidebar">
-                <h2>Group3.5</h2>
+                <div class="logo">
+                    <img src="./img/logo.jpg" alt="RAILWAYVN">
+                </div>
                 <ul>
                     <li><a href="#">Quản lý tàu</a></li>
                     <li><a href="#">Quản lý chuyến</a></li>
