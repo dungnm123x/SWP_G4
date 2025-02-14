@@ -20,6 +20,14 @@
         <servlet-name>Filter</servlet-name>
         <servlet-class>controller.TrainController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StationController</servlet-name>
+        <servlet-class>controller.StationController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditStationController</servlet-name>
+        <servlet-class>controller.EditStationController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/listtrain</url-pattern>
@@ -47,5 +55,13 @@
     <servlet-mapping>
         <servlet-name>AdminController</servlet-name>
         <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StationController</servlet-name>
+        <url-pattern>/station</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditStationController</servlet-name>
+        <url-pattern>/editstation</url-pattern>
     </servlet-mapping>
 </web-app>

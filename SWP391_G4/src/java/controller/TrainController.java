@@ -33,6 +33,6 @@ public class TrainController extends HttpServlet {
     }
 
     request.setAttribute("trains", trains);
-    request.getRequestDispatcher("view/train/main.jsp").forward(request, response);
+    request.getRequestDispatcher("view/employee/main.jsp").forward(request, response);
 }
 }
