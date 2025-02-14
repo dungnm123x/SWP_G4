@@ -1,0 +1,116 @@
+/* navbar.css */
+
+/* Navbar styling */
+#includes-topnav {
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #007bff;
+    padding: 0 20px;
+    height: 70px; /* Height of the navbar */
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Ensure all items are vertically centered */
+}
+
+/* Left side of the navbar - Logo */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.navbar-brand img {
+    height: 65px; /* Set logo height to 65px */
+    width: auto; /* Maintain aspect ratio */
+}
+
+/* Center section of the navbar - Menu items */
+.navbar-nav {
+    display: flex;
+    justify-content: center; /* Center the items */
+    margin-left: 0;
+    padding-left: 0;
+    width: auto;
+    list-style: none; /* Xóa dấu chấm trước các mục */
+}
+
+.navbar-nav .nav-item {
+    margin: 0 20px; /* Space between items */
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ADD8E6 !important;
+    background-color: #0056b3;
+    border-radius: 5px;
+}
+
+/* Right side of the navbar - Login button */
+.navbar-nav .login-btn {
+    margin-left: auto; /* Push login to the right */
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: #007bff; /* Set the background color to match navbar */
+    color: white; /* Set text color to white */
+    border-radius: 5px;
+    border: none; /* Remove border */
+}
+
+/* Ensure the button color does not change when hovering */
+.navbar-nav .login-btn:hover {
+    background-color: #007bff; /* Keep the background color same */
+    color: white; /* Keep text color same */
+}
+
+#content {
+    position: absolute;
+    top: 0;
+    start: 100%;
+    background-color: #dc3545;
+    border-radius: 50%;
+    padding: 5px 10px;
+    color: white;
+    font-size: 14px;
+}
+
+/* Hover style for Hello dropdown */
+.dropdown-toggle::after {
+    content: " ▼"; /* Arrow down icon */
+}
+
+.dropdown-menu {
+    display: none;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block; /* Show dropdown when hovering over Hello */
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #5385B4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #205F9C;
+}
