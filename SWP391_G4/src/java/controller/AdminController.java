@@ -79,8 +79,9 @@ public class AdminController extends HttpServlet {
                 String fullName = request.getParameter("fullName");
                 String email = request.getParameter("email");
                 String phone = request.getParameter("phone");
+                String address = request.getParameter("address");
 
-                User newUser = new User(0, username, password, fullName, email, phone, 3);
+                User newUser = new User(0, username, password, fullName, email, phone,address, 3);
                 boolean success = dao.addEmployee(newUser);
 
                 if (success) {

@@ -34,6 +34,10 @@
                     <label>Số điện thoại</label>
                     <input type="text" name="phone" required placeholder="Nhập số điện thoại">
                 </div>
+                <div class="form-group">
+                    <label>Địa chỉ</label>
+                    <input type="text" name="address" required placeholder="Nhập địa chỉ">
+                </div>
 
                 <div class="button-group">
                     <button type="submit" class="btn-confirm">Thêm Nhân Viên</button>

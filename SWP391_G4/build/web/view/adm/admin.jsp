@@ -12,14 +12,14 @@
         <div class="container">
             <div class="sidebar">
                 <div class="logo">
-                    <img src="./img/Screenshot 2025-02-12 142854.png" alt="RAILWAYVN">
+                    <img src="./img/logo.jpg" alt="RAILWAYVN">
                 </div>
                 <ul class="menu">
-                    <li><a >Dashboard</a></li>
+                    <li><a href="dashboard.jsp">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
                     <li><a href="admin?view=trains">Quản lý chuyến tàu</a></li>
-                    <li><a >Thống kê</a></li>
+                    <li><a href="thongke.jsp">Thống kê</a></li>
                 </ul>
             </div>
 
@@ -27,13 +27,9 @@
                 <div class="header">
                     <h1>Trang Quản Trị Hệ Thống Vé Tàu</h1>
                 </div>
-
-
                 <div class="content">
-
                     <c:choose>
                         <c:when test="${not empty list}">
-
                             <c:if test="${not empty list}">
                                 <div class="search-container">
                                     <form method="get" action="admin">
@@ -101,9 +97,10 @@
                                 </c:if>
                             </c:if>
 
+
+
+
                         </c:when>
-
-
                         <c:otherwise>
                             <p>Chọn chức năng từ menu bên trái để bắt đầu quản lý hệ thống.</p>
                         </c:otherwise>
