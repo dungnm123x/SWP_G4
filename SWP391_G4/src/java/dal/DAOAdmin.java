@@ -15,7 +15,7 @@ public class DAOAdmin extends DBContext {
         String query = "SELECT * FROM [User] WHERE RoleID = 3";
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                employees.add(new User(rs.getInt("UserID"), rs.getString("Username"),rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getInt("RoleID")));
+                employees.add(new User(rs.getInt("UserID"), rs.getString("Username"),rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getString("Addresss"),rs.getInt("RoleID")));
             }
         }
         return employees;
@@ -47,7 +47,7 @@ public class DAOAdmin extends DBContext {
         String query = "SELECT * FROM [User] WHERE RoleID = 2";
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                customers.add(new User(rs.getInt("UserID"), rs.getString("Username"),rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getInt("RoleID")));
+                customers.add(new User(rs.getInt("UserID"), rs.getString("Username"),rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getString("Address"),rs.getInt("RoleID")));
             }
         }
         return customers;
