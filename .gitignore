@@ -13,3 +13,5 @@ SWP391_G4/build/web/WEB-INF/classes/dal/TrainDAO.class
 SWP391_G4/build/web/WEB-INF/classes/dal/TripDAO.class
 SWP391_G4/build/web/WEB-INF/classes/dto/RailwayDTO.class
 /SWP391_G4/dist/
+SWP391_G4/build/web/view/adm/admin.jsp
+SWP391_G4/build/web/view/adm/admin.jsp

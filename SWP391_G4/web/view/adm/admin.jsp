@@ -15,11 +15,11 @@
                     <img src="./img/logo.jpg" alt="RAILWAYVN">
                 </div>
                 <ul class="menu">
-                    <li><a href="dashboard.jsp">Dashboard</a></li>
+                    <li><a href="#">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                    <li><a href="admin?view=trains">Quản lý chuyến tàu</a></li>
-                    <li><a href="thongke.jsp">Thống kê</a></li>
+                    <li><a href="listtrain">Quản lý chuyến tàu</a></li>
+                    <li><a href="#">Thống kê</a></li>
                 </ul>
             </div>
 
