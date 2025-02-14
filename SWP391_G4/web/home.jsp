@@ -10,62 +10,9 @@
     <link rel="icon" href="images/logo-title.png" type="image/x-icon"/>
     <link rel="stylesheet" href="css/home.css">
  <jsp:include page="/navbar.jsp"></jsp:include>
+ <jsp:include page="/searchtickets.jsp"></jsp:include>
 </head>
 <body>
-    <form action="/searchTicket" method="GET">
-    <div class="ticket-search">
-        <div class="search-field">
-            <label for="departureStation">Ga đi</label>
-            <input type="text" id="departureStation" name="departureStation" required />
-        </div>
-        <div class="search-field">
-            <label for="arrivalStation">Ga đến</label>
-            <input type="text" id="arrivalStation" name="arrivalStation" required />
-        </div>
-
-        <!-- Lựa chọn loại vé -->
-        <div class="search-field">
-            <label for="ticketType">Loại vé</label>
-            <select id="ticketType" name="ticketType" required>
-                <option value="one-way">Một chiều</option>
-                <option value="round-trip">Khứ hồi</option>
-            </select>
-        </div>
-
-        <!-- Ngày đi (chỉ hiển thị khi chọn một chiều hoặc khứ hồi) -->
-        <div class="search-field" id="departureDateField">
-            <label for="departureDate">Ngày đi</label>
-            <input type="date" id="departureDate" name="departureDate" required />
-        </div>
-
-        <!-- Ngày về (chỉ hiển thị khi chọn khứ hồi) -->
-        <div class="search-field" id="returnDateField" style="display: none;">
-            <label for="returnDate">Ngày về</label>
-            <input type="date" id="returnDate" name="returnDate" />
-        </div>
-
-        <div class="submit-button">
-            <button type="submit">Tìm kiếm</button>
-        </div>
-    </div>
-</form>
-
-<script>
-    // JavaScript để ẩn/hiện ngày về dựa trên loại vé
-    document.getElementById('ticketType').addEventListener('change', function() {
-        var ticketType = this.value;
-        var returnDateField = document.getElementById('returnDateField');
-        var departureDateField = document.getElementById('departureDateField');
-        
-        if (ticketType === 'round-trip') {
-            returnDateField.style.display = 'block';
-            departureDateField.style.display = 'block';
-        } else {
-            returnDateField.style.display = 'none';
-            departureDateField.style.display = 'block';
-        }
-    });
-</script>
 
     <section class="about">
         <div class="container">
