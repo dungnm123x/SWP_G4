@@ -118,11 +118,11 @@ public class LoginSevlet extends HttpServlet {
             }
 
             if (user.getRoleID() == 1 ) {
-                response.sendRedirect("dashboard");
+                response.sendRedirect("admin");
             } 
             
-           if(user.getRoleID() == 2 ) {
-                response.sendRedirect("dashboard");
+            else if(user.getRoleID() == 2 ) {
+                response.sendRedirect("listtrain");
             }
            else{
                response.sendRedirect("home");
