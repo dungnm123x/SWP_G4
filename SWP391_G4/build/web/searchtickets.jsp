@@ -9,7 +9,18 @@
 
 <!DOCTYPE html>
 <html lang="vi">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tìm Kiếm Vé - Đường Sắt Việt Nam</title>
+
+        <link href="css/stylesearch.css" rel="stylesheet" type="text/css"/>
+        <script src="wp-includes/js/jquery/jquery.js"></script>
+    </head>
+
     <body>
+
+
             <section id="content-container" class="clearfix">
                 <div class="center-wrap tt-relative clearfix">
                     <h2>Tìm kiếm vé</h2>
