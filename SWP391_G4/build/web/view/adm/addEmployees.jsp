@@ -13,7 +13,7 @@
             <h1>Thêm Nhân Viên</h1>
             <form method="post" action="admin">
                 <input type="hidden" name="action" value="addEmployee">
-
+                
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" name="username" required placeholder="Nhập username">

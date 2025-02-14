@@ -85,7 +85,7 @@ public class DAOAdmin extends DBContext {
     // Thêm nhân viên mới
 
     // Thêm nhân viên mới
-    public boolean insertEmployee(User user) {
+    public boolean addEmployee(User user) {
 
         String insertQuery = "INSERT INTO [User] ( Username, Password, FullName, Email, PhoneNumber, RoleID) VALUES ( ?, ?, ?, ?, ?, ?)";
 

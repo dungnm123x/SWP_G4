@@ -80,8 +80,8 @@ public class AdminController extends HttpServlet {
                 String email = request.getParameter("email");
                 String phone = request.getParameter("phone");
 
-                User newUser = new User(Integer.parseInt(request.getParameter("userID")), username, password, fullName, email, phone, 3);
-                boolean success = dao.insertEmployee(newUser);
+                User newUser = new User(0, username, password, fullName, email, phone, 3);
+                boolean success = dao.addEmployee(newUser);
 
                 if (success) {
                     request.getSession().setAttribute("message", "✅ Thêm nhân viên thành công!");
