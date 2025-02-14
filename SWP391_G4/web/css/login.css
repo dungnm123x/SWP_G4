@@ -136,3 +136,40 @@ p {
     width: 90%;
   }
 }
+.account-options {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-forgot {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Adjust the space between the buttons */
+}
+
+.social-login {
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.btn-social {
+    padding: 10px 20px;
+    background-color: #4267B2; /* Facebook color for demo */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 10px;
+}
+
+.btn-social.google {
+    background-color: #DB4437; /* Google color for demo */
+}

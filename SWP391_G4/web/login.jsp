@@ -29,7 +29,7 @@
                     <!-- Hiển thị lỗi nếu có -->
                     <% String error = (String) request.getAttribute("error"); %>
                     <% if (error != null) { %>
-                        <h3 style="color: red; text-align: center;"><%= error %></h3>
+                    <h3 style="color: red; text-align: center;"><%= error %></h3>
                     <% } %>
 
                     <!-- Lấy dữ liệu từ Cookie -->
@@ -87,15 +87,12 @@
 
                     <!-- Phần đăng ký & quên mật khẩu -->
                     <div class="account-options">
-                        <div class="register">
-                            <p>Chưa có tài khoản?</p>
-                            <a href="register" class="btn-secondary">Đăng ký ngay</a>
-                        </div>
-                        <div class="forgot-password">
-                            <p>Quên mật khẩu?</p>
-                            <a href="forgotPassword.jsp" class="btn-secondary">Khôi phục mật khẩu</a>
+                        <div class="register-forgot">
+                            <a href="register" class="btn-secondary">Đăng Kí</a>
+                            <a href="forgotPassword.jsp" class="btn-secondary">Forgetpass</a>
                         </div>
                     </div>
+
 
                 </form>
             </div>
