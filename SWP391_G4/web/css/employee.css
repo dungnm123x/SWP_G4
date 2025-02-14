@@ -15,7 +15,7 @@ body {
 /* Sidebar */
 .sidebar {
     width: 250px;
-    background: #003366;
+    background: #2C3E50;
     color: white;
     padding: 20px;
     height: 100vh;
@@ -49,7 +49,13 @@ body {
 .sidebar ul li:hover {
     background: #00509e;
 }
-
+.logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
 
 /* Container chính */
 .container {
@@ -112,7 +118,7 @@ h1 {
 }
 
 .btn-primary:hover {
-    background: #003366;
+    background: #2C3E50;
 }
 
 .returnbtn {
@@ -132,7 +138,7 @@ h1 {
 }
 
 .returnbtn:hover {
-    background: #003366;
+    background: #2C3E50;
 }
 
 
@@ -153,7 +159,7 @@ th, td {
 }
 
 th {
-    background: #003366;
+    background: #2C3E50;
     color: white;
 }
 
@@ -197,7 +203,7 @@ tr:hover {
     cursor: pointer;
     font-size: 16px;
     width: 100%;
-    margin-top: 420px;
+    margin-top: 300px;
     transition: 0.3s;
 }
 
@@ -247,4 +253,11 @@ form {
 
 .edit-link:hover {
    opacity: 0.8;
+}
+.logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
 }

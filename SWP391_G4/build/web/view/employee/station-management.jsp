@@ -13,7 +13,9 @@
         <div class="container">
             <h1>Danh sách ga tàu</h1>
             <div class="sidebar">
-                <h2>Group3.5</h2>
+                <div class="logo">
+                    <img src="./img/logo.jpg" alt="RAILWAYVN">
+                </div>
                 <ul>
                     <li><a href="#">Quản lý tàu</a></li>
                     <li><a href="listtrain">Quản lý chuyến</a></li>
