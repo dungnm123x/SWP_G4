@@ -23,8 +23,6 @@
 
             <section id="content-container" class="clearfix">
                 <div class="center-wrap tt-relative clearfix">
-                    <h2>Tìm kiếm vé</h2>
-
                     <form method="post" action="schedule">
                         <label for="diemdi">Ga đi:</label>
                         <select name="diemdi" id="diemdi" required>
