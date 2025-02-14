@@ -1,0 +1,146 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Toàn bộ trang */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+/* Bố cục trang */
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+/* Menu */
+.menu {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+}
+
+.menu li {
+    margin-bottom: 10px;
+}
+
+.menu li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.menu li a:hover {
+    background-color: #34495e;
+}
+
+/* Nội dung chính */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    background-color: #3498db;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Bảng */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Header bảng */
+th {
+    background-color: #3498db;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+    border-bottom: 2px solid #2980b9;
+}
+
+/* Ô trong bảng */
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+/* Hàng xen kẽ có màu nền khác */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hiệu ứng hover */
+tr:hover {
+    background-color: #f1f1f1;
+    transition: background 0.3s;
+}
+
+/* Nút Xóa */
+.btn-delete {
+     display: block;  /* Giúp nút chiếm toàn bộ chiều rộng */
+    width: 100%;     /* Đảm bảo nút dài bằng ô */
+    padding: 10px;   /* Tạo khoảng cách để nhìn đẹp hơn */
+    text-align: center; 
+    background-color: red; /* Màu nền đỏ để nổi bật */
+    color: white;    /* Màu chữ trắng */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-delete:hover {
+    background-color: darkred;
+}
+
+/* Căn chỉnh nút trong bảng */
+.action-buttons {
+    text-align: center;
+}

@@ -16,6 +16,10 @@
         <servlet-name>SearchTicketServlet</servlet-name>
         <servlet-class>controller.SearchTicketServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Filter</servlet-name>
+        <servlet-class>controller.TrainController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/listtrain</url-pattern>
@@ -31,5 +35,17 @@
     <servlet-mapping>
         <servlet-name>SearchTicketServlet</servlet-name>
         <url-pattern>/searchticket</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Filter</servlet-name>
+        <url-pattern>/filter</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AdminController</servlet-name>
+        <servlet-class>controller.AdminController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminController</servlet-name>
+        <url-pattern>/admin</url-pattern>
     </servlet-mapping>
 </web-app>

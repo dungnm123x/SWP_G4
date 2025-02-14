@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import dto.TrainDTO;
 import java.sql.*;
+import java.util.List;
 
 public class TrainDBContext extends DBContext<TrainDTO> {
 
@@ -16,33 +17,38 @@ public class TrainDBContext extends DBContext<TrainDTO> {
         ArrayList<TrainDTO> trains = new ArrayList<>();
         PreparedStatement stm = null;
         try {
-            String sql = "SELECT t.TrainID AS id, MIN(t.TrainName) AS tentau, "
-                   + "COUNT(DISTINCT c.CarriageID) AS tongtoa, COUNT(s.SeatID) AS tongghe, "
-                   + "MIN(st2.StationName) AS gadi, MIN(st.StationName) AS gaden, "
-                   + "MIN(tr.DepartureTime) AS xuatphat, MIN(tr.ArrivalTime) AS dennoi, "
-                   + "MIN(r.BasePrice) AS giave "
-                   + "FROM Train t "
-                   + "JOIN Carriage c ON t.TrainID = c.TrainID "
-                   + "JOIN Seat s ON c.CarriageID = s.CarriageID "
-                   + "JOIN Trip tr ON tr.TrainID = t.TrainID "
-                   + "JOIN Route r ON r.RouteID = tr.RouteID "
-                   + "JOIN Station st ON st.StationID = r.ArrivalStationID "
-                   + "JOIN Station st2 ON st2.StationID = r.DepartureStationID "
-                   + "GROUP BY t.TrainID";
-        
+            String sql = "SELECT \n"
+                    + "    t.TrainID AS id,\n"
+                    + "    MIN(t.TrainName) AS tentau,\n"
+                    + "    COUNT(DISTINCT c.CarriageID) AS tongtoa,\n"
+                    + "    COUNT(DISTINCT s.SeatID) AS tongghe,\n"
+                    + "    MIN(st2.StationName) AS gadi,\n"
+                    + "    MIN(st.StationName) AS gaden,\n"
+                    + "    MIN(tr.DepartureTime) AS xuatphat,\n"
+                    + "    MIN(tr.ArrivalTime) AS dennoi,\n"
+                    + "    MIN(r.BasePrice) AS giave\n"
+                    + "FROM Train t\n"
+                    + "JOIN Carriage c ON t.TrainID = c.TrainID\n"
+                    + "JOIN Seat s ON c.CarriageID = s.CarriageID\n"
+                    + "JOIN Trip tr ON tr.TrainID = t.TrainID\n"
+                    + "JOIN Route r ON r.RouteID = tr.RouteID\n"
+                    + "JOIN Station st ON st.StationID = r.ArrivalStationID\n"
+                    + "JOIN Station st2 ON st2.StationID = r.DepartureStationID\n"
+                    + "GROUP BY t.TrainID, tr.TripID;";
+
             stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
 
             while (rs.next()) {
-                TrainDTO train = new TrainDTO( rs.getInt("id"),
-                    rs.getString("tentau"),
-                    rs.getInt("tongtoa"),
-                    rs.getInt("tongghe"),
-                    rs.getString("gadi"),
-                    rs.getString("gaden"),
-                    rs.getDate("xuatphat"),
-                    rs.getDate("dennoi"),
-                    rs.getDouble("giave"));
+                TrainDTO train = new TrainDTO(rs.getInt("id"),
+                        rs.getString("tentau"),
+                        rs.getInt("tongtoa"),
+                        rs.getInt("tongghe"),
+                        rs.getString("gadi"),
+                        rs.getString("gaden"),
+                        rs.getDate("xuatphat"),
+                        rs.getDate("dennoi"),
+                        rs.getDouble("giave"));
                 trains.add(train);
 
             }
@@ -59,6 +65,63 @@ public class TrainDBContext extends DBContext<TrainDTO> {
             } catch (SQLException ex) {
                 Logger.getLogger(TrainDBContext.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+        return trains;
+    }
+
+    public List<TrainDTO> getFilteredTrains(String departStation, String arriveStation, String departureDate) {
+        List<TrainDTO> trains = new ArrayList<>();
+        String sql = "SELECT t.TrainID AS id, MIN(t.TrainName) AS tentau, COUNT(DISTINCT c.CarriageID) AS tongtoa, "
+                + "COUNT(DISTINCT s.SeatID) AS tongghe, MIN(st2.StationName) AS gadi, MIN(st.StationName) AS gaden, "
+                + "MIN(tr.DepartureTime) AS xuatphat, MIN(tr.ArrivalTime) AS dennoi, MIN(r.BasePrice) AS giave "
+                + "FROM Train t "
+                + "JOIN Carriage c ON t.TrainID = c.TrainID "
+                + "JOIN Seat s ON c.CarriageID = s.CarriageID "
+                + "JOIN Trip tr ON tr.TrainID = t.TrainID "
+                + "JOIN Route r ON r.RouteID = tr.RouteID "
+                + "JOIN Station st ON st.StationID = r.ArrivalStationID "
+                + "JOIN Station st2 ON st2.StationID = r.DepartureStationID "
+                + "WHERE 1=1 ";
+
+        if (departStation != null && !departStation.isEmpty()) {
+            sql += "AND st2.StationName LIKE ? ";
+        }
+        if (arriveStation != null && !arriveStation.isEmpty()) {
+            sql += "AND st.StationName LIKE ? ";
+        }
+        if (departureDate != null && !departureDate.isEmpty()) {
+            sql += "AND CONVERT(DATE, tr.DepartureTime) = ? ";
+        }
+        sql += "GROUP BY t.TrainID";
+
+        try (Connection conn = connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            int index = 1;
+            if (departStation != null && !departStation.isEmpty()) {
+                stmt.setString(index++, "%" + departStation + "%");
+            }
+            if (arriveStation != null && !arriveStation.isEmpty()) {
+                stmt.setString(index++, "%" + arriveStation + "%");
+            }
+            if (departureDate != null && !departureDate.isEmpty()) {
+                stmt.setDate(index++, Date.valueOf(departureDate));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                TrainDTO train = new TrainDTO();
+                train.setTrainID(rs.getInt("id"));
+                train.setTrainName(rs.getString("tentau"));
+                train.setTotalCarriages(rs.getInt("tongtoa"));
+                train.setTotalSeats(rs.getInt("tongghe"));
+                train.setDepartureStation(rs.getString("gadi"));
+                train.setArrivalStation(rs.getString("gaden"));
+                train.setDepartureTime(rs.getDate("xuatphat"));
+                train.setArrivalTime(rs.getDate("dennoi"));
+                train.setPrice(rs.getDouble("giave"));
+                trains.add(train);
+            }
+        } catch (SQLException e) {
         }
         return trains;
     }

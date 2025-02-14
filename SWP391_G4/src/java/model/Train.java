@@ -12,6 +12,12 @@ public class Train {
     public Train() {
     }
 
+    public Train(int trainID, String trainName) {
+        this.trainID = trainID;
+        this.trainName = trainName;
+    }
+    
+
     public int getTrainID() {
         return trainID;
     }

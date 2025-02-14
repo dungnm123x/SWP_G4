@@ -9,78 +9,78 @@ package model;
  * @author dung9
  */
 public class User{
-    private int UserId;
-    private String Username;
-    private String Password;
-    private String FullName;
-    private String Email;
-    private String PhoneNumber;
-    private int RoleID;
+    private int userId;
+    private String username;
+    private String password;
+    private String fullName;
+    private String email;
+    private String phoneNumber;
+    private int roleID;
     public User() {
     }
 
-    public User(int UserId, String Username, String Password, String FullName, String Email, String PhoneNumber,int RoleID) {
-        this.UserId = UserId;
-        this.Username = Username;
-        this.Password = Password;
-        this.FullName = FullName;
-        this.Email = Email;
-        this.PhoneNumber = PhoneNumber;
-        this.RoleID = RoleID;
+    public User(int userId, String username, String password, String fullName, String email, String phoneNumber,int roleID) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.roleID = roleID;
     }
 
     public int getUserId() {
-        return UserId;
+        return userId;
     }
 
     public String getUsername() {
-        return Username;
+        return username;
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     public String getFullName() {
-        return FullName;
+        return fullName;
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public String getPhoneNumber() {
-        return PhoneNumber;
+        return phoneNumber;
     }
 
     public int getRoleID() {
-        return RoleID;
+        return roleID;
     }
-    public void setUserId(int UserId) {
-        this.UserId = UserId;
-    }
-
-    public void setUsername(String Username) {
-        this.Username = Username;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public void setPassword(String Password) {
-        this.Password = Password;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setFullName(String FullName) {
-        this.FullName = FullName;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setEmail(String Email) {
-        this.Email = Email;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public void setPhoneNumber(String PhoneNumber) {
-        this.PhoneNumber = PhoneNumber;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setRoleID(int RoleID) {
-        this.RoleID = RoleID;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setRoleID(int roleID) {
+        this.roleID = roleID;
     }
 }

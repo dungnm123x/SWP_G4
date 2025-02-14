@@ -4,177 +4,211 @@
 <html>
     <head>
         <style>
- /* Reset mặc định */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-}
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Arial', sans-serif;
+            }
 
-/* Body nền nhẹ nhàng */
-body {
-    background-color: #f4f7f9;
-    color: #333;
-    display: flex;
-}
+            body {
+                background-color: #f4f7f9;
+                color: #333;
+                display: flex;
+            }
 
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background: #003366;
-    color: white;
-    padding: 20px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    overflow-y: auto;
-}
+            /* Sidebar */
+            .sidebar {
+                width: 250px;
+                background: #003366;
+                color: white;
+                padding: 20px;
+                height: 100vh;
+                position: fixed;
+                left: 0;
+                top: 0;
+                overflow-y: auto;
+            }
 
-.sidebar h2 {
-    text-align: center;
-    font-size: 22px;
-    margin-bottom: 20px;
-}
+            .sidebar h2 {
+                text-align: center;
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
 
-.sidebar ul {
-    list-style: none;
-}
+            .sidebar ul {
+                list-style: none;
+            }
 
-.sidebar ul li {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
+            .sidebar ul li {
+                padding: 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            }
 
-.sidebar ul li a {
-    color: white;
-    text-decoration: none;
-    display: block;
-}
+            .sidebar ul li a {
+                color: white;
+                text-decoration: none;
+                display: block;
+            }
 
-.sidebar ul li:hover {
-    background: #00509e;
-}
+            .sidebar ul li:hover {
+                background: #00509e;
+            }
 
 
-/* Container chính */
-.container {
-    margin-left: 250px;
-    padding: 20px;
-    width: calc(100% - 250px);
-    margin-top: 60px;
-}
+            /* Container chính */
+            .container {
+                margin-left: 250px;
+                padding: 20px;
+                width: calc(100% - 250px);
+                margin-top: 60px;
+            }
 
-/* Tiêu đề */
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
+            h1 {
+                text-align: center;
+                margin-bottom: 20px;
+            }
 
-/* Bộ lọc chuyến tàu */
-.filter-section {
-    background: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
+            .filter-section {
+                background: white;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 10px;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            }
 
-.form-row {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
+            .form-row {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
 
-.form-group {
-    flex: 1;
-    margin: 0 10px;
-}
+            .form-group {
+                flex: 1;
+                margin: 0 10px;
+            }
 
-.form-group label {
-    font-weight: bold;
-    color: #333;
-    display: block;
-    margin-bottom: 5px;
-}
+            .form-group label {
+                font-weight: bold;
+                color: #333;
+                display: block;
+                margin-bottom: 5px;
+            }
 
-.form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
+            .form-control {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
 
-/* Nút lọc */
-.btn-primary {
-    background: #00509e;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s;
-    margin-top: 10px;
-}
+            /* Nút lọc */
+            .btn-primary {
+                background: #00509e;
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: 0.3s;
+                margin-top: 10px;
+            }
 
-.btn-primary:hover {
-    background: #003366;
-}
+            .btn-primary:hover {
+                background: #003366;
+            }
 
-/* Bảng danh sách */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
+            .returnbtn {
+                background: #00509e;
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: 0.3s;
+                margin-top: 10px;
+                margin-left: 330px;
+                display: inline-block;
+                text-decoration: none;
+                text-align: center;
+            }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-}
+            .returnbtn:hover {
+                background: #003366;
+            }
 
-th {
-    background: #003366;
-    color: white;
-}
 
-tr:hover {
-    background: #f1f1f1;
-}
+            /* Bảng danh sách */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
 
-/* Responsive */
-@media screen and (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
+            th, td {
+                padding: 12px;
+                text-align: center;
+                border-bottom: 1px solid #ddd;
+            }
 
-    .navbar {
-        width: 100%;
-        left: 0;
-    }
+            th {
+                background: #003366;
+                color: white;
+            }
 
-    .container {
-        margin-left: 0;
-        width: 100%;
-    }
+            tr:hover {
+                background: #f1f1f1;
+            }
 
-    .form-row {
-        flex-direction: column;
-    }
+            /* Responsive */
+            @media screen and (max-width: 768px) {
+                .sidebar {
+                    width: 100%;
+                    height: auto;
+                    position: relative;
+                }
 
-    .form-group {
-        margin: 10px 0;
-    }
-}
+                .navbar {
+                    width: 100%;
+                    left: 0;
+                }
+
+                .container {
+                    margin-left: 0;
+                    width: 100%;
+                }
+
+                .form-row {
+                    flex-direction: column;
+                }
+
+                .form-group {
+                    margin: 10px 0;
+                }
+            }
+
+            .logout-button {
+                background: #d9534f; /* Màu đỏ nổi bật */
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                width: 100%;
+                margin-top: 450px;
+                transition: 0.3s;
+            }
+
+            .logout-button:hover {
+                background: #c9302c;
+            }
 
         </style>
         <title>Danh sách chuyến tàu</title>
@@ -189,10 +223,11 @@ tr:hover {
                     <li><a href="#">Quản lý chuyến</a></li>
                     <li><a href="#">Quản lý tuyến tàu</a></li>
                 </ul>
+                <button type="submit" class="logout-button">Logout</button>
             </div>
             <h1>Danh sách chuyến tàu</h1>
             <div class="filter-section">
-                <form action="TrainController" method="GET">
+                <form action="filter" method="GET">
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="departStation">Ga Đi</label>
@@ -208,11 +243,17 @@ tr:hover {
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Lọc</button>
+                    <a href="listtrain" class="returnbtn" onclick="resetForm()">Trở về</a>
+                    <script>
+                        function resetForm() {
+                            document.querySelector("form").reset();
+                        }
+                    </script>
                 </form>
             </div>
             <table border="1">
                 <tr>
-                    <th>ID</th>
+                    <th></th>
                     <th>Tên tàu</th>
                     <th>Tổng toa</th>
                     <th>Tổng ghế</th>
@@ -222,11 +263,11 @@ tr:hover {
                     <th>Đến nơi</th>
                     <th>Giá vé</th>
                 </tr>
-
+                <% int stt=1; %>
                 <tr>
                     <c:forEach var="t" items="${trains}">
                     <tr>
-                        <td>${t.trainID}</td>
+                        <td><%= stt++ %></td>
                         <td>${t.trainName}</td>
                         <td>${t.totalCarriages}</td>
                         <td>${t.totalSeats}</td>
