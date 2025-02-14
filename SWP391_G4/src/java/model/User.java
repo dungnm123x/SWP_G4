@@ -8,24 +8,28 @@ package model;
  *
  * @author dung9
  */
-public class User{
+public class User {
+
     private int UserId;
     private String Username;
     private String Password;
     private String FullName;
     private String Email;
     private String PhoneNumber;
+    private String Address;
     private int RoleID;
+
     public User() {
     }
 
-    public User(int UserId, String Username, String Password, String FullName, String Email, String PhoneNumber,int RoleID) {
+    public User(int UserId, String Username, String Password, String FullName, String Email, String PhoneNumber, String Address, int RoleID) {
         this.UserId = UserId;
         this.Username = Username;
         this.Password = Password;
         this.FullName = FullName;
         this.Email = Email;
         this.PhoneNumber = PhoneNumber;
+        this.Address = Address;
         this.RoleID = RoleID;
     }
 
@@ -53,9 +57,14 @@ public class User{
         return PhoneNumber;
     }
 
+    public String getAddress() {
+        return Address;
+    }
+
     public int getRoleID() {
         return RoleID;
     }
+
     public void setUserId(int UserId) {
         this.UserId = UserId;
     }
@@ -78,6 +87,10 @@ public class User{
 
     public void setPhoneNumber(String PhoneNumber) {
         this.PhoneNumber = PhoneNumber;
+    }
+
+    public void setAddress(String Address) {
+        this.Address = Address;
     }
 
     public void setRoleID(int RoleID) {
