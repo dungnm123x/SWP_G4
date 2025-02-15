@@ -46,81 +46,82 @@
 
         <div class="mx-auto mt-10">
 
-<div class="flex">
-    <!-- Sidebar -->
-    <c:set value="${requestScope.userProfile}" var="user"/>
-    <c:set value="${sessionScope.user}" var="account"/>
-    <div class="w-1/4 bg-white p-4 rounded shadow">
-        <div class="flex items-center mb-6">
-            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                <i class="fas fa-user text-gray-400 text-4xl"></i>
-            </div>
-            <div class="ml-4">
-                <div class="font-bold">${account.username}</div>
-            </div>
-        </div>
-        <ul>
-            <li class="mb-4">
-                <a href="updateuser" class="flex items-center text-red-500">
-                    <i class="fas fa-id-card mr-2"></i>
-                    Hồ Sơ
-                </a>
-            </li>
-            <li class="mb-4">
-                <a href="changepassword" class="flex items-center text-gray-700">
-                    <i class="fas fa-lock mr-2"></i>
-                    Đổi Mật Khẩu
-                </a>
-            </li>
-            <li class="mb-4">
-                <a href="home" class="flex items-center text-gray-700">
-                    <i class="fas fa-backward mr-2"></i>
-                    Trở về trang chủ
-                </a>
-            </li>
-        </ul>
-    </div>
+            <div class="flex">
+                <!-- Sidebar -->
+                <c:set value="${requestScope.userProfile}" var="user"/>
+                <c:set value="${sessionScope.user}" var="account"/>
+                <div class="w-1/4 bg-white p-4 rounded shadow">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-gray-400 text-4xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold">${account.username}</div>
+                        </div>
+                    </div>
+                    <ul>
+                        <li class="mb-4">
+                            <a href="updateuser" class="flex items-center text-red-500">
+                                <i class="fas fa-id-card mr-2"></i>
+                                Hồ Sơ
+                            </a>
+                        </li>
+                        <li class="mb-4">
+                            <a href="changepassword" class="flex items-center text-gray-700">
+                                <i class="fas fa-lock mr-2"></i>
+                                Đổi Mật Khẩu
+                            </a>
+                        </li>
+                        <li class="mb-4">
+                            <a href="javascript:history.back();" class="flex items-center text-gray-700">
+                                <i class="fas fa-backward mr-2"></i>
+                                Trở về
+                            </a>
 
-    <!-- Main Content -->
-    <div class="w-3/4 bg-white p-6 rounded shadow ml-6">
-        <h2 class="text-2xl font-bold mb-4">Hồ Sơ Của Tôi</h2>
-        <p class="text-gray-600 mb-6">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+                        </li>
+                    </ul>
+                </div>
 
-        <form action="updateuser" method="post">
-            <div class="mb-4">
-                <label class="block text-gray-700">Tên đăng nhập</label>
-                <input type="text" readonly value="${account.username}" class="w-full p-2 border border-gray-300 rounded" disabled>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Họ và Tên</label>
-                <input type="text" value="${user.fullName}" class="w-full p-2 border border-gray-300 rounded" required name="fullName">
-                <h4 style="color: red">${requestScope.err1}</h4>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Địa chỉ</label>
-                <input type="text" value="${user.address}" class="w-full p-2 border border-gray-300 rounded" required name="address">
-                <h4 style="color: red">${requestScope.err1}</h4>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Email</label>
-                <div class="flex items-center">
-                    <input type="email" value="${account.email}" class="w-full p-2 border border-gray-300 rounded" disabled name="email">                    
+                <!-- Main Content -->
+                <div class="w-3/4 bg-white p-6 rounded shadow ml-6">
+                    <h2 class="text-2xl font-bold mb-4">Hồ Sơ Của Tôi</h2>
+                    <p class="text-gray-600 mb-6">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+
+                    <form action="updateuser" method="post">
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Tên đăng nhập</label>
+                            <input type="text" readonly value="${account.username}" class="w-full p-2 border border-gray-300 rounded" disabled>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Họ và Tên</label>
+                            <input type="text" value="${user.fullName}" class="w-full p-2 border border-gray-300 rounded" required name="fullName">
+                            <h4 style="color: red">${requestScope.err1}</h4>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Địa chỉ</label>
+                            <input type="text" value="${user.address}" class="w-full p-2 border border-gray-300 rounded" required name="address">
+                            <h4 style="color: red">${requestScope.err1}</h4>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Email</label>
+                            <div class="flex items-center">
+                                <input type="email" value="${account.email}" class="w-full p-2 border border-gray-300 rounded" disabled name="email">                    
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Số điện thoại</label>
+                            <div class="flex items-center">
+                                <input type="text" value="${user.phoneNumber}" class="w-full p-2 border border-gray-300 rounded" name="phone" required>
+                            </div>
+                            <h4 style="color: red">${requestScope.err}</h4>
+                        </div>
+                        <br>
+                        <button class="bg-red-500 text-white px-4 py-2 rounded" type="submit">Lưu</button>
+                        <h3 style="color: #00c4a7;">${requestScope.mess}</h3>
+                    </form>
+
                 </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Số điện thoại</label>
-                <div class="flex items-center">
-                    <input type="text" value="${user.phoneNumber}" class="w-full p-2 border border-gray-300 rounded" name="phone" required>
-                </div>
-                <h4 style="color: red">${requestScope.err}</h4>
-            </div>
-            <br>
-            <button class="bg-red-500 text-white px-4 py-2 rounded" type="submit">Lưu</button>
-            <h3 style="color: #00c4a7;">${requestScope.mess}</h3>
-        </form>
-
-            </div>
-        </div>
     </body>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

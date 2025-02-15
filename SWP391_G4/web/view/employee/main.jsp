@@ -18,8 +18,12 @@
                     <li><a href="#">Quản lý chuyến</a></li>
                     <li><a href="#">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
+                    <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
-                <button type="submit" class="logout-button">Logout</button>
+                <form action="logout" method="GET">
+                   <button type="submit" class="logout-button">Logout</button>
+                </form>
+                
             </div>
             <h1>Danh sách chuyến tàu</h1>
             <div class="filter-section">
