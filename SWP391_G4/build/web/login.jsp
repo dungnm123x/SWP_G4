@@ -1,113 +1,89 @@
+<%@page import="java.util.*"%>
+<%@page import="molder.*" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="jakarta.servlet.http.Cookie" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Train Ticket Shop - Đăng nhập</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Train Login</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <input type="hidden" id="msg" value="<%= request.getAttribute("msg") != null ? request.getAttribute("msg") : "" %>">
 
-        <!-- Custom styles -->
-        <link rel="stylesheet" href="css/login.css">
-        <script type="text/javascript" src="js/validation.js"></script>
-
-        <!-- Font Awesome kit -->
-        <script src="https://kit.fontawesome.com/a81368914c.js"></script>
-
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-    </head>
-
-    <body style="background-image: url('img/Login.jpg');">
-        <div class="container">
-            <div class="login-container">
-                <form action="login" method="post">
-                    <h2>Đăng Nhập</h2>
-                    <p>Chào Mừng Trở Lại!</p>
-
-                    <!-- Hiển thị lỗi nếu có -->
-                    <% String error = (String) request.getAttribute("error"); %>
-                    <% if (error != null) { %>
-                    <h3 style="color: red; text-align: center;"><%= error %></h3>
-                    <% } %>
-
-                    <!-- Lấy dữ liệu từ Cookie -->
-                    <%
-                        String savedUsername = "";
-                        String savedPassword = "";
-                        boolean rememberMeChecked = false;
-                        
-                        Cookie[] cookies = request.getCookies();
-                        if (cookies != null) {
-                            for (Cookie cookie : cookies) {
-                                if (cookie.getName().equals("cuser")) {
-                                    savedUsername = cookie.getValue();
-                                }
-                                if (cookie.getName().equals("cpass")) {
-                                    savedPassword = cookie.getValue();
-                                }
-                                if (cookie.getName().equals("crem") && "on".equals(cookie.getValue())) {
-                                    rememberMeChecked = true;
-                                }
-                            }
-                        }
-                    %>
-
-                    <!-- Ô nhập Username -->
-                    <div class="input-div one">
-                        <div class="i">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div>
-                            <h5>Tên đăng nhập</h5>
-                            <input class="input" type="text" name="username" value="<%= savedUsername %>" required oninput="validateForm()">
-                        </div>
+    <div class="main">
+        <section class="sign-in">
+            <div class="container">
+                <div class="signin-content">
+                    <div class="signin-image">
+                        <figure><img src="img/Login.jpg" alt="sign up image"></figure>
+                        <a href="register.jsp" class="signup-image-link">Create an account</a>
+                        <a href="forgotPassword.jsp" class="signup-image-link">Forgot password</a>
                     </div>
+                    <div class="signin-form">
+                        <h2 class="form-title">Sign in</h2>
 
-                    <!-- Ô nhập Password -->
-                    <div class="input-div two">
-                        <div class="i">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div>
-                            <h5>Mật khẩu</h5>
-                            <input class="input" type="password" name="password" value="<%= savedPassword %>" required oninput="validateForm()">
-                        </div>
+                        <!-- Hiển thị lỗi chung nếu có -->
+                        <% if (request.getAttribute("loginError") != null) { %>
+                            <p class="error-message"><%= request.getAttribute("loginError") %></p>
+                        <% } %>
+
+                        <form action="login" method="post" class="register-form" id="login-form">
+                            <div class="form-group">
+                                <label for="username"><i class="zmdi zmdi-email"></i></label>
+                                <input type="text" name="username" id="username" placeholder="UserName"
+                                       required oninput="clearError(this)"/>
+                            </div>
+
+                            <div class="form-group password-container">
+                                <label for="password"><i class="zmdi zmdi-lock"></i></label>
+                                <input type="password" name="password" id="password" placeholder="Password"
+                                       required oninput="clearError(this)"/>
+                                <span id="togglePassword">👁️</span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="checkbox" id="remember_me" name="remember_me" class="agree-term"
+                                       <%= "on".equals(request.getParameter("remember_me")) ? "checked" : "" %> />
+                                <label for="remember_me" class="label-agree-term"><span><span></span></span>Remember me</label>
+                            </div>
+
+                            <div class="form-group form-button">
+                                <input type="submit" name="signin" id="signin" class="form-submit" value="Login"> 
+                            </div>
+                        </form>
                     </div>
-
-                    <!-- Ô "Nhớ mật khẩu" -->
-                    <div class="remember-me">
-                        <input type="checkbox" name="remember" <%= rememberMeChecked ? "checked" : "" %>> 
-                        <label>Nhớ mật khẩu</label>
-                    </div>
-
-                    <!-- Nút Đăng nhập -->
-                    <input type="submit" class="btn" name="submit" value="Đăng Nhập">
-
-                    <!-- Phần đăng ký & quên mật khẩu -->
-                    <div class="account-options">
-                        <div class="register-forgot">
-                            <a href="register" class="btn-secondary">Đăng Kí</a>
-                            <a href="forgotPassword.jsp" class="btn-secondary">Forgetpass</a>
-                        </div>
-                    </div>
-
-
-                </form>
+                </div>
             </div>
-        </div>
+        </section>
+    </div>
 
-        <script type="text/javascript" src="js/login.js"></script>
-        <script type="text/javascript">
-            // Giữ trạng thái placeholder nếu input có giá trị
-            window.addEventListener('load', function () {
-                document.querySelectorAll('.input').forEach(function (input) {
-                    if (input.value.trim() !== '') {
-                        input.focus();
-                    }
-                });
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordInput = document.getElementById("password");
+            const togglePassword = document.getElementById("togglePassword");
+
+            togglePassword.addEventListener("click", function() {
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    togglePassword.innerHTML = "🙈";
+                } else {
+                    passwordInput.type = "password";
+                    togglePassword.innerHTML = "👁️";
+                }
             });
-        </script>
-    </body>
+
+            var msg = document.getElementById("msg").value;
+            if (msg === "Email or password incorrect!") {
+                alert("Wrong Email or Password");
+            }
+        });
+
+        function clearError(input) {
+            input.classList.remove("input-error");
+        }
+    </script>
+</body>
 </html>
