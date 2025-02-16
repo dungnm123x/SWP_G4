@@ -18,7 +18,7 @@
                     <li><a href="#">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                    <li><a href="listtrain">Quản lý chuyến tàu</a></li>
+                    <li><a href="trip">Quản lý chuyến tàu</a></li>
                     <li><a href="#">Thống kê</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
