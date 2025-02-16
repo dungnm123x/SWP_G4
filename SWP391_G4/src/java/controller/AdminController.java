@@ -77,19 +77,7 @@ public class AdminController extends HttpServlet {
         DAOAdmin dao = new DAOAdmin();
         String action = request.getParameter("action");
 
-        if ("delete".equals(action)) {
-            String type = request.getParameter("type");
-            int id = Integer.parseInt(request.getParameter("id"));
-
-            if ("employees".equals(type)) {
-                dao.deleteEmployee(id);
-            } else if ("customers".equals(type)) {
-                dao.deleteCustomer(id);
-            } else if ("trains".equals(type)) {
-                dao.deleteTrain(id);
-            }
-            response.sendRedirect("admin?view=" + type);
-        } else if ("addEmployee".equals(action)) {
+        if ("addEmployee".equals(action)) {
             try {
                 String username = request.getParameter("username");
                 String password = request.getParameter("password"); // Cần hash mật khẩu
@@ -98,7 +86,7 @@ public class AdminController extends HttpServlet {
                 String phone = request.getParameter("phone");
                 String address = request.getParameter("address");
 
-                User newUser = new User(0, username, password, fullName, email, phone, address, 3);
+                User newUser = new User(0, username, password, fullName, email, phone, address, 3, true);
                 boolean success = dao.addEmployee(newUser);
 
                 if (success) {
@@ -123,7 +111,7 @@ public class AdminController extends HttpServlet {
                 String phone = request.getParameter("phone");
                 String address = request.getParameter("address");
 
-                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2)); // Tạo đối tượng User mới
+                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2),true); // Tạo đối tượng User mới
 
                 boolean success = dao.updateUser(updatedUser); // Gọi hàm update trong DAO
 

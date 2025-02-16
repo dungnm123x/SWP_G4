@@ -23,6 +23,7 @@ public class DAOAdmin extends DBContext {
         }
         return false;
     }
+
     // Tìm kiếm nhân viên theo Username, FullName, Email hoặc PhoneNumber
     public List<User> searchEmployees(String keyword) throws SQLException {
         List<User> employees = new ArrayList<>();
@@ -37,7 +38,7 @@ public class DAOAdmin extends DBContext {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
-                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status")));
                 }
             }
         }
@@ -58,7 +59,7 @@ public class DAOAdmin extends DBContext {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
-                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status")));
                 }
             }
         }
@@ -89,7 +90,7 @@ public class DAOAdmin extends DBContext {
         String query = "SELECT * FROM [User] WHERE RoleID = 3";
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
+                employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status")));
             }
         }
         return employees;
@@ -123,21 +124,25 @@ public class DAOAdmin extends DBContext {
         return false;
     }
 
-    // Delete an employee
-    public boolean deleteEmployee(int userId) {
-        try {
-            // Xóa tất cả booking liên quan trước
-            String sql1 = "DELETE FROM Booking WHERE UserID = ?";
-            PreparedStatement ps1 = connection.prepareStatement(sql1);
-            ps1.setInt(1, userId);
-            ps1.executeUpdate();
+    // Vô hiệu hóa nhân viên (cập nhật status = 0 thay vì xóa)
+    public boolean disableEmployee(int userId) {
+        String query = "UPDATE [User] SET Status = 0 WHERE UserID = ? AND RoleID = 3";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-            // Xóa nhân viên sau khi đã xóa booking
-            String sql2 = "DELETE FROM User WHERE UserID = ?";
-            PreparedStatement ps2 = connection.prepareStatement(sql2);
-            ps2.setInt(1, userId);
-            return ps2.executeUpdate() > 0;
-        } catch (Exception e) {
+    // Kích hoạt lại nhân viên
+    public boolean restoreEmployee(int userId) {
+        String query = "UPDATE [User] SET Status = 1 WHERE UserID = ? AND RoleID = 3";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
@@ -149,27 +154,30 @@ public class DAOAdmin extends DBContext {
         String query = "SELECT * FROM [User] WHERE RoleID = 2";
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
+                customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status")));
             }
         }
         return customers;
     }
 
-    // Delete a customer
-    public boolean deleteCustomer(int userId) {
-        try {
-            // Xóa tất cả booking liên quan trước
-            String sql1 = "DELETE FROM Booking WHERE UserID = ?";
-            PreparedStatement ps1 = connection.prepareStatement(sql1);
-            ps1.setInt(1, userId);
-            ps1.executeUpdate();
+    // Tương tự cho khách hàng
+    public boolean disableCustomer(int userId) {
+        String query = "UPDATE [User] SET Status = 0 WHERE UserID = ? AND RoleID = 2";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-            // Xóa khách hàng sau khi đã xóa booking
-            String sql2 = "DELETE FROM User WHERE UserID = ?";
-            PreparedStatement ps2 = connection.prepareStatement(sql2);
-            ps2.setInt(1, userId);
-            return ps2.executeUpdate() > 0;
-        } catch (Exception e) {
+    public boolean restoreCustomer(int userId) {
+        String query = "UPDATE [User] SET Status = 1 WHERE UserID = ? AND RoleID = 2";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
@@ -217,7 +225,7 @@ public class DAOAdmin extends DBContext {
                 if (rs.next()) {
                     user = new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
                             rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),
-                            rs.getString("Address"), rs.getInt("RoleID"));
+                            rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status"));
                 }
             }
         }
@@ -234,7 +242,7 @@ public class DAOAdmin extends DBContext {
                 if (rs.next()) {
                     user = new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
                             rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),
-                            rs.getString("Address"), rs.getInt("RoleID"));
+                            rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status"));
                 }
             }
         }
@@ -253,7 +261,7 @@ public class DAOAdmin extends DBContext {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
-                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"));
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status"));
                 }
             }
         }

@@ -1,14 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author dung9
- */
-public class User{
+public class User {
     private int userId;
     private String username;
     private String password;
@@ -17,10 +9,12 @@ public class User{
     private String phoneNumber;
     private String address;
     private int roleID;
+    private boolean status; // Thêm thuộc tính status
+
     public User() {
     }
 
-    public User(int userId, String username, String password, String fullName, String email, String phoneNumber, String address, int roleID) {
+    public User(int userId, String username, String password, String fullName, String email, String phoneNumber, String address, int roleID, boolean status) {
         this.userId = userId;
         this.username = username;
         this.password = password;
@@ -29,6 +23,7 @@ public class User{
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.roleID = roleID;
+        this.status = status;
     }
 
     public int getUserId() {
@@ -95,5 +90,11 @@ public class User{
         this.roleID = roleID;
     }
 
-    
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 }
