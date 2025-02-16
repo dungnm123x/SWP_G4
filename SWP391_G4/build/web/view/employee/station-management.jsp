@@ -21,8 +21,11 @@
                     <li><a href="listtrain">Quản lý chuyến</a></li>
                     <li><a href="#">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
+                    <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
-                <button type="submit" class="logout-button">Logout</button>
+                <form action="logout" method="GET">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
             </div>
 
             <!-- Form Thêm/Sửa Ga -->
@@ -39,7 +42,7 @@
                 <button type="submit">Lưu</button>
                 <button type="button" id="resetBtn">Hủy</button>
             </form>
-            
+
             <table>
                 <thead>
                     <tr>
@@ -50,18 +53,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
-                <c:forEach var="station" items="${stations}">
-                    <tr>
-                        <td>${station.stationID}</td>
-                        <td>${station.stationName}</td>
-                        <td>${station.address}</td>
-                        <td>
-                            <a href="editstation?action=edit&stationID=${station.stationID}" class="edit-link">Sửa</a>
-                            <button class="delete-btn" onclick="deleteStation(${station.stationID})">Xóa</button>
-                        </td>
-                    </tr>
-                </c:forEach>
+
+                    <c:forEach var="station" items="${stations}">
+                        <tr>
+                            <td>${station.stationID}</td>
+                            <td>${station.stationName}</td>
+                            <td>${station.address}</td>
+                            <td>
+                                <a href="editstation?action=edit&stationID=${station.stationID}" class="edit-link">Sửa</a>
+                                <button class="delete-btn" onclick="deleteStation(${station.stationID})">Xóa</button>
+                            </td>
+                        </tr>
+                    </c:forEach>
                 </tbody>
             </table>
         </div>

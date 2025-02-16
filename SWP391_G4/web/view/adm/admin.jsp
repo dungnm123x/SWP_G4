@@ -5,14 +5,14 @@
     <head>
         <meta charset="UTF-8">
         <title>Admin Quản Lý Vé Tàu</title>
-        <link rel="stylesheet" href="./css/admin/admin.css">
+        <link rel="stylesheet" href="css/employee.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     </head>
     <body>
         <div class="container">
             <div class="sidebar">
                 <div class="logo">
-                    <img src="./img/logo.jpg" alt="RAILWAYVN">
+                    <img src="./img/logo.jpg" alt="trainpicture">
                 </div>
                 <ul class="menu">
                     <li><a href="#">Dashboard</a></li>
@@ -20,8 +20,13 @@
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
                     <li><a href="listtrain">Quản lý chuyến tàu</a></li>
                     <li><a href="#">Thống kê</a></li>
+                    <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
+                <form action="logout" method="GET">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
             </div>
+
 
             <div class="main-content">
                 <div class="header">
