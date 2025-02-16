@@ -27,7 +27,7 @@
             <!-- Nếu người dùng đã đăng nhập, hiển thị tên và nút Đăng xuất -->
             <div class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="updateuser"><i class="fas fa-user"></i> Hello, ${sessionScope.user.username}</a>
+                    <a class="nav-link" href="updateuser"><i class="fas fa-user"></i> Hello, ${sessionScope.user.fullName}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
