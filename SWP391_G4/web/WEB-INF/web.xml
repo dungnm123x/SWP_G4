@@ -34,7 +34,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
-        <url-pattern>/listtrain</url-pattern>
+        <url-pattern>/trip</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>GetCarriageSeatsServlet</servlet-name>

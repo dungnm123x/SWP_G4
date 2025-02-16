@@ -34,6 +34,7 @@ CREATE TABLE [User] (
     PhoneNumber NVARCHAR(20) UNIQUE,
 	Address NVARCHAR(255) NULL,
     RoleID INT,
+	Status bit,
     FOREIGN KEY (RoleID) REFERENCES Role(RoleID),  
 );
 

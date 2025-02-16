@@ -18,7 +18,7 @@
                 </div>
                 <ul>
                     <li><a href="#">Quản lý tàu</a></li>
-                    <li><a href="listtrain">Quản lý chuyến</a></li>
+                    <li><a href="trip">Quản lý chuyến</a></li>
                     <li><a href="route">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>

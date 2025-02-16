@@ -118,8 +118,10 @@ public class LoginSevlet extends HttpServlet {
             clearCookies(response);
         }
 
-        if (user.getRoleID() == 1 || user.getRoleID() == 2) {
-            response.sendRedirect("dashboard");
+        if (user.getRoleID() == 2) {
+            response.sendRedirect("trip");
+        } else if (user.getRoleID() == 1) {
+            response.sendRedirect("admin");
         } else {
             response.sendRedirect("home");
         }
