@@ -583,3 +583,21 @@ label.valid:after {
     border: 2px solid red;
     background-color: #ffe6e6;
 }
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center; /* Giúp căn chỉnh icon theo chiều dọc */
+}
+
+.password-container input {
+    flex: 1; /* Đảm bảo input chiếm toàn bộ không gian trừ phần icon */
+    padding-right: 40px; /* Chừa khoảng trống bên phải để tránh icon đè lên text */
+}
+
+#togglePassword {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #222;
+}
