@@ -11,19 +11,19 @@
         <div class="container">
             <div class="sidebar">
                 <div class="logo">
-                    <img src="./img/logo.jpg" alt="RAILWAYVN">
+                    <img src="./img/logo.jpg" alt="avatar">
                 </div>
                 <ul>
                     <li><a href="#">Quản lý tàu</a></li>
                     <li><a href="#">Quản lý chuyến</a></li>
-                    <li><a href="#">Quản lý tuyến tàu</a></li>
+                    <li><a href="route">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
                 <form action="logout" method="GET">
-                   <button type="submit" class="logout-button">Logout</button>
+                    <button type="submit" class="logout-button">Logout</button>
                 </form>
-                
+
             </div>
             <h1>Danh sách chuyến tàu</h1>
             <div class="filter-section">
@@ -81,5 +81,6 @@
                 </tr>
 
             </table>
+        </div>
     </body>
 </html>

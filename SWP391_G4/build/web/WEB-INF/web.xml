@@ -28,6 +28,10 @@
         <servlet-name>EditStationController</servlet-name>
         <servlet-class>controller.EditStationController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RouteController</servlet-name>
+        <servlet-class>controller.RouteController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/listtrain</url-pattern>
@@ -84,7 +88,6 @@
         <servlet-name>UpdateProfile</servlet-name>
         <servlet-class>controller.UpdateProfile</servlet-class>
     </servlet>
-   
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -104,5 +107,9 @@
     <servlet-mapping>
         <servlet-name>UpdateProfile</servlet-name>
         <url-pattern>/updateuser</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RouteController</servlet-name>
+        <url-pattern>/route</url-pattern>
     </servlet-mapping>
 </web-app>

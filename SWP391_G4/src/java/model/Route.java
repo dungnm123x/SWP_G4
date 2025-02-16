@@ -10,6 +10,14 @@ public class Route {
     public Route() {
     }
 
+    public Route(int routeID, Station departureStation, Station arrivalStation, double distance, double basePrice) {
+        this.routeID = routeID;
+        this.departureStation = departureStation;
+        this.arrivalStation = arrivalStation;
+        this.distance = distance;
+        this.basePrice = basePrice;
+    }
+
     // Getters and Setters
     public int getRouteID() {
         return routeID;
