@@ -146,22 +146,34 @@ tr:hover {
 }
 .add-button-container {
     text-align: center;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .btn-add {
-    display: inline-block;
-    background-color: #2ecc71;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Tạo khoảng cách giữa icon và text */
+    background: linear-gradient(135deg, #2ecc71, #27ae60); /* Hiệu ứng gradient */
     color: white;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 30px; /* Làm tròn nút */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bóng đổ */
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-add i {
+    font-size: 20px;
 }
 
 .btn-add:hover {
-    background-color: #27ae60;
+    background: linear-gradient(135deg, #27ae60, #219150);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px); /* Hiệu ứng nhấn */
 }
+
 .search-container {
     display: flex;
     justify-content: flex-end;
