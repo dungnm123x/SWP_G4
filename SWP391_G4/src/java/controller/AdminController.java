@@ -113,6 +113,31 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("message", "⚠️ Lỗi hệ thống: " + e.getMessage());
                 request.getRequestDispatcher("view/adm/addEmployees.jsp").forward(request, response);
             }
+        } else if ("save".equals(action)) { // Lưu thông tin đã chỉnh sửa
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String type = request.getParameter("type");
+                String username = request.getParameter("username");
+                String fullName = request.getParameter("fullName");
+                String email = request.getParameter("email");
+                String phone = request.getParameter("phone");
+                String address = request.getParameter("address");
+
+                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2)); // Tạo đối tượng User mới
+
+                boolean success = dao.updateUser(updatedUser); // Gọi hàm update trong DAO
+
+                if (success) {
+                    request.getSession().setAttribute("message", "✅ Cập nhật thành công!");
+                } else {
+                    request.setAttribute("message", "❌ Cập nhật thất bại! Vui lòng thử lại.");
+                }
+                response.sendRedirect("admin?view=" + type); // Quay lại trang danh sách
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("message", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                response.sendRedirect("admin?view=" + request.getParameter("type"));
+            }
         }
 
     }

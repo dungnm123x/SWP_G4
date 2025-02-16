@@ -1,0 +1,120 @@
+/* userDetails.css */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container { /* Style cho container chính */
+    width: 600px; /* Điều chỉnh độ rộng container */
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.header h1 { /* Style cho tiêu đề */
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center; /* Căn giữa tiêu đề */
+}
+
+.content { /* Style cho phần nội dung */
+    text-align: left; /* Căn trái nội dung */
+}
+
+.view-form p { /* Style cho các đoạn văn bản hiển thị thông tin */
+    margin-bottom: 10px;
+}
+
+.view-form strong { /* Style cho nhãn thông tin (ví dụ: "Username:") */
+    font-weight: 500;
+    color: #555;
+    margin-right: 5px;
+}
+
+.edit-form .mb-3 { /* Style cho các nhóm form trong form chỉnh sửa */
+    margin-bottom: 15px;
+}
+
+.edit-form label { /* Style cho label trong form chỉnh sửa */
+    font-weight: 500;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="email"],
+.edit-form input[type="tel"] { /* Style cho input trong form chỉnh sửa */
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box; /* Để padding không làm tăng độ rộng của input */
+}
+
+.edit-form input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #80bdff; /* Màu border khi focus */
+}
+
+.btn { /* Style chung cho các nút */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-right: 10px; /* Khoảng cách giữa các nút */
+}
+
+.btn-primary { /* Style cho nút "Chỉnh sửa" */
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.btn-secondary { /* Style cho nút "Trở lại" và "Hủy" */
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-success { /* Style cho nút "Lưu" */
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+
+/* Hiệu ứng fade-in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

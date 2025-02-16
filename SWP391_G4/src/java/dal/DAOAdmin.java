@@ -8,8 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DAOAdmin extends DBContext {
-    // Tìm kiếm nhân viên theo Username, FullName, Email hoặc PhoneNumber
 
+    //chỉnh sửa account 
+    public boolean updateUser(User user) {
+        String updateQuery = "UPDATE [User] SET FullName = ?, PhoneNumber = ?, Address = ? WHERE UserID = ?"; // Loại bỏ Username và Email
+        try (PreparedStatement ps = connection.prepareStatement(updateQuery)) {
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getPhoneNumber());
+            ps.setString(3, user.getAddress());
+            ps.setInt(4, user.getUserId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // Tìm kiếm nhân viên theo Username, FullName, Email hoặc PhoneNumber
     public List<User> searchEmployees(String keyword) throws SQLException {
         List<User> employees = new ArrayList<>();
         String query = "SELECT * FROM [User] WHERE RoleID = 3 AND (Username LIKE ? OR FullName LIKE ? OR Email LIKE ? OR PhoneNumber LIKE ?)";
