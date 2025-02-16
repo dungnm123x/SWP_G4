@@ -51,7 +51,8 @@ public class UserDAO extends DBContext{
                 rs.getString("Email"),
                 rs.getString("PhoneNumber"),
                 rs.getString("address"),
-                rs.getInt("RoleID")
+                rs.getInt("RoleID"),
+                rs.getBoolean("Status")
         );
     }
 
@@ -100,7 +101,8 @@ public class UserDAO extends DBContext{
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
                         rs.getString("Address"),
-                        rs.getInt("RoleID")
+                        rs.getInt("RoleID"),
+                        rs.getBoolean("Status")
 
                 );
             }
@@ -180,7 +182,8 @@ public class UserDAO extends DBContext{
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
                         rs.getString("Address"),
-                        rs.getInt("RoleID")
+                        rs.getInt("RoleID"),
+                        rs.getBoolean("Status")
 
                 );
             }
@@ -234,7 +237,8 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
                         rs.getString("Address"),
-                        rs.getInt("RoleID")
+                        rs.getInt("RoleID"),
+                        rs.getBoolean("Status")
 
                 );
             }
