@@ -3,116 +3,125 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-        
-        <!-- Custom styles-path -->
-        <link rel="stylesheet" href="css/register.css">
+        <title>Register</title>
+        <!-- Custom styles -->
+        <link rel="stylesheet" href="css/login.css">
+        <link rel="icon" href="images/cash-register.gif" type="images/x-icon"/>
 
-        <!-- Font Awesome kit script -->
+        <!-- Font Awesome & Google Fonts -->
         <script src="https://kit.fontawesome.com/a81368914c.js"></script>
-
-        <!-- Google Fonts Open Sans-->
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     </head>
+        <input type="hidden" id="status" value="<%= request.getAttribute("status")%>">
 
-    <body style="background-image: url('img/login.jpg'); background-size: cover;">
+        <div class="main">
+            <section class="signup">
+                <div class="container">
+                    <div class="signup-content">
+                        <div class="signup-form">
+                            <h2 class="form-title">Sign up</h2>
+                            <form action="register" method="POST" class="register-form" id="register-form" onsubmit="return onSubmitForm(event)">
+                                <div class="form-group">
+                                    <label for="username"><i class="fas fa-user"></i></label>
+                                    <input type="text" name="username" id="username" placeholder="UserName"
+                                           value="${requestScope.username}" class="${requestScope.usernameError != null ? 'input-error' : ''}"
+                                           required oninput="clearError(this)"/>
+                                    <p class="error-message">${requestScope.usernameError}</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email"><i class="fas fa-envelope"></i></label>
+                                    <input type="email" name="email" id="email" placeholder="Your Email"
+                                           value="${requestScope.email}" class="${requestScope.emailError != null ? 'input-error' : ''}"
+                                           required oninput="clearError(this)"/>
+                                    <p class="error-message">${requestScope.emailError}</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password"><i class="fas fa-lock"></i></label>
+                                    <input type="password" name="password" id="password" placeholder="Password"
+                                           class="${requestScope.passwordError != null ? 'input-error' : ''}" required/>
+                                    <p class="error-message">${requestScope.passwordError}</p>
+                                </div>
 
-        <div class="container">
-            <div class="img">
-                <!-- You can add an image here if needed -->
-            </div>
-            <div class="login-container">
-                <form action="register" method="post" onsubmit="return onSubmitForm(event)">
-                    <h2>REGISTER</h2>
-                    <div id="whitespaceMessage"></div>
+                                <div class="form-group">
+                                    <label for="re_pass"><i class="fas fa-lock"></i></label>
+                                    <input type="password" name="repassword" id="re_pass" placeholder="Repeat your password"
+                                           class="${requestScope.repasswordError != null ? 'input-error' : ''}" required/>
+                                    <p class="error-message">${requestScope.repasswordError}</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fullname"><i class="fas fa-user"></i></label>
+                                    <input type="text" name="fullname" id="fullname" placeholder="Full Name" value="${requestScope.fullname}" required/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone"><i class="fas fa-phone"></i></label>
+                                    <input type="text" name="phone" id="phone" placeholder="Your Contact Number"
+                                           value="${requestScope.phone}" class="${requestScope.phoneError != null ? 'input-error' : ''}"
+                                           required oninput="clearError(this)"/>
+                                    <p class="error-message">${requestScope.phoneError}</p>
+                                </div>
 
-                    <!-- Username -->
-                    <div class="input-div one">
-                        <div class="i">
-                            <i class="fas fa-user"></i>
+                                <div class="form-group">
+                                    <label for="address"><i class="fas fa-map-marker-alt"></i></label>
+                                    <input type="text" name="address" id="address" placeholder="Your City" value="${requestScope.address}" required/>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" required/>
+                                    <label for="agree-term" class="label-agree-term">
+                                        <span><span></span></span>I agree to all statements in <a href="#" class="term-service">Terms of service</a>
+                                    </label>
+                                </div>
+
+                                <div class="form-group form-button">
+                                    <input type="submit" name="signup" id="signup" class="form-submit" value="Register"/>
+                                </div>
+
+                                <p style="color: red">${requestScope.error}</p>
+
+                            </form>
                         </div>
-                        <div>
-                            <h5>Tên đăng nhập <div id="usernameMessage"></div></h5>
-                            <input class="input" type="text" id="username" name="username" required oninput="validateUsername(),checkWhitespace()">
+
+                        <div class="signup-image">
+                            <figure><img src="img/register.png" alt="sign up image"></figure>
+                            <a href="login.jsp" class="signup-image-link">I am already a member</a>
                         </div>
                     </div>
-
-                    <!-- Phone Number -->
-                    <div class="input-div one">
-                        <div class="i">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div>
-                            <h5>Số điện thoại <div id="phoneMessage"></div></h5>
-                            <input class="input" type="text" id="phoneNumber" name="phone" required oninput="validatePhoneNumber(),checkWhitespace()">
-                        </div>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="input-div one">
-                        <div class="i">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div>
-                            <h5>Mật khẩu <div id="passwordMessage"></div></h5>
-                            <input class="input" type="password" id="password" name="password" required oninput="validatePassword(),checkWhitespace()">
-                        </div>
-                    </div>
-
-                    <!-- Repeat Password -->
-                    <div class="input-div two">
-                        <div class="i">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div>
-                            <h5>Nhập lại mật khẩu <div id="repeatPasswordMessage"></div></h5>
-                            <input class="input" type="password" id="re_pass" name="repassword" required oninput="validateRepeatPassword(),checkWhitespace()">
-                        </div>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="input-div one">
-                        <div class="i">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div>
-                            <h5>Email <div id="emailMessage"></div></h5>
-                            <input class="input" type="email" id="email" name="email" required oninput="validateEmail(),checkWhitespace()">
-                        </div>
-                    </div>
- 
-                    <div class="input-div one">
-                        <div class="i">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div>
-                            <h5>Địa chỉ <div id="addressMessage"></div></h5>
-                            <input class="input" type="text" id="address" name="address" required oninput="checkWhitespace()">
-                        </div>
-                    </div>
-
-                    <!-- Error message -->
-                    <h3 style="color: red">${requestScope.error}</h3>
-
-                    <!-- Submit button -->
-                    <div class="btn-container">
-                        <input style="margin-bottom: 10px" type="submit" class="btn" value="Đăng ký">
-                        <br>
-                        <a class="col-sm-6" href="login">
-                            <button class="btn btn-primary btn-block" type="button" id="btn-signup"> Trở về</button>
-                        </a>
-                    </div>
-
-                    <div class="account">
-                        <p>Bạn đã có tài khoản?</p>
-                        <a href="login">Đăng nhập.</a>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </section>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var msg = document.getElementById("status").value;
+                if (msg == "success") {
+                    swal({
+                        title: "Congrats",
+                        text: "Account Created Successfully",
+                        icon: "success",
+                        timer: 3000,
+                        button: false
+                    });
+
+                    setTimeout(function () {
+                        window.location.href = "home";
+                    }, 3000);
+                }
+            });
+        </script>
+        <script>
+            function clearError(input) {
+                // Xóa class input-error khi người dùng nhập lại dữ liệu
+                input.classList.remove("input-error");
+
+                // Ẩn thông báo lỗi dưới ô nhập
+                let errorMsg = input.nextElementSibling;
+                if (errorMsg && errorMsg.classList.contains("error-message")) {
+                    errorMsg.innerText = "";
+                }
+            }
+        </script>
 
         <!-- Validation Scripts -->
         <script type="text/javascript" src="js/validation.js"></script>
-        <script type="text/javascript" src="js/login.js"></script>
     </body>
 </html>
