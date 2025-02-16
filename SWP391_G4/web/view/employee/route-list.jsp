@@ -31,7 +31,7 @@
         <p style="color:red;">${error}</p>
     </c:if>
 
-    <h3><c:if test="${not empty editRoute}">Chỉnh Sửa</c:if><c:if test="${empty editRoute}">Thêm</c:if> Tuyến Tàu</h3>
+    <h3><c:if test="${not empty editRoute}">Sửa</c:if><c:if test="${empty editRoute}">Thêm</c:if> Tuyến Tàu</h3>
     <form method="post" action="route">
         <input type="hidden" name="routeID" value="${editRoute.routeID}">
         <input type="hidden" name="action" value="${not empty editRoute ? 'update' : 'add'}">
@@ -55,10 +55,10 @@
         </select>
 
         <label for="distance">Khoảng cách (km):</label>
-        <input type="number" name="distance" step="0.1" value="${editRoute.distance}" required>
+        <input type="number" name="distance" step="0.1" min="0" value="${editRoute.distance}" required>
 
         <label for="basePrice">Giá cơ bản:</label>
-        <input type="number" name="basePrice" step="0.01" value="${editRoute.basePrice}" required>
+        <input type="number" name="basePrice" step="0.01" min="0" value="${editRoute.basePrice}" required>
 
         <button type="submit"><c:if test="${not empty editRoute}">Cập Nhật</c:if><c:if test="${empty editRoute}">Thêm</c:if></button>
     </form>
@@ -81,7 +81,7 @@
                 <td>${route.distance}</td>
                 <td>${route.basePrice}</td>
                 <td>
-                    <a href="route?editId=${route.routeID}">Chỉnh Sửa</a> | 
+                    <a href="route?editId=${route.routeID}">Sửa</a> | 
                     <form method="post" action="route" style="display:inline;">
                         <input type="hidden" name="routeID" value="${route.routeID}">
                         <input type="hidden" name="action" value="delete">
