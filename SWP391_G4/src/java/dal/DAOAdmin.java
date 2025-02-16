@@ -23,7 +23,7 @@ public class DAOAdmin extends DBContext {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
-                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getString("Address"), rs.getInt("RoleID")));
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
                 }
             }
         }
@@ -44,7 +44,7 @@ public class DAOAdmin extends DBContext {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
-                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getString("Address"), rs.getInt("RoleID")));
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
                 }
             }
         }
@@ -69,15 +69,13 @@ public class DAOAdmin extends DBContext {
         return trains;
     }
 
-    
-
     // View all employees
     public List<User> getAllEmployees() throws SQLException {
         List<User> employees = new ArrayList<>();
         String query = "SELECT * FROM [User] WHERE RoleID = 3";
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getString("Address"), rs.getInt("RoleID")));
+                employees.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
             }
         }
         return employees;
@@ -87,7 +85,7 @@ public class DAOAdmin extends DBContext {
     // Thêm nhân viên mới
     public boolean addEmployee(User user) {
 
-        String insertQuery = "INSERT INTO [User] ( Username, Password, FullName, Email, PhoneNumber, RoleID) VALUES ( ?, ?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO [User] ( Username, Password, FullName, Email, PhoneNumber, Address, RoleID) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
@@ -98,7 +96,8 @@ public class DAOAdmin extends DBContext {
                 ps.setString(3, user.getFullName());
                 ps.setString(4, user.getEmail());
                 ps.setString(5, user.getPhoneNumber());
-                ps.setInt(6, user.getRoleID()); // RoleID = 3 là nhân viên
+                ps.setString(6, user.getAddress());
+                ps.setInt(7, user.getRoleID()); // RoleID = 3 là nhân viên
 
                 return ps.executeUpdate() > 0;
             }
@@ -136,7 +135,7 @@ public class DAOAdmin extends DBContext {
         String query = "SELECT * FROM [User] WHERE RoleID = 2";
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),rs.getString("Address"), rs.getInt("RoleID")));
+                customers.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"), rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID")));
             }
         }
         return customers;
@@ -192,6 +191,59 @@ public class DAOAdmin extends DBContext {
             e.printStackTrace();
         }
         return false;
+    }
+    // Lấy thông tin nhân viên theo userId
+
+    public User getEmployeeById(int userId) throws SQLException {
+        User user = null;
+        String query = "SELECT * FROM [User] WHERE UserID = ? AND RoleID = 3";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),
+                            rs.getString("Address"), rs.getInt("RoleID"));
+                }
+            }
+        }
+        return user;
+    }
+
+// Lấy thông tin khách hàng theo userId
+    public User getCustomerById(int userId) throws SQLException {
+        User user = null;
+        String query = "SELECT * FROM [User] WHERE UserID = ? AND RoleID = 2";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),
+                            rs.getString("Address"), rs.getInt("RoleID"));
+                }
+            }
+        }
+        return user;
+    }
+
+    public User getUserById(int userId, String type) throws SQLException {
+        String query = "SELECT * FROM [User] WHERE UserID = ?";
+        if ("employees".equals(type)) {
+            query += " AND RoleID = 3";
+        } else if ("customers".equals(type)) {
+            query += " AND RoleID = 2";
+        }
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"), rs.getString("Address"), rs.getInt("RoleID"));
+                }
+            }
+        }
+        return null; // Return null if the user is not found
     }
 
     @Override

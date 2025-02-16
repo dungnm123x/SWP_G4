@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Admin Quản Lý Vé Tàu</title>
-        <link rel="stylesheet" href="./css/employee.css">
+        <link rel="stylesheet" href="./css/admin/admin.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     </head>
     <body>
@@ -41,15 +41,17 @@
                                         <input type="hidden" name="view" value="${type}">
                                         <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
                                         <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
+                                        <a href="admin?view=${type}" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
                                     </form>
                                 </div>
+
 
                                 <table border="1">
                                     <thead>
                                         <tr>
                                             <c:choose>
                                                 <c:when test="${type == 'employees' || type == 'customers'}">
-                                                    <th>ID</th>
+                                                    <th></th>
                                                     <th>Username</th>
                                                     <th>Full Name</th>
                                                     <th>Email</th>
@@ -65,34 +67,26 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <c:forEach var="item" items="${list}">
+                                        <c:forEach var="item" items="${list}" varStatus="status">
                                             <tr>
                                                 <c:choose>
                                                     <c:when test="${type == 'employees' || type == 'customers'}">
-                                                        <td>${item.userId}</td>
+                                                        <td>${status.index + 1}</td>
                                                         <td>${item.username}</td>
                                                         <td>${item.fullName}</td>
                                                         <td>${item.email}</td>
                                                         <td>${item.phoneNumber}</td>
                                                     </c:when>
-                                                    <c:when test="${type == 'trains'}">
-                                                        <td>${item.trainID}</td>
-                                                        <td>${item.trainName}</td>
-                                                    </c:when>
                                                 </c:choose>
                                                 <td>
-                                                    <form method="post" action="admin">
-                                                        <input type="hidden" name="action" value="delete">
-                                                        <input type="hidden" name="type" value="${type}">
-                                                        <input type="hidden" name="id" value="${type == 'trains' ? item.trainID : item.userId}">
-                                                        <button type="submit" class="btn-delete"><i class="bi bi-trash"></i></button>
-                                                    </form>
+                                                    <button class="btn btn-outline-primary btn-sm" 
+                                                            onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
+                                                        <i class="bi bi-eye"></i> Chi Tiết
+                                                    </button>
                                                 </td>
-                                            </tr>
-                                        </c:forEach>
+                                            </c:forEach>
                                     </tbody>
                                 </table>
-
                                 <c:if test="${type eq 'employees'}">
                                     <div class="add-button-container">
                                         <a href="admin?view=addEmployee" class="btn-add">
@@ -101,10 +95,6 @@
                                     </div>
                                 </c:if>
                             </c:if>
-
-
-
-
                         </c:when>
                         <c:otherwise>
                             <p>Chọn chức năng từ menu bên trái để bắt đầu quản lý hệ thống.</p>

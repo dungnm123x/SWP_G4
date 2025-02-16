@@ -44,6 +44,25 @@ public class AdminController extends HttpServlet {
                         : dao.searchTrains(search);
                 request.setAttribute("list", trains);
                 request.setAttribute("type", "trains");
+            } else if ("details".equals(view)) { // Xử lý yêu cầu xem chi tiết
+                String type = request.getParameter("type");
+                int id = Integer.parseInt(request.getParameter("id"));
+                User userDetails = null;
+
+                if ("employees".equals(type) || "customers".equals(type)) {
+                    userDetails = dao.getUserById(id, type); // Gọi phương thức mới trong DAO
+                }
+
+                if (userDetails != null) {
+                    request.setAttribute("userDetails", userDetails);
+                    request.setAttribute("type", type); // Truyền type để biết đang xem chi tiết employee hay customer
+                    request.getRequestDispatcher("view/adm/userDetails.jsp").forward(request, response);
+                } else {
+                    // Xử lý trường hợp không tìm thấy user (ví dụ: chuyển hướng về trang danh sách)
+                    response.sendRedirect("admin?view=" + type);
+                    return; // Đảm bảo dừng xử lý sau khi chuyển hướng
+                }
+                return; // Kết thúc xử lý cho view details
             }
 
             request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
@@ -51,8 +70,6 @@ public class AdminController extends HttpServlet {
             throw new ServletException(e);
         }
     }
-
-    
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -81,7 +98,7 @@ public class AdminController extends HttpServlet {
                 String phone = request.getParameter("phone");
                 String address = request.getParameter("address");
 
-                User newUser = new User(0, username, password, fullName, email, phone,address, 3);
+                User newUser = new User(0, username, password, fullName, email, phone, address, 3);
                 boolean success = dao.addEmployee(newUser);
 
                 if (success) {
