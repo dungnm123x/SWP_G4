@@ -1,4 +1,3 @@
-
 package controller;
 
 import dal.RouteDAO;
@@ -15,7 +14,7 @@ import model.Route;
 import model.Station;
 
 public class RouteController extends HttpServlet {
-   
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RouteDAO routeDAO = new RouteDAO();
         List<Route> routes = routeDAO.list();
@@ -44,7 +43,11 @@ public class RouteController extends HttpServlet {
             double distance = Double.parseDouble(request.getParameter("distance"));
             double basePrice = Double.parseDouble(request.getParameter("basePrice"));
 
-            if (departureStationID == arrivalStationID) {
+            if (routeDAO.isRouteExists(departureStationID, arrivalStationID)) {
+                request.setAttribute("error", "Tuyến tàu này đã tồn tại!");
+            } else if (distance < 0 || basePrice < 0) {
+                request.setAttribute("error", "Khoảng cách và giá không thể là số âm!");
+            } else if (departureStationID == arrivalStationID) {
                 request.setAttribute("error", "Ga đi không thể trùng với ga đến.");
             } else {
                 boolean success = routeDAO.addRoute(departureStationID, arrivalStationID, distance, basePrice);
@@ -62,7 +65,7 @@ public class RouteController extends HttpServlet {
         } else if ("delete".equals(action)) {
             int routeID = Integer.parseInt(request.getParameter("routeID"));
             boolean success = routeDAO.deleteRoute(routeID);
-            request.setAttribute("message", success ? "Xóa tuyến tàu thành công!" : "Xóa thất bại.");
+            request.setAttribute("message", success ? "Xóa tuyến tàu thành công!" : "Xóa thất bại(tuyến đang trong sử dụng).");
         }
 
         doGet(request, response); // Load lại danh sách tuyến tàu
