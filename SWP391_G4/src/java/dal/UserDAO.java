@@ -15,34 +15,35 @@ import model.User;
  *
  * @author dung9
  */
-public class UserDAO extends DBContext{
+public class UserDAO extends DBContext {
 
     @Override
     public void insert(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void update(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void delete(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public ArrayList list() {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    
-}
+        throw new UnsupportedOperationException("Not supported yet.");
+
+    }
 
     @Override
     public Object get(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-        private User mapUser(ResultSet rs) throws SQLException {
+
+    private User mapUser(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("UserID"),
                 rs.getString("Username"),
@@ -103,7 +104,6 @@ public class UserDAO extends DBContext{
                         rs.getString("Address"),
                         rs.getInt("RoleID"),
                         rs.getBoolean("Status")
-
                 );
             }
         } catch (Exception e) {
@@ -184,7 +184,6 @@ public class UserDAO extends DBContext{
                         rs.getString("Address"),
                         rs.getInt("RoleID"),
                         rs.getBoolean("Status")
-
                 );
             }
         } catch (Exception e) {
@@ -194,7 +193,7 @@ public class UserDAO extends DBContext{
     }
 
     public boolean checkphone(String phone) {
-String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE PhoneNumber=?";
+        String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE PhoneNumber=?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, phone);
@@ -205,11 +204,11 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi để debug
         }
-        return false;    
+        return false;
     }
 
     public boolean checkemail(String email) {
-String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE Email=?";
+        String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE Email=?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, email);
@@ -220,10 +219,11 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi để debug
         }
-        return false;        }
+        return false;
+    }
 
     public User getUserByUsername(String username) {
-                String sql = "SELECT * FROM [User] WHERE Username = ?";
+        String sql = "SELECT * FROM [User] WHERE Username = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, username);
@@ -239,12 +239,27 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
                         rs.getString("Address"),
                         rs.getInt("RoleID"),
                         rs.getBoolean("Status")
-
                 );
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean updatePassword(String username, String newPassword) {
+        String sql = "UPDATE [User] SET Password = ? WHERE Username = ?";
+        try (Connection conn = connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newPassword);
+            stmt.setString(2, username);
+
+            int rowsUpdated = stmt.executeUpdate();
+            System.out.println("DEBUG: Số dòng cập nhật: " + rowsUpdated);
+
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

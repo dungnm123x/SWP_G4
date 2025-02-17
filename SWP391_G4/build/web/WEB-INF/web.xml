@@ -32,6 +32,10 @@
         <servlet-name>RouteController</servlet-name>
         <servlet-class>controller.RouteController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordServlet</servlet-name>
+        <servlet-class>controller.ChangePasswordServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -111,5 +115,9 @@
     <servlet-mapping>
         <servlet-name>RouteController</servlet-name>
         <url-pattern>/route</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordServlet</servlet-name>
+        <url-pattern>/changePassword</url-pattern>
     </servlet-mapping>
 </web-app>
