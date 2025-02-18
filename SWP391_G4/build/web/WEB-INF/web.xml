@@ -37,12 +37,16 @@
         <servlet-class>controller.ChangePasswordServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>TrainController</servlet-name>
-        <servlet-class>controller.TrainController</servlet-class>
+        <servlet-name>SendOtpChangePass</servlet-name>
+        <servlet-class>Utils.SendOtpChangePass</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CarriageController</servlet-name>
-        <servlet-class>controller.CarriageController</servlet-class>
+        <servlet-name>NewPasswordServlet</servlet-name>
+        <servlet-class>controller.NewPasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OTPValidationServlet</servlet-name>
+        <servlet-class>controller.OTPValidationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
@@ -129,11 +133,15 @@
         <url-pattern>/changePassword</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>TrainController</servlet-name>
-        <url-pattern>/train</url-pattern>
+        <servlet-name>SendOtpChangePass</servlet-name>
+        <url-pattern>/sendOtpResetPass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CarriageController</servlet-name>
-        <url-pattern>/carriage</url-pattern>
+        <servlet-name>NewPasswordServlet</servlet-name>
+        <url-pattern>/newPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OTPValidationServlet</servlet-name>
+        <url-pattern>/validateotp</url-pattern>
     </servlet-mapping>
 </web-app>
