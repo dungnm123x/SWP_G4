@@ -12,6 +12,16 @@ public class Train {
     public Train() {
     }
 
+    public Train(String trainName) {
+        this.trainName = trainName;
+    }
+
+    public Train(int trainID) {
+        this.trainID = trainID;
+    }
+    
+    
+
     public Train(int trainID, String trainName) {
         this.trainID = trainID;
         this.trainName = trainName;

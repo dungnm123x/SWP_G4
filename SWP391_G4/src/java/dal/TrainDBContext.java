@@ -1,6 +1,7 @@
 package dal;
 
 import dal.DBContext;
+import dto.RailwayDTO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,6 +68,31 @@ public class TrainDBContext extends DBContext<TrainDTO> {
             }
         }
         return trains;
+    }
+
+
+    public TrainDTO getTrainById(int trainID) {
+        TrainDTO train = null;
+        String sql = "SELECT \n"
+                + "    MIN(t.TrainName) AS tentau,\n"
+                + "    COUNT(DISTINCT c.CarriageID) AS tongtoa,\n"
+                + "    COUNT(DISTINCT s.SeatID) AS tongghe\n"
+                + "FROM Train t\n"
+                + "JOIN Carriage c ON t.TrainID = c.TrainID\n"
+                + "JOIN Seat s ON c.CarriageID = s.CarriageID\n"
+                + "WHERE t.TrainId = ?\n"
+                + "GROUP BY t.TrainID;";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, trainID);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    train = new TrainDTO(trainID, rs.getNString("tentau"), rs.getInt("tongtoa"), rs.getInt("tongghe"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return train;
     }
 
     public List<TrainDTO> getFilteredTrains(String departStation, String arriveStation, String departureDate) {

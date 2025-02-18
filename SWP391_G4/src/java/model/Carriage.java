@@ -1,11 +1,37 @@
 package model;
 
 public class Carriage {
+
     private int carriageID;
     private String carriageNumber;
     private String carriageType;
     private Train train;
     private int capacity;
+
+    public Carriage() {
+    }
+
+    public Carriage(String carriageNumber, String carriageType, Train train, int capacity) {
+        this.carriageNumber = carriageNumber;
+        this.carriageType = carriageType;
+        this.train = train;
+        this.capacity = capacity;
+    }
+
+    public Carriage(int carriageID, String carriageNumber, String carriageType, int capacity) {
+        this.carriageID = carriageID;
+        this.carriageNumber = carriageNumber;
+        this.carriageType = carriageType;
+        this.capacity = capacity;
+    }
+
+    public Carriage(int carriageID, String carriageNumber, String carriageType, Train train, int capacity) {
+        this.carriageID = carriageID;
+        this.carriageNumber = carriageNumber;
+        this.carriageType = carriageType;
+        this.train = train;
+        this.capacity = capacity;
+    }
 
     // Getters and Setters
     public int getCarriageID() {
