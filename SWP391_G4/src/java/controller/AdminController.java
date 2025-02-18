@@ -38,12 +38,6 @@ public class AdminController extends HttpServlet {
                         : dao.searchCustomers(search);
                 request.setAttribute("list", customers);
                 request.setAttribute("type", "customers");
-            } else if ("trains".equals(view)) {
-                List<Train> trains = (search == null || search.isEmpty())
-                        ? dao.getAllTrains()
-                        : dao.searchTrains(search);
-                request.setAttribute("list", trains);
-                request.setAttribute("type", "trains");
             } else if ("details".equals(view)) { // Xử lý yêu cầu xem chi tiết
                 String type = request.getParameter("type");
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -90,7 +84,7 @@ public class AdminController extends HttpServlet {
                 response.sendRedirect("admin?view=" + type);
                 return;
             }
-            
+
             request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
