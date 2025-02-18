@@ -33,6 +33,14 @@
         <servlet-class>controller.RouteController</servlet-class>
     </servlet>
     <servlet>
+    <servlet-name>TrainController</servlet-name>
+    <servlet-class>controller.TrainController</servlet-class>
+</servlet>
+<servlet>
+    <servlet-name>CarriageController</servlet-name>
+    <servlet-class>controller.CarriageController</servlet-class>
+</servlet>
+    <servlet>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <servlet-class>controller.ChangePasswordServlet</servlet-class>
     </servlet>
@@ -128,6 +136,14 @@
         <servlet-name>RouteController</servlet-name>
         <url-pattern>/route</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+    <servlet-name>TrainController</servlet-name>
+    <url-pattern>/train</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>CarriageController</servlet-name>
+    <url-pattern>/carriage</url-pattern>
+</servlet-mapping>
     <servlet-mapping>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <url-pattern>/changePassword</url-pattern>
