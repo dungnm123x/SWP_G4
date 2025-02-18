@@ -9,6 +9,50 @@ import java.util.List;
 
 public class DAOAdmin extends DBContext {
 
+    public boolean disableEmployee(int userId) {
+        String query = "UPDATE [User] SET Status = 0 WHERE UserID = ? AND RoleID = 3";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean disableCustomer(int userId) {
+        String query = "UPDATE [User] SET Status = 0 WHERE UserID = ? AND RoleID = 2";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean restoreEmployee(int userId) {
+        String query = "UPDATE [User] SET Status = 1 WHERE UserID = ? AND RoleID = 3";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean restoreCustomer(int userId) {
+        String query = "UPDATE [User] SET Status = 1 WHERE UserID = ? AND RoleID = 2";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     //chỉnh sửa account 
     public boolean updateUser(User user) {
         String updateQuery = "UPDATE [User] SET FullName = ?, PhoneNumber = ?, Address = ? WHERE UserID = ?"; // Loại bỏ Username và Email
@@ -124,30 +168,6 @@ public class DAOAdmin extends DBContext {
         return false;
     }
 
-    // Vô hiệu hóa nhân viên (cập nhật status = 0 thay vì xóa)
-    public boolean disableEmployee(int userId) {
-        String query = "UPDATE [User] SET Status = 0 WHERE UserID = ? AND RoleID = 3";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // Kích hoạt lại nhân viên
-    public boolean restoreEmployee(int userId) {
-        String query = "UPDATE [User] SET Status = 1 WHERE UserID = ? AND RoleID = 3";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     // View all customers
     public List<User> getAllCustomers() throws SQLException {
         List<User> customers = new ArrayList<>();
@@ -158,29 +178,6 @@ public class DAOAdmin extends DBContext {
             }
         }
         return customers;
-    }
-
-    // Tương tự cho khách hàng
-    public boolean disableCustomer(int userId) {
-        String query = "UPDATE [User] SET Status = 0 WHERE UserID = ? AND RoleID = 2";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean restoreCustomer(int userId) {
-        String query = "UPDATE [User] SET Status = 1 WHERE UserID = ? AND RoleID = 2";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     // View all trains

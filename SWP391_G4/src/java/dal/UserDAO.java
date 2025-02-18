@@ -15,34 +15,35 @@ import model.User;
  *
  * @author dung9
  */
-public class UserDAO extends DBContext{
+public class UserDAO extends DBContext {
 
     @Override
     public void insert(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void update(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void delete(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public ArrayList list() {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    
-}
+        throw new UnsupportedOperationException("Not supported yet.");
+
+    }
 
     @Override
     public Object get(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-        private User mapUser(ResultSet rs) throws SQLException {
+
+    private User mapUser(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("UserID"),
                 rs.getString("Username"),
@@ -57,31 +58,27 @@ public class UserDAO extends DBContext{
     }
 
     public User checkUserLogin(String username, String password) {
-        String sql = "SELECT * FROM [User] WHERE Username=? AND Password=?";
+        String sql = "SELECT * FROM [User] WHERE Username=? AND Password=? AND Status = 1";
         try (Connection conn = connection; PreparedStatement stm = conn.prepareStatement(sql)) {
 
             if (conn == null) {
-                System.out.println("DEBUG: Database connection failed!");
+                System.out.println("Lỗi: Kết nối database thất bại!");
                 return null;
             }
-
-            System.out.println("DEBUG: Kiểm tra đăng nhập với Username = " + username);
-            System.out.println("DEBUG: Password nhập vào = " + password);
 
             stm.setString(1, username);
             stm.setString(2, password);
 
             try (ResultSet rs = stm.executeQuery()) {
                 if (rs.next()) {
-                    System.out.println("DEBUG: Đăng nhập thành công!");
-                    return mapUser(rs);
+                    return mapUser(rs); // Gọi phương thức mapUser để tạo đối tượng User
                 } else {
-                    System.out.println("DEBUG: Không tìm thấy tài khoản phù hợp!");
+                    System.out.println("Không tìm thấy tài khoản hoặc tài khoản đã bị vô hiệu hóa!");
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("DEBUG: Lỗi khi kiểm tra đăng nhập!");
+            System.out.println("Lỗi khi kiểm tra đăng nhập!");
         }
         return null;
     }
@@ -103,7 +100,6 @@ public class UserDAO extends DBContext{
                         rs.getString("Address"),
                         rs.getInt("RoleID"),
                         rs.getBoolean("Status")
-
                 );
             }
         } catch (Exception e) {
@@ -184,7 +180,6 @@ public class UserDAO extends DBContext{
                         rs.getString("Address"),
                         rs.getInt("RoleID"),
                         rs.getBoolean("Status")
-
                 );
             }
         } catch (Exception e) {
@@ -192,9 +187,9 @@ public class UserDAO extends DBContext{
         }
         return null;
     }
-
+    
     public boolean checkphone(String phone) {
-String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE PhoneNumber=?";
+        String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE PhoneNumber=?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, phone);
@@ -205,11 +200,11 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi để debug
         }
-        return false;    
+        return false;
     }
 
     public boolean checkemail(String email) {
-String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE Email=?";
+        String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, Address ,RoleID FROM [User] WHERE Email=?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, email);
@@ -220,10 +215,11 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi để debug
         }
-        return false;        }
+        return false;
+    }
 
     public User getUserByUsername(String username) {
-                String sql = "SELECT * FROM [User] WHERE Username = ?";
+        String sql = "SELECT * FROM [User] WHERE Username = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, username);
@@ -239,7 +235,6 @@ String sql = "SELECT UserID, Username, Password, FullName, Email, PhoneNumber, A
                         rs.getString("Address"),
                         rs.getInt("RoleID"),
                         rs.getBoolean("Status")
-
                 );
             }
         } catch (Exception e) {
