@@ -5,31 +5,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý Toa Tàu</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        .actions button {
-            margin: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-    </style>
+   <link rel="stylesheet" href="css/employee.css">
 </head>
 <body>
+    <div class="container">
+        <div class="sidebar">
+                <div class="logo">
+                    <img src="./img/logo.jpg" alt="avatar">
+                </div>
+                <ul>
+                    <li><a href="train">Quản lý tàu</a></li>
+                    <li><a href="trip">Quản lý chuyến</a></li>
+                    <li><a href="route">Quản lý tuyến tàu</a></li>
+                    <li><a href="station">Quản lý ga</a></li>
+                    <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+                </ul>
+                <form action="logout" method="GET">
+                   <button type="submit" class="logout-button">Logout</button>
+                </form>
+                
+            </div>
     <h2>Quản lý Toa Tàu</h2>
     
     <p><strong>Tên tàu:</strong> ${train.trainName}</p>
-    <a href="train-management"><button>Quay lại danh sách tàu</button></a>
+    <a href="train"><button>Quay lại danh sách tàu</button></a>
 
     <!-- Hiển thị thông báo -->
     <c:if test="${not empty message}">
@@ -40,7 +39,7 @@
     </c:if>
 
     <!-- Form thêm hoặc chỉnh sửa toa tàu -->
-    <form action="carriage-management" method="post">
+    <form action="carriage" method="post">
         <input type="hidden" name="action" value="${empty carriage ? 'add' : 'update'}">
         <input type="hidden" name="trainID" value="${train.trainID}">
         <c:if test="${not empty carriage}">
@@ -71,12 +70,12 @@
                 <tr>
                     <td>${c.carriageID}</td>
                     <td>${c.carriageType}</td>
-                    <td>${c.seatCount}</td>
+                    <td>${c.capacity}</td>
                     <td class="actions">
-                        <a href="carriage-management?action=edit&trainID=${train.trainID}&carriageID=${c.carriageID}">
+                        <a href="carriage?action=edit&trainID=${train.trainID}&carriageID=${c.carriageID}">
                             <button>Chỉnh sửa</button>
                         </a>
-                        <a href="carriage-management?action=delete&trainID=${train.trainID}&carriageID=${c.carriageID}" 
+                        <a href="carriage?action=delete&trainID=${train.trainID}&carriageID=${c.carriageID}" 
                            onclick="return confirm('Bạn có chắc chắn muốn xóa toa này?')">
                             <button style="background-color: red; color: white;">Xóa</button>
                         </a>
@@ -85,5 +84,6 @@
             </c:forEach>
         </tbody>
     </table>
+    </div>
 </body>
 </html>

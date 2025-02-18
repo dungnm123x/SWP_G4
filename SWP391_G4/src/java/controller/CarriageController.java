@@ -37,7 +37,7 @@ public class CarriageController extends HttpServlet {
             List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID);
             request.setAttribute("train", train);
             request.setAttribute("carriages", carriages);
-            request.getRequestDispatcher("carriage_management.jsp").forward(request, response);
+            request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
         } else if (action.equals("edit")) {
             // Chỉnh sửa toa tàu
             int carriageID = Integer.parseInt(request.getParameter("carriageID"));

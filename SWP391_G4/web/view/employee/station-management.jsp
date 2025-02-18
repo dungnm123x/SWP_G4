@@ -14,10 +14,10 @@
             <h1>Danh sách ga tàu</h1>
             <div class="sidebar">
                 <div class="logo">
-                    <img src="./img/logo.jpg" alt="RAILWAYVN">
+                    <img src="./img/logo.jpg" alt="avatar">
                 </div>
                 <ul>
-                    <li><a href="#">Quản lý tàu</a></li>
+                    <li><a href="train">Quản lý tàu</a></li>
                     <li><a href="trip">Quản lý chuyến</a></li>
                     <li><a href="route">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>

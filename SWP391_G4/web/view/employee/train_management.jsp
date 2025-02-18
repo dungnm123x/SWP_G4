@@ -6,9 +6,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý tàu</title>
+    <link rel="stylesheet" href="css/employee.css">
 </head>
 <body>
+    <div class="container">
     <h2>Quản lý tàu</h2>
+    <div class="sidebar">
+                <div class="logo">
+                    <img src="./img/logo.jpg" alt="avatar">
+                </div>
+                <ul>
+                    <li><a href="train">Quản lý tàu</a></li>
+                    <li><a href="trip">Quản lý chuyến</a></li>
+                    <li><a href="route">Quản lý tuyến tàu</a></li>
+                    <li><a href="station">Quản lý ga</a></li>
+                    <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+                </ul>
+                <form action="logout" method="GET">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+
+            </div>
 
     <!-- Hiển thị thông báo -->
     <c:if test="${not empty message}">
@@ -19,7 +37,7 @@
     </c:if>
 
     <!-- Form thêm hoặc chỉnh sửa tàu -->
-    <form action="train-management" method="post">
+    <form action="train" method="post">
         <input type="hidden" name="action" value="${empty train ? 'add' : 'update'}">
         <c:if test="${not empty train}">
             <input type="hidden" name="trainID" value="${train.trainID}">
@@ -64,5 +82,6 @@
             </c:forEach>
         </tbody>
     </table>
+    </div>
 </body>
 </html>

@@ -71,7 +71,7 @@ public class TrainController extends HttpServlet {
             throws IOException, SQLException {
         int trainID = Integer.parseInt(request.getParameter("id"));
         trainDAO.deleteTrain(trainID);
-        response.sendRedirect("train-management");
+        response.sendRedirect("train");
     }
 
     private void manageCarriages(HttpServletRequest request, HttpServletResponse response)
@@ -81,7 +81,7 @@ public class TrainController extends HttpServlet {
         List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID);
         request.setAttribute("train", train);
         request.setAttribute("carriages", carriages);
-        request.getRequestDispatcher("carriage_management.jsp").forward(request, response);
+        request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class TrainController extends HttpServlet {
         String trainName = request.getParameter("trainName");
         Train train = new Train(trainName);
         trainDAO.addTrain(train);
-        response.sendRedirect("train-management");
+        response.sendRedirect("train");
     }
 
     private void updateTrain(HttpServletRequest request, HttpServletResponse response)
@@ -121,7 +121,7 @@ public class TrainController extends HttpServlet {
         String trainName = request.getParameter("trainName");
         Train train = new Train(trainID, trainName);
         trainDAO.updateTrain(train);
-        response.sendRedirect("train-management");
+        response.sendRedirect("train");
     }
 
     private void addCarriage(HttpServletRequest request, HttpServletResponse response)
@@ -133,7 +133,7 @@ public class TrainController extends HttpServlet {
 
         Carriage carriage = new Carriage(carriageNumber, carriageType,train,capacity);
         carriageDAO.addCarriage(carriage);
-        response.sendRedirect("train-management?action=manageCarriages&id=" + train.getTrainID());
+        response.sendRedirect("train?action=manageCarriages&id=" + train.getTrainID());
     }
 
     private void updateCarriage(HttpServletRequest request, HttpServletResponse response)
@@ -146,7 +146,7 @@ public class TrainController extends HttpServlet {
         Carriage carriage = new Carriage(carriageID, carriageNumber, carriageType, capacity);
         carriageDAO.updateCarriage(carriage);
         int trainID = Integer.parseInt(request.getParameter("trainID"));
-        response.sendRedirect("train-management?action=manageCarriages&id=" + trainID);
+        response.sendRedirect("train?action=manageCarriages&id=" + trainID);
     }
 
     private void deleteCarriage(HttpServletRequest request, HttpServletResponse response)
@@ -154,7 +154,7 @@ public class TrainController extends HttpServlet {
         int carriageID = Integer.parseInt(request.getParameter("carriageID"));
         int trainID = Integer.parseInt(request.getParameter("trainID"));
         carriageDAO.deleteCarriage(carriageID);
-        response.sendRedirect("train-management?action=manageCarriages&id=" + trainID);
+        response.sendRedirect("train?action=manageCarriages&id=" + trainID);
     }
 
 }
