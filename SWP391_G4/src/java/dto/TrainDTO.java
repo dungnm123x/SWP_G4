@@ -15,6 +15,13 @@ public class TrainDTO {
     public TrainDTO() {
     }
 
+    public TrainDTO(int trainID, String trainName, int totalCarriages, int totalSeats) {
+        this.trainID = trainID;
+        this.trainName = trainName;
+        this.totalCarriages = totalCarriages;
+        this.totalSeats = totalSeats;
+    }
+
     public TrainDTO(int trainID, String trainName, int totalCarriages, int totalSeats, String departureStation, String arrivalStation, Date departureTime, Date arrivalTime, double price) {
         this.trainID = trainID;
         this.trainName = trainName;
