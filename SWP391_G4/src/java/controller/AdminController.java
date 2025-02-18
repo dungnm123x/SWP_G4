@@ -63,8 +63,34 @@ public class AdminController extends HttpServlet {
                     return; // Đảm bảo dừng xử lý sau khi chuyển hướng
                 }
                 return; // Kết thúc xử lý cho view details
-            }
+            } else if ("disable".equals(view) || "restore".equals(view)) {
+                int userId = Integer.parseInt(request.getParameter("id"));
+                String type = request.getParameter("type");
+                boolean success = false;
 
+                if ("disable".equals(view)) {
+                    if ("employees".equals(type)) {
+                        success = dao.disableEmployee(userId);
+                    } else if ("customers".equals(type)) {
+                        success = dao.disableCustomer(userId);
+                    }
+                } else if ("restore".equals(view)) {
+                    if ("employees".equals(type)) {
+                        success = dao.restoreEmployee(userId);
+                    } else if ("customers".equals(type)) {
+                        success = dao.restoreCustomer(userId);
+                    }
+                }
+
+                if (success) {
+                    request.getSession().setAttribute("message", "✅ Thay đổi trạng thái thành công!");
+                } else {
+                    request.getSession().setAttribute("message", "❌ Thay đổi trạng thái thất bại!");
+                }
+                response.sendRedirect("admin?view=" + type);
+                return;
+            }
+            
             request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
@@ -111,7 +137,7 @@ public class AdminController extends HttpServlet {
                 String phone = request.getParameter("phone");
                 String address = request.getParameter("address");
 
-                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2),true); // Tạo đối tượng User mới
+                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2), true); // Tạo đối tượng User mới
 
                 boolean success = dao.updateUser(updatedUser); // Gọi hàm update trong DAO
 

@@ -18,7 +18,7 @@
                     <li><a href="#">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                    <li><a href="listtrain">Quản lý chuyến tàu</a></li>
+                    <li><a href="trip">Quản lý chuyến tàu</a></li>
                     <li><a href="#">Thống kê</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
@@ -79,14 +79,31 @@
                                                     </c:when>
                                                 </c:choose>
                                                 <td>
-                                                    <button class="btn btn-outline-primary btn-sm" 
+                                                    <button class="btn btn-outline-primary btn-sm"
                                                             onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
                                                         <i class="bi bi-eye"></i> Chi Tiết
                                                     </button>
+
+                                                    <c:choose>
+                                                        <c:when test="${item.status}">
+                                                            <button class="btn btn-outline-danger btn-sm"
+                                                                    onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
+                                                                <i class="bi bi-x-circle"></i> Vô Hiệu
+                                                            </button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <button class="btn btn-outline-success btn-sm"
+                                                                    onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
+                                                                <i class="bi bi-check-circle"></i> Khôi Phục
+                                                            </button>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
+
                                             </c:forEach>
                                     </tbody>
                                 </table>
+
                                 <c:if test="${type eq 'employees'}">
                                     <div class="add-button-container">
                                         <a href="admin?view=addEmployee" class="btn-add">
@@ -95,6 +112,7 @@
                                     </div>
                                 </c:if>
                             </c:if>
+
                         </c:when>
                         <c:otherwise>
                             <p>Chọn chức năng từ menu bên trái để bắt đầu quản lý hệ thống.</p>
