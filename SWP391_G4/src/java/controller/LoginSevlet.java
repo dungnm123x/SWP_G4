@@ -83,9 +83,15 @@ public class LoginSevlet extends HttpServlet {
         User user = userDAO.checkUserLogin(username, password);
 
         boolean hasError = false;
-
+        
         if (user == null) {
             request.setAttribute("loginError", "Tên đăng nhập hoặc mật khẩu không đúng!");
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        } 
+        if (!user.isStatus()) { // Check the status!
+            request.setAttribute("loginError", "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
             request.setAttribute("username", username);
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;

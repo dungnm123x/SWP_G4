@@ -58,7 +58,7 @@ public class UserDAO extends DBContext {
     }
 
     public User checkUserLogin(String username, String password) {
-        String sql = "SELECT * FROM [User] WHERE Username=? AND Password=? AND Status = 1";
+        String sql = "SELECT * FROM [User] WHERE Username=? AND Password=?";
         try (Connection conn = connection; PreparedStatement stm = conn.prepareStatement(sql)) {
 
             if (conn == null) {
