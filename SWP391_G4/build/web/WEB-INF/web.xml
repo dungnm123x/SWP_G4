@@ -36,6 +36,18 @@
         <servlet-name>ChangePasswordServlet</servlet-name>
         <servlet-class>controller.ChangePasswordServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SendOtpChangePass</servlet-name>
+        <servlet-class>Utils.SendOtpChangePass</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>NewPasswordServlet</servlet-name>
+        <servlet-class>controller.NewPasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OTPValidationServlet</servlet-name>
+        <servlet-class>controller.OTPValidationServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -119,5 +131,17 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <url-pattern>/changePassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SendOtpChangePass</servlet-name>
+        <url-pattern>/sendOtpResetPass</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NewPasswordServlet</servlet-name>
+        <url-pattern>/newPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OTPValidationServlet</servlet-name>
+        <url-pattern>/validateotp</url-pattern>
     </servlet-mapping>
 </web-app>
