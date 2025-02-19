@@ -77,9 +77,9 @@ public class AdminController extends HttpServlet {
                 }
 
                 if (success) {
-                    request.getSession().setAttribute("message", "✅ Thay đổi trạng thái thành công!");
+                    request.getSession().setAttribute("message2", "✅ Thay đổi trạng thái thành công!");
                 } else {
-                    request.getSession().setAttribute("message", "❌ Thay đổi trạng thái thất bại!");
+                    request.getSession().setAttribute("message2", "❌ Thay đổi trạng thái thất bại!");
                 }
                 response.sendRedirect("admin?view=" + type);
                 return;
@@ -111,7 +111,7 @@ public class AdminController extends HttpServlet {
                 try {
                     boolean success = dao.addEmployee(newUser);
                     if (success) {
-                        request.getSession().setAttribute("message", "✅ Thêm nhân viên thành công!");
+                        request.getSession().setAttribute("message2", "✅ Thêm nhân viên thành công!");
                         response.sendRedirect("admin?view=employees");
                         return; // Important: Stop further processing after successful redirect
                     }
@@ -142,14 +142,14 @@ public class AdminController extends HttpServlet {
                 boolean success = dao.updateUser(updatedUser); // Gọi hàm update trong DAO
 
                 if (success) {
-                    request.getSession().setAttribute("message", "✅ Cập nhật thành công!");
+                    request.getSession().setAttribute("message2", "✅ Cập nhật thành công!");
                 } else {
-                    request.setAttribute("message", "❌ Cập nhật thất bại! Vui lòng thử lại.");
+                    request.setAttribute("message2", "❌ Cập nhật thất bại! Vui lòng thử lại.");
                 }
                 response.sendRedirect("admin?view=" + type); // Quay lại trang danh sách
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("message", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                request.setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
                 response.sendRedirect("admin?view=" + request.getParameter("type"));
             }
         }
