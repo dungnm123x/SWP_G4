@@ -60,11 +60,11 @@ public class TrainController extends HttpServlet {
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int trainID = Integer.parseInt(request.getParameter("id"));
-        TrainDTO train = trainDB.getTrainById(trainID);
-        request.setAttribute("train", train);
-        listTrains(request, response);
+        throws ServletException, IOException {
+    int trainID = Integer.parseInt(request.getParameter("id"));
+    Train train = new Train(trainID, trainDAO.getTrainNameById(trainID));
+    request.setAttribute("train", train);
+    listTrains(request, response);
     }
 
     private void deleteTrain(HttpServletRequest request, HttpServletResponse response)

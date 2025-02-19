@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class CarriageController extends HttpServlet {
+
     private CarriageDAO carriageDAO;
     private TrainDAO trainDAO;
     private TrainDBContext trainDB;
@@ -24,6 +25,7 @@ public class CarriageController extends HttpServlet {
     public void init() throws ServletException {
         carriageDAO = new CarriageDAO();
         trainDAO = new TrainDAO();
+        trainDB = new TrainDBContext(); 
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

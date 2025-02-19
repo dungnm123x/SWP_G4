@@ -2,8 +2,6 @@
 package controller;
 
 import dal.TrainDBContext;
-import dto.TrainDTO;
-import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,27 +10,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.List;
+import dto.TrainDTO;
 
 public class TripController extends HttpServlet {
-    private TrainDBContext trainDB = new TrainDBContext();
+
 
     @Override
-   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String departStation = request.getParameter("departStation");
-    String arriveStation = request.getParameter("arriveStation");
-    String departureDate = request.getParameter("departureDate");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+         TrainDBContext trainDB = new TrainDBContext();
+        ArrayList<TrainDTO> train = trainDB.getTrains();
 
-    TrainDBContext db = new TrainDBContext();
-    List<TrainDTO> trains;
-
-    if (departStation == null && arriveStation == null && departureDate == null) {
-        trains = db.getTrains();
-    } else {
-        trains = db.getFilteredTrains(departStation, arriveStation, departureDate);
+        request.setAttribute("trains", train);
+        request.getRequestDispatcher("view/employee/main.jsp").forward(request, response);
     }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
 
-    request.setAttribute("trains", trains);
-    request.getRequestDispatcher("view/employee/main.jsp").forward(request, response);
-}
+    }
 }

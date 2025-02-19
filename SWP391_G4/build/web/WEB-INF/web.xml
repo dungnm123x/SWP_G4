@@ -2,7 +2,7 @@
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <servlet>
         <servlet-name>listTrainController</servlet-name>
-        <servlet-class>controller.TrainsListController</servlet-class>
+        <servlet-class>controller.TripController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>GetCarriageSeatsServlet</servlet-name>
@@ -33,13 +33,13 @@
         <servlet-class>controller.RouteController</servlet-class>
     </servlet>
     <servlet>
-    <servlet-name>TrainController</servlet-name>
-    <servlet-class>controller.TrainController</servlet-class>
-</servlet>
-<servlet>
-    <servlet-name>CarriageController</servlet-name>
-    <servlet-class>controller.CarriageController</servlet-class>
-</servlet>
+        <servlet-name>TrainController</servlet-name>
+        <servlet-class>controller.TrainController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CarriageController</servlet-name>
+        <servlet-class>controller.CarriageController</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <servlet-class>controller.ChangePasswordServlet</servlet-class>
@@ -137,13 +137,13 @@
         <url-pattern>/route</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    <servlet-name>TrainController</servlet-name>
-    <url-pattern>/train</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-    <servlet-name>CarriageController</servlet-name>
-    <url-pattern>/carriage</url-pattern>
-</servlet-mapping>
+        <servlet-name>TrainController</servlet-name>
+        <url-pattern>/train</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CarriageController</servlet-name>
+        <url-pattern>/carriage</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <url-pattern>/changePassword</url-pattern>

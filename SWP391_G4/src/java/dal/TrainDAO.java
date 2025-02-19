@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dal;
 
 import java.sql.PreparedStatement;
@@ -53,17 +49,16 @@ public class TrainDAO extends DBContext<RailwayDTO> {
         }
         return trainName;
     }
-    
+
     public List<TrainDTO> getAllTrains() {
         List<TrainDTO> trains = new ArrayList<>();
-        String sql = "SELECT t.TrainID, t.TrainName," +
-                     "COUNT(c.CarriageID) AS TotalCarriages, COALESCE(SUM(c.Capacity), 0) AS TotalSeats " +
-                     "FROM Train t " +
-                     "LEFT JOIN Carriage c ON t.TrainID = c.TrainID " +
-                     "GROUP BY t.TrainID, t.TrainName";
+        String sql = "SELECT t.TrainID, t.TrainName,"
+                + "COUNT(c.CarriageID) AS TotalCarriages, COALESCE(SUM(c.Capacity), 0) AS TotalSeats "
+                + "FROM Train t "
+                + "LEFT JOIN Carriage c ON t.TrainID = c.TrainID "
+                + "GROUP BY t.TrainID, t.TrainName";
         try (
-             PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 TrainDTO train = new TrainDTO();
                 train.setTrainID(rs.getInt("TrainID"));
@@ -82,7 +77,7 @@ public class TrainDAO extends DBContext<RailwayDTO> {
     public boolean addTrain(Train train) {
         String sql = "INSERT INTO Train (TrainName) VALUES (?)";
         try (
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+                PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, train.getTrainName());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -93,37 +88,35 @@ public class TrainDAO extends DBContext<RailwayDTO> {
 
     // Sửa thông tin tàu
     public boolean updateTrain(Train train) {
-        String sql = "UPDATE Train SET TrainName = ? WHERE TrainID = ?";
-        try (
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, train.getTrainName());
-            ps.setInt(3, train.getTrainID());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    String sql = "UPDATE Train SET TrainName = ? WHERE TrainID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, train.getTrainName());
+        ps.setInt(2, train.getTrainID()); // Sửa index từ 3 thành 2
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
     // Xóa tàu (phải xóa tất cả toa trước)
     public boolean deleteTrain(int trainID) throws SQLException {
         String deleteCarriages = "DELETE FROM Carriage WHERE TrainID = ?";
         String deleteTrain = "DELETE FROM Train WHERE TrainID = ?";
-            connection.setAutoCommit(false);
-            try (PreparedStatement ps1 = connection.prepareStatement(deleteCarriages);
-                 PreparedStatement ps2 = connection.prepareStatement(deleteTrain)) {
-                ps1.setInt(1, trainID);
-                ps1.executeUpdate();
-                ps2.setInt(1, trainID);
-                ps2.executeUpdate();
-                connection.commit();
-                return true;
-            } catch (SQLException e) {
-                connection.rollback();
-                e.printStackTrace();
-                return false;
-            }
-        
+        connection.setAutoCommit(false);
+        try (PreparedStatement ps1 = connection.prepareStatement(deleteCarriages); PreparedStatement ps2 = connection.prepareStatement(deleteTrain)) {
+            ps1.setInt(1, trainID);
+            ps1.executeUpdate();
+            ps2.setInt(1, trainID);
+            ps2.executeUpdate();
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+            return false;
+        }
+
     }
 
     @Override
