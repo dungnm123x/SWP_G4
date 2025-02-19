@@ -4,7 +4,17 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Chi tiết ${type}</title>
+        <title><c:choose>
+                <c:when test="${type == 'employees'}">
+                    Nhân viên
+                </c:when>
+                <c:when test="${type == 'customers'}">
+                    Khách hàng
+                </c:when>
+                <c:otherwise>
+                    Chi tiết
+                </c:otherwise>
+            </c:choose></title>
         <link rel="stylesheet" href="css/admin/userDetails.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <style>
@@ -17,7 +27,18 @@
         <div class="container">
             <div class="main-content">
                 <div class="header">
-                    <h1>Chi tiết ${type}</h1>
+                    <h1> Chi tiết <c:choose>
+                            
+                            <c:when test="${type == 'employees'}">
+                                nhân viên
+                            </c:when>
+                            <c:when test="${type == 'customers'}">
+                                khách hàng
+                            </c:when>
+                            <c:otherwise>
+                                Không gì cả
+                            </c:otherwise>
+                        </c:choose></h1>
                 </div>
                 <div class="content">
                     <c:if test="${not empty userDetails}">
@@ -39,7 +60,7 @@
                         <form action="admin" method="post" class="edit-form"> <%-- Form chỉnh sửa --%>
                             <input type="hidden" name="action" value="save"> <%-- Action cho save --%>
                             <input type="hidden" name="type" value="${type}">
-                             <input type="hidden" name="id" value="${userDetails.userId}">
+                            <input type="hidden" name="id" value="${userDetails.userId}">
 
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username:</label>
@@ -55,7 +76,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Số điện thoại:</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" value="${userDetails.phoneNumber}" required>
+                                <p>${userDetails.phoneNumber}</p> 
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="form-label">Địa chỉ:</label>

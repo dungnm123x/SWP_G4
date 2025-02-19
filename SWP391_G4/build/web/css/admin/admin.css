@@ -340,3 +340,9 @@ form {
 .search-btn i {
     font-size: 16px;
 }
+.btn btn-outline-danger{
+    background-color: red;
+}
+.btn btn-outline-success{
+    background-color: green
+}

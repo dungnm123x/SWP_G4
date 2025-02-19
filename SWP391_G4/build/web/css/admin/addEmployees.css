@@ -92,6 +92,9 @@ input:focus {
     background: linear-gradient(135deg, #c0392b, #e74c3c);
     transform: scale(1.05);
 }
+.error {
+    color: red;
+}
 
 /* Hiệu ứng fade-in */
 @keyframes fadeIn {

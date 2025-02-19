@@ -38,12 +38,6 @@ public class AdminController extends HttpServlet {
                         : dao.searchCustomers(search);
                 request.setAttribute("list", customers);
                 request.setAttribute("type", "customers");
-            } else if ("trains".equals(view)) {
-                List<Train> trains = (search == null || search.isEmpty())
-                        ? dao.getAllTrains()
-                        : dao.searchTrains(search);
-                request.setAttribute("list", trains);
-                request.setAttribute("type", "trains");
             } else if ("details".equals(view)) { // Xử lý yêu cầu xem chi tiết
                 String type = request.getParameter("type");
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -90,7 +84,7 @@ public class AdminController extends HttpServlet {
                 response.sendRedirect("admin?view=" + type);
                 return;
             }
-            
+
             request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
@@ -113,19 +107,25 @@ public class AdminController extends HttpServlet {
                 String address = request.getParameter("address");
 
                 User newUser = new User(0, username, password, fullName, email, phone, address, 3, true);
-                boolean success = dao.addEmployee(newUser);
 
-                if (success) {
-                    request.getSession().setAttribute("message", "✅ Thêm nhân viên thành công!");
-                    response.sendRedirect("admin?view=employees");
-                } else {
-                    request.setAttribute("message", "❌ Thêm nhân viên thất bại! Vui lòng thử lại.");
+                try {
+                    boolean success = dao.addEmployee(newUser);
+                    if (success) {
+                        request.getSession().setAttribute("message", "✅ Thêm nhân viên thành công!");
+                        response.sendRedirect("admin?view=employees");
+                        return; // Important: Stop further processing after successful redirect
+                    }
+                } catch (IllegalArgumentException ex) {
+                    request.setAttribute("errorMessage", ex.getMessage()); // Set error message
                     request.getRequestDispatcher("view/adm/addEmployees.jsp").forward(request, response);
+                    return; // Important: Stop further processing after forwarding with error
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("message", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                request.setAttribute("errorMessage", "⚠️ Lỗi hệ thống: " + e.getMessage()); // Catch and set general errors
                 request.getRequestDispatcher("view/adm/addEmployees.jsp").forward(request, response);
+                return; // Stop processing
             }
         } else if ("save".equals(action)) { // Lưu thông tin đã chỉnh sửa
             try {

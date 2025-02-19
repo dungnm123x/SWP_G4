@@ -86,13 +86,13 @@
 
                                                     <c:choose>
                                                         <c:when test="${item.status}">
-                                                            <button class="btn btn-outline-danger btn-sm"
+                                                            <button class="btn btn-outline-danger btn-sm" style="color: red; border-color: red;"
                                                                     onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
                                                                 <i class="bi bi-x-circle"></i> Vô Hiệu
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <button class="btn btn-outline-success btn-sm"
+                                                            <button class="btn btn-outline-success btn-sm" style="color: green; border-color: green;"
                                                                     onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
                                                                 <i class="bi bi-check-circle"></i> Khôi Phục
                                                             </button>
