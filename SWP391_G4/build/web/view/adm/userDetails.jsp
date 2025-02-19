@@ -76,7 +76,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Số điện thoại:</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" value="${userDetails.phoneNumber}" required>
+                                <p>${userDetails.phoneNumber}</p> 
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="form-label">Địa chỉ:</label>

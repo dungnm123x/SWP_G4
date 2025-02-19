@@ -115,23 +115,58 @@ public class DAOAdmin extends DBContext {
         return employees;
     }
 
-    public boolean addEmployee(User user) {
-        String insertQuery = "INSERT INTO [User] ( Username, Password, FullName, Email, PhoneNumber, Address, RoleID) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
-        try {
-            try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
-                ps.setString(1, user.getUsername());
-                ps.setString(2, user.getPassword());
-                ps.setString(3, user.getFullName());
-                ps.setString(4, user.getEmail());
-                ps.setString(5, user.getPhoneNumber());
-                ps.setString(6, user.getAddress());
-                ps.setInt(7, 2); // RoleID 2 for Employee
-                return ps.executeUpdate() > 0;
+    public boolean isUsernameTaken(String username) throws SQLException {
+        String query = "SELECT 1 FROM [User] WHERE Username = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu username đã tồn tại
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return false;
+    }
+
+    public boolean isEmailTaken(String email) throws SQLException {
+        String query = "SELECT 1 FROM [User] WHERE Email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu email đã tồn tại
+            }
+        }
+    }
+
+    public boolean isPhoneTaken(String phone) throws SQLException {
+        String query = "SELECT 1 FROM [User] WHERE PhoneNumber = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu số điện thoại đã tồn tại
+            }
+        }
+    }
+
+    public boolean addEmployee(User user) throws SQLException {
+        if (isUsernameTaken(user.getUsername())) {
+            throw new IllegalArgumentException("Username đã tồn tại!");
+        }
+        if (isEmailTaken(user.getEmail())) {
+            throw new IllegalArgumentException("Email đã tồn tại!");
+        }
+        if (isPhoneTaken(user.getPhoneNumber())) {
+            throw new IllegalArgumentException("Số điện thoại đã tồn tại!");
+        }
+
+        String insertQuery = "INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber, Address, RoleID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getFullName());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, user.getPhoneNumber());
+            ps.setString(6, user.getAddress());
+            ps.setInt(7, 2); // RoleID 2 for Employee
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public List<User> getAllCustomers() throws SQLException {
@@ -181,7 +216,7 @@ public class DAOAdmin extends DBContext {
         String query = "SELECT * FROM [User] WHERE UserID = ?";
         if ("employees".equals(type)) {
             query += " AND RoleID = 2";  // RoleID 2
-        }else if ("customers".equals(type)) {
+        } else if ("customers".equals(type)) {
             query += " AND RoleID = 3"; // RoleID 3
         }
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
