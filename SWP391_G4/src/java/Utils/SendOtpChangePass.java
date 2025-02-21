@@ -96,7 +96,7 @@ public class SendOtpChangePass extends HttpServlet {
         if (email != null && !email.isEmpty()) {
             // Tạo mã OTP ngẫu nhiên
             Random rand = new Random();
-            otpvalue = rand.nextInt(1255650); // OTP có thể có giá trị từ 0 đến 1255650
+            otpvalue = 100000 + rand.nextInt(900000); 
 
             // Thông tin người gửi email
             String to = email;
