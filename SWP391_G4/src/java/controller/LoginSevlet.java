@@ -4,6 +4,7 @@ package controller;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
+import Utils.Encryptor;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -79,8 +80,14 @@ public class LoginSevlet extends HttpServlet {
         System.out.println("DEBUG: Username nhập vào = " + username);
         System.out.println("DEBUG: Password nhập vào = " + password);
 
+               // Mã hóa mật khẩu nhập vào để so sánh với DB
+        String encryptedPassword = Encryptor.encryptPassword(password);
+
+        System.out.println("DEBUG: Username nhập vào = " + username);
+        System.out.println("DEBUG: Password sau khi mã hóa = " + encryptedPassword);
+
         UserDAO userDAO = new UserDAO();
-        User user = userDAO.checkUserLogin(username, password);
+        User user = userDAO.checkUserLogin(username, encryptedPassword);
 
         boolean hasError = false;
         
