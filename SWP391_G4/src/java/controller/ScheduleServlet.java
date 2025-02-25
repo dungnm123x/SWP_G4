@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.Station;
 import model.Train;
 import model.Trip;
 
@@ -84,10 +85,13 @@ public class ScheduleServlet extends HttpServlet {
             int departureStationID = Integer.parseInt(request.getParameter("diemdi"));
             int arrivalStationID = Integer.parseInt(request.getParameter("diemden"));
             String departureDate = request.getParameter("ngaydi");
+            String ticketType = request.getParameter("loaive");
 
             StationDAO stationDAO = new StationDAO();
             String departureStationName = stationDAO.getStationNameById(departureStationID);
             String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
+            List<RailwayDTO> gaList = stationDAO.getAllStations(); // Lấy danh sách Ga
+            request.setAttribute("gaList", gaList);
 
             request.setAttribute("departureStation", departureStationName);
             request.setAttribute("arrivalStation", arrivalStationName);
@@ -101,8 +105,13 @@ public class ScheduleServlet extends HttpServlet {
             for (RailwayDTO trip : tripList) {
                 String trainName = trainDAO.getTrainNameById(trip.getTrainID());
                 trainNames.put(trip.getTripID(), trainName);
-
             }
+
+            // Truyền lại dữ liệu form tìm kiếm về JSP để giữ lại giá trị đã nhập
+            request.setAttribute("selectedDeparture", departureStationID);
+            request.setAttribute("selectedArrival", arrivalStationID);
+            request.setAttribute("selectedDate", departureDate);
+            request.setAttribute("selectedTicketType", ticketType);
 
             request.setAttribute("scheduleList", tripList);
             request.setAttribute("trainNames", trainNames);

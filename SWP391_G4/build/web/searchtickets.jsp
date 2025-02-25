@@ -21,73 +21,76 @@
     <body>
 
 
-            <section id="content-container" class="clearfix">
-                <div class="center-wrap tt-relative clearfix">
-                    <form method="post" action="schedule">
-                        <label for="diemdi">Ga đi:</label>
-                        <select name="diemdi" id="diemdi" required>
-                            <option value="">Chọn ga đi</option>
-                            <c:if test="${not empty gaList}">
-                                <c:forEach var="ga" items="${gaList}">
-                                    <option value="${ga.stationID}">${ga.stationName}</option>
-                                </c:forEach>
-                            </c:if>
-                        </select>
+        <section id="content-container" class="clearfix">
+            <div class="center-wrap tt-relative clearfix">
+                <form method="post" action="schedule" class="search-form">
 
+                    <!-- Ga đi -->
+                    <select name="diemdi" id="diemdi" required>
+                        <option value="">Chọn ga đi</option>
+                        <c:forEach var="ga" items="${gaList}">
+                            <option value="${ga.stationID}" ${ga.stationID == selectedDeparture ? 'selected' : ''}>
+                                ${ga.stationName}
+                            </option>
+                        </c:forEach>
+                    </select>
 
-                        <label for="diemden">Ga đến:</label>
-                        <select name="diemden" id="diemden" required>
-                            <option value="">Chọn ga đến</option>
-                            <c:forEach var="ga" items="${gaList}">
-                                <option value="${ga.stationID}">${ga.stationName}</option>
-                            </c:forEach>
-                        </select>
+                    <!-- Ga đến -->
+                    <select name="diemden" id="diemden" required>
+                        <option value="">Chọn ga đến</option>
+                        <c:forEach var="ga" items="${gaList}">
+                            <option value="${ga.stationID}" ${ga.stationID == selectedArrival ? 'selected' : ''}>
+                                ${ga.stationName}
+                            </option>
+                        </c:forEach>
+                    </select>
 
-                        <label for="ngaydi">Ngày đi:</label>
-                        <input type="date" name="ngaydi" id="ngaydi" required>
+                    <!-- Ngày đi -->
+                    <input type="date" name="ngaydi" id="ngaydi" value="${selectedDate}" required>
 
-                        <label for="loaive">Loại vé:</label>
-                        <select name="loaive" id="loaive" required onchange="toggleReturnDate()">
-                            <option value="1">Một chiều</option>
-                            <option value="2">Khứ hồi</option>
-                        </select>
+                    <!-- Loại vé -->
+                    <select name="loaive" id="loaive" required onchange="toggleReturnDate()">
+                        <option value="1" ${selectedTicketType == '1' ? 'selected' : ''}>Một chiều</option>
+                        <option value="2" ${selectedTicketType == '2' ? 'selected' : ''}>Khứ hồi</option>
+                    </select>
 
-                        <div id="returnDateContainer">
-                            <label for="ngayve">Ngày về:</label>
-                            <input type="date" name="ngayve" id="ngayve">
-                        </div>
+                    <!-- Ngày về (ẩn nếu chọn "Một chiều") -->
+                    <div id="returnDateContainer" style="display: ${selectedTicketType == '2' ? 'block' : 'none'};">
+                        <input type="date" name="ngayve" id="ngayve">
+                    </div>
 
-                        <button type="submit">Tìm Kiếm</button>
-                    </form>
-                </div>
-            </section>
-        </div>
+                    <button type="submit">Tìm Kiếm</button>
+                </form>
 
-        <script>
-            function toggleReturnDate() {
-                var loaiVe = document.getElementById("loaive").value;
-                var returnDateContainer = document.getElementById("returnDateContainer");
+            </div>
+        </section>
+    </div>
 
-                if (loaiVe == "1") {
-                    returnDateContainer.style.display = "none";
-                    document.getElementById("ngayve").value = "";
-                } else {
-                    returnDateContainer.style.display = "block";
-                }
+    <script>
+        function toggleReturnDate() {
+            var loaiVe = document.getElementById("loaive").value;
+            var returnDateContainer = document.getElementById("returnDateContainer");
+
+            if (loaiVe == "1") {
+                returnDateContainer.style.display = "none";
+                document.getElementById("ngayve").value = "";
+            } else {
+                returnDateContainer.style.display = "block";
             }
+        }
 
-            window.onload = function () {
-                toggleReturnDate();
+        window.onload = function () {
+            toggleReturnDate();
+        }
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const diemdi = document.getElementById("diemdi").value;
+            const diemden = document.getElementById("diemden").value;
+            if (diemdi === diemden) {
+                alert("Ga đi và ga đến không thể giống nhau!");
+                event.preventDefault();
             }
-
-            document.querySelector("form").addEventListener("submit", function (event) {
-                const diemdi = document.getElementById("diemdi").value;
-                const diemden = document.getElementById("diemden").value;
-                if (diemdi === diemden) {
-                    alert("Ga đi và ga đến không thể giống nhau!");
-                    event.preventDefault();
-                }
-            });
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>

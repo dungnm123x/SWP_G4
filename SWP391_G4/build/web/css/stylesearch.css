@@ -39,45 +39,66 @@ h2 {
 }
 
 /* Form Tìm kiếm vé */
-form {
+.search-container {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-label {
-    font-weight: 600;
-    color: #444;
-}
-
-select, input[type="date"] {
+    justify-content: center;
+    align-items: center;
     width: 100%;
+    max-width: 1200px; /* Giới hạn tối đa chiều rộng */
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Form tìm kiếm theo hàng ngang */
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 900px; /* Giới hạn chiều rộng form */
+    background: #ffffff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
     padding: 10px;
-    font-size: 15px;
+}
+
+/* Căn chỉnh từng phần tử trong form */
+.search-form select,
+.search-form input[type="date"],
+.search-form button {
+    width: auto;
+    min-width: 150px;
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    transition: border 0.3s ease;
 }
 
-select:focus, input[type="date"]:focus {
-    border: 1px solid #007bff;
-    outline: none;
+/* Loại bỏ khoảng trống thừa */
+body, html {
+    margin: 0;
+    padding: 0;
 }
 
-button {
-    padding: 12px;
+/* Định dạng lại nút tìm kiếm */
+.search-form button {
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
     background-color: #007bff;
     color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
     transition: background 0.3s ease;
 }
 
-button:hover {
+.search-form button:hover {
     background-color: #0056b3;
 }
+
 
 /* Bảng hiển thị lịch trình */
 .table {

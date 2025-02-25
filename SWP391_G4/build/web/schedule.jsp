@@ -16,21 +16,12 @@
 
         <link href="css/stylesearch.css" rel="stylesheet" type="text/css"/>
         <script src="wp-includes/js/jquery/jquery.js"></script>
+        <jsp:include page="/navbar.jsp"></jsp:include>
+ <jsp:include page="/searchtickets.jsp"></jsp:include>
     </head>
 
     <body>
-        <div id="tt-wide-layout">
-            <div id="tt-header-wrap">
-                <header>
-                    <div class="center-wrap">
-                        <nav>
-                            <ul id="menu-main-nav">
-                                <li class="menu-item"><a href="home">Trang chủ</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </header>
-            </div>
+       
 
             <section id="content-container" class="clearfix">
                 <div class="center-wrap tt-relative clearfix">

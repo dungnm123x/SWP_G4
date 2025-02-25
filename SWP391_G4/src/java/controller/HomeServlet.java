@@ -5,6 +5,8 @@
 
 package controller;
 
+import dal.StationDAO;
+import dto.RailwayDTO;
 import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,6 +14,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *
@@ -54,6 +57,13 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        try {
+            StationDAO stationDAO = new StationDAO();
+            List<RailwayDTO> gaList = stationDAO.getAllStations();
+            request.setAttribute("gaList", gaList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         RequestDispatcher dispatcher = request.getRequestDispatcher("/home.jsp");
         dispatcher.forward(request, response);
     } 
