@@ -1,0 +1,348 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f4f7f9;
+    color: #333;
+    display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: #2C3E50;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar ul li:hover {
+    background: #00509e;
+}
+.logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+/* Container chính */
+.container {
+    margin-left: 250px;
+    padding: 20px;
+    width: calc(100% - 250px);
+    margin-top: 60px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filter-section {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    margin: 0 10px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Nút lọc */
+.btn-primary {
+    background: #00509e;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background: #2C3E50;
+}
+
+.returnbtn {
+    background: #00509e;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+    margin-top: 10px;
+    margin-left: 330px;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+}
+
+.returnbtn:hover {
+    background: #2C3E50;
+}
+
+
+/* Bảng danh sách */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #2C3E50;
+    color: white;
+}
+
+tr:hover {
+    background: #f1f1f1;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .navbar {
+        width: 100%;
+        left: 0;
+    }
+
+    .container {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin: 10px 0;
+    }
+}
+
+.logout-button {
+    background: #d9534f; 
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    position: absolute;
+    bottom: 20px; 
+    left: 0;
+    transition: 0.3s;
+}
+
+.logout-button:hover {
+    background: #c9302c;
+}
+input {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    padding: 8px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+form {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.edit-link {
+    display: inline-block;
+    background-color: #89AAF0;
+    color: white;
+    text-decoration: none;
+     padding: 8px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+}
+
+.edit-link:hover {
+   opacity: 0.8;
+}
+.logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+
+.action-buttons {
+    text-align: center;
+}
+.add-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Tạo khoảng cách giữa icon và text */
+    background: linear-gradient(to right, #2C3E50, #34495E); /* Hiệu ứng gradient */
+    color: white;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 30px; /* Làm tròn nút */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bóng đổ */
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-add i {
+    font-size: 20px;
+}
+
+.btn-add:hover {
+    background: linear-gradient(to right, #2C3E50, #34495E);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px); /* Hiệu ứng nhấn */
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.search-container form {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 25px;
+    padding: 5px 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-input {
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    width: 200px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.search-btn {
+    background: #2C3E50;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 5px;
+}
+
+.search-btn:hover {
+    background: #2C3E50;
+}
+
+.search-btn i {
+    font-size: 16px;
+}
+.btn btn-outline-danger{
+    background-color: red;
+}
+.btn btn-outline-success{
+    background-color: green
+}

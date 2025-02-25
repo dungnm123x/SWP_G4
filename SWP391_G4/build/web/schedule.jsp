@@ -1,4 +1,4 @@
-<%-- 
+    <%-- 
     Document   : schedule
     Created on : Feb 12, 2025, 11:46:05 PM
     Author     : Admin
@@ -25,8 +25,7 @@
                     <div class="center-wrap">
                         <nav>
                             <ul id="menu-main-nav">
-                                <li class="menu-item"><a href="index.jsp">Trang chủ</a></li>
-                                <li class="menu-item"><a href="searchticket">Tìm Kiếm Vé</a></li>
+                                <li class="menu-item"><a href="home">Trang chủ</a></li>
                             </ul>
                         </nav>
                     </div>

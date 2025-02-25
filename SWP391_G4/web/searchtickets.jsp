@@ -19,23 +19,10 @@
     </head>
 
     <body>
-        <div id="tt-wide-layout">
-            <div id="tt-header-wrap">
-                <header>
-                    <div class="center-wrap">
-                        <nav>
-                            <ul id="menu-main-nav">
-                                <li class="menu-item"><a href="index.jsp">Trang chủ</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </header>
-            </div>
+
 
             <section id="content-container" class="clearfix">
                 <div class="center-wrap tt-relative clearfix">
-                    <h2>Tìm kiếm vé</h2>
-
                     <form method="post" action="schedule">
                         <label for="diemdi">Ga đi:</label>
                         <select name="diemdi" id="diemdi" required>

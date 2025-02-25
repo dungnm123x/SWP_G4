@@ -70,32 +70,5 @@ public class TripDAO extends DBContext<RailwayDTO> {
     public RailwayDTO get(int id) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    public static void main(String[] args) {
-        try {
-            TripDAO tripDAO = new TripDAO();
-            int departureStationID = 1; 
-            int arrivalStationID = 2;   
-            String departureDate = "2025-02-15"; 
-
-            List<RailwayDTO> tripList = tripDAO.getTripsByRoute(departureStationID, arrivalStationID, departureDate);
-
-            if (tripList.isEmpty()) {
-                System.out.println("Không có chuyến tàu nào phù hợp.");
-            } else {
-                System.out.println("Danh sách chuyến tàu:");
-                for (RailwayDTO trip : tripList) {
-                    System.out.println("TripID: " + trip.getTripID()
-                            + " | TrainID: " + trip.getTrainID()
-                            + " | RouteID: " + trip.getRouteID()
-                            + " | DepartureTime: " + trip.getDepartureTime()
-                            + " | ArrivalTime: " + trip.getArrivalTime()
-                            + " | Status: " + trip.getTripStatus());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
 
