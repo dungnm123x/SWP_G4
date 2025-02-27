@@ -11,20 +11,18 @@ import model.Train;
 
 public class TrainDAO extends DBContext<RailwayDTO> {
 
-    public RailwayDTO getTrainById(int trainID) {
-        RailwayDTO train = null;
-        String sql = "SELECT * FROM Train WHERE TrainID = ?";
+    public Train getTrainById(int trainID) {
+        Train train = null;
+        String sql = "SELECT TrainID, TrainName FROM Train WHERE TrainID = ?";
+
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, trainID);
+
             try (ResultSet rs = stm.executeQuery()) {
                 if (rs.next()) {
-                    train = new RailwayDTO(
-                            0, 0, null, trainID, 0,
-                            0, 0, null, null,
-                            0, null, null,
-                            0, 0, 0, 0, 0.0,
-                            0, null, null, 0.0,
-                            0, null, null, null
+                    train = new Train(
+                            rs.getInt("TrainID"), // ID của tàu
+                            rs.getString("TrainName") // Tên của tàu
                     );
                 }
             }
@@ -88,16 +86,16 @@ public class TrainDAO extends DBContext<RailwayDTO> {
 
     // Sửa thông tin tàu
     public boolean updateTrain(Train train) {
-    String sql = "UPDATE Train SET TrainName = ? WHERE TrainID = ?";
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setString(1, train.getTrainName());
-        ps.setInt(2, train.getTrainID()); // Sửa index từ 3 thành 2
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+        String sql = "UPDATE Train SET TrainName = ? WHERE TrainID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, train.getTrainName());
+            ps.setInt(2, train.getTrainID()); // Sửa index từ 3 thành 2
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
     // Xóa tàu (phải xóa tất cả toa trước)
     public boolean deleteTrain(int trainID) throws SQLException {

@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.Station;
 
 /**
  *
@@ -59,7 +60,7 @@ public class HomeServlet extends HttpServlet {
     throws ServletException, IOException {
         try {
             StationDAO stationDAO = new StationDAO();
-            List<RailwayDTO> gaList = stationDAO.getAllStations();
+            List<Station> gaList = stationDAO.getAllStations();
             request.setAttribute("gaList", gaList);
         } catch (Exception e) {
             e.printStackTrace();

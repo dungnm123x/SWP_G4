@@ -9,11 +9,12 @@ import java.util.Date;
  * @author dung9
  */
 
-   
 
 public class Booking {
     private int bookingID;
     private int userID;
+    private int tripID;
+    private Integer roundTripTripID; // Chuyến về nếu có (nullable)
     private Date bookingDate;
     private double totalPrice;
     private String paymentStatus;
@@ -23,9 +24,11 @@ public class Booking {
     }
 
     // Constructor
-    public Booking(int bookingID, int userID, Date bookingDate, double totalPrice, String paymentStatus, String bookingStatus) {
+    public Booking(int bookingID, int userID, int tripID, Integer roundTripTripID, Date bookingDate, double totalPrice, String paymentStatus, String bookingStatus) {
         this.bookingID = bookingID;
         this.userID = userID;
+        this.tripID = tripID;
+        this.roundTripTripID = roundTripTripID;
         this.bookingDate = bookingDate;
         this.totalPrice = totalPrice;
         this.paymentStatus = paymentStatus;
@@ -47,6 +50,22 @@ public class Booking {
 
     public void setUserID(int userID) {
         this.userID = userID;
+    }
+
+    public int getTripID() {
+        return tripID;
+    }
+
+    public void setTripID(int tripID) {
+        this.tripID = tripID;
+    }
+
+    public Integer getRoundTripTripID() {
+        return roundTripTripID;
+    }
+
+    public void setRoundTripTripID(Integer roundTripTripID) {
+        this.roundTripTripID = roundTripTripID;
     }
 
     public Date getBookingDate() {
@@ -83,8 +102,11 @@ public class Booking {
 
     @Override
     public String toString() {
-        return "Booking [bookingID=" + bookingID + ", userID=" + userID + ", bookingDate=" + bookingDate + ", totalPrice=" + totalPrice + ", paymentStatus=" + paymentStatus + ", bookingStatus=" + bookingStatus + "]";
+        return "Booking [bookingID=" + bookingID + ", userID=" + userID + ", tripID=" + tripID + 
+               ", roundTripTripID=" + roundTripTripID + ", bookingDate=" + bookingDate + 
+               ", totalPrice=" + totalPrice + ", paymentStatus=" + paymentStatus + 
+               ", bookingStatus=" + bookingStatus + "]";
     }
 }
- 
+
 

@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller;
 
 import dal.CarriageDAO;
@@ -61,8 +60,6 @@ public class GetCarriageSeatsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -73,22 +70,25 @@ public class GetCarriageSeatsServlet extends HttpServlet {
         SeatDAO seatDAO = new SeatDAO();
 
         try (PrintWriter out = response.getWriter()) {
-            List<RailwayDTO> carriages = carriageDAO.getCarriagesByTrainID(trainID);
+            List<Carriage> carriages = carriageDAO.getCarriagesByTrainID(trainID);
             if (carriages.isEmpty()) {
                 out.println("<p class='text-danger'>Không có toa nào cho tàu này.</p>");
                 return;
             }
 
-            for (RailwayDTO carriage : carriages) {
+            for (Carriage carriage : carriages) {
                 out.println("<div class='carriage-container'>");
                 out.println("<h5 class='carriage-header'>Toa " + carriage.getCarriageNumber() + " (" + carriage.getCarriageType() + ")</h5>");
                 out.println("<div class='seat-grid'>");
 
-                List<RailwayDTO> seats = seatDAO.getSeatsByCarriageID(carriage.getCarriageID());
-                for (RailwayDTO seat : seats) {
-                    String seatClass = "seat-available";
+                List<Seat> seats = seatDAO.getSeatsByCarriageID(carriage.getCarriageID());
+                for (Seat seat : seats) {
+                    // Kiểm tra null trước khi sử dụng getSeatStatus()
+                    String seatStatus = (seat.getStatus() != null) ? seat.getStatus() : "Unknown";
 
-                    switch (seat.getSeatStatus()) {
+                    // Xác định class CSS theo trạng thái ghế
+                    String seatClass;
+                    switch (seatStatus) {
                         case "Booked":
                             seatClass = "seat-booked";
                             break;
@@ -98,11 +98,14 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                         case "Out of Service":
                             seatClass = "seat-outofservice";
                             break;
+                        default:
+                            seatClass = "seat-available";
+                            break;
                     }
 
-                    out.println("<div class='seat " + seatClass + "'>"
-                            + "Ghế " + seat.getSeatNumber() + " - " + seat.getSeatStatus()
-                            + " (" + seat.getSeatType() + ")</div>");
+                    out.println("<div class='seat " + seatClass + "' data-tooltip='Ghế "
+                            + seat.getSeatNumber() + " - " + seatStatus + "'>"
+                            + seat.getSeatNumber() + "</div>");
                 }
 
                 out.println("</div>");

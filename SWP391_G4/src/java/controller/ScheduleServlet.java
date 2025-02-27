@@ -86,35 +86,51 @@ public class ScheduleServlet extends HttpServlet {
             int arrivalStationID = Integer.parseInt(request.getParameter("diemden"));
             String departureDate = request.getParameter("ngaydi");
             String ticketType = request.getParameter("loaive");
+            String returnDate = request.getParameter("ngayve");
 
+            // Lấy thông tin ga đi và ga đến
             StationDAO stationDAO = new StationDAO();
             String departureStationName = stationDAO.getStationNameById(departureStationID);
             String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
-            List<RailwayDTO> gaList = stationDAO.getAllStations(); // Lấy danh sách Ga
+
+            // Lấy danh sách ga
+            List<Station> gaList = stationDAO.getAllStations();
             request.setAttribute("gaList", gaList);
 
-            request.setAttribute("departureStation", departureStationName);
-            request.setAttribute("arrivalStation", arrivalStationName);
-            request.setAttribute("departureDate", departureDate);
-
+            // Lấy danh sách chuyến đi
             TripDAO tripDAO = new TripDAO();
-            List<RailwayDTO> tripList = tripDAO.getTripsByRoute(departureStationID, arrivalStationID, departureDate);
+            List<Trip> tripList = tripDAO.getTripsByRoute(departureStationID, arrivalStationID, departureDate);
 
-            TrainDAO trainDAO = new TrainDAO();
-            Map<Integer, String> trainNames = new HashMap<>();
-            for (RailwayDTO trip : tripList) {
-                String trainName = trainDAO.getTrainNameById(trip.getTrainID());
-                trainNames.put(trip.getTripID(), trainName);
+            // Nếu là vé khứ hồi, lấy danh sách chuyến về
+            List<Trip> returnTripList = null;
+            if ("2".equals(ticketType) && returnDate != null && !returnDate.isEmpty()) {
+                returnTripList = tripDAO.getTripsByRoute(arrivalStationID, departureStationID, returnDate);
             }
 
-            // Truyền lại dữ liệu form tìm kiếm về JSP để giữ lại giá trị đã nhập
+            // Lấy danh sách tên tàu
+            TrainDAO trainDAO = new TrainDAO();
+            Map<Integer, Train> trainMap = new HashMap<>();
+            for (Trip trip : tripList) {
+                Train train = trainDAO.getTrainById(trip.getTrain().getTrainID());
+                trainMap.put(trip.getTripID(), train);
+            }
+
+            // Giữ lại dữ liệu khi tìm kiếm
             request.setAttribute("selectedDeparture", departureStationID);
             request.setAttribute("selectedArrival", arrivalStationID);
             request.setAttribute("selectedDate", departureDate);
             request.setAttribute("selectedTicketType", ticketType);
+            request.setAttribute("returnDate", returnDate);
+
+            request.setAttribute("departureStation", departureStationName);
+            request.setAttribute("arrivalStation", arrivalStationName);
+            request.setAttribute("departureDate", departureDate);
+            request.setAttribute("selectedTicketType", ticketType);
+            request.setAttribute("returnDate", returnDate);
 
             request.setAttribute("scheduleList", tripList);
-            request.setAttribute("trainNames", trainNames);
+            request.setAttribute("returnScheduleList", returnTripList);
+            request.setAttribute("trainMap", trainMap);
 
             request.getRequestDispatcher("schedule.jsp").forward(request, response);
         } catch (Exception e) {

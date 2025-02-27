@@ -185,6 +185,7 @@ nav a:hover {
 }
 
 /* Bố cục ghế theo dạng lưới */
+/* Bố cục ghế theo dạng lưới */
 .seat-grid {
     display: flex;
     flex-wrap: wrap;
@@ -204,26 +205,56 @@ nav a:hover {
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
     border: 1px solid #000; /* Viền đen để rõ hơn */
+    position: relative;
+ 
+    color: white; /* Hiển thị số ghế */
+    font-size: 14px;
+
+ /* Ẩn chữ mặc định */
 }
 
 /* Màu sắc ghế theo trạng thái */
 .seat-available {
-    background-color: #28a745;
-    color: white;
-} /* Xanh lá */
+    background-color: #28a745; /* Xanh lá */
+} 
 .seat-booked {
-    background-color: #dc3545;
-    color: white;
-} /* Đỏ */
+    background-color: #dc3545; /* Đỏ */
+} 
 .seat-reserved {
-    background-color: #ffc107;
-    color: black;
-} /* Vàng */
+    background-color: #ffc107; /* Vàng */
+} 
 .seat-outofservice {
-    background-color: #6c757d;
-    color: white;
-} /* Xám */
+    background-color: #6c757d; /* Xám */
+}
 
+/* Hiển thị chữ khi hover vào ghế */
+.seat:hover {
+    color: white !important;
+}
+
+/* Hiển thị tooltip khi di chuột vào ghế */
+.seat::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 5px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Khi hover vào ghế thì tooltip sẽ hiện lên */
+.seat:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
 
 
 

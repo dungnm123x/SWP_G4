@@ -10,24 +10,32 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import dto.RailwayDTO;
+import model.Carriage;
+import model.Seat;
 
 public class SeatDAO extends DBContext<RailwayDTO> {
 
-    public List<RailwayDTO> getSeatsByCarriageID(int carriageID) {
-        List<RailwayDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM Seat WHERE CarriageID = ?";
+    public List<Seat> getSeatsByCarriageID(int carriageID) {
+        List<Seat> list = new ArrayList<>();
+        String sql = "SELECT SeatID, SeatNumber, Status, SeatType, CarriageID FROM Seat WHERE CarriageID = ?";
+
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, carriageID);
+
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
-                    list.add(new RailwayDTO(
-                            0, 0, null, 0, 0,
-                            rs.getInt("SeatID"),
-                            rs.getInt("SeatNumber"),
-                            rs.getString("Status"),
-                            rs.getString("SeatType"),
-                            0, null, null, 0, 0, 0, 0, 0.0, 0, null, null, 0.0, 0, null, null, null
-                    ));
+                    
+                    Carriage carriage = new Carriage(rs.getInt("CarriageID"), null, null, null, 0);
+
+                    
+                    Seat seat = new Seat();
+                    seat.setSeatID(rs.getInt("SeatID"));
+                    seat.setSeatNumber(String.valueOf(rs.getInt("SeatNumber"))); // Chuyển số thành chuỗi
+                    seat.setStatus(rs.getString("Status") != null ? rs.getString("Status") : "Unknown");
+                    seat.setSeatType(rs.getString("SeatType"));
+                    seat.setCarriage(carriage); 
+
+                    list.add(seat);
                 }
             }
         } catch (SQLException e) {
@@ -61,4 +69,3 @@ public class SeatDAO extends DBContext<RailwayDTO> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
-

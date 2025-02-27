@@ -2,8 +2,8 @@
 package model;
 public class Route {
     private int routeID;
-    private Station departureStation;
-    private Station arrivalStation;
+    private Station departureStationID;
+    private Station arrivalStationID;
     private double distance;
     private double basePrice;
 
@@ -12,8 +12,8 @@ public class Route {
 
     public Route(int routeID, Station departureStation, Station arrivalStation, double distance, double basePrice) {
         this.routeID = routeID;
-        this.departureStation = departureStation;
-        this.arrivalStation = arrivalStation;
+        this.departureStationID = departureStation;
+        this.arrivalStationID = arrivalStation;
         this.distance = distance;
         this.basePrice = basePrice;
     }
@@ -28,19 +28,19 @@ public class Route {
     }
 
     public Station getDepartureStation() {
-        return departureStation;
+        return departureStationID;
     }
 
     public void setDepartureStation(Station departureStation) {
-        this.departureStation = departureStation;
+        this.departureStationID = departureStation;
     }
 
     public Station getArrivalStation() {
-        return arrivalStation;
+        return arrivalStationID;
     }
 
     public void setArrivalStation(Station arrivalStation) {
-        this.arrivalStation = arrivalStation;
+        this.arrivalStationID = arrivalStation;
     }
 
     public double getDistance() {

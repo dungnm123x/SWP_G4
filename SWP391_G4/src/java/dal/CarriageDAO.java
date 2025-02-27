@@ -11,20 +11,22 @@ import model.Train;
 
 public class CarriageDAO extends DBContext<RailwayDTO> {
 
-    public List<RailwayDTO> getCarriagesByTrainID(int trainID) {
-        List<RailwayDTO> list = new ArrayList<>();
+    public List<Carriage> getCarriagesByTrainID(int trainID) {
+        List<Carriage> list = new ArrayList<>();
         String sql = "SELECT * FROM Carriage WHERE TrainID = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, trainID);
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
-                    list.add(new RailwayDTO(
-                            rs.getInt("CarriageID"),
-                            rs.getInt("CarriageNumber"),
+                    Train train = new Train(rs.getInt("TrainID"));
+                    
+                    list.add(new Carriage(
+                            rs.getInt("CarriageID"), 
+                            rs.getString("CarriageNumber"),
                             rs.getString("CarriageType"),
-                            rs.getInt("TrainID"),
-                            rs.getInt("Capacity"),
-                            0, 0, null, null, 0, null, null, 0, 0, 0, 0, 0.0, 0, null, null, 0.0, 0, null, null, null
+                            train,
+                            rs.getInt("Capacity")
+                           
                     ));
                 }
             }

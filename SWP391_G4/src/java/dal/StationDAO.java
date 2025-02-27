@@ -14,18 +14,15 @@ import model.Station;
 
 public class StationDAO extends DBContext<RailwayDTO> {
 
-    public List<RailwayDTO> getAllStations() {
-        List<RailwayDTO> stationList = new ArrayList<>();
+    public List<Station> getAllStations() {
+        List<Station> stationList = new ArrayList<>();
         String sql = "SELECT * FROM Station";
         try (PreparedStatement stm = connection.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
-                stationList.add(new RailwayDTO(
-                        0, 0, null, 0, 0,
-                        0, 0, null, null,
-                        rs.getInt("StationID"),
-                        rs.getString("StationName"),
-                        rs.getString("Address"),
-                        0, 0, 0, 0, 0.0, 0, null, null, 0.0, 0, null, null, null
+                stationList.add(new Station(
+                      rs.getInt("StationID"),
+                        rs.getString("StationName"), 
+                        rs.getString("Address")
                 ));
             }
         } catch (SQLException e) {
@@ -33,7 +30,8 @@ public class StationDAO extends DBContext<RailwayDTO> {
         }
         return stationList;
     }
- public List<Station> getStations() {
+
+    public List<Station> getStations() {
         List<Station> stations = new ArrayList<>();
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM Station");
@@ -46,6 +44,7 @@ public class StationDAO extends DBContext<RailwayDTO> {
         }
         return stations;
     }
+
     public String getStationNameById(int stationID) {
         String stationName = null;
         String sql = "SELECT StationName FROM Station WHERE StationID = ?";
@@ -61,25 +60,26 @@ public class StationDAO extends DBContext<RailwayDTO> {
         }
         return stationName;
     }
-    public Station getStationById(int stationID) {
-    String sql = "SELECT * FROM Station WHERE StationID = ?";
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setInt(1, stationID);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return new Station(
-                    rs.getInt("StationID"),
-                    rs.getString("StationName"),
-                    rs.getString("Address")
-                );
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return null;}
 
-    
+    public Station getStationById(int stationID) {
+        String sql = "SELECT * FROM Station WHERE StationID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, stationID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Station(
+                            rs.getInt("StationID"),
+                            rs.getString("StationName"),
+                            rs.getString("Address")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public void addStation(Station station) {
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO Station (StationName, Address) VALUES (?, ?)");
@@ -92,17 +92,16 @@ public class StationDAO extends DBContext<RailwayDTO> {
     }
 
     public void updateStation(Station station) {
-    String sql = "UPDATE Station SET StationName = ?, Address = ? WHERE StationID = ?";
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setString(1, station.getStationName());
-        ps.setString(2, station.getAddress());
-        ps.setInt(3, station.getStationID());
-        ps.executeUpdate();
-    } catch (SQLException e) {
-        e.printStackTrace();
+        String sql = "UPDATE Station SET StationName = ?, Address = ? WHERE StationID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, station.getStationName());
+            ps.setString(2, station.getAddress());
+            ps.setInt(3, station.getStationID());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-}
-
 
     public void deleteStation(int stationID) {
         try {

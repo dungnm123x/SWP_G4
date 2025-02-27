@@ -23,7 +23,7 @@ public class RailwayDTO {
     
     private int stationID;
     private String stationName;
-    private String stationAddress;
+    private String Address;
     
     private int routeID;
     private int departureStationID;
@@ -35,21 +35,23 @@ public class RailwayDTO {
     private String cccd;
     private String ticketStatus;
     private double ticketPrice;
-    
+
     private int tripID;
     private String departureTime;
     private String arrivalTime;
     private String tripStatus;
+    private String tripType;
+    private Integer roundTripReference; // Tham chiếu chuyến về nếu có
+
+    private int bookingID;
+    private int userID;
+    private int tripIDBooking;
+    private Integer roundTripTripID; // Vé khứ hồi nếu có
 
     public RailwayDTO() {
     }
 
-    public RailwayDTO(int carriageID, int carriageNumber, String carriageType, int trainID, int capacity,
-                      int seatID, int seatNumber, String seatStatus, String seatType,
-                      int stationID, String stationName, String stationAddress,
-                      int routeID, int departureStationID, int arrivalStationID, int distance, double basePrice,
-                      int ticketID, String cccd, String ticketStatus, double ticketPrice,
-                      int tripID, String departureTime, String arrivalTime, String tripStatus) {
+    public RailwayDTO(int carriageID, int carriageNumber, String carriageType, int trainID, int capacity, int seatID, int seatNumber, String seatStatus, String seatType, int stationID, String stationName, String Address, int routeID, int departureStationID, int arrivalStationID, int distance, double basePrice, int ticketID, String cccd, String ticketStatus, double ticketPrice, int tripID, String departureTime, String arrivalTime, String tripStatus, String tripType, Integer roundTripReference, int bookingID, int userID, int tripIDBooking, Integer roundTripTripID) {
         this.carriageID = carriageID;
         this.carriageNumber = carriageNumber;
         this.carriageType = carriageType;
@@ -61,7 +63,7 @@ public class RailwayDTO {
         this.seatType = seatType;
         this.stationID = stationID;
         this.stationName = stationName;
-        this.stationAddress = stationAddress;
+        this.Address = Address;
         this.routeID = routeID;
         this.departureStationID = departureStationID;
         this.arrivalStationID = arrivalStationID;
@@ -75,6 +77,12 @@ public class RailwayDTO {
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.tripStatus = tripStatus;
+        this.tripType = tripType;
+        this.roundTripReference = roundTripReference;
+        this.bookingID = bookingID;
+        this.userID = userID;
+        this.tripIDBooking = tripIDBooking;
+        this.roundTripTripID = roundTripTripID;
     }
 
     public int getCarriageID() {
@@ -165,12 +173,12 @@ public class RailwayDTO {
         this.stationName = stationName;
     }
 
-    public String getStationAddress() {
-        return stationAddress;
+    public String getAddress() {
+        return Address;
     }
 
-    public void setStationAddress(String stationAddress) {
-        this.stationAddress = stationAddress;
+    public void setAddress(String Address) {
+        this.Address = Address;
     }
 
     public int getRouteID() {
@@ -277,6 +285,56 @@ public class RailwayDTO {
         this.tripStatus = tripStatus;
     }
 
+    public String getTripType() {
+        return tripType;
+    }
+
+    public void setTripType(String tripType) {
+        this.tripType = tripType;
+    }
+
+    public Integer getRoundTripReference() {
+        return roundTripReference;
+    }
+
+    public void setRoundTripReference(Integer roundTripReference) {
+        this.roundTripReference = roundTripReference;
+    }
+
+    public int getBookingID() {
+        return bookingID;
+    }
+
+    public void setBookingID(int bookingID) {
+        this.bookingID = bookingID;
+    }
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
+    public int getTripIDBooking() {
+        return tripIDBooking;
+    }
+
+    public void setTripIDBooking(int tripIDBooking) {
+        this.tripIDBooking = tripIDBooking;
+    }
+
+    public Integer getRoundTripTripID() {
+        return roundTripTripID;
+    }
+
+    public void setRoundTripTripID(Integer roundTripTripID) {
+        this.roundTripTripID = roundTripTripID;
+    }
+
+   
+    
     public int getStatus() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }

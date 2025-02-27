@@ -9,6 +9,8 @@ public class Trip {
     private Date departureTime;
     private Date arrivalTime;
     private String tripStatus;
+    private String tripType;
+    private Integer roundTripReference; // Chuyến về nếu có
 
     public Trip() {
     }
@@ -60,5 +62,21 @@ public class Trip {
 
     public void setTripStatus(String tripStatus) {
         this.tripStatus = tripStatus;
+    }
+
+    public String getTripType() {
+        return tripType;
+    }
+
+    public void setTripType(String tripType) {
+        this.tripType = tripType;
+    }
+
+    public Integer getRoundTripReference() {
+        return roundTripReference;
+    }
+
+    public void setRoundTripReference(Integer roundTripReference) {
+        this.roundTripReference = roundTripReference;
     }
 }

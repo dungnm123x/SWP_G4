@@ -69,7 +69,7 @@ public class SearchTicketServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             StationDAO stationDAO = new StationDAO();
-            List<RailwayDTO> gaList = stationDAO.getAllStations();
+            List<Station> gaList = stationDAO.getAllStations();
             request.setAttribute("gaList", gaList);
         } catch (Exception e) {
             e.printStackTrace();
