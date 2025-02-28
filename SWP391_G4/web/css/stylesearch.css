@@ -47,6 +47,12 @@ h2 {
     max-width: 1200px; /* Giới hạn tối đa chiều rộng */
     margin: 0 auto;
     padding: 0;
+
+    
+
+    margin-top: 48px; /* Điều chỉnh khoảng cách theo chiều cao navbar */
+
+
 }
 
 /* Form tìm kiếm theo hàng ngang */

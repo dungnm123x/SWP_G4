@@ -9,18 +9,27 @@
 
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tìm Kiếm Vé - Đường Sắt Việt Nam</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tìm Kiếm Vé - Đường Sắt Việt Nam</title>
 
-    <link href="css/stylesearch.css" rel="stylesheet" type="text/css"/>
-    <script src="wp-includes/js/jquery/jquery.js"></script>
-</head>
+        <link href="css/stylesearch.css" rel="stylesheet" type="text/css"/>
+        <script src="wp-includes/js/jquery/jquery.js"></script>
+    </head>
 
-<body>
-    <section id="content-container">
-        <div class="center-wrap">
+    <body>
+
+        <%-- Kiểm tra nếu có tham số layout, mặc định là "horizontal" nếu không có --%>
+        <%
+            String layout = request.getParameter("layout");
+            if (layout == null) {
+                layout = "horizontal"; // Mặc định là ngang
+            }
+        %>
+
+        <div class="search-container <%= layout.equals("vertical") ? "search-vertical" : "search-horizontal" %>">
+
             <form method="post" action="schedule" class="search-form">
 
                 <!-- Ga đi -->
@@ -60,34 +69,34 @@
                 <button type="submit">Tìm Kiếm</button>
             </form>
         </div>
-    </section>
 
-    <script>
-        function toggleReturnDate() {
-            var loaiVe = document.getElementById("loaive").value;
-            var returnDateContainer = document.getElementById("returnDateContainer");
 
-            if (loaiVe == "1") {
-                returnDateContainer.style.display = "none";
-                document.getElementById("ngayve").value = "";
-            } else {
-                returnDateContainer.style.display = "block";
+        <script>
+            function toggleReturnDate() {
+                var loaiVe = document.getElementById("loaive").value;
+                var returnDateContainer = document.getElementById("returnDateContainer");
+
+                if (loaiVe == "1") {
+                    returnDateContainer.style.display = "none";
+                    document.getElementById("ngayve").value = "";
+                } else {
+                    returnDateContainer.style.display = "block";
+                }
             }
-        }
 
-        window.onload = function () {
-            toggleReturnDate();
-        }
-
-        // Kiểm tra nếu ga đi và ga đến giống nhau thì báo lỗi
-        document.querySelector("form").addEventListener("submit", function (event) {
-            const diemdi = document.getElementById("diemdi").value;
-            const diemden = document.getElementById("diemden").value;
-            if (diemdi === diemden) {
-                alert("Ga đi và ga đến không thể giống nhau!");
-                event.preventDefault();
+            window.onload = function () {
+                toggleReturnDate();
             }
-        });
-    </script>
-</body>
+
+            // Kiểm tra nếu ga đi và ga đến giống nhau thì báo lỗi
+            document.querySelector("form").addEventListener("submit", function (event) {
+                const diemdi = document.getElementById("diemdi").value;
+                const diemden = document.getElementById("diemden").value;
+                if (diemdi === diemden) {
+                    alert("Ga đi và ga đến không thể giống nhau!");
+                    event.preventDefault();
+                }
+            });
+        </script>
+    </body>
 </html>
