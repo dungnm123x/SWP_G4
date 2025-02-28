@@ -6,8 +6,8 @@ package controller.employee;
 
 import dal.BlogDAO;
 import model.User;
-import entity.Blog;
-import entity.CategoryBlog;
+import model.Blog;
+import model.CategoryBlog;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
