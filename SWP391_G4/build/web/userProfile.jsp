@@ -73,7 +73,7 @@
                             </a>
                         </li>
                         <li class="mb-4">
-                            <a href="home" class="flex items-center text-gray-700">
+                            <a href="javascript:history.back()" class="flex items-center text-gray-700">
                                 <i class="fas fa-backward mr-2"></i>
                                 Trở về
                             </a>
