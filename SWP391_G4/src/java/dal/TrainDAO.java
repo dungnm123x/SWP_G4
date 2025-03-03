@@ -21,8 +21,8 @@ public class TrainDAO extends DBContext<RailwayDTO> {
             try (ResultSet rs = stm.executeQuery()) {
                 if (rs.next()) {
                     train = new Train(
-                            rs.getInt("TrainID"), // ID của tàu
-                            rs.getString("TrainName") // Tên của tàu
+                            rs.getInt("TrainID"), 
+                            rs.getString("TrainName") 
                     );
                 }
             }

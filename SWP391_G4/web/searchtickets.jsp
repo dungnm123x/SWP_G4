@@ -29,74 +29,74 @@
         %>
 
         <div class="search-container <%= layout.equals("vertical") ? "search-vertical" : "search-horizontal" %>">
+                <form method="post" action="schedule" class="search-form">
+                    <!-- Ga đi -->
+                    <select name="departureStationID" id="departureStationID" required>
+                        <option value="">Chọn ga đi</option>
+                        <c:forEach var="ga" items="${gaList}">
+                            <!-- so sánh ga.stationID với selectedDeparture -->
+                            <option value="${ga.stationID}"
+                                    ${ga.stationID == selectedDeparture ? 'selected' : ''}>
+                                ${ga.stationName}
+                            </option>
+                        </c:forEach>
+                    </select>
 
-            <form method="post" action="schedule" class="search-form">
+                    <!-- Ga đến -->
+                    <select name="arrivalStationID" id="arrivalStationID" required>
+                        <option value="">Chọn ga đến</option>
+                        <c:forEach var="ga" items="${gaList}">
+                            <option value="${ga.stationID}"
+                                    ${ga.stationID == selectedArrival ? 'selected' : ''}>
+                                ${ga.stationName}
+                            </option>
+                        </c:forEach>
+                    </select>
 
-                <!-- Ga đi -->
-                <select name="diemdi" id="diemdi" required>
-                    <option value="">Chọn ga đi</option>
-                    <c:forEach var="ga" items="${gaList}">
-                        <option value="${ga.stationID}" ${ga.stationID == selectedDeparture ? 'selected' : ''}>
-                            ${ga.stationName}
-                        </option>
-                    </c:forEach>
-                </select>
+                    <!-- Ngày đi -->
+                    <input type="date" name="departureDay" id="departureDay"
+                           value="${selectedDate}" required />
 
-                <!-- Ga đến -->
-                <select name="diemden" id="diemden" required>
-                    <option value="">Chọn ga đến</option>
-                    <c:forEach var="ga" items="${gaList}">
-                        <option value="${ga.stationID}" ${ga.stationID == selectedArrival ? 'selected' : ''}>
-                            ${ga.stationName}
-                        </option>
-                    </c:forEach>
-                </select>
+                    <!-- Loại vé -->
+                    <select name="tripType" id="tripType" required onchange="toggleReturnDate()">
+                        <option value="1" ${selectedTicketType == '1' ? 'selected' : ''}>Một chiều</option>
+                        <option value="2" ${selectedTicketType == '2' ? 'selected' : ''}>Khứ hồi</option>
+                    </select>
 
-                <!-- Ngày đi -->
-                <input type="date" name="ngaydi" id="ngaydi" value="${selectedDate}" required>
+                    <!-- Ngày về (ẩn nếu chọn "Một chiều") -->
+                    <div id="returnDateContainer" style="display: ${selectedTicketType == '2' ? 'block' : 'none'};">
+                        <input type="date" name="returnDate" id="returnDate"
+                               value="${returnDate}" />
+                    </div>
 
-                <!-- Loại vé -->
-                <select name="loaive" id="loaive" required onchange="toggleReturnDate()">
-                    <option value="1" ${selectedTicketType == '1' ? 'selected' : ''}>Một chiều</option>
-                    <option value="2" ${selectedTicketType == '2' ? 'selected' : ''}>Khứ hồi</option>
-                </select>
+                    <button type="submit">Tìm Kiếm</button>
+                </form>
+            </div>
 
-                <!-- Ngày về (ẩn nếu chọn "Một chiều") -->
-                <div id="returnDateContainer" style="display: ${selectedTicketType == '2' ? 'block' : 'none'};">
-                    <input type="date" name="ngayve" id="ngayve" value="${returnDate}">
-                </div>
-
-                <button type="submit">Tìm Kiếm</button>
-            </form>
-        </div>
-
-
-        <script>
-            function toggleReturnDate() {
-                var loaiVe = document.getElementById("loaive").value;
-                var returnDateContainer = document.getElementById("returnDateContainer");
-
-                if (loaiVe == "1") {
-                    returnDateContainer.style.display = "none";
-                    document.getElementById("ngayve").value = "";
-                } else {
-                    returnDateContainer.style.display = "block";
+            <script>
+                function toggleReturnDate() {
+                    var loaiVe = document.getElementById("tripType").value;
+                    var returnDateContainer = document.getElementById("returnDateContainer");
+                    if (loaiVe === "1") {
+                        returnDateContainer.style.display = "none";
+                        document.getElementById("returnDate").value = "";
+                    } else {
+                        returnDateContainer.style.display = "block";
+                    }
                 }
-            }
-
-            window.onload = function () {
-                toggleReturnDate();
-            }
-
-            // Kiểm tra nếu ga đi và ga đến giống nhau thì báo lỗi
-            document.querySelector("form").addEventListener("submit", function (event) {
-                const diemdi = document.getElementById("diemdi").value;
-                const diemden = document.getElementById("diemden").value;
-                if (diemdi === diemden) {
-                    alert("Ga đi và ga đến không thể giống nhau!");
-                    event.preventDefault();
+                window.onload = function () {
+                    toggleReturnDate();
                 }
-            });
-        </script>
+
+                // Kiểm tra nếu ga đi và ga đến giống nhau thì báo lỗi
+                document.querySelector("form").addEventListener("submit", function (event) {
+                    const diemdi = document.getElementById("departureStationID").value;
+                    const diemden = document.getElementById("arrivalStationID").value;
+                    if (diemdi === diemden) {
+                        alert("Ga đi và ga đến không thể giống nhau!");
+                        event.preventDefault();
+                    }
+                });
+            </script>
     </body>
 </html>

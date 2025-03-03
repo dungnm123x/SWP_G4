@@ -85,6 +85,35 @@ public class TripDAO extends DBContext<RailwayDTO> {
         return tripList;
     }
 
+    public Trip getTripByTrainID(int trainID) {
+        Trip trip = null;
+        String sql = "SELECT t.TripID, t.TrainID, tr.TrainName, t.DepartureTime " +
+                     "FROM Trip t " +
+                     "JOIN Train tr ON t.TrainID = tr.TrainID " +
+                     "WHERE t.TrainID = ?";
+
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            
+            ps.setInt(1, trainID);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                trip = new Trip();
+                Train train = new Train();
+
+                train.setTrainID(rs.getInt("TrainID"));
+                train.setTrainName(rs.getString("TrainName"));
+                trip.setTripID(rs.getInt("TripID"));
+                trip.setTrain(train);
+                trip.setDepartureTime(rs.getTimestamp("DepartureTime"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return trip;
+    }
+
     @Override
     public void insert(RailwayDTO model) {
         throw new UnsupportedOperationException("Not supported yet.");
