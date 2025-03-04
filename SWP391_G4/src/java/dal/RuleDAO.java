@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class RuleDAO extends DBContext {
 
     public List<CategoryRule> getAllCategories() {
-        String query = "SELECT categoryRuleID, categoryRuleName, content, img, update_date, status FROM CategoryRule WHERE status = 1";
+        String query = "SELECT categoryRuleID, categoryRuleName, content, img, update_date, status FROM CategoryRule";
         List<CategoryRule> list = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {

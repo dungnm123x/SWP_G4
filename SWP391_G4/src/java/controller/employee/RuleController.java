@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "RuleController", urlPatterns = {"/rule-list"})
 public class RuleController extends HttpServlet {
@@ -77,7 +78,10 @@ public class RuleController extends HttpServlet {
         }
 
         List<Rule> rules = ruleDAO.searchAndPagingRule(ruleName, categoryId, index, pageSize);       
-        List<CategoryRule> categories = ruleDAO.getAllCategories();
+        List<CategoryRule> categories = ruleDAO.getAllCategories()
+                .stream()
+                .filter(category -> category.isStatus()) // Chỉ giữ CategoryRule có status = true
+                .collect(Collectors.toList());
 
         request.setAttribute("categories", categories);
         request.setAttribute("ruleList", rules);
