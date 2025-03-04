@@ -7,6 +7,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link rel="stylesheet" href="css/employee.css">
         <style>
 
@@ -80,47 +81,59 @@
             <div class="filter-row">
                 <!-- Chọn số lượng hiển thị trên mỗi trang -->
                 <div class="filter-group">
-                    <form action="category-blog" method="GET">
-                        <label for="page-size-select" class="form-label">Per Page</label>
-                        <select name="pageSize" id="page-size-select" class="form-select" onchange="this.form.submit();">
-                            <option value="5" ${param.pageSize == '5' ? 'selected' : ''}>5</option>
-                            <option value="10" ${param.pageSize == '10' ? 'selected' : ''}>10</option>
-                            <option value="15" ${param.pageSize == '15' ? 'selected' : ''}>15</option>
-                            <option value="20" ${param.pageSize == '20' ? 'selected' : ''}>20</option>
-                            <option value="25" ${param.pageSize == '25' ? 'selected' : ''}>25</option>
+                    <form id="pageSizeForm" action="category-blog" method="get" >
+                        <label for="page-size-select" class="form-label me-2 mb-0">Show</label>
+                        <select name="pageSize" id="page-size-select" class="form-select me-2" onchange="document.getElementById('pageSizeForm').submit()">
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                            <option value="15" ${pageSize == 15 ? 'selected' : ''}>15</option>
+                            <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25</option>
                         </select>
-                        <input type="hidden" name="page" value="${param.currentPage}">
+                        <input type="hidden" name="index" value="${currentPage}" />
+                        <input type="hidden" name="categoryName" value="${categoryName}" />
+                        <input type="hidden" name="status" value="${status}" />
+                        <input type="hidden" name="sortBy" value="${sortBy}" />
                     </form>
                 </div>
                 <div class="filter-group">
-                    <form action="category-blog" method="GET">
-                        <label class="form-label">Sort By</label>
-                        <select class="form-select" name="sortBy" onchange="this.form.submit();">
-                            <option value="">Default</option>
-                            <option value="name_asc" ${param.sortBy == 'name_asc' ? 'selected' : ''}>Name (asc)</option>
-                            <option value="name_desc" ${param.sortBy == 'name_desc' ? 'selected' : ''}>Name (desc)</option>
-                            <option value="id_asc" ${param.sortBy == 'id_asc' ? 'selected' : ''}>ID (asc)</option>
-                            <option value="id_desc" ${param.sortBy == 'id_desc' ? 'selected' : ''}>ID (desc)</option>
+                    <form action="category-blog" method="get" >
+                        <label for="sortBy" class="form-label me-2 mb-0">Sort By</label>
+                        <select id="sortBy" name="sortBy" class="form-select" onchange="this.form.submit()">
+                            <option value="0" ${sortBy == 0 ? 'selected' : ''}>Default</option>
+                            <option value="1" ${sortBy == 1 ? 'selected' : ''}>Name (A-Z)</option>
+                            <option value="2" ${sortBy == 2 ? 'selected' : ''}>Name (Z-A)</option>
+                            <option value="3" ${sortBy == 3 ? 'selected' : ''}>ID (Ascending)</option>
+                            <option value="4" ${sortBy == 4 ? 'selected' : ''}>ID (Descending)</option>
                         </select>
+                        <input type="hidden" name="categoryName" value="${categoryName}" />
+                        <input type="hidden" name="pageSize" value="${pageSize}" />
+                        <input type="hidden" name="status" value="${status}" />
                     </form>
                 </div>
                 <!-- Trạng thái -->
                 <div class="filter-group">
-                    <form action="category-blog" method="GET">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" name="status" onchange="this.form.submit();">
-                            <option value="all" ${empty param.status || param.status == 'all' ? 'selected' : ''}>All</option>
-                            <option value="true" ${param.status == 'true' ? 'selected' : ''}>Active</option>
-                            <option value="false" ${param.status == 'false' ? 'selected' : ''}>Inactive</option>
+                    <form action="category-blog" method="get">
+                        <label for="statusFilter" class="form-label me-2 mb-0">Status</label>
+                        <select id="statusFilter" name="status" class="form-select" onchange="this.form.submit()">
+                            <option value="-1" ${status == -1 ? 'selected' : ''}>All</option>
+                            <option value="1" ${status == 1 ? 'selected' : ''}>Active</option>
+                            <option value="0" ${status == 0 ? 'selected' : ''}>Inactive</option>
                         </select>
+                        <input type="hidden" name="categoryName" value="${categoryName}" />
+                        <input type="hidden" name="pageSize" value="${pageSize}" />
+                        <input type="hidden" name="sortBy" value="${sortBy}" />
                     </form>
                 </div>
                 <!-- Tìm kiếm -->
                 <div class="filter-group">
                     <form action="category-blog" method="GET">
-                        <label class="form-label">Search</label>
+                        <label for="search" class="form-label me-2 mb-0">Search</label>
                         <div class="input-group">
-                            <input type="text" name="key" placeholder="Tìm kiếm" class="form-control" value="${param.key}">
+                            <input id="search" type="text" name="categoryName" class="form-control" placeholder="Tìm kiếm" value="${categoryName != null ? categoryName : ''}">
+                            <input type="hidden" name="pageSize" value="${pageSize}" />
+                            <input type="hidden" name="status" value="${status}" />
+                            <input type="hidden" name="sortBy" value="${sortBy}" />
                             <button type="submit" class="btn btn-outline-danger">
                                 <i class="fas fa-search"></i>
                             </button>
