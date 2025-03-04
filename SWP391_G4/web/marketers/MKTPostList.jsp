@@ -200,7 +200,11 @@
             </c:if>
 
             <!-- Bảng danh sách Blog -->
-            <div class="card">
+            <div class="card shadow ">
+                <div class="card-header text-white" style="background-color: #2C3E50;">
+                    <h5 class="mb-0">Blog List</h5>
+                </div>
+
                 <div class="card-body">
                     <table class="table table-bordered">
                         <thead class="bg-light">
