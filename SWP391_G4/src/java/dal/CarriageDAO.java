@@ -19,14 +19,14 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
                     Train train = new Train(rs.getInt("TrainID"));
-                    
+
                     list.add(new Carriage(
-                            rs.getInt("CarriageID"), 
-                            rs.getString("CarriageNumber"),
+                            rs.getInt("CarriageID"),
+                            rs.getString("CarriageNumber"), // Lấy số toa từ ResultSet
                             rs.getString("CarriageType"),
                             train,
                             rs.getInt("Capacity")
-                           
+
                     ));
                 }
             }
@@ -37,37 +37,16 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
     }
 
     public List<Carriage> getCarByTrainID(int trainID) {
-        List<Carriage> list = new ArrayList<>();
-        String sql = "SELECT * FROM Carriage WHERE TrainID = ?";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, trainID);
-            try (ResultSet rs = stm.executeQuery()) {
-                while (rs.next()) {
-                    Train train = new Train(rs.getInt("TrainID"));
-
-                    list.add(new Carriage(
-                            rs.getInt("CarriageID"),
-                            rs.getString("CarriageNumber"),
-                            rs.getString("CarriageType"),
-                            train,
-                            rs.getInt("Capacity")
-                    ));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
+        return getCarriagesByTrainID(trainID); // Sử dụng lại phương thức getCarriagesByTrainID
     }
 
     public boolean addCarriage(Carriage carriage) {
         String sql = "INSERT INTO Carriage (CarriageNumber, CarriageType, Capacity, TrainID) VALUES (?, ?, ?, ?)";
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, carriage.getCarriageNumber());
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, carriage.getCarriageNumber()); // Gán số toa
             ps.setString(2, carriage.getCarriageType());
             ps.setInt(3, carriage.getCapacity());
-            ps.setInt(4, carriage.getTrain().getTrainID()); // Sửa lỗi TrainID là object
+            ps.setInt(4, carriage.getTrain().getTrainID());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,9 +56,8 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
 
     public boolean updateCarriage(Carriage carriage) {
         String sql = "UPDATE Carriage SET CarriageNumber = ?, CarriageType = ?, Capacity = ? WHERE CarriageID = ?";
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, carriage.getCarriageNumber());
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, carriage.getCarriageNumber()); // Gán số toa
             ps.setString(2, carriage.getCarriageType());
             ps.setInt(3, carriage.getCapacity());
             ps.setInt(4, carriage.getCarriageID());
@@ -92,8 +70,7 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
 
     public boolean deleteCarriage(int carriageID) {
         String sql = "DELETE FROM Carriage WHERE CarriageID = ?";
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, carriageID);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -111,7 +88,7 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
                 Carriage carriage = new Carriage();
                 carriage.setCarriageID(rs.getInt("CarriageID"));
                 carriage.setTrain(new Train(rs.getInt("TrainID")));
-                carriage.setCarriageNumber(rs.getString("CarriageNumber"));
+                carriage.setCarriageNumber(rs.getString("CarriageNumber")); // Lấy số toa từ ResultSet
                 carriage.setCarriageType(rs.getString("CarriageType"));
                 carriage.setCapacity(rs.getInt("Capacity"));
                 return carriage;
@@ -124,26 +101,28 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
 
     @Override
     public void insert(RailwayDTO model) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public void update(RailwayDTO model) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public void delete(RailwayDTO model) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public ArrayList<RailwayDTO> list() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public RailwayDTO get(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+
 }
