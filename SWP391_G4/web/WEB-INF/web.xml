@@ -60,6 +60,10 @@
         <servlet-name>CartServlet</servlet-name>
         <servlet-class>controller.CartServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PassengerInfoServlet</servlet-name>
+        <servlet-class>controller.PassengerInfoServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -167,5 +171,9 @@
     <servlet-mapping>
         <servlet-name>CartServlet</servlet-name>
         <url-pattern>/cartitem</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PassengerInfoServlet</servlet-name>
+        <url-pattern>/passengerinfo</url-pattern>
     </servlet-mapping>
 </web-app>

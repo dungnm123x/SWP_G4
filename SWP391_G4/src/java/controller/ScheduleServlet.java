@@ -162,18 +162,30 @@ public class ScheduleServlet extends HttpServlet {
             String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
 
             // Set attribute cho JSP hiển thị
-            request.setAttribute("departureStation", departureStationName);
-            request.setAttribute("arrivalStation", arrivalStationName);
-            request.setAttribute("departureDate", dDay);
-            request.setAttribute("selectedTicketType", tType);
-            request.setAttribute("returnDate", rDate);
+//            request.setAttribute("departureStation", departureStationName);
+//            request.setAttribute("arrivalStation", arrivalStationName);
+//            request.setAttribute("departureDate", dDay);
+//            request.setAttribute("selectedTicketType", tType);
+//            request.setAttribute("returnDate", rDate);
+            
+            session.setAttribute("departureStation", departureStationName);
+            session.setAttribute("arrivalStation", arrivalStationName);
+            session.setAttribute("departureDate", dDay);
+            session.setAttribute("selectedTicketType", tType);
+            session.setAttribute("returnDate", rDate);
 
             // Để searchtickets.jsp hiển thị “selected”
-            request.setAttribute("selectedDeparture", departureStationID);
-            request.setAttribute("selectedArrival", arrivalStationID);
-            request.setAttribute("selectedDate", dDay);
-            request.setAttribute("selectedTicketType", tType);
-            request.setAttribute("returnDate", rDate);
+//            request.setAttribute("selectedDeparture", departureStationID);
+//            request.setAttribute("selectedArrival", arrivalStationID);
+//            request.setAttribute("selectedDate", dDay);
+//            request.setAttribute("selectedTicketType", tType);
+//            request.setAttribute("returnDate", rDate);
+           
+            session.setAttribute("selectedDeparture", departureStationID);
+            session.setAttribute("selectedArrival", arrivalStationID);
+            session.setAttribute("selectedDate", dDay);
+            session.setAttribute("selectedTicketType", tType);
+            session.setAttribute("returnDate", rDate);
 
             // Forward sang schedule.jsp
             request.getRequestDispatcher("schedule.jsp").forward(request, response);

@@ -27,7 +27,7 @@
             <ul>
                 <c:forEach var="item" items="${cartItems}">
                     <li>
-                        
+
                         <span>${item.trainName} - ${item.departureDate}</span>
                         <span>Toa ${item.carriageNumber} - Chỗ ${item.seatNumber}</span>
                         <span>Giá: ${item.price}</span>
@@ -58,27 +58,30 @@
 
             <!-- Nút thanh toán -->
             <c:if test="${not empty cartItems}">
-                <button class="checkout">Mua vé</button>
+                <form action="cartitem" method="post">
+                    <input type="hidden" name="action" value="checkout">
+                    <button type="submit" class="checkout">Mua vé</button>
+                </form>
             </c:if>
         </div>
-        
-<!--        <script>
-            document.querySelectorAll(".remove-ticket").forEach(button => {
-                button.addEventListener("click", function (event) {
-                    event.preventDefault(); // Ngăn chặn tải lại trang
-                    let seatID = this.getAttribute("data-seatid");
 
-                    fetch("cartitem", {
-                        method: "POST",
-                        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                        body: "seatID=" + encodeURIComponent(seatID)
-                    }).then(response => response.text())
-                            .then(data => {
-                                document.querySelector(".cart-container").innerHTML = data; // Cập nhật giỏ vé
-                            }).catch(error => console.error("Lỗi:", error));
-                });
-            });
-        </script>-->
+        <!--        <script>
+                    document.querySelectorAll(".remove-ticket").forEach(button => {
+                        button.addEventListener("click", function (event) {
+                            event.preventDefault(); // Ngăn chặn tải lại trang
+                            let seatID = this.getAttribute("data-seatid");
+        
+                            fetch("cartitem", {
+                                method: "POST",
+                                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                                body: "seatID=" + encodeURIComponent(seatID)
+                            }).then(response => response.text())
+                                    .then(data => {
+                                        document.querySelector(".cart-container").innerHTML = data; // Cập nhật giỏ vé
+                                    }).catch(error => console.error("Lỗi:", error));
+                        });
+                    });
+                </script>-->
     </body>
 </html>
 

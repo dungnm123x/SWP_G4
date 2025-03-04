@@ -180,6 +180,13 @@ public class CartServlet extends HttpServlet {
             return;
         }
 
+        String action = request.getParameter("action");
+
+        // Nếu nhấn nút "Mua vé" → Chuyển sang trang nhập thông tin hành khách
+        if ("checkout".equals(action)) {
+            response.sendRedirect("passengerinfo");
+            return;
+        }
         // Nếu không phải xóa, thì là thêm
         String ticketID = request.getParameter("ticketID");
         String trainName = request.getParameter("trainName");
