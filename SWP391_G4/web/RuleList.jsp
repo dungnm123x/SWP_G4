@@ -49,7 +49,7 @@
                     </div>
                     <c:set var="ruleCounter" value="1" />
                     <c:forEach var="rule" items="${ruleList}">
-                        <c:if test="${rule.categoryRuleID == category.categoryRuleID}">
+                        <c:if test="${rule.categoryRuleID == category.categoryRuleID && rule.status == true}">
                             <div class="rule-item">
                                 <strong>
                                     <a href="rule-details?ruleID=${rule.ruleID}">
