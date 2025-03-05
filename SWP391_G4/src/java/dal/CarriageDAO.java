@@ -8,6 +8,7 @@ import java.util.List;
 import dto.RailwayDTO;
 import model.Carriage;
 import model.Train;
+import java.sql.CallableStatement;
 
 public class CarriageDAO extends DBContext<RailwayDTO> {
 
@@ -42,42 +43,76 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
 
     public boolean addCarriage(Carriage carriage) {
         String sql = "INSERT INTO Carriage (CarriageNumber, CarriageType, Capacity, TrainID) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, carriage.getCarriageNumber()); // Gán số toa
+        try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, carriage.getCarriageNumber());
             ps.setString(2, carriage.getCarriageType());
             ps.setInt(3, carriage.getCapacity());
             ps.setInt(4, carriage.getTrain().getTrainID());
-            return ps.executeUpdate() > 0;
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                return false; // Thêm toa thất bại
+            }
+
+            // Lấy CarriageID vừa được tạo (auto-increment)
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int carriageID = generatedKeys.getInt(1);
+                    carriage.setCarriageID(carriageID); // Cập nhật ID cho đối tượng Carriage
+
+                    // Gọi stored procedure để thêm ghế
+                    addSeats(carriageID, carriage.getCarriageType(), carriage.getTrain().getTrainID());
+
+                    return true;
+                } else {
+                    return false; // Không lấy được ID
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+
+    // Phương thức gọi Stored Procedure
+    private void addSeats(int carriageID, String carriageType, int trainID) throws SQLException {
+        String sql = "{CALL AddSeatsForNewCarriage(?, ?, ?)}";
+        try (CallableStatement cs = connection.prepareCall(sql)) {
+            cs.setInt(1, carriageID);
+            cs.setString(2, carriageType);
+            cs.setInt(3, trainID);
+            cs.execute(); // Thực thi stored procedure.
         }
     }
 
     public boolean updateCarriage(Carriage carriage) {
-        String sql = "UPDATE Carriage SET CarriageNumber = ?, CarriageType = ?, Capacity = ? WHERE CarriageID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, carriage.getCarriageNumber()); // Gán số toa
-            ps.setString(2, carriage.getCarriageType());
-            ps.setInt(3, carriage.getCapacity());
-            ps.setInt(4, carriage.getCarriageID());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    String sql = "{CALL UpdateCarriageAndSeats(?, ?, ?, ?)}";
+    try (CallableStatement cs = connection.prepareCall(sql)) {
+        cs.setInt(1, carriage.getCarriageID());
+        cs.setString(2, carriage.getCarriageNumber());
+        cs.setString(3, carriage.getCarriageType());
+        cs.setInt(4, carriage.getCapacity());
+        cs.execute();
+        return true;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
     public boolean deleteCarriage(int carriageID) {
-        String sql = "DELETE FROM Carriage WHERE CarriageID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, carriageID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    String sql = "{CALL DeleteCarriageAndSeats(?)}";
+    try (CallableStatement cs = connection.prepareCall(sql)) {
+        cs.setInt(1, carriageID);
+        cs.execute(); // Không cần kiểm tra kết quả, stored proc sẽ ném exception nếu có lỗi
+        return true;
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
     public Carriage getCarriageById(int carriageID) {
         String query = "SELECT * FROM Carriage WHERE CarriageID = ?";
