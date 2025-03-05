@@ -100,5 +100,9 @@ public class Rule {
         this.categoryRuleID = categoryRuleID;
     }
 
+    public void setUpdated_date(java.sql.Date date) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
   
 }

@@ -70,6 +70,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
+                                <div class="mb-3">
+                            <label class="form-label">Update Date</label>
+                            <input type="text" class="form-control" value="${categoryRule.update_date}" readonly>
+                        </div>
                             <div class="mb-3">
                                 <label for="status" class="form-label">Status</label><br/>
                                 <div class="form-check form-check-inline">

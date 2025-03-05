@@ -45,8 +45,9 @@ public class RuleController extends HttpServlet {
             throws ServletException, IOException {
         String ruleName = request.getParameter("ruleName");
         String category_Id_Raw = request.getParameter("categoryId");
-        
+
         int categoryId = 0;
+        int userID = 0; // Không lọc theo UserID
         int index = 1;
         int pageSize = 5;
         try {
@@ -67,7 +68,8 @@ public class RuleController extends HttpServlet {
             e.printStackTrace();
         }
 
-        int total_size = ruleDAO.getSizeRule(ruleName, categoryId);
+        Boolean status = null; 
+        int total_size = ruleDAO.getSizeRule(ruleName, userID, categoryId, status);
         int num = (total_size == 0) ? 1 : (int) Math.ceil((double) total_size / pageSize);
 
         if (index > num) {
@@ -77,10 +79,10 @@ public class RuleController extends HttpServlet {
             index = 1;
         }
 
-        List<Rule> rules = ruleDAO.searchAndPagingRule(ruleName, categoryId, index, pageSize);       
+        List<Rule> rules = ruleDAO.searchAndPagingRule(ruleName, userID, categoryId, status, 3, index, pageSize);
         List<CategoryRule> categories = ruleDAO.getAllCategories()
                 .stream()
-                .filter(category -> category.isStatus()) // Chỉ giữ CategoryRule có status = true
+                .filter(CategoryRule::isStatus) // Chỉ giữ CategoryRule có status = true
                 .collect(Collectors.toList());
 
         request.setAttribute("categories", categories);
@@ -94,7 +96,6 @@ public class RuleController extends HttpServlet {
         request.setAttribute("end", Math.min(index * pageSize, total_size));
 
         request.getRequestDispatcher("RuleList.jsp").forward(request, response);
-        
     }
 
     @Override
