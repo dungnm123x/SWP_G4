@@ -1,136 +1,213 @@
-﻿
-USE [master]
+﻿USE [master]
 GO
 
-/*******************************************************************************
-   Drop database if it exists
-********************************************************************************/
+/*******************************************************************************  
+   Drop database if it exists  
+********************************************************************************/  
+IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'SWP391')  
+BEGIN  
+    ALTER DATABASE [SWP391] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;  
+    DROP DATABASE [SWP391];  
+END  
+GO  
 
-IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'SWP391')
-BEGIN
-	ALTER DATABASE [SWP391] SET OFFLINE WITH ROLLBACK IMMEDIATE;
-	ALTER DATABASE [SWP391] SET ONLINE;
-	DROP DATABASE [SWP391];
-END
+-- Tạo database mới
+CREATE DATABASE [SWP391]  
+GO  
+USE [SWP391]  
+GO  
 
-GO
-CREATE DATABASE [SWP391]
-GO
-USE  [SWP391]
+/*******************************************************************************  
+   Tạo bảng dữ liệu  
+********************************************************************************/  
 
-GO
-CREATE TABLE Role (
-    RoleID INT PRIMARY KEY IDENTITY(1,1),
-    RoleName NVARCHAR(255) NOT NULL
+-- Bảng Role
+CREATE TABLE Role (  
+    RoleID INT PRIMARY KEY IDENTITY(1,1),  
+    RoleName NVARCHAR(255) NOT NULL  
+);  
+
+-- Bảng User
+CREATE TABLE [User] (  
+    UserID INT PRIMARY KEY IDENTITY(1,1),  
+    Username NVARCHAR(255) NOT NULL UNIQUE,  
+    Password NVARCHAR(255) NOT NULL,  
+    FullName NVARCHAR(255) NOT NULL,  
+    Email NVARCHAR(255) UNIQUE,  
+    PhoneNumber NVARCHAR(20) UNIQUE,  
+    Address NVARCHAR(255) NULL,  
+    RoleID INT,  
+    Status BIT NOT NULL DEFAULT 1,  
+    FOREIGN KEY (RoleID) REFERENCES Role(RoleID)  
+);  
+
+-- Trigger mã hóa mật khẩu trước khi insert
+GO  
+CREATE TRIGGER EncryptPasswordBeforeInsert  
+ON [User]  
+FOR INSERT  
+AS  
+BEGIN  
+    UPDATE [User]  
+    SET Password = CONVERT(NVARCHAR(255), HASHBYTES('SHA2_256', INSERTED.Password), 2)  
+    FROM INSERTED  
+    WHERE [User].UserID = INSERTED.UserID;  
+END;  
+GO  
+
+-- Bảng Station  
+CREATE TABLE Station (  
+    StationID INT PRIMARY KEY IDENTITY(1,1),  
+    StationName NVARCHAR(255) NOT NULL,  
+    Address NVARCHAR(255) NOT NULL  
+);  
+
+-- Bảng Train  
+CREATE TABLE Train (  
+    TrainID INT PRIMARY KEY IDENTITY(1,1),  
+    TrainName NVARCHAR(255) NOT NULL  
+);  
+
+-- Bảng Carriage  
+CREATE TABLE Carriage (  
+    CarriageID INT PRIMARY KEY IDENTITY(1,1),  
+    CarriageNumber INT NOT NULL,  
+    CarriageType NVARCHAR(50) NOT NULL,  
+    TrainID INT,  
+    Capacity INT NOT NULL DEFAULT 1,  
+    FOREIGN KEY (TrainID) REFERENCES Train(TrainID)  
+);  
+
+-- Bảng Seat  
+CREATE TABLE Seat (  
+    SeatID INT PRIMARY KEY IDENTITY(1,1),  
+    SeatNumber INT NOT NULL,  
+    Status NVARCHAR(50) NOT NULL CHECK (Status IN ('Available', 'Booked', 'Reserved', 'Out of Service')),  
+    SeatType NVARCHAR(50) NOT NULL,  
+    CarriageID INT,  
+    FOREIGN KEY (CarriageID) REFERENCES Carriage(CarriageID)  
+);  
+
+-- Bảng Route  
+CREATE TABLE Route (  
+    RouteID INT PRIMARY KEY IDENTITY(1,1),  
+    DepartureStationID INT,  
+    ArrivalStationID INT,  
+    Distance INT NOT NULL,  
+    BasePrice DECIMAL(10,2) NOT NULL,  
+    FOREIGN KEY (DepartureStationID) REFERENCES Station(StationID),  
+    FOREIGN KEY (ArrivalStationID) REFERENCES Station(StationID)  
+);  
+
+-- Bảng Trip với TripType  
+CREATE TABLE Trip (  
+    TripID INT PRIMARY KEY IDENTITY(1,1),  
+    TrainID INT,  
+    RouteID INT,  
+    DepartureTime DATETIME NOT NULL,  
+    ArrivalTime DATETIME NOT NULL,  
+    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),  
+    TripType NVARCHAR(50) NOT NULL DEFAULT 'One-way' CHECK (TripType IN ('One-way', 'Round-trip')),  
+    RoundTripReference INT NULL,  
+    FOREIGN KEY (TrainID) REFERENCES Train(TrainID),  
+    FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
+    FOREIGN KEY (RoundTripReference) REFERENCES Trip(TripID)
 );
 
 
-CREATE TABLE [User] (
-    UserID INT PRIMARY KEY IDENTITY(1,1),
-    Username NVARCHAR(255) NOT NULL UNIQUE,
-    Password NVARCHAR(255) NOT NULL,
-    FullName NVARCHAR(255) NOT NULL,
-    Email NVARCHAR(255) UNIQUE,
-    PhoneNumber NVARCHAR(20) UNIQUE,
-	Address NVARCHAR(255) NULL,
-    RoleID INT,
-	Status bit,
-    FOREIGN KEY (RoleID) REFERENCES Role(RoleID),  
-);
-
-CREATE TABLE Station (
-    StationID INT PRIMARY KEY IDENTITY(1,1),
-    StationName NVARCHAR(255) NOT NULL,
-    Address NVARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Train (
-    TrainID INT PRIMARY KEY IDENTITY(1,1),
-    TrainName NVARCHAR(255) NOT NULL,
+-- Bảng Booking  
+CREATE TABLE Booking (  
+    BookingID INT PRIMARY KEY IDENTITY(1,1),  
+    UserID INT,  
+    TripID INT,  
+    RoundTripTripID INT NULL,  
+    BookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,  
+    TotalPrice DECIMAL(10,2) NOT NULL,  
+    PaymentStatus NVARCHAR(50) NOT NULL CHECK (PaymentStatus IN ('Pending', 'Paid', 'Cancelled')),  
+    BookingStatus NVARCHAR(50) NOT NULL CHECK (BookingStatus IN ('Active', 'Expired')),  
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),
+    FOREIGN KEY (TripID) REFERENCES Trip(TripID),
+    FOREIGN KEY (RoundTripTripID) REFERENCES Trip(TripID)
 );
 
 
-CREATE TABLE Carriage (
-    CarriageID INT PRIMARY KEY IDENTITY(1,1),
-    CarriageNumber INT NOT NULL,
-    CarriageType NVARCHAR(50) NOT NULL,
-    TrainID INT,
-    Capacity INT NOT NULL,
-    CONSTRAINT FK_Carriage_Train FOREIGN KEY (TrainID) REFERENCES Train(TrainID)
+-- Bảng Ticket  
+CREATE TABLE Ticket (  
+    TicketID INT PRIMARY KEY IDENTITY(1,1),  
+    CCCD NVARCHAR(20) NOT NULL,  
+    BookingID INT,  
+    SeatID INT,  
+    TripID INT,  
+    TicketPrice DECIMAL(10,2) NOT NULL,  
+    TicketStatus NVARCHAR(50) NOT NULL CHECK (TicketStatus IN ('Used', 'Unused', 'Refunded')),  
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID),  
+    FOREIGN KEY (SeatID) REFERENCES Seat(SeatID),  
+    FOREIGN KEY (TripID) REFERENCES Trip(TripID)  
+);  
+
+-- Bảng OrderDetail  
+CREATE TABLE OrderDetail (  
+    OrderID INT PRIMARY KEY IDENTITY(1,1),  
+    TicketID INT,  
+    UserID INT,  
+    SeatID INT,  
+    TripID INT,  
+    OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,  
+    OrderStatus NVARCHAR(50) NOT NULL CHECK (OrderStatus IN ('Pending', 'Completed', 'Cancelled')),  
+    FOREIGN KEY (TicketID) REFERENCES Ticket(TicketID),  
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),  
+    FOREIGN KEY (SeatID) REFERENCES Seat(SeatID),  
+    FOREIGN KEY (TripID) REFERENCES Trip(TripID)  
 );
-
-CREATE TABLE Seat (
-    SeatID INT PRIMARY KEY IDENTITY(1,1),
-    SeatNumber INT NOT NULL,
-    Status NVARCHAR(50) NOT NULL CHECK (Status IN ('Available', 'Booked', 'Reserved', 'Out of Service')),
-    SeatType NVARCHAR(50) NOT NULL,
-    CarriageID INT,
-    CONSTRAINT FK_Seat_Carriage FOREIGN KEY (CarriageID) REFERENCES Carriage(CarriageID)
-);
-
-
-CREATE TABLE Route (
-    RouteID INT PRIMARY KEY IDENTITY(1,1),
-    DepartureStationID INT,
-    ArrivalStationID INT,
-    Distance INT NOT NULL,
-    BasePrice DECIMAL(10,2) NOT NULL,
-    CONSTRAINT FK_Route_DepartureStation FOREIGN KEY (DepartureStationID) REFERENCES Station(StationID),
-    CONSTRAINT FK_Route_ArrivalStation FOREIGN KEY (ArrivalStationID) REFERENCES Station(StationID)
-);
-
-
-CREATE TABLE Trip (
-    TripID INT PRIMARY KEY IDENTITY(1,1),
-    TrainID INT,
-    RouteID INT,
-    DepartureTime DATETIME NOT NULL,
-    ArrivalTime DATETIME NOT NULL,
-    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),
-    CONSTRAINT FK_Trip_Train FOREIGN KEY (TrainID) REFERENCES Train(TrainID),
-    CONSTRAINT FK_Trip_Route FOREIGN KEY (RouteID) REFERENCES Route(RouteID)
-);
-
-
-CREATE TABLE Booking (
-    BookingID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT,
-    BookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    TotalPrice DECIMAL(10,2) NOT NULL,
-    PaymentStatus NVARCHAR(50) NOT NULL CHECK (PaymentStatus IN ('Pending', 'Paid', 'Cancelled')),
-    BookingStatus NVARCHAR(50) NOT NULL CHECK (BookingStatus IN ('Active', 'Expired')),
-    CONSTRAINT FK_Booking_User FOREIGN KEY (UserID) REFERENCES [User](UserID)
-);
-
-
-CREATE TABLE Ticket (
-    TicketID INT PRIMARY KEY IDENTITY(1,1),
-    CCCD NVARCHAR(20) NOT NULL,
-    BookingID INT,
-    SeatID INT,
-    TripID INT,
-    TicketPrice DECIMAL(10,2) NOT NULL,
-    TicketStatus NVARCHAR(50) NOT NULL CHECK (TicketStatus IN ('Used', 'Unused', 'Refunded')),
-    CONSTRAINT FK_Ticket_Booking FOREIGN KEY (BookingID) REFERENCES Booking(BookingID),
-    CONSTRAINT FK_Ticket_Seat FOREIGN KEY (SeatID) REFERENCES Seat(SeatID),
-    CONSTRAINT FK_Ticket_Trip FOREIGN KEY (TripID) REFERENCES Trip(TripID)
-);
-
-
-CREATE TABLE OrderDetail (
-    OrderID INT PRIMARY KEY IDENTITY(1,1),
-    TicketID INT,
-    UserID INT,
-    SeatID INT,
-    TripID INT,
-    OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    OrderStatus NVARCHAR(50) NOT NULL CHECK (OrderStatus IN ('Pending', 'Completed', 'Cancelled')),
-    CONSTRAINT FK_OrderDetail_Ticket FOREIGN KEY (TicketID) REFERENCES Ticket(TicketID),
-    CONSTRAINT FK_OrderDetail_User FOREIGN KEY (UserID) REFERENCES [User](UserID),
-    CONSTRAINT FK_OrderDetail_Seat FOREIGN KEY (SeatID) REFERENCES Seat(SeatID),
-    CONSTRAINT FK_OrderDetail_Trip FOREIGN KEY (TripID) REFERENCES Trip(TripID)
-);
+-- Bảng Blog  
+CREATE TABLE [dbo].[Blog](
+	[blog_id] [int] IDENTITY(1,1) NOT NULL,
+	[title] [nvarchar](max) NULL,
+	[UserID] [int] NULL,
+	[update_date] [date] NULL,
+	[content] [nvarchar](max) NULL,
+	[thumbnail] [nvarchar](max) NULL,
+	[brief_infor] [nvarchar](max) NULL,
+	[categoryBlog_id] [int] NULL,
+	[status] [bit] NULL,
+	FOREIGN KEY (UserID) REFERENCES [User](UserID), 
+ CONSTRAINT [PK_Blog] PRIMARY KEY CLUSTERED 
+(
+	[blog_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+CREATE TABLE [dbo].[CategoryBlog](
+	[categoryBlog_id] [int] IDENTITY(1,1) NOT NULL,
+	[categoryBlogName] [nvarchar](100) NULL,
+	[status] [bit] NULL,
+ CONSTRAINT [PK_CategoryBlog] PRIMARY KEY CLUSTERED 
+(
+	[categoryBlog_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 Go
+CREATE TABLE CategoryRule (
+    CategoryRuleID INT PRIMARY KEY IDENTITY(1,1),
+    CategoryRuleName NVARCHAR(255) NOT NULL UNIQUE,
+    Content NVARCHAR(MAX) NOT NULL,
+    Img NVARCHAR(255) NULL,
+    Update_Date date Not null,
+    Status BIT NOT NULL DEFAULT 1
+);
+	
+CREATE TABLE [Rule] (
+    RuleID INT PRIMARY KEY IDENTITY(1,1),
+    Title NVARCHAR(255) NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    Img NVARCHAR(255) NULL,
+    Update_Date date Not Null,
+    Status BIT NOT NULL DEFAULT 1,
+    UserID INT,
+    CategoryRuleID INT,
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),
+    FOREIGN KEY (CategoryRuleID) REFERENCES CategoryRule(CategoryRuleID)
+);
+GO 
 -- Thêm dữ liệu cho bảng Role
 INSERT INTO Role (RoleName) VALUES ('Admin');
 INSERT INTO Role (RoleName) VALUES ('Employer');
@@ -138,10 +215,10 @@ INSERT INTO Role (RoleName) VALUES ('Customer');
 
 -- Thêm dữ liệu cho bảng User
 -- Người dùng với vai trò Admin
-INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber,Address, RoleID) 
-VALUES ('admin', 'admin123', 'Admin User', 'admin@example.com', '0123456789','Vinh Phuc', 1),
-('customer', 'customer123', 'Customer User', 'customer@example.com', '0987654321','Ha Noi', 3),
-('employer', 'employer123', 'Employer User', 'employer@example.com', '0912345678','Hai Phong', 2);
+INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber,Address, RoleID, Status) 
+VALUES ('admin', 'admin123', 'Admin User', 'admin@example.com', '0123456789','Vinh Phuc', 1,1),
+('customer', 'customer123', 'Customer User', 'customer@example.com', '0987654321','Ha Noi', 3,1),
+('employer', 'employer123', 'Employer User', 'employer@example.com', '0912345678','Hai Phong', 2,1);
 
 -- Thêm dữ liệu cho bảng Station
 INSERT INTO Station (StationName, Address) 
@@ -211,6 +288,7 @@ WHERE CarriageType = N'Toa thường';
 INSERT INTO Route (DepartureStationID, ArrivalStationID, Distance, BasePrice) 
 VALUES 
 (1, 2, 150, 20.00),
+(2,1,150,20),
 (2, 3, 100, 15.00),
 (3, 4, 200, 30.00),
 (4, 5, 180, 25.00),
@@ -221,26 +299,46 @@ VALUES
 
 
 -- Thêm dữ liệu cho bảng Trip (10 dòng)
-INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus) 
+-- Thêm chuyến đi một chiều
+INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType) 
 VALUES 
-(1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled'),
-(2, 2, '2025-02-16 09:00:00', '2025-02-16 11:00:00', 'Scheduled'),
-(3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled'),
-(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed'),
-(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed'),
-(1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled'),
-(2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled'),
-(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed');
+(1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled', 'Round-trip'), -- Chuyến đi
+(2, 2, '2025-02-15 18:00:00', '2025-02-15 20:00:00', 'Scheduled', 'Round-trip'), -- Chuyến về
+(3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled', 'One-way'),
+(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed', 'One-way'),
+(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed', 'One-way'),
+(1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled', 'One-way'),
+(2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled', 'One-way'),
+(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed', 'One-way');
+
+-- Cập nhật RoundTripReference cho chuyến đi khứ hồi (chuyến về tham chiếu chuyến đi)
+UPDATE Trip SET RoundTripReference = 1 WHERE TripID = 2;
+UPDATE Trip SET RoundTripReference = 2 WHERE TripID = 1; -- Ngược lại để tham chiếu lẫn nhau
+
 
 
 
 
 -- Thêm dữ liệu cho bảng Booking (10 dòng)
-INSERT INTO Booking (UserID, TotalPrice, PaymentStatus, BookingStatus) 
+INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
 VALUES 
-(2, 40.00, 'Paid', 'Active'),
-(3, 30.00, 'Pending', 'Active'),
-(2, 50.00, 'Paid', 'Expired');
+(2, 1, NULL, 300.00, 'Paid', 'Active'); -- Chuyến đi một chiều từ Hà Nội -> Sài Gòn
+DECLARE @BookingID INT;
+
+-- Chuyến đi từ Hà Nội -> Sài Gòn
+INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
+VALUES (2, 1, NULL, 300.00, 'Paid', 'Active');
+
+-- Lấy BookingID của chuyến đi
+SET @BookingID = SCOPE_IDENTITY();
+
+-- Chuyến về từ Sài Gòn -> Hà Nội
+INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
+VALUES (2, 2, @BookingID, 300.00, 'Paid', 'Active');
+
+-- Cập nhật RoundTripTripID của chuyến đi để liên kết với chuyến về
+UPDATE Booking SET RoundTripTripID = SCOPE_IDENTITY() WHERE BookingID = @BookingID;
+
 
 -- Thêm dữ liệu cho bảng Ticket (10 dòng)
 INSERT INTO Ticket (CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) 
@@ -253,5 +351,231 @@ INSERT INTO OrderDetail (TicketID, UserID, SeatID, TripID, OrderStatus)
 VALUES 
 (1, 2, 1, 1, 'Pending'),
 (2, 3, 2, 2, 'Completed');
+-- Thêm dữ liệu cho bảng CategoryBlog
+INSERT INTO CategoryBlog (categoryBlogName, status)  
+VALUES  
+(N'Tin tức ngành đường sắt', 1),  
+(N'Hướng dẫn mua vé', 1),  
+(N'Khuyến mãi & Ưu đãi', 1),  
+(N'Cẩm nang du lịch', 1);
+-- Thêm dữ liệu cho bảng Blog
+INSERT INTO Blog (title, UserID, update_date, content, thumbnail, brief_infor, categoryBlog_id, status)  
+VALUES  
+(N'Cách đặt vé tàu online nhanh chóng', 2, '2025-02-27', 
+N'Bạn muốn đặt vé tàu nhanh chóng mà không cần ra ga? Trong bài viết này, chúng tôi sẽ hướng dẫn bạn từng bước cách đặt vé tàu trực tuyến trên website chính thức. Từ việc lựa chọn chuyến đi, nhập thông tin hành khách đến bước thanh toán an toàn, tất cả sẽ được trình bày chi tiết để bạn có thể đặt vé dễ dàng ngay tại nhà.', 
+'thumbnail1.jpg', 
+N'Hướng dẫn chi tiết cách đặt vé tàu online, giúp bạn tiết kiệm thời gian và đảm bảo có vé cho hành trình của mình.', 
+2, 1),  
+
+(N'Lịch trình tàu Tết 2025', 2, '2025-02-25', 
+N'Tết Nguyên Đán là thời điểm nhu cầu đi lại tăng cao, vì vậy việc nắm rõ lịch trình tàu là rất quan trọng. Trong bài viết này, chúng tôi sẽ cập nhật chi tiết lịch trình tàu Tết 2025, bao gồm các tuyến đường chính, thời gian khởi hành, giá vé, và những lưu ý quan trọng giúp bạn có một chuyến đi suôn sẻ.', 
+'thumbnail2.jpg', 
+N'Thông tin chi tiết về lịch trình tàu dịp Tết 2025, giúp bạn chủ động sắp xếp kế hoạch di chuyển hợp lý.', 
+1, 1),  
+
+(N'Ưu đãi 30% khi đặt vé trước', 2, '2025-02-20', 
+N'Bạn đang lên kế hoạch cho chuyến đi sắp tới? Đừng bỏ lỡ cơ hội nhận ưu đãi lên đến 30% khi đặt vé tàu trước. Chương trình khuyến mãi này áp dụng cho nhiều tuyến đường và có số lượng vé giới hạn. Hãy đọc ngay bài viết để biết cách đặt vé và tận dụng ưu đãi đặc biệt này!', 
+'thumbnail3.jpg', 
+N'Cơ hội tiết kiệm chi phí với ưu đãi giảm giá 30% khi đặt vé tàu sớm – thông tin chi tiết trong bài viết.', 
+3, 1),  
+
+(N'Những điểm đến hấp dẫn khi đi tàu', 2, '2025-02-18', 
+N'Đi tàu không chỉ là một phương tiện di chuyển mà còn là một trải nghiệm tuyệt vời để khám phá những điểm đến thú vị. Từ những bãi biển tuyệt đẹp, vùng núi hùng vĩ đến các thành phố sầm uất, hãy cùng khám phá danh sách những địa điểm đáng ghé thăm nhất khi đi tàu trong bài viết này.', 
+'thumbnail4.jpg', 
+N'Danh sách những điểm du lịch hấp dẫn khi đi tàu – từ thiên nhiên hùng vĩ đến thành phố sôi động.', 
+4, 1);  
+-- Cập nhật bảng CategoryRule với nội dung chi tiết hơn
+INSERT INTO CategoryRule (CategoryRuleName, Content, Img, Update_Date, Status)
+VALUES 
+(N'Các Điều Kiện & Điều Khoản', 
+ N'Nội dung về các điều kiện và điều khoản sử dụng dịch vụ của công ty. Điều khoản này quy định quyền lợi và nghĩa vụ của khách hàng khi tham gia sử dụng các dịch vụ do công ty cung cấp. Những điều khoản này áp dụng đối với mọi giao dịch giữa khách hàng và công ty, bao gồm việc đăng ký tài khoản, lựa chọn dịch vụ, thanh toán, quyền và nghĩa vụ trong việc hủy hoặc hoàn lại dịch vụ. Các điều kiện này sẽ được cập nhật định kỳ và khách hàng cần đồng ý với những điều kiện mới khi tiếp tục sử dụng dịch vụ. Ngoài ra, các điều kiện áp dụng cho các chương trình khuyến mãi, giảm giá, hoặc ưu đãi đặc biệt cũng sẽ được đề cập rõ ràng trong phần này. Mọi khách hàng đều có quyền yêu cầu thông tin rõ ràng về các điều kiện, và yêu cầu hoàn lại dịch vụ nếu có bất kỳ điều gì không minh bạch.', 
+ NULL, GETDATE(), 1),
+(N'Phương thức thanh toán', 
+ N'Phương thức thanh toán là các cách thức mà khách hàng có thể sử dụng để thực hiện thanh toán cho các dịch vụ do công ty cung cấp. Các phương thức thanh toán bao gồm thẻ tín dụng, thẻ ghi nợ, chuyển khoản qua ngân hàng, và các hệ thống thanh toán trực tuyến như PayPal, MoMo, ZaloPay, v.v. Mỗi phương thức thanh toán có ưu điểm và hạn chế riêng. Ví dụ, thanh toán qua thẻ tín dụng nhanh chóng nhưng có thể mất phí giao dịch, trong khi chuyển khoản ngân hàng có thể mất vài ngày để hoàn tất. Quy trình thanh toán cũng bao gồm các bước xác nhận đơn hàng, kiểm tra tính hợp lệ của các thông tin thanh toán, và xử lý giao dịch qua các cổng thanh toán an toàn. Khách hàng cần đảm bảo rằng thông tin thanh toán của mình là chính xác để tránh các sự cố trong quá trình giao dịch. Các điều kiện hoàn tiền, hủy giao dịch hoặc tranh chấp giao dịch sẽ được giải quyết theo quy trình rõ ràng đã quy định trong điều khoản này.', 
+ NULL, GETDATE(), 1),
+(N'Chính sách hoàn trả vé', 
+ N'Chính sách hoàn trả vé được áp dụng trong các trường hợp khách hàng muốn hủy vé sau khi đã thanh toán. Chính sách này quy định các điều kiện hoàn trả, bao gồm thời gian áp dụng hoàn trả (thường là trong vòng 30 ngày kể từ ngày mua vé), các khoản phí hoàn trả có thể bị trừ (nếu có), và quy trình thực hiện yêu cầu hoàn trả. Ví dụ, nếu khách hàng yêu cầu hoàn vé trong vòng 24 giờ sau khi mua, toàn bộ số tiền sẽ được hoàn lại. Tuy nhiên, nếu yêu cầu hoàn vé sau thời gian này, công ty có thể thu phí hủy vé. Chính sách này cũng bao gồm các trường hợp đặc biệt, chẳng hạn như khách hàng không thể sử dụng vé do lý do bất khả kháng (ví dụ: thiên tai, dịch bệnh, sự cố ngoài ý muốn). Khi đó, công ty sẽ xem xét hoàn lại vé theo từng trường hợp cụ thể, và có thể yêu cầu giấy tờ chứng minh tình huống khẩn cấp. Quy trình yêu cầu hoàn trả vé sẽ được hướng dẫn rõ ràng trên website, và khách hàng cần điền đầy đủ thông tin trong biểu mẫu yêu cầu hoàn vé.', 
+ NULL, GETDATE(), 1),
+(N'Chính sách Bảo Mật Thông Tin', 
+ N'Chính sách bảo mật thông tin cá nhân là cam kết của công ty trong việc bảo vệ dữ liệu cá nhân của khách hàng. Các thông tin như tên, địa chỉ, số điện thoại, thông tin thanh toán và các dữ liệu nhạy cảm khác sẽ chỉ được sử dụng với mục đích cung cấp dịch vụ và không bao giờ được chia sẻ cho bên thứ ba mà không có sự đồng ý của khách hàng. Công ty cam kết tuân thủ các quy định của pháp luật về bảo vệ thông tin cá nhân, và sử dụng các biện pháp bảo mật tiên tiến như mã hóa dữ liệu, hệ thống tường lửa và các công cụ giám sát để ngăn chặn truy cập trái phép. Khách hàng cũng có quyền yêu cầu quyền truy cập vào thông tin cá nhân của mình, yêu cầu sửa chữa hoặc xóa bỏ dữ liệu khi không còn cần thiết. Chính sách này cũng sẽ mô tả về cách thức công ty thông báo cho khách hàng trong trường hợp có sự cố bảo mật xảy ra, và những biện pháp khắc phục mà công ty sẽ thực hiện.', 
+ NULL, GETDATE(), 1);
+
+-- Cập nhật bảng Rule với nội dung chi tiết hơn
+INSERT INTO [Rule] (Title, Content, Img, Update_Date, Status, UserID, CategoryRuleID)
+VALUES 
+(N'Quy định vận chuyển', 
+ N'Quy định vận chuyển được áp dụng đối với tất cả các dịch vụ vận chuyển do công ty cung cấp. Quy định này bao gồm thông tin chi tiết về các phương thức vận chuyển, từ giao hàng nhanh qua các công ty vận chuyển lớn đến các hình thức giao hàng trực tiếp tại cửa. Các khách hàng cần cung cấp thông tin chính xác về địa chỉ giao hàng và thời gian nhận hàng để đảm bảo việc vận chuyển diễn ra suôn sẻ. Ngoài ra, công ty sẽ thông báo cho khách hàng về tình trạng vận chuyển qua email hoặc SMS, bao gồm thông tin về lộ trình, thời gian dự kiến giao hàng và các thay đổi (nếu có). Trong trường hợp khách hàng không nhận được hàng trong thời gian quy định, công ty cam kết sẽ tiến hành điều tra và xử lý yêu cầu bồi thường nếu có lỗi từ phía công ty hoặc đối tác vận chuyển. Các trường hợp bất khả kháng như thời tiết xấu hoặc tình trạng giao thông tắc nghẽn sẽ được xử lý theo từng trường hợp cụ thể và có thể dẫn đến việc giao hàng bị trễ.', 
+ NULL, GETDATE(), 1, 1, 1),
+(N'Điều kiện sử dụng hệ thống mua vé trực tuyến', 
+ N'Điều kiện sử dụng hệ thống mua vé trực tuyến là những yêu cầu mà khách hàng cần đáp ứng khi sử dụng nền tảng mua vé của công ty. Khách hàng phải tạo tài khoản, cung cấp thông tin cá nhân chính xác, và đồng ý với các điều khoản và điều kiện khi sử dụng hệ thống. Sau khi đăng ký, khách hàng có thể chọn dịch vụ, thanh toán trực tuyến và nhận vé điện tử. Các khách hàng có thể lưu trữ vé trong tài khoản và sử dụng chúng cho các dịch vụ tương lai. Điều khoản này cũng bao gồm việc khách hàng phải chịu trách nhiệm đối với việc bảo mật tài khoản và mật khẩu, và không được phép chia sẻ tài khoản của mình với người khác. Hệ thống cũng cung cấp các chức năng quản lý vé như việc hủy hoặc thay đổi vé nếu có sự cố, và khách hàng phải tuân theo các điều kiện áp dụng cho việc thay đổi hoặc hủy vé. Các quy định về thanh toán và hoàn trả cũng được quy định rõ ràng trong điều kiện này.', 
+ NULL, GETDATE(), 1, 2, 1),
+(N'Điều khoản sử dụng website Ticket Train Booking', 
+ N'Điều khoản sử dụng website Ticket Train Booking cung cấp các thông tin chi tiết về việc sử dụng dịch vụ trên website của công ty. Khi khách hàng truy cập vào website, họ đồng ý với các điều khoản và điều kiện sử dụng mà công ty đã đặt ra. Điều này bao gồm việc khách hàng không được phép sử dụng website cho các mục đích phi pháp, không tải lên các nội dung xâm phạm bản quyền, và không can thiệp vào hoạt động của website. Công ty cũng cam kết bảo vệ thông tin cá nhân của khách hàng theo chính sách bảo mật đã được công bố. Các quyền và nghĩa vụ của khách hàng trong việc sử dụng các dịch vụ trên website cũng sẽ được giải thích rõ ràng trong phần này, bao gồm việc tuân thủ các quy định về thanh toán, hoàn tiền, và sử dụng các dịch vụ bổ sung nếu có.', 
+ NULL, GETDATE(), 1, 2, 1),
+(N'Chính sách hoàn trả vé, đổi vé', 
+ N'Chính sách hoàn trả vé và đổi vé bao gồm các quy định liên quan đến việc yêu cầu hoàn trả vé sau khi thanh toán hoặc đổi vé trong các trường hợp cần thiết. Các khách hàng có quyền yêu cầu hoàn tiền nếu vé không sử dụng được trong thời gian quy định, hoặc khi có sự thay đổi về lịch trình từ phía công ty. Chính sách này cũng bao gồm các điều kiện đổi vé, ví dụ như đổi vé trong vòng 24 giờ trước giờ khởi hành sẽ không tính phí. Tuy nhiên, nếu đổi vé muộn hơn, khách hàng có thể phải chịu một khoản phí dịch vụ. Quy trình đổi và hoàn vé được thực hiện qua các kênh hỗ trợ khách hàng và thông qua hệ thống của công ty, và khách hàng cần tuân thủ quy trình này để yêu cầu hoàn trả hoặc đổi vé.', 
+ NULL, GETDATE(), 1, 2, 3),
+(N'Quy định thời gian hoàn tiền', 
+ N'Quy định thời gian hoàn tiền bao gồm các điều kiện và thời gian yêu cầu hoàn lại tiền cho khách hàng trong các trường hợp như hủy vé, không thể sử dụng dịch vụ do lý do bất khả kháng, hoặc khi khách hàng yêu cầu hoàn tiền sau khi sử dụng dịch vụ. Thời gian hoàn tiền có thể thay đổi tùy theo phương thức thanh toán mà khách hàng đã sử dụng. Ví dụ, nếu thanh toán qua thẻ tín dụng, thời gian hoàn tiền có thể từ 5 đến 10 ngày làm việc, trong khi thanh toán qua chuyển khoản ngân hàng có thể mất từ 7 đến 15 ngày. Chính sách hoàn tiền cũng quy định về các trường hợp không đủ điều kiện hoàn tiền, chẳng hạn như khi khách hàng không tuân thủ quy định về hủy vé hoặc thay đổi dịch vụ trong thời gian quy định.', 
+ NULL, GETDATE(), 1, 2, 3);
+
+GO
+CREATE PROCEDURE AddSeatsForNewCarriage
+    @CarriageID INT,
+    @CarriageType VARCHAR(50),
+    @TrainID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @NumberOfSeats INT;
+    DECLARE @SeatNumber INT;
+    DECLARE @SeatType VARCHAR(50);
+
+    -- Xác định số ghế dựa trên loại toa
+    IF @CarriageType = 'VIP'
+        SET @NumberOfSeats = 12;
+    ELSE IF @CarriageType = 'Standard'
+        SET @NumberOfSeats = 10;
+    ELSE
+        --  Xử lý trường hợp loại toa không hợp lệ (tùy chọn)
+        RETURN;
+    -- Hoặc RAISERROR
+
+    -- Đặt loại ghế (có thể giống loại toa, hoặc tùy chỉnh)
+    IF @CarriageType = 'VIP'
+        SET @SeatType = 'VIP';
+    ELSE
+        SET @SeatType = 'Normal';
+    -- hoặc 'Standard', tùy vào cách bạn đặt tên.
+
+    -- Vòng lặp để thêm ghế
+    SET @SeatNumber = 1;
+    WHILE @SeatNumber <= @NumberOfSeats
+    BEGIN
+        INSERT INTO Seat
+            (SeatNumber, Status, SeatType, CarriageID)
+        VALUES
+            (@SeatNumber, 'Available', @SeatType, @CarriageID);
+        -- 'Available' là trạng thái ghế.
+
+        SET @SeatNumber = @SeatNumber + 1;
+    END
+END
+GO
+GO
+CREATE PROCEDURE DeleteCarriageAndSeats
+    @CarriageID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+    -- Bắt đầu transaction
+
+    BEGIN TRY
+        -- Xóa ghế của toa
+        DELETE FROM Seat WHERE CarriageID = @CarriageID;
+
+        -- Xóa toa
+        DELETE FROM Carriage WHERE CarriageID = @CarriageID;
+
+        COMMIT TRANSACTION; -- Commit transaction nếu thành công
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION; -- Rollback nếu có lỗi
+
+        -- Xử lý lỗi (ghi log, ném exception, ...)
+        THROW; -- Hoặc xử lý lỗi theo cách khác
+    END CATCH
+END;
+GO
+GO
+CREATE PROCEDURE UpdateCarriageAndSeats
+    @CarriageID INT,
+    @CarriageNumber VARCHAR(50),
+    @CarriageType VARCHAR(50),
+    @NewCapacity INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Lấy số lượng ghế hiện tại
+        DECLARE @CurrentCapacity INT;
+        SELECT @CurrentCapacity = Capacity
+    FROM Carriage
+    WHERE CarriageID = @CarriageID;
+
+        -- Cập nhật thông tin toa tàu
+        UPDATE Carriage
+        SET CarriageNumber = @CarriageNumber,
+            CarriageType = @CarriageType,
+            Capacity = @NewCapacity
+        WHERE CarriageID = @CarriageID;
 
 
+        -- Điều chỉnh số lượng ghế
+        IF @NewCapacity > @CurrentCapacity  -- Thêm ghế
+        BEGIN
+        DECLARE @SeatsToAdd INT = @NewCapacity - @CurrentCapacity;
+        DECLARE @SeatNumber INT;
+        -- Tìm số ghế lớn nhất hiện tại + 1 của toa đó
+        SELECT @SeatNumber = ISNULL(MAX(CAST(SeatNumber AS INT)), 0) + 1
+        FROM Seat
+        WHERE CarriageID = @CarriageID;
+
+        WHILE @SeatsToAdd > 0
+            BEGIN
+            DECLARE @SeatType VARCHAR(50);
+            IF @CarriageType = 'VIP'
+                    SET @SeatType = 'VIP';
+                ELSE
+                    SET @SeatType = 'Normal';
+
+            INSERT INTO Seat
+                (SeatNumber, Status, SeatType, CarriageID)
+            VALUES
+                (CAST(@SeatNumber AS VARCHAR(10)), 'Available', @SeatType, @CarriageID);
+
+            SET @SeatNumber = @SeatNumber + 1;
+            SET @SeatsToAdd = @SeatsToAdd - 1;
+        END
+    END
+        ELSE IF @NewCapacity < @CurrentCapacity  -- Xóa ghế
+        BEGIN
+        DECLARE @SeatsToDelete INT = @CurrentCapacity - @NewCapacity;
+
+        -- Xóa những ghế có ID lớn nhất (giả sử ghế mới thêm vào có ID lớn hơn)
+        -- Cách 1 (dùng CTE, an toàn hơn, hoạt động tốt cả khi SeatNumber không phải số)
+
+        ;WITH
+            SeatsToDelete
+            AS
+            (
+                SELECT TOP (@SeatsToDelete)
+                    SeatID
+                FROM Seat
+                WHERE CarriageID = @CarriageID
+                ORDER BY CAST(SeatNumber AS INT) DESC
+                -- Sắp xếp theo số ghế (dạng số) giảm dần.
+            )
+            DELETE FROM SeatsToDelete;
+
+
+    -- Cách 2 (Dùng DELETE TOP, chỉ dùng khi SeatNumber là số và tăng dần)
+    --DELETE TOP (@SeatsToDelete) FROM Seat
+    --WHERE CarriageID = @CarriageID
+    --ORDER BY SeatID DESC;
+    END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;  -- Rethrow the error
+    END CATCH
+END;
+GO
