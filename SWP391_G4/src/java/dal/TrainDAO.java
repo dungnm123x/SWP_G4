@@ -72,17 +72,29 @@ public class TrainDAO extends DBContext<RailwayDTO> {
     }
 
     // Thêm mới tàu
-    public boolean addTrain(Train train) {
-        String sql = "INSERT INTO Train (TrainName) VALUES (?)";
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, train.getTrainName());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+    public Train addTrain(Train train) {
+    String sql = "INSERT INTO Train (TrainName) VALUES (?)";
+    try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        ps.setString(1, train.getTrainName());
+        int affectedRows = ps.executeUpdate();
+
+        if (affectedRows == 0) {
+            throw new SQLException("Creating train failed, no rows affected.");
         }
+
+        try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                train.setTrainID(generatedKeys.getInt(1)); // Lấy TrainID và set cho đối tượng Train
+                return train; // Trả về đối tượng Train đã có ID
+            } else {
+                throw new SQLException("Creating train failed, no ID obtained.");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return null; // Xử lý lỗi, có thể throw exception hoặc trả về null
     }
+}
 
     // Sửa thông tin tàu
     public boolean updateTrain(Train train) {

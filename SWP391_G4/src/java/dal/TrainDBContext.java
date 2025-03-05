@@ -70,6 +70,31 @@ public class TrainDBContext extends DBContext<TrainDTO> {
         return trains;
     }
 
+    public TrainDTO getFullTrainInfoById(int trainID) {
+        TrainDTO train = null;
+        String sql = "SELECT t.TrainID, t.TrainName, "
+                + "COUNT(c.CarriageID) AS TotalCarriages, COALESCE(SUM(c.Capacity), 0) AS TotalSeats "
+                + "FROM Train t "
+                + "LEFT JOIN Carriage c ON t.TrainID = c.TrainID "
+                + "WHERE t.TrainID = ? " // Thêm điều kiện WHERE
+                + "GROUP BY t.TrainID, t.TrainName"; // Gom nhóm theo TrainID
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trainID); // Set tham số TrainID
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    train = new TrainDTO();
+                    train.setTrainID(rs.getInt("TrainID"));
+                    train.setTrainName(rs.getString("TrainName"));
+                    train.setTotalCarriages(rs.getInt("TotalCarriages"));
+                    train.setTotalSeats(rs.getInt("TotalSeats"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return train;
+    }
 
     public TrainDTO getTrainById(int trainID) {
         TrainDTO train = null;
