@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,12 +21,12 @@ public class RuleDAO extends DBContext {
         try (PreparedStatement ps = connection.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new CategoryRule(
-                    rs.getInt("categoryRuleID"),
-                    rs.getString("categoryRuleName"),
-                    rs.getString("content"),
-                    rs.getString("img"),
-                    rs.getDate("update_date"),
-                    rs.getBoolean("status")
+                        rs.getInt("categoryRuleID"),
+                        rs.getString("categoryRuleName"),
+                        rs.getString("content"),
+                        rs.getString("img"),
+                        rs.getDate("update_date"),
+                        rs.getBoolean("status")
                 ));
             }
         } catch (SQLException ex) {
@@ -34,30 +35,48 @@ public class RuleDAO extends DBContext {
         return list;
     }
 
-    public boolean addCategory(String name, String content, String img, boolean status) throws SQLException {
-        String query = "INSERT INTO CategoryRule (categoryRuleName, content, img, status) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, name);
-            ps.setString(2, content);
-            ps.setString(3, img);
-            ps.setBoolean(4, status);
-            ps.executeUpdate();
+       public boolean addCategory(String categoryRuleName, String content, String img, boolean status) throws SQLException {
+    String query = "INSERT INTO CategoryRule (categoryRuleName, content, img, Update_Date, status) VALUES (?, ?, ?, GETDATE(), ?)";
+
+    try (PreparedStatement ps = connection.prepareStatement(query)) {
+        ps.setString(1, categoryRuleName);
+        ps.setString(2, content);
+        ps.setString(3, img);
+        ps.setBoolean(4, status); 
+
+        ps.executeUpdate(); 
+    }
+    return true;
+}
+
+    public boolean updateCategory(int id, String name, String content, String img, boolean status) {
+    String query = "UPDATE CategoryRule SET categoryRuleName = ?, content = ?, img = ?, status = ? WHERE categoryRuleID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(query)) {
+        ps.setString(1, name);
+        ps.setString(2, content);
+        ps.setString(3, img);
+        ps.setBoolean(4, status);
+        ps.setInt(5, id);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+    public boolean updateCategoryRuleStatus(int categoryRuleID, boolean status) {
+        // Cập nhật trạng thái blog trong cơ sở dữ liệu
+        String sql = "UPDATE CategoryRule SET status = ? WHERE CategoryRuleID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setBoolean(1, status);
+            stmt.setInt(2, categoryRuleID);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
-        return true;
     }
 
-    public boolean updateCategory(int id, String name, String content, String img, boolean status) throws SQLException {
-        String query = "UPDATE CategoryRule SET categoryRuleName = ?, content = ?, img = ?, status = ? WHERE categoryRuleID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, name);
-            ps.setString(2, content);
-            ps.setString(3, img);
-            ps.setBoolean(4, status);
-            ps.setInt(5, id);
-            ps.executeUpdate();
-        }
-        return true;
-    }
 
     public boolean deleteCategory(int id) {
         String query = "DELETE FROM CategoryRule WHERE categoryRuleID = ?";
@@ -70,20 +89,132 @@ public class RuleDAO extends DBContext {
         }
     }
 
+    public List<CategoryRule> searchAndPagingCategoryRule(String categoryRuleName, Boolean status, int sortBy, int index, int pageSize) {
+        List<CategoryRule> rules = new ArrayList<>();
+        String sql = "SELECT CategoryRuleID, CategoryRuleName, Content, Img, Update_Date, Status FROM CategoryRule WHERE 1=1 ";
+
+        // Tìm kiếm theo tên CategoryRule nếu có
+        if (categoryRuleName != null && !categoryRuleName.trim().isEmpty()) {
+            sql += "AND CategoryRuleName LIKE ? ";
+        }
+
+        // Lọc theo trạng thái nếu có
+        if (status != null) {
+            sql += "AND Status = ? ";
+        }
+
+        // Xử lý sắp xếp
+        switch (sortBy) {
+            case 1:
+                sql += "ORDER BY CategoryRuleName ASC ";
+                break;
+            case 2:
+                sql += "ORDER BY CategoryRuleName DESC ";
+                break;
+            case 3:
+                sql += "ORDER BY CategoryRuleID ASC ";
+                break;
+            case 4:
+                sql += "ORDER BY CategoryRuleID DESC ";
+                break;
+            default:
+                sql += "ORDER BY CategoryRuleID ASC ";
+        }
+
+        // Thêm phân trang
+        sql += "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
+
+            // Nếu có tìm kiếm theo tên CategoryRule
+            if (categoryRuleName != null && !categoryRuleName.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + categoryRuleName.trim() + "%");
+            }
+
+            // Nếu có trạng thái thì set giá trị
+            if (status != null) {
+                ps.setBoolean(paramIndex++, status);
+            }
+
+            // Thêm tham số OFFSET và FETCH
+            int offset = (index - 1) * pageSize;
+            ps.setInt(paramIndex++, offset);
+            ps.setInt(paramIndex++, pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    CategoryRule rule = new CategoryRule();
+                    rule.setCategoryRuleID(rs.getInt("CategoryRuleID"));
+                    rule.setCategoryRuleName(rs.getString("CategoryRuleName"));
+                    rule.setContent(rs.getString("Content"));
+                    rule.setImg(rs.getString("Img"));
+                    rule.setUpdate_date(rs.getDate("Update_Date"));
+                    rule.setStatus(rs.getBoolean("Status"));
+                    rules.add(rule);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rules;
+    }
+
+    public int getSizeCategoryRule(String categoryRuleName, Boolean status) {
+        int count = 0;
+
+        String sql = "SELECT COUNT(*) AS TotalCount FROM CategoryRule WHERE 1=1 ";
+
+        // Thêm điều kiện tìm kiếm theo tên CategoryRule nếu có
+        if (categoryRuleName != null && !categoryRuleName.trim().isEmpty()) {
+            sql += "AND CategoryRuleName LIKE ? ";
+        }
+
+        // Thêm điều kiện lọc theo trạng thái nếu có
+        if (status != null) {
+            sql += "AND Status = ? ";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
+
+            // Nếu có tìm kiếm theo tên CategoryRule
+            if (categoryRuleName != null && !categoryRuleName.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + categoryRuleName.trim() + "%");
+            }
+
+            // Nếu có trạng thái thì set giá trị
+            if (status != null) {
+                ps.setBoolean(paramIndex++, status);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
     public List<Rule> getAllRules() {
         String query = "SELECT ruleID, title, userID, content, img, update_date, status, categoryRuleID FROM [Rule]";
         List<Rule> list = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new Rule(
-                    rs.getInt("ruleID"),
-                    rs.getString("title"),
-                    rs.getInt("userID"),
-                    rs.getDate("update_date"),
-                    rs.getString("content"),
-                    rs.getString("img"),
-                    rs.getBoolean("status"),
-                    rs.getInt("categoryRuleID")
+                        rs.getInt("ruleID"),
+                        rs.getString("title"),
+                        rs.getInt("userID"),
+                        rs.getDate("update_date"),
+                        rs.getString("content"),
+                        rs.getString("img"),
+                        rs.getBoolean("status"),
+                        rs.getInt("categoryRuleID")
                 ));
             }
         } catch (SQLException ex) {
@@ -120,106 +251,107 @@ public class RuleDAO extends DBContext {
         }
         return true;
     }
-public List<Rule> searchAndPagingRule(String ruleName, int categoryId, int index, int pageSize) {
-    List<Rule> rules = new ArrayList<>();
-    String sql = "SELECT r.ruleID, r.title, r.userID, r.update_date, r.content, r.img, r.status, r.categoryRuleID "
-            + "FROM [Rule] r "
-            + "JOIN CategoryRule c ON r.categoryRuleID = c.categoryRuleID "
-            + "WHERE 1=1 "
-            + "AND r.status = 1 "
-            + "AND c.status = 1 ";  // Lọc status
 
-    if (ruleName != null && !ruleName.trim().isEmpty()) {
-        sql += "AND r.title LIKE ? ";
-    }
-
-    if (categoryId > 0) {
-        sql += "AND r.categoryRuleID = ? ";
-    }
-
-    sql += "ORDER BY r.ruleID ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";  // Phân trang
-
-    System.out.println("SQL Query: " + sql);
-    System.out.println("Params: ruleName = " + ruleName + ", categoryId = " + categoryId + ", index = " + index + ", pageSize = " + pageSize);
-
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        int paramIndex = 1;
+    public List<Rule> searchAndPagingRule(String ruleName, int categoryId, int index, int pageSize) {
+        List<Rule> rules = new ArrayList<>();
+        String sql = "SELECT r.ruleID, r.title, r.userID, r.update_date, r.content, r.img, r.status, r.categoryRuleID "
+                + "FROM [Rule] r "
+                + "JOIN CategoryRule c ON r.categoryRuleID = c.categoryRuleID "
+                + "WHERE 1=1 "
+                + "AND r.status = 1 "
+                + "AND c.status = 1 ";  // Lọc status
 
         if (ruleName != null && !ruleName.trim().isEmpty()) {
-            ps.setString(paramIndex++, "%" + ruleName.trim() + "%");
+            sql += "AND r.title LIKE ? ";
         }
 
         if (categoryId > 0) {
-            ps.setInt(paramIndex++, categoryId);
+            sql += "AND r.categoryRuleID = ? ";
         }
 
-        int offset = (index - 1) * pageSize;
-        ps.setInt(paramIndex++, offset);
-        ps.setInt(paramIndex++, pageSize);
+        sql += "ORDER BY r.ruleID ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";  // Phân trang
 
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Rule rule = new Rule();
-            rule.setRuleID(rs.getInt("ruleID"));
-            rule.setTitle(rs.getString("title"));
-            rule.setUserID(rs.getInt("userID"));
-            rule.setUpdate_date(rs.getDate("update_date"));
-            rule.setContent(rs.getString("content"));
-            rule.setImg(rs.getString("img"));
-            rule.setStatus(rs.getBoolean("status"));
-            rule.setCategoryRuleID(rs.getInt("categoryRuleID"));
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Params: ruleName = " + ruleName + ", categoryId = " + categoryId + ", index = " + index + ", pageSize = " + pageSize);
 
-            System.out.println("Rule Found: " + rule.getRuleID() + " - " + rule.getTitle());
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
 
-            rules.add(rule);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-
-    System.out.println("Total Rules Found: " + rules.size());
-    return rules;
-}
-
-
-public int getSizeRule(String ruleName, int categoryId) {
-    int count = 0;
-
-    String sql = "SELECT COUNT(*) AS TotalCount FROM [Rule] r "
-            + "JOIN CategoryRule c ON r.categoryRuleID = c.categoryRuleID "
-            + "WHERE 1=1 AND r.status = 1 AND c.status = 1 ";
-
-    if (ruleName != null && !ruleName.trim().isEmpty()) {
-        sql += "AND r.title LIKE ? ";
-    }
-
-    if (categoryId > 0) {
-        sql += "AND r.categoryRuleID = ? ";
-    }
-
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        int paramIndex = 1;
-
-        if (ruleName != null && !ruleName.trim().isEmpty()) {
-            ps.setString(paramIndex++, "%" + ruleName.trim() + "%");
-        }
-
-        if (categoryId > 0) {
-            ps.setInt(paramIndex++, categoryId);
-        }
-
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt("TotalCount");
+            if (ruleName != null && !ruleName.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + ruleName.trim() + "%");
             }
+
+            if (categoryId > 0) {
+                ps.setInt(paramIndex++, categoryId);
+            }
+
+            int offset = (index - 1) * pageSize;
+            ps.setInt(paramIndex++, offset);
+            ps.setInt(paramIndex++, pageSize);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Rule rule = new Rule();
+                rule.setRuleID(rs.getInt("ruleID"));
+                rule.setTitle(rs.getString("title"));
+                rule.setUserID(rs.getInt("userID"));
+                rule.setUpdate_date(rs.getDate("update_date"));
+                rule.setContent(rs.getString("content"));
+                rule.setImg(rs.getString("img"));
+                rule.setStatus(rs.getBoolean("status"));
+                rule.setCategoryRuleID(rs.getInt("categoryRuleID"));
+
+                System.out.println("Rule Found: " + rule.getRuleID() + " - " + rule.getTitle());
+
+                rules.add(rule);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+
+        System.out.println("Total Rules Found: " + rules.size());
+        return rules;
     }
 
-    return count;
-}
- public List<Rule> getRulesByCategory(int categoryRuleId) {
+    public int getSizeRule(String ruleName, int categoryId) {
+        int count = 0;
+
+        String sql = "SELECT COUNT(*) AS TotalCount FROM [Rule] r "
+                + "JOIN CategoryRule c ON r.categoryRuleID = c.categoryRuleID "
+                + "WHERE 1=1 AND r.status = 1 AND c.status = 1 ";
+
+        if (ruleName != null && !ruleName.trim().isEmpty()) {
+            sql += "AND r.title LIKE ? ";
+        }
+
+        if (categoryId > 0) {
+            sql += "AND r.categoryRuleID = ? ";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
+
+            if (ruleName != null && !ruleName.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + ruleName.trim() + "%");
+            }
+
+            if (categoryId > 0) {
+                ps.setInt(paramIndex++, categoryId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("TotalCount");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    public List<Rule> getRulesByCategory(int categoryRuleId) {
         List<Rule> list = new ArrayList<>();
         String sql = "SELECT * FROM [Rule] WHERE CategoryRuleID = ?";
         try {
@@ -255,44 +387,45 @@ public int getSizeRule(String ruleName, int categoryId) {
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 rule = new Rule();
-                rule.setRuleID(rs.getInt(1));  
+                rule.setRuleID(rs.getInt(1));
                 rule.setTitle(rs.getString(2));
-                rule.setContent(rs.getString(3)); 
+                rule.setContent(rs.getString(3));
                 rule.setImg(rs.getString(4));
-                rule.setUpdate_date(rs.getDate(5)); 
-                rule.setStatus(rs.getBoolean(6)); 
+                rule.setUpdate_date(rs.getDate(5));
+                rule.setStatus(rs.getBoolean(6));
                 rule.setUserID(rs.getInt(7));
-                rule.setCategoryRuleID(rs.getInt(8)); 
+                rule.setCategoryRuleID(rs.getInt(8));
             }
         } catch (SQLException e) {
             System.out.println(e);
         }
         return rule;
     }
+
     public CategoryRule getCategoryRuleByID(int categoryRuleID) {
-    CategoryRule categoryRule = null;
-    String sql = "SELECT * FROM CategoryRule WHERE CategoryRuleID = ?";
-    
-    try {
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setInt(1, categoryRuleID);
-        ResultSet rs = st.executeQuery();
-        
-        if (rs.next()) {
-            categoryRule = new CategoryRule();
-            categoryRule.setCategoryRuleID(rs.getInt("CategoryRuleID"));  
-            categoryRule.setCategoryRuleName(rs.getString("CategoryRuleName")); 
-            categoryRule.setContent(rs.getString("Content"));  
-            categoryRule.setImg(rs.getString("Img"));  
-            categoryRule.setUpdate_date(rs.getDate("Update_date"));  
-            categoryRule.setStatus(rs.getBoolean("Status"));  
+        CategoryRule categoryRule = null;
+        String sql = "SELECT * FROM CategoryRule WHERE CategoryRuleID = ?";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, categoryRuleID);
+            ResultSet rs = st.executeQuery();
+
+            if (rs.next()) {
+                categoryRule = new CategoryRule();
+                categoryRule.setCategoryRuleID(rs.getInt("CategoryRuleID"));
+                categoryRule.setCategoryRuleName(rs.getString("CategoryRuleName"));
+                categoryRule.setContent(rs.getString("Content"));
+                categoryRule.setImg(rs.getString("Img"));
+                categoryRule.setUpdate_date(rs.getDate("Update_date"));
+                categoryRule.setStatus(rs.getBoolean("Status"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  // In ra thông báo lỗi chi tiết
         }
-    } catch (SQLException e) {
-        e.printStackTrace();  // In ra thông báo lỗi chi tiết
+
+        return categoryRule;
     }
-    
-    return categoryRule;
-}
 
     @Override
     public void insert(Object model) {
@@ -319,5 +452,4 @@ public int getSizeRule(String ruleName, int categoryId) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-  
 }
