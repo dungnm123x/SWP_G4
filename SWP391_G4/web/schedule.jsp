@@ -66,7 +66,7 @@ Author     : Admin
 
                     <!-- Nếu là vé khứ hồi, hiển thị danh sách chuyến về -->
                     <c:if test="${not empty sessionScope.returnScheduleList}">
-                        <h4>Chuyến Về: ngày ${departureDate} từ ${arrivalStation} đến ${departureStation}      </h4>
+                        <h4>Chuyến Về: ngày ${returnDate} từ ${arrivalStation} đến ${departureStation}      </h4>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
