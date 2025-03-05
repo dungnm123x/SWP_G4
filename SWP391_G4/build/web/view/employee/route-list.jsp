@@ -83,11 +83,11 @@
                 <td>${route.distance}</td>
                 <td>${route.basePrice}</td>
                 <td>
-                    <a href="route?editId=${route.routeID}">Sửa</a> | 
+                    <a href="route?editId=${route.routeID}"><button>Chỉnh sửa</button></a> | 
                     <form method="post" action="route" style="display:inline;">
                         <input type="hidden" name="routeID" value="${route.routeID}">
                         <input type="hidden" name="action" value="delete">
-                        <button type="submit">Xóa</button>
+                        <button type="submit" style="background-color: red; color: white;">Xóa</button>
                     </form>
                 </td>
             </tr>

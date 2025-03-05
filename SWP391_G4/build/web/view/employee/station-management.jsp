@@ -62,7 +62,7 @@
                             <td>${station.stationName}</td>
                             <td>${station.address}</td>
                             <td>
-                                <a href="editstation?action=edit&stationID=${station.stationID}" class="edit-link">Sửa</a>
+                                <a href="editstation?action=edit&stationID=${station.stationID}"><button>Chỉnh sửa</button></a>
                                 <button class="delete-btn" onclick="deleteStation(${station.stationID})">Xóa</button>
                             </td>
                         </tr>
