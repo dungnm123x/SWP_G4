@@ -20,6 +20,8 @@
                     <li><a href="station">Quản lý ga</a></li>
                     <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                     <li><a href="posts-list">Quản lý Blog</a></li>
+                    <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                    <li><a href="manager-rule-list">Quản lý quy định</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
                 <form action="logout" method="GET">
@@ -45,7 +47,7 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Lọc</button>
-                    <a href="listtrain" class="returnbtn" onclick="resetForm()">Trở về</a>
+                    <a href="trip" class="returnbtn" onclick="resetForm()">Trở về</a>
                     <script>
                         function resetForm() {
                             document.querySelector("form").reset();

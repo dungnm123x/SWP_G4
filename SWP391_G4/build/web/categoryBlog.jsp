@@ -7,6 +7,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link rel="stylesheet" href="css/employee.css">
         <style>
 
@@ -25,6 +26,16 @@
                 font-weight: bold;
                 text-align: center;
             }
+            .filter-row {
+                display: flex;
+                flex-wrap: wrap; /* Cho phép xuống dòng khi màn hình nhỏ */
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .filter-group {
+                flex: 1; /* Mỗi nhóm form sẽ dàn đều */
+                min-width: 120px; /* Đảm bảo không quá nhỏ ở màn hẹp */
+            }
         </style>
     </head>
     <body class="bg-light">
@@ -39,6 +50,8 @@
                 <li><a href="station">Quản lý ga</a></li>
                 <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                 <li><a href="posts-list">Quản lý Blog</a></li>
+                <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                <li><a href="manager-rule-list">Quản lý quy định</a></li>
                 <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
             </ul>
             <form action="logout" method="GET">
@@ -67,66 +80,69 @@
                 <% session.removeAttribute("error"); %>
             </c:if>
 
-
-            <div class="filter-controls d-flex flex-wrap align-items-center justify-content-between mb-3">
+            <div class="filter-row">
                 <!-- Chọn số lượng hiển thị trên mỗi trang -->
-                <form id="pageSizeForm" action="category-blog" method="get" class="d-flex align-items-center me-3">
-                    <label for="page-size-select" class="form-label me-2 mb-0">Show</label>
-                    <select name="pageSize" id="page-size-select" class="form-select me-2" onchange="document.getElementById('pageSizeForm').submit()">
-                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
-                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
-                        <option value="15" ${pageSize == 15 ? 'selected' : ''}>15</option>
-                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
-                        <option value="25" ${pageSize ==     25 ? 'selected' : ''}>25</option>
-                    </select>
-                    <input type="hidden" name="index" value="${currentPage}" />
-                    <input type="hidden" name="categoryName" value="${categoryName}" />
-                    <input type="hidden" name="status" value="${status}" />
-                    <input type="hidden" name="sortBy" value="${sortBy}" />
-                </form>
-
-                <!-- Tìm kiếm theo tên danh mục -->
-                <form action="category-blog" method="GET" class="d-flex align-items-center me-3">
-                    <label for="search" class="form-label me-2 mb-0">Search</label>
-                    <div class="input-group">
-                        <input id="search" type="text" name="categoryName" class="form-control" placeholder="Search..." value="${categoryName != null ? categoryName : ''}">
-                        <input type="hidden" name="pageSize" value="${pageSize}" />
+                <div class="filter-group">
+                    <form id="pageSizeForm" action="category-blog" method="get" >
+                        <label for="page-size-select" class="form-label me-2 mb-0">Show</label>
+                        <select name="pageSize" id="page-size-select" class="form-select me-2" onchange="document.getElementById('pageSizeForm').submit()">
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                            <option value="15" ${pageSize == 15 ? 'selected' : ''}>15</option>
+                            <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25</option>
+                        </select>
+                        <input type="hidden" name="index" value="${currentPage}" />
+                        <input type="hidden" name="categoryName" value="${categoryName}" />
                         <input type="hidden" name="status" value="${status}" />
                         <input type="hidden" name="sortBy" value="${sortBy}" />
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </div>
-                </form>
-
-                <!-- Lọc theo trạng thái -->
-                <form action="category-blog" method="get" class="d-flex align-items-center me-3">
-                    <label for="statusFilter" class="form-label me-2 mb-0">Status</label>
-                    <select id="statusFilter" name="status" class="form-select" onchange="this.form.submit()">
-                        <option value="-1" ${status == -1 ? 'selected' : ''}>All</option>
-                        <option value="1" ${status == 1 ? 'selected' : ''}>Active</option>
-                        <option value="0" ${status == 0 ? 'selected' : ''}>Inactive</option>
-                    </select>
-                    <input type="hidden" name="categoryName" value="${categoryName}" />
-                    <input type="hidden" name="pageSize" value="${pageSize}" />
-                    <input type="hidden" name="sortBy" value="${sortBy}" />
-                </form>
-
-                <!-- Sắp xếp danh mục -->
-                <form action="category-blog" method="get" class="d-flex align-items-center">
-                    <label for="sortBy" class="form-label me-2 mb-0">Sort By</label>
-                    <select id="sortBy" name="sortBy" class="form-select me-2">
-                        <option value="0" ${sortBy == 0 ? 'selected' : ''}>Default</option>
-                        <option value="1" ${sortBy == 1 ? 'selected' : ''}>Name (A-Z)</option>
-                        <option value="2" ${sortBy == 2 ? 'selected' : ''}>Name (Z-A)</option>
-                        <option value="3" ${sortBy == 3 ? 'selected' : ''}>ID (Ascending)</option>
-                        <option value="4" ${sortBy == 4 ? 'selected' : ''}>ID (Descending)</option>
-                    </select>
-                    <input type="hidden" name="categoryName" value="${categoryName}" />
-                    <input type="hidden" name="pageSize" value="${pageSize}" />
-                    <input type="hidden" name="status" value="${status}" />
-                    <button type="submit" class="btn btn-primary">Sort</button>
-                </form>
+                    </form>
+                </div>
+                <div class="filter-group">
+                    <form action="category-blog" method="get" >
+                        <label for="sortBy" class="form-label me-2 mb-0">Sort By</label>
+                        <select id="sortBy" name="sortBy" class="form-select" onchange="this.form.submit()">
+                            <option value="0" ${sortBy == 0 ? 'selected' : ''}>Default</option>
+                            <option value="1" ${sortBy == 1 ? 'selected' : ''}>Name (A-Z)</option>
+                            <option value="2" ${sortBy == 2 ? 'selected' : ''}>Name (Z-A)</option>
+                            <option value="3" ${sortBy == 3 ? 'selected' : ''}>ID (Ascending)</option>
+                            <option value="4" ${sortBy == 4 ? 'selected' : ''}>ID (Descending)</option>
+                        </select>
+                        <input type="hidden" name="categoryName" value="${categoryName}" />
+                        <input type="hidden" name="pageSize" value="${pageSize}" />
+                        <input type="hidden" name="status" value="${status}" />
+                    </form>
+                </div>
+                <!-- Trạng thái -->
+                <div class="filter-group">
+                    <form action="category-blog" method="get">
+                        <label for="statusFilter" class="form-label me-2 mb-0">Status</label>
+                        <select id="statusFilter" name="status" class="form-select" onchange="this.form.submit()">
+                            <option value="-1" ${status == -1 ? 'selected' : ''}>All</option>
+                            <option value="1" ${status == 1 ? 'selected' : ''}>Active</option>
+                            <option value="0" ${status == 0 ? 'selected' : ''}>Inactive</option>
+                        </select>
+                        <input type="hidden" name="categoryName" value="${categoryName}" />
+                        <input type="hidden" name="pageSize" value="${pageSize}" />
+                        <input type="hidden" name="sortBy" value="${sortBy}" />
+                    </form>
+                </div>
+                <!-- Tìm kiếm -->
+                <div class="filter-group">
+                    <form action="category-blog" method="GET">
+                        <label for="search" class="form-label me-2 mb-0">Search</label>
+                        <div class="input-group">
+                            <input id="search" type="text" name="categoryName" class="form-control" placeholder="Tìm kiếm" value="${categoryName != null ? categoryName : ''}">
+                            <input type="hidden" name="pageSize" value="${pageSize}" />
+                            <input type="hidden" name="status" value="${status}" />
+                            <input type="hidden" name="sortBy" value="${sortBy}" />
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
             <div class="card shadow">
                 <div class="card-header text-white" style="background-color: #2C3E50;">
                     <h5 class="mb-0">Category Blog List</h5>
@@ -302,6 +318,6 @@
 
 
         </script>
-
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

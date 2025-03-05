@@ -67,6 +67,8 @@
                     <li><a href="station">Quản lý ga</a></li>
                     <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                     <li><a href="posts-list">Quản lý Blog</a></li>
+                    <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                    <li><a href="manager-rule-list">Quản lý quy định</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
                 <form action="logout" method="GET">
@@ -200,7 +202,11 @@
             </c:if>
 
             <!-- Bảng danh sách Blog -->
-            <div class="card">
+            <div class="card shadow ">
+                <div class="card-header text-white" style="background-color: #2C3E50;">
+                    <h5 class="mb-0">Blog List</h5>
+                </div>
+
                 <div class="card-body">
                     <table class="table table-bordered">
                         <thead class="bg-light">

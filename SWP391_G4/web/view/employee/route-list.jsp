@@ -18,6 +18,8 @@
                     <li><a href="station">Quản lý ga</a></li>
                     <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                     <li><a href="posts-list">Quản lý Blog</a></li>
+                    <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                    <li><a href="manager-rule-list">Quản lý quy định</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
                 <form action="logout" method="GET">
@@ -83,11 +85,11 @@
                 <td>${route.distance}</td>
                 <td>${route.basePrice}</td>
                 <td>
-                    <a href="route?editId=${route.routeID}">Sửa</a> | 
+                    <a href="route?editId=${route.routeID}"><button>Chỉnh sửa</button></a> | 
                     <form method="post" action="route" style="display:inline;">
                         <input type="hidden" name="routeID" value="${route.routeID}">
                         <input type="hidden" name="action" value="delete">
-                        <button type="submit">Xóa</button>
+                        <button type="submit" style="background-color: red; color: white;">Xóa</button>
                     </form>
                 </td>
             </tr>

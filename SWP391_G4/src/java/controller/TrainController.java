@@ -75,14 +75,16 @@ public class TrainController extends HttpServlet {
     }
 
     private void manageCarriages(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int trainID = Integer.parseInt(request.getParameter("id"));
-        TrainDTO train = trainDB.getTrainById(trainID);
-        List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID);
-        request.setAttribute("train", train);
-        request.setAttribute("carriages", carriages);
-        request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
-    }
+        throws ServletException, IOException {
+    int trainID = Integer.parseInt(request.getParameter("id"));
+    // Sử dụng phương thức mới để lấy đầy đủ thông tin TrainDTO
+    TrainDTO train = trainDB.getFullTrainInfoById(trainID);  // Sửa ở đây
+
+    List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID);
+    request.setAttribute("train", train);
+    request.setAttribute("carriages", carriages);
+    request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
+}
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -108,12 +110,19 @@ public class TrainController extends HttpServlet {
     }
 
     private void addTrain(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        String trainName = request.getParameter("trainName");
-        Train train = new Train(trainName);
-        trainDAO.addTrain(train);
-        response.sendRedirect("train");
+    throws IOException {
+    String trainName = request.getParameter("trainName");
+    Train train = new Train(trainName);
+    train = trainDAO.addTrain(train); // Nhận lại đối tượng Train đã có ID
+    if(train != null) {
+         // Không cần redirect đến manageCarriages nữa.
+         // Thay vào đó, redirect về trang danh sách tàu, có thể kèm theo thông báo.
+         response.sendRedirect("train?message=Train added successfully!"); // Thêm thông báo (tùy chọn)
+    }else{
+         //xử lí lỗi
+         response.sendRedirect("train?error=Failed to add train."); // Thêm thông báo lỗi (tùy chọn)
     }
+}
 
     private void updateTrain(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
