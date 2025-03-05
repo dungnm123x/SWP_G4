@@ -58,10 +58,10 @@
         </select>
 
         <label for="distance">Khoảng cách (km):</label>
-        <input type="number" name="distance" step="0.1" min="0" value="${editRoute.distance}" required>
+        <input type="number" name="distance" step="0.5" min="0" value="${editRoute.distance}" required>
 
         <label for="basePrice">Giá cơ bản:</label>
-        <input type="number" name="basePrice" step="0.01" min="0" value="${editRoute.basePrice}" required>
+        <input type="number" name="basePrice" step="1" min="0" value="${editRoute.basePrice}" required>
 
         <button type="submit"><c:if test="${not empty editRoute}">Cập Nhật</c:if><c:if test="${empty editRoute}">Thêm</c:if></button>
     </form>
