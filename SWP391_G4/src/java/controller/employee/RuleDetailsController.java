@@ -62,7 +62,7 @@ public class RuleDetailsController extends HttpServlet {
         
         // Sử dụng RuleDAO để lấy thông tin quy định theo ID
         RuleDAO ruleDAO = new RuleDAO();
-        Rule rule = ruleDAO.getRuleById(ruleId);
+        Rule rule = ruleDAO.getRuleByID(ruleId);
         // Lưu các đối tượng vào request để truyền sang JSP
         request.setAttribute("rule", rule); 
         // Chuyển tiếp đến trang RuleDetails.jsp
