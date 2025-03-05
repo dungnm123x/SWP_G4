@@ -8,76 +8,70 @@
     <head>
         <title>Sửa Ga</title>
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #f4f7f9;
-                color: #333;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-            }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
 
-            h1 {
-                text-align: center;
-                color: #003366;
-                margin-bottom: 20px;
-            }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
 
-            form {
-                background: white;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-                width: 350px;
-                display: flex;
-                flex-direction: column;
-            }
+        form {
+            width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-            label {
-                font-weight: bold;
-                margin-top: 10px;
-            }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-            input {
-                padding: 10px;
-                margin-top: 5px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                font-size: 16px;
-                width: 100%;
-            }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
 
-            button {
-                background: #00509e;
-                color: white;
-                border: none;
-                padding: 10px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                transition: 0.3s;
-                margin-top: 15px;
-            }
+        button[type="submit"], a {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
 
-            button:hover {
-                background: #003366;
-            }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-            a {
-                text-align: center;
-                display: block;
-                margin-top: 10px;
-                text-decoration: none;
-                color: #00509e;
-                font-weight: bold;
-            }
+        a {
+            background-color: #f44336;
+            color: white;
+        }
 
-            a:hover {
-                color: #003366;
-            }
-        </style>
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        a:hover {
+            background-color: #d32f2f;
+        }
+    </style>
     </head>
     <body>
         <h1>Sửa Ga</h1>
