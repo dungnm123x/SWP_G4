@@ -74,7 +74,7 @@
                 <div class="alert alert-success" role="alert">${successMessage}</div>
             </c:if>
 
-            <form action="edit-rule" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <form action="edit-rule" method="post">
                 <input type="hidden" name="ruleID" value="${rule.ruleID}">
 
                 <div class="row mt-4">
@@ -90,6 +90,8 @@
                     </div>
 
                     <div class="col-md-4">
+                        <input type="hidden" name="userID" value="${rule.userID}">
+
                         <div class="mb-3">
                             <label class="form-label">Category Rule</label>
                             <select class="form-control" name="categoryRuleID" required>
@@ -100,7 +102,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Update Date</label>
-                            <input type="text" class="form-control" value="${blog.updated_date}" readonly>
+                            <input type="text" class="form-control" value="${rule.update_date}" readonly>
                         </div>
 
                         <div class="mb-3">

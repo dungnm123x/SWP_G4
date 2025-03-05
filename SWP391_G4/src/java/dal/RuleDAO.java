@@ -236,19 +236,20 @@ public class RuleDAO extends DBContext {
         return true;
     }
 
-    public boolean updateRule(int id, String title, int userID, String content, String img, boolean status, int categoryRuleID) throws SQLException {
-        String query = "UPDATE [Rule] SET title = ?, userID = ?, content = ?, img = ?, status = ?, categoryRuleID = ?, update_date = GETDATE() WHERE ruleID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+    public boolean updateRule(int ruleID, String title, int userID, String content, boolean status, int categoryRuleID) {
+        String sql = "UPDATE [Rule] SET title=?, userID=?, content=?, status=?, categoryRuleID=? WHERE ruleID=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, title);
             ps.setInt(2, userID);
             ps.setString(3, content);
-            ps.setString(4, img);
-            ps.setBoolean(5, status);
-            ps.setInt(6, categoryRuleID);
-            ps.setInt(7, id);
-            ps.executeUpdate();
+            ps.setBoolean(4, status);
+            ps.setInt(5, categoryRuleID);
+            ps.setInt(6, ruleID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return true;
+        return false;
     }
 
     public boolean deleteRule(int id) {
@@ -433,12 +434,12 @@ public class RuleDAO extends DBContext {
     }
 
     // Lấy một quy định theo RuleID
-    public Rule getRuleById(int ruleId) {
+    public Rule getRuleByID(int ruleID) {
         Rule rule = null;
         String sql = "SELECT * FROM [Rule] WHERE RuleID = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, ruleId);
+            st.setInt(1, ruleID);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 rule = new Rule();
