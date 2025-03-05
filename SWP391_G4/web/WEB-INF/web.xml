@@ -18,7 +18,7 @@
     </servlet>
     <servlet>
         <servlet-name>Filter</servlet-name>
-        <servlet-class>controller.TrainController</servlet-class>
+        <servlet-class>controller.TripFilterController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>StationController</servlet-name>

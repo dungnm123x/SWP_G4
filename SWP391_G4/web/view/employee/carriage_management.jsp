@@ -51,7 +51,7 @@
                 <label for="carriageType">Loại Toa:</label>
                 <select id="carriageType" name="carriageType" required>
                     <option value="VIP" ${carriage.carriageType == 'VIP' ? 'selected' : ''}>Toa VIP (12 ghế)</option>
-                    <option value="Standard" ${carriage.carriageType == 'Standard' ? 'selected' : ''}>Toa Thường (10 ghế)</option>
+                    <option value="Toa Thường" ${carriage.carriageType == 'Toa Thường' ? 'selected' : ''}>Toa Thường (10 ghế)</option>
                 </select>
 
                 <button type="submit">${empty carriage ? 'Thêm Toa' : 'Cập nhật Toa'}</button>

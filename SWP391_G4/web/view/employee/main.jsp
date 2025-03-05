@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Lọc</button>
-                    <a href="listtrain" class="returnbtn" onclick="resetForm()">Trở về</a>
+                    <a href="trip" class="returnbtn" onclick="resetForm()">Trở về</a>
                     <script>
                         function resetForm() {
                             document.querySelector("form").reset();
