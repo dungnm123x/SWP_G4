@@ -1,28 +1,24 @@
 <%-- 
     Document   : cart
-    Created on : Feb 27, 2025, 10:22:55 PM
+    Created on : Feb 28, 2025, 12:47:14 PM
     Author     : Admin
 --%>
 
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <!DOCTYPE html>
-<html lang="vi">
+<html>
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Giỏ Vé</title>
-        <link href="css/stylesearch.css" rel="stylesheet" type="text/css"/>
-
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+        <link href="css/cart.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
-
         <div class="cart">
             <h3>🛒 Giỏ vé</h3>
             <c:choose>
                 <c:when test="${empty cartItems}">
-                    <p>Chưa có vé</p>
+                    <p style="color: orange; font-weight: bold;">Chưa có vé</p>
                 </c:when>
                 <c:otherwise>
                     <ul>
@@ -38,7 +34,5 @@
                 </c:otherwise>
             </c:choose>
         </div>
-
-
     </body>
 </html>
