@@ -64,6 +64,10 @@
         <servlet-name>PassengerInfoServlet</servlet-name>
         <servlet-class>controller.PassengerInfoServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PaymentServlet</servlet-name>
+        <servlet-class>controller.PaymentServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -175,5 +179,9 @@
     <servlet-mapping>
         <servlet-name>PassengerInfoServlet</servlet-name>
         <url-pattern>/passengerinfo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PaymentServlet</servlet-name>
+        <url-pattern>/payment</url-pattern>
     </servlet-mapping>
 </web-app>

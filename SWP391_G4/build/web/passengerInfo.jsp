@@ -43,9 +43,9 @@
                 // Các loại khác (Người lớn, Sinh viên) => tính luôn
                 let rate = discountRates[selectedOption] || 0;
                 let discountAmount = basePrice * rate / 100;
-                let finalPrice = basePrice - discountAmount + 1000;
+                let finalPrice = basePrice - discountAmount + 1;
                 document.getElementById(discountId).innerText = '-' + rate + '%';
-                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' $';
                 updateTotalAmount();
             }
 
@@ -115,10 +115,10 @@
                 }
 
                 let discountAmount = basePrice * rate / 100;
-                let finalPrice = basePrice - discountAmount + 1000;
+                let finalPrice = basePrice - discountAmount + 1;
 
                 document.getElementById(discountId).innerText = '-' + rate + '%';
-                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' $';
                 updateTotalAmount();
             }
 
@@ -135,10 +135,10 @@
                 let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
                 let rate = 10; // Tạm cứng 10% (client)
                 let discountAmount = basePrice * rate / 100;
-                let finalPrice = basePrice - discountAmount + 1000;
+                let finalPrice = basePrice - discountAmount + 1;
 
                 document.getElementById(discountId).innerText = '-10%';
-                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' $';
                 updateTotalAmount();
             }
 
@@ -172,7 +172,7 @@
         </style>
         <jsp:include page="/navbar.jsp"/>
     </head>
-    <body class="container py-4">
+    <body class="container py-4 mt-5">
         <h3 class="text-primary mb-3">📋 Nhập thông tin hành khách</h3>
 
         <!-- Hiển thị thông báo lỗi nếu có -->
@@ -195,17 +195,18 @@
                             <th>Giảm đối tượng</th>
                             <th>Khuyến mại</th>
                             <th>Bảo hiểm</th>
-                            <th>Thành tiền (VND)</th>
+                            <th>Thành tiền ($)</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="item" items="${cartItems}" varStatus="status">
+                        <c:forEach var="item" items="${sessionScope.cartItems}" varStatus="status">
                             <tr>
                                 <!-- Cột nhập thông tin hành khách -->
                                 <td class="p-2">
                                     <input type="text" class="form-control mb-2"
                                            name="fullName${status.index}" 
+                                           value="${sessionScope.fullNameList[status.index]}"
                                            placeholder="Họ và tên" required />
 
                                     <select id="passengerType${status.index}"
@@ -219,27 +220,63 @@
                                                             'displayTotal${status.index}',
                                                             'ageModal${status.index}',
                                                             'vipModal${status.index}')">
-                                        <option value="Người lớn">Người lớn</option>
-                                        <option value="Trẻ em">Trẻ em</option>
-                                        <option value="Sinh viên">Sinh viên</option>
-                                        <option value="Người cao tuổi">Người cao tuổi</option>
-                                        <option value="VIP">Hội viên VIP</option>
+                                        <option value="Người lớn" <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
+                                                selected
+                                            </c:if>>Người lớn</option>
+                                        <option value="Trẻ em"<c:if test="${sessionScope.typeList[status.index] == 'Trẻ em'}">
+                                                selected
+                                            </c:if>>Trẻ em</option>
+                                        <option value="Sinh viên"<c:if test="${sessionScope.typeList[status.index] == 'Sinh viên'}">
+                                                selected
+                                            </c:if>>Sinh viên</option>
+                                        <option value="Người cao tuổi"<c:if test="${sessionScope.typeList[status.index] == 'Người cao tuổi'}">
+                                                selected
+                                            </c:if>>Người cao tuổi</option>
+                                        <option value="VIP"<c:if test="${sessionScope.typeList[status.index] == 'VIP'}">
+                                                selected
+                                            </c:if>>Hội viên VIP</option>
                                     </select>
 
                                     <input type="text" class="form-control" 
-                                           name="idNumber${status.index}" 
+                                           name="idNumber${status.index}"
+                                           value="${sessionScope.idNumberList[status.index]}"
                                            placeholder="Số CMND/Hộ chiếu" required />
                                 </td>
 
                                 <!-- Cột thông tin chỗ -->
+                                <!-- Cột thông tin chỗ -->
                                 <td>
-                                    ${item.trainName} - ${item.departureDate}<br>
-                                    Toa ${item.carriageNumber}, Chỗ ${item.seatNumber}
+                                    <!-- Phân biệt chuyến đi / chuyến về -->
+                                    <c:choose>
+                                        <c:when test="${item.returnTrip}">
+                                            <!-- Chuyến về: hiển thị ngược -->
+                                            <strong class="text-danger">Chuyến về:</strong>
+                                            <br/>
+                                            <small>
+                                                ${item.arrivalStationName} &rarr; ${item.departureStationName}
+                                            </small>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <!-- Chuyến đi: hiển thị xuôi -->
+                                            <strong class="text-success">Chuyến đi:</strong>
+                                            <br/>
+                                            <small>
+                                                ${item.departureStationName} &rarr; ${item.arrivalStationName}
+                                            </small>
+                                        </c:otherwise>
+                                    </c:choose>
+
+                                    <!-- Dòng hiển thị tàu và chỗ -->
+                                    <br/>
+                                    <span>Tàu: <strong>${item.trainName}</strong> - ${item.departureDate}</span>
+                                    <br/>
+                                    <span>Toa: <strong>${item.carriageNumber}</strong>, Chỗ <strong>${item.seatNumber}</strong></span>
                                 </td>
+
 
                                 <!-- Cột giá vé gốc -->
                                 <td>
-                                    ${item.price} VND
+                                    ${item.price} $
                                     <!-- Input hidden để Servlet đọc -->
                                     <input type="hidden" id="price${status.index}"
                                            name="price${status.index}"
@@ -253,21 +290,21 @@
                                 <td>Không có khuyến mại</td>
 
                                 <!-- Bảo hiểm -->
-                                <td>1,000</td>
+                                <td>1$</td>
 
                                 <!-- Thành tiền tạm (client) -->
                                 <td id="displayTotal${status.index}">
-                                    <c:out value="${item.price + 1000}" /> VND
+                                    <c:out value="${item.price + 1}" /> $
                                 </td>
 
                                 <!-- Nút xóa -->
-                                <td><input type="hidden" name="seatIndex" value="${status.index}" />
-                                    <button type="submit" name="action" value="removeOne" 
-                                            class="btn btn-danger" 
+                                <td>
+                                    <input type="hidden" id="seatIDHidden" name="seatID" />
+                                    <button type="submit" name="action" value="removeOne" class="btn btn-danger"
+                                            onclick="setSeatID('${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}')"
                                             formnovalidate>
                                         Xóa vé
                                     </button>
-
 
                                 </td>
 
@@ -349,46 +386,69 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Tổng số hành khách -->
             <input type="hidden" name="passengerCount" value="${fn:length(cartItems)}" />
-
-            <!-- Hiển thị tổng tiền tạm (client) -->
             <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Nút Xóa tất cả vé: gửi action=clearAll -->
-                <!-- Nút Xóa tất cả vé: gửi action=clearAll, bỏ qua validation -->
                 <button type="submit" name="action" value="clearAll" 
                         class="btn btn-danger"
                         formnovalidate>
                     🗑 Xóa tất cả vé
                 </button>
-
-
-                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0</span> VND</h5>
+                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0</span> $</h5>
             </div>
-
-            <!-- Thông tin người đặt vé -->
             <h4 class="text-primary mt-4">Thông tin người đặt vé</h4>
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Họ và tên</label>
-                    <input type="text" class="form-control" name="bookingName" required />
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        name="bookingName" 
+                        value="${sessionScope.bookingName}" 
+                        required 
+                        />
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">CCCD/Hộ chiếu (người đặt)</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        name="bookingCCCD"   
+                        value="${sessionScope.bookingCCCD}"  
+                        required 
+                        />
+                </div>
+
                 <div class="col-md-4">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="bookingEmail" required />
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        name="bookingEmail" 
+                        value="${sessionScope.bookingEmail}" 
+                        required 
+                        />
                 </div>
+
                 <div class="col-md-4">
                     <label class="form-label">Số điện thoại</label>
-                    <input type="text" class="form-control" name="bookingPhone" required />
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        name="bookingPhone" 
+                        value="${sessionScope.bookingPhone}" 
+                        required 
+                        />
                 </div>
             </div>
+
             <div class="d-flex justify-content-between mt-4">
                 <!-- Nút "Quay lại" đến 1 trang cụ thể -->
-                <button type="button" class="btn btn-secondary"
-                        onclick="window.location.href = 'schedule'">
-                    Quay lại
-                </button>
+                <button type="button" onclick="goBack()" class="btn btn-secondary">Quay lại</button>
+
+
+
+
 
                 <button type="submit" class="btn btn-primary">
                     Tiếp tục
@@ -396,6 +456,22 @@
             </div>
 
         </form>
+        <script>
+            function setSeatID(seatID) {
+                document.getElementById("seatIDHidden").value = seatID;
+            }
+        </script>
+
+        <script>
+            function goBack() {
+                let urlParams = new URLSearchParams(window.location.search);
+
+                let previousURL = '<%= session.getAttribute("previousURL") != null ? session.getAttribute("previousURL") : "schedule" %>';
+                window.location.href = previousURL;
+
+            }
+        </script>
+
     </body>
 </html>
 

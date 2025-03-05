@@ -65,101 +65,6 @@ public class GetCarriageSeatsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        response.setContentType("text/html;charset=UTF-8");
-//
-//        int trainID = Integer.parseInt(request.getParameter("trainID"));
-//        CarriageDAO carriageDAO = new CarriageDAO();
-//        SeatDAO seatDAO = new SeatDAO();
-//        RouteDAO routeDAO = new RouteDAO();
-//
-//        try (PrintWriter out = response.getWriter()) {
-//            List<Carriage> carriages = carriageDAO.getCarriagesByTrainID(trainID);
-//            if (carriages.isEmpty()) {
-//                out.println("<p class='text-danger'>Không có toa nào cho tàu này.</p>");
-//                return;
-//            }
-//
-//            // Lấy giá BasePrice từ Route tương ứng với TrainID
-//            double basePrice = routeDAO.getBasePriceByTrainID(trainID);
-//            System.out.println("🚆 TrainID: " + trainID + " | BasePrice: " + basePrice);
-//
-//            DecimalFormat df = new DecimalFormat("#,##0.00");
-//
-//            for (Carriage carriage : carriages) {
-//                out.println("<div class='carriage-container'>");
-//                out.println("<h5 class='carriage-header'>Toa " + carriage.getCarriageNumber() + " (" + carriage.getCarriageType() + ")</h5>");
-//                out.println("<div class='seat-grid'>");
-//
-//                List<Seat> seats = seatDAO.getSeatsByCarriageID(carriage.getCarriageID());
-//                for (Seat seat : seats) {
-//                    // Kiểm tra null trước khi sử dụng getSeatStatus()
-//                    String seatStatus = (seat.getStatus() != null) ? seat.getStatus() : "Unknown";
-//
-//                    // Xác định class CSS theo trạng thái ghế
-//                    String seatClass;
-//                    switch (seatStatus) {
-//                        case "Booked":
-//                            seatClass = "seat-booked";
-//                            break;
-//                        case "Reserved":
-//                            seatClass = "seat-reserved";
-//                            break;
-//                        case "Out of Service":
-//                            seatClass = "seat-outofservice";
-//                            break;
-//                        default:
-//                            seatClass = "seat-available";
-//                            break;
-//                    }
-//
-//                    // Tính giá ghế
-//                    double seatPrice = basePrice;
-//                    if (carriage.getCarriageType().equalsIgnoreCase("Toa VIP")) {
-//                        seatPrice *= 1.3; // Ghế VIP tăng 30%
-//                    }
-//
-//                    TripDAO tripDAO = new TripDAO();
-//                    Trip trip = tripDAO.getTripByTrainID(trainID);
-//
-//                    out.println("<form action='cartitem' method='post' style='display:inline;'>");
-//
-//// Thông tin vé
-//                    out.println("<input type='hidden' name='ticketID' value='" + seat.getSeatID() + "'/>");
-//                    out.println("<input type='hidden' name='trainName' value='" + trip.getTrain().getTrainName() + "'/>");
-//                    out.println("<input type='hidden' name='departureDate' value='" + trip.getDepartureTime() + "'/>");
-//                    out.println("<input type='hidden' name='carriageNumber' value='" + carriage.getCarriageNumber() + "'/>");
-//                    out.println("<input type='hidden' name='seatNumber' value='" + seat.getSeatNumber() + "'/>");
-//                    out.println("<input type='hidden' name='seatID' value='" + seat.getSeatID() + "'/>");
-//                    out.println("<input type='hidden' name='price' value='" + seatPrice + "'/>");
-//
-//// **Thêm các input ẩn để giữ lại dữ liệu tìm kiếm** (bạn đang dùng gì để tìm?):
-//                    out.println("<input type='hidden' name='departureStation' value='" + request.getParameter("departureStation") + "'/>");
-//                    out.println("<input type='hidden' name='arrivalStation' value='" + request.getParameter("arrivalStation") + "'/>");
-//                    out.println("<input type='hidden' name='departureDay' value='" + request.getParameter("departureDay") + "'/>");
-//                    out.println("<input type='hidden' name='tripType' value='" + request.getParameter("tripType") + "'/>");
-//
-//// Nút submit
-//                    out.println("<button type='submit' class='seat " + seatClass + "'"
-//                            + " data-tooltip='Ghế " + seat.getSeatNumber() + " - " + seatStatus + " - Giá: " + df.format(seatPrice) + " VND'>"
-//                            + seat.getSeatNumber()
-//                            + "</button>");
-//
-//                    out.println("</form>");
-//
-//                    System.out.println("🚆 TrainID: " + trainID + " | BasePrice: " + basePrice);
-//                    System.out.println("🪑 Seat ID: " + seat.getSeatID() + " | Price: " + seatPrice);
-//
-//                }
-//
-//                out.println("</div>");
-//                out.println("</div>");
-//
-//            }
-//        }
-//    }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -176,6 +81,7 @@ public class GetCarriageSeatsServlet extends HttpServlet {
             String tripType = request.getParameter("tripType");
             String returnDate = request.getParameter("returnDate");
 
+            String isReturnParam = request.getParameter("isReturnTrip");
             CarriageDAO carriageDAO = new CarriageDAO();
             SeatDAO seatDAO = new SeatDAO();
             RouteDAO routeDAO = new RouteDAO();
@@ -193,7 +99,7 @@ public class GetCarriageSeatsServlet extends HttpServlet {
             // Lấy Trip (để in trainName, v.v.)
             TripDAO tripDAO = new TripDAO();
             Trip trip = tripDAO.getTripByTrainID(trainID);
-
+            int theTripID = trip.getTripID();
             for (Carriage carriage : carriages) {
                 out.println("<div class='carriage-container'>");
                 out.println("<h5 class='carriage-header'>Toa " + carriage.getCarriageNumber()
@@ -204,6 +110,11 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                 for (Seat seat : seats) {
                     String seatStatus = (seat.getStatus() != null) ? seat.getStatus() : "Unknown";
 
+                    if ("Booked".equalsIgnoreCase(seatStatus)) {
+                        out.println("<button class='seat seat-booked' disabled>"
+                                + seat.getSeatNumber() + "</button>");
+                        continue;
+                    }
                     // Xác định class CSS
                     String seatClass;
                     switch (seatStatus) {
@@ -237,6 +148,12 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                     out.println("<input type='hidden' name='seatNumber' value='" + seat.getSeatNumber() + "'/>");
                     out.println("<input type='hidden' name='seatID' value='" + seat.getSeatID() + "'/>");
                     out.println("<input type='hidden' name='price' value='" + seatPrice + "'/>");
+                    out.println("<input type='hidden' name='tripID' value='" + theTripID + "'/>");
+                    if ("true".equalsIgnoreCase(isReturnParam)) {
+                        out.println("<input type='hidden' name='isReturnTrip' value='true'/>");
+                    } else {
+                        out.println("<input type='hidden' name='isReturnTrip' value='false'/>");
+                    }
 
                     // Thông tin tìm kiếm (giữ lại)
                     out.println("<input type='hidden' name='departureStationID' value='" + departureStationID + "'/>");
@@ -253,6 +170,7 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                             + "</button>");
 
                     out.println("</form>");
+
                 }
                 out.println("</div>");
                 out.println("</div>");

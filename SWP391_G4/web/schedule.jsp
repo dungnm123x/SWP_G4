@@ -44,7 +44,8 @@ Author     : Admin
 
                                         <tr>
                                             <td>
-                                                <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}">
+                                                <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}"
+                                                        data-isreturn="false">
                                                     ${trip.train.trainName}
                                                 </button>
                                             </td>
@@ -65,7 +66,7 @@ Author     : Admin
 
                     <!-- Nếu là vé khứ hồi, hiển thị danh sách chuyến về -->
                     <c:if test="${not empty sessionScope.returnScheduleList}">
-                        <h4>Chuyến Về: ngày ${departureDate} từ ${arrivalStation} đến ${departureStation}    </h4>
+                        <h4>Chuyến Về: ngày ${departureDate} từ ${arrivalStation} đến ${departureStation}      </h4>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -79,7 +80,8 @@ Author     : Admin
                                 <c:forEach var="trip" items="${sessionScope.returnScheduleList}">
                                     <tr>
                                         <td>
-                                            <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}">
+                                            <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}"
+                                                    data-isreturn="true">
                                                 ${trip.train.trainName}
                                             </button>
                                         </td>
@@ -136,6 +138,7 @@ Author     : Admin
                 document.querySelectorAll(".toggle-train").forEach(button => {
                     button.addEventListener("click", function () {
                         let trainID = this.getAttribute("data-trainid");
+                        let isReturnParam = this.getAttribute("data-isreturn");
                         let containerRow = document.getElementById("train-container-" + trainID);
                         let detailsDiv = document.getElementById("train-" + trainID);
                         if (!detailsDiv)
@@ -149,7 +152,9 @@ Author     : Admin
                                     + "&arrivalStationID=" + encodeURIComponent(arrivalStationIDParam)
                                     + "&departureDay=" + encodeURIComponent(departureDayParam)
                                     + "&tripType=" + encodeURIComponent(tripTypeParam)
-                                    + "&returnDate=" + encodeURIComponent(returnDateParam);
+                                    + "&returnDate=" + encodeURIComponent(returnDateParam)
+                                    + "&isReturnTrip=" + isReturnParam;  // <-- chuyến đi
+
 
                             fetch(url)
                                     .then(response => response.text())
@@ -244,7 +249,7 @@ Author     : Admin
                             }).catch(error => console.error("Lỗi:", error));
                 });
             });
-          
+
         </script>
 
         <style>

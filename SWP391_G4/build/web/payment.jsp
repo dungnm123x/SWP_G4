@@ -6,47 +6,93 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Thanh toán</title>
-    <link href="css/payment.css" rel="stylesheet" type="text/css"/>
-</head>
-<body>
-    <div class="payment-info">
-        <h3>💳 Thanh toán vé</h3>
-        <p>Chọn phương thức thanh toán để hoàn tất đặt vé.</p>
-        
-        <form action="BookingServlet" method="post">
-            <c:forEach var="item" items="${cartItems}" varStatus="status">
-                <input type="hidden" name="tripID" value="${item.tripID}" />
-                <input type="hidden" name="seatID" value="${item.seatID}" />
-                <input type="hidden" name="cccd" value="${param["idNumber" + status.index]}" />
-                <input type="hidden" name="price" value="${item.price}" />
-            </c:forEach>
-            
-            <h4>Chọn phương thức thanh toán</h4>
-            <label>
-                <input type="radio" name="paymentMethod" value="creditCard" required> Thẻ tín dụng/ghi nợ
-            </label>
-            <label>
-                <input type="radio" name="paymentMethod" value="eWallet"> Ví điện tử (Momo, ZaloPay)
-            </label>
-            <label>
-                <input type="radio" name="paymentMethod" value="bankTransfer"> Chuyển khoản ngân hàng
-            </label>
-            
-            <h4>Thông tin người đặt vé</h4>
-            <p><strong>Họ và tên:</strong> ${param.bookingName}</p>
-            <p><strong>Email:</strong> ${param.bookingEmail}</p>
-            <p><strong>Số điện thoại:</strong> ${param.bookingPhone}</p>
-            
-            <button type="submit">Xác nhận thanh toán</button>
-            <a href="confirm.jsp" class="edit-link">Quay lại</a>
-        </form>
-    </div>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Thanh toán</title>
+
+        <!-- Link Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            />
+
+        <!-- Link file CSS riêng (nếu có) -->
+        <link href="css/payment.css" rel="stylesheet" type="text/css" />
+
+        <style>
+            /* CSS tùy chỉnh (có thể bỏ vào file payment.css) */
+            .payment-container {
+                max-width: 600px;
+                margin: 40px auto;
+                background: #f8f9fa;
+                padding: 20px 30px;
+                border-radius: 8px;
+            }
+
+            .payment-container h3 {
+                margin-bottom: 20px;
+            }
+
+            .payment-methods {
+                margin-bottom: 20px;
+            }
+
+            .btn-space {
+                margin-right: 10px;
+            }
+        </style>
+         <jsp:include page="/navbar.jsp"/>
+    </head>
+    <body>
+        <div class="container payment-container">
+            <h3 class="text-primary">💳 Thanh toán vé</h3>
+            <p>Chọn phương thức thanh toán để hoàn tất đặt vé.</p>
+
+            <!-- Nếu mustLogin = true => hiển popup + chuyển login -->
+            <c:if test="${mustLogin == true}">
+                <script>
+                    alert("Bạn phải đăng nhập trước khi thanh toán!");
+                    window.location.href = 'login.jsp';
+                </script>
+            </c:if>
+
+            <!-- Form POST đến PaymentServlet (mapping = "payment") -->
+            <form action="payment" method="post">
+                <div class="payment-methods mb-3">
+                    <label class="d-block mb-2">
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="creditCard"
+                            required
+                            />
+                        Thẻ tín dụng/ghi nợ
+                    </label>
+                    <label class="d-block mb-2">
+                        <input type="radio" name="paymentMethod" value="eWallet" />
+                        Ví điện tử (Momo, ZaloPay)
+                    </label>
+                    <label class="d-block">
+                        <input type="radio" name="paymentMethod" value="bankTransfer" />
+                        Chuyển khoản ngân hàng
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-space">
+                    Xác nhận thanh toán
+                </button>
+                <a href="passengerinfo" class="btn btn-secondary">Quay lại</a>
+            </form>
+        </div>
+
+        <!-- Bootstrap JS (nếu cần JavaScript của Bootstrap) -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        ></script>
+    </body>
 </html>
+
+
 

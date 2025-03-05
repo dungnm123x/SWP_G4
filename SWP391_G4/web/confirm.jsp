@@ -6,42 +6,172 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Xác nhận thông tin vé</title>
-        <link href="css/confirm.css" rel="stylesheet" type="text/css"/>
+        <meta charset="UTF-8">
+        <title>Xác nhận thông tin đặt mua vé tàu</title>
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            />
+        <style>
+            /* Nếu muốn tùy chỉnh thêm, bạn có thể viết CSS ở đây hoặc file .css riêng */
+            .header-title {
+                margin-top: 20px;
+                margin-bottom: 30px;
+            }
+            .info-section h5 {
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+            .info-section ul {
+                padding-left: 0;
+                list-style: none;
+            }
+            .table thead th {
+                background-color: #f8f9fa; /* màu nền header */
+            }
+            .table tfoot td {
+                font-weight: bold;
+            }
+            .btn-space {
+                margin-right: 10px;
+            }
+            /* Tùy biến thêm nếu cần */
+        </style>
+        <jsp:include page="/navbar.jsp"/>
     </head>
     <body>
-        <div class="confirm-info">
-            <h3>✅ Xác nhận thông tin vé</h3>
-            <p>Vui lòng kiểm tra lại thông tin trước khi thanh toán.</p>
+        <div class="container mt-5">
+            <h3 class="text-primary header-title">Xác nhận thông tin đặt mua vé tàu</h3>
 
-            <form action="payment.jsp" method="post">
-                <c:forEach var="item" items="${cartItems}" varStatus="status">
-                    <fieldset>
-                        <legend>Vé ${status.index + 1}</legend>
-                        <p><strong>Tàu:</strong> ${item.trainName} - ${item.departureDate}</p>
-                        <p><strong>Toa:</strong> ${item.carriageNumber} - Chỗ ${item.seatNumber}</p>
-                        <p><strong>Giá:</strong> ${item.price} VND</p>
+            <!-- Phần hiển thị thông tin người mua vé & thông tin hóa đơn -->
+            <div class="row mb-4">
+                <!-- Bên trái: Thông tin người mua vé -->
+                <div class="col-md-6 info-section">
+                    <h5>Thông tin người mua vé</h5>
+                    <ul>
+                        <li><strong>Họ và tên:</strong> ${param.bookingName}</li>
+                        <li><strong>Số CMND/Hộ chiếu:${param.bookingCCCD}</strong> <!-- Bạn có thể chèn thêm nếu cần --></li>
+                        <li><strong>Số điện thoại:</strong> ${param.bookingPhone}</li>
+                        <li><strong>Email:</strong> ${param.bookingEmail}</li>
+                    </ul>
+                </div>
 
-                        <p><strong>Hành khách:</strong> ${param["fullName" + status.index]}</p>
-                        <p><strong>Số CMND/Hộ chiếu:</strong> ${param["idNumber" + status.index]}</p>
-                        <p><strong>Đối tượng:</strong> ${param["passengerType" + status.index]}</p>
-                    </fieldset>
-                </c:forEach>
+                <!-- Bên phải: Thông tin hóa đơn (nếu có) -->
+                <!--                <div class="col-md-6 info-section">
+                                    <h5>Thông tin hóa đơn</h5>
+                                    <ul>
+                                        <li><strong>Tên công ty:</strong>  Nếu cần  </li>
+                                        <li><strong>MST:</strong>  Nếu cần  </li>
+                                        <li><strong>Địa chỉ:</strong>  Nếu cần  </li>
+                                        <li><strong>Phương thức thanh toán:</strong> Thanh toán trực tuyến (VNPAY)  Ví dụ  </li>
+                                    </ul>
+                                </div>-->
+            </div>
 
-                <h4>Thông tin người đặt vé</h4>
-                <p><strong>Họ và tên:</strong> ${param.bookingName}</p>
-                <p><strong>Email:</strong> ${param.bookingEmail}</p>
-                <p><strong>Số điện thoại:</strong> ${param.bookingPhone}</p>
+            <!-- Form gửi sang payment.jsp (hoặc PaymentServlet) -->
+            <form action="payment" method="get">
+                <h5 class="mb-3">Thông tin vé mua</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Thông tin vé mua</th>
+                                <th>Giá (VNĐ)</th>
+                                <th>Thành tiền (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="item" items="${sessionScope.cartItems}" varStatus="status">
+                                <tr>
+                                    <td>${status.index + 1}</td>
+                                    <td class="text-start">
+                                        <!-- Hiển thị loại chuyến -->
+                                        <strong>Loại chuyến:</strong>
+                                        <c:choose>
+                                            <c:when test="${item.returnTrip}">
+                                                <span class="text-danger">Chuyến về</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="text-success">Chuyến đi</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <br/>
 
-                <button type="submit">Thanh toán</button>
-                <a href="passengerInfo.jsp" class="edit-link">Chỉnh sửa</a>
+                                        <!-- Hiển thị thông tin vé -->
+                                        <strong>Hành trình:</strong> 
+                                        <c:choose>
+                                            <c:when test="${item.returnTrip}">
+                                                ${item.arrivalStationName} → ${item.departureStationName}
+                                            </c:when>
+                                            <c:otherwise>
+                                                ${item.departureStationName} → ${item.arrivalStationName}
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <br/>
+
+                                        <strong>Tàu:</strong> ${item.trainName} - ${item.departureDate}<br>
+                                        <strong>Toa:</strong> ${item.carriageNumber}, Chỗ ${item.seatNumber}<br>
+
+                                        <!-- Thông tin hành khách (nếu bạn đang lưu) -->
+                                        <strong>Hành khách:</strong> ${sessionScope.fullNameList[status.index]} <br>
+                                        <strong>Số CMND/Hộ chiếu:</strong> ${sessionScope.idNumberList[status.index]} <br>
+                                        <strong>Đối tượng:</strong> ${sessionScope.typeList[status.index]}
+                                    </td>
+                                    <td>${item.price}</td>
+                                    <td>
+                                        <!-- Tạm = item.price, hoặc discount, vv -->
+                                        ${item.price}
+                                    </td>
+                                </tr>
+                            </c:forEach>
+
+                        </tbody>
+                        <tfoot>
+                            <c:if test="${not empty totalAmount}">
+                                <tr>
+                                    <td colspan="3" class="text-end">Tổng cộng:</td>
+                                    <td>${totalAmount}</td>
+                                </tr>
+                            </c:if>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <p class="mt-3">
+                    Vui lòng kiểm tra kỹ và xác nhận các thông tin đã nhập trước khi thực
+                    hiện giao dịch mua vé. Sau khi thực hiện giao dịch, bạn sẽ không thể thay
+                    đổi thông tin vé.
+                </p>
+
+                <!-- Ẩn totalAmount nếu muốn gửi qua payment.jsp -->
+                <c:if test="${not empty totalAmount}">
+                    <input type="hidden" name="totalAmount" value="${totalAmount}" />
+                </c:if>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="passengerinfo" class="btn btn-secondary btn-space">
+                        Nhập lại
+                    </a>
+                    <!-- confirm.jsp -->
+                    <a href="payment" class="btn btn-primary">
+                        Chọn phương thức thanh toán
+                    </a>
+
+
+                </div>
             </form>
         </div>
+
+        <!-- Bootstrap JS (nếu cần dùng) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
+
+
+
 

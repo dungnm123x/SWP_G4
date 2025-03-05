@@ -17,11 +17,15 @@ public class CartItem {
     private String seatNumber;
     private String seatID;
     private double price;
+    private Trip trip;
+    private String departureStationName ; 
+    private String arrivalStationName;
+    private boolean returnTrip;
 
     public CartItem() {
     }
 
-    public CartItem(String ticketID, String trainName, String departureDate, String carriageNumber, String seatNumber, String seatID, double price) {
+    public CartItem(String ticketID, String trainName, String departureDate, String carriageNumber, String seatNumber, String seatID, double price, Trip trip, String departureStationName, String arrivalStationName, boolean ReturnTrip) {
         this.ticketID = ticketID;
         this.trainName = trainName;
         this.departureDate = departureDate;
@@ -29,6 +33,10 @@ public class CartItem {
         this.seatNumber = seatNumber;
         this.seatID = seatID;
         this.price = price;
+        this.trip = trip;
+        this.departureStationName = departureStationName;
+        this.arrivalStationName = arrivalStationName;
+        this.returnTrip = ReturnTrip;
     }
 
     public String getTicketID() {
@@ -87,5 +95,37 @@ public class CartItem {
         this.price = price;
     }
 
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+    public String getDepartureStationName() {
+        return departureStationName;
+    }
+
+    public void setDepartureStationName(String departureStationName) {
+        this.departureStationName = departureStationName;
+    }
+
+    public String getArrivalStationName() {
+        return arrivalStationName;
+    }
+
+    public void setArrivalStationName(String arrivalStationName) {
+        this.arrivalStationName = arrivalStationName;
+    }
+
+    public boolean isReturnTrip() {
+        return returnTrip;
+    }
+
+    public void setReturnTrip(boolean ReturnTrip) {
+        this.returnTrip = ReturnTrip;
+    }
+    
     
 }
