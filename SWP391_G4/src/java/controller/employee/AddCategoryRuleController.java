@@ -30,7 +30,7 @@ import model.CategoryRule;
  *
  * @author admin
  */
-@WebServlet(name = "AddPostController", urlPatterns = {"/add-categoryRule"})
+@WebServlet(name = "AddCategoryController", urlPatterns = {"/add-categoryRule"})
 @MultipartConfig(maxFileSize = 16177215)
 public class AddCategoryRuleController extends HttpServlet {
 
