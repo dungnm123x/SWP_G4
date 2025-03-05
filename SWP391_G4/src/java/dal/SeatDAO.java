@@ -24,16 +24,15 @@ public class SeatDAO extends DBContext<RailwayDTO> {
 
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
-                    
+
                     Carriage carriage = new Carriage(rs.getInt("CarriageID"), null, null, null, 0);
 
-                    
                     Seat seat = new Seat();
                     seat.setSeatID(rs.getInt("SeatID"));
                     seat.setSeatNumber(String.valueOf(rs.getInt("SeatNumber"))); // Chuyển số thành chuỗi
                     seat.setStatus(rs.getString("Status") != null ? rs.getString("Status") : "Unknown");
                     seat.setSeatType(rs.getString("SeatType"));
-                    seat.setCarriage(carriage); 
+                    seat.setCarriage(carriage);
 
                     list.add(seat);
                 }
@@ -42,6 +41,17 @@ public class SeatDAO extends DBContext<RailwayDTO> {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public void updateSeatStatus(String seatID, String status) {
+        String sql = "UPDATE Seats SET status = ? WHERE seatID = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setString(2, seatID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

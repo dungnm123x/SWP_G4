@@ -56,6 +56,18 @@
         <servlet-name>OTPValidationServlet</servlet-name>
         <servlet-class>controller.OTPValidationServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CartServlet</servlet-name>
+        <servlet-class>controller.CartServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PassengerInfoServlet</servlet-name>
+        <servlet-class>controller.PassengerInfoServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PaymentServlet</servlet-name>
+        <servlet-class>controller.PaymentServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -159,5 +171,17 @@
     <servlet-mapping>
         <servlet-name>OTPValidationServlet</servlet-name>
         <url-pattern>/validateotp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CartServlet</servlet-name>
+        <url-pattern>/cartitem</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PassengerInfoServlet</servlet-name>
+        <url-pattern>/passengerinfo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PaymentServlet</servlet-name>
+        <url-pattern>/payment</url-pattern>
     </servlet-mapping>
 </web-app>

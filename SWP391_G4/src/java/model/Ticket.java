@@ -9,26 +9,37 @@ package model;
  * @author dung9
  */
 public class Ticket {
-    private int ticketID;
-    private int userID;
+//    private int ticketID;
+//    private int userID;
+//    private int seatID;
+//    private int tripID;
+//    private String ticketStatus;
+//    private String bookingDate;
+//    private double ticketPrice;
+
+    private int ticketID; // auto
+    private String cccd;  // CMND/Hộ chiếu
+    private int bookingID;
     private int seatID;
     private int tripID;
-    private String ticketStatus;
-    private String bookingDate;
     private double ticketPrice;
+    private String ticketStatus;
 
     // Constructor
-    public Ticket(int ticketID, int userID, int seatID, int tripID, String ticketStatus, String bookingDate, double ticketPrice) {
-        this.ticketID = ticketID;
-        this.userID = userID;
-        this.seatID = seatID;
-        this.tripID = tripID;
-        this.ticketStatus = ticketStatus;
-        this.bookingDate = bookingDate;
-        this.ticketPrice = ticketPrice;
+
+    public Ticket() {
     }
 
-    // Getters and Setters
+    public Ticket(int ticketID, String cccd, int bookingID, int seatID, int tripID, double ticketPrice, String ticketStatus) {
+        this.ticketID = ticketID;
+        this.cccd = cccd;
+        this.bookingID = bookingID;
+        this.seatID = seatID;
+        this.tripID = tripID;
+        this.ticketPrice = ticketPrice;
+        this.ticketStatus = ticketStatus;
+    }
+
     public int getTicketID() {
         return ticketID;
     }
@@ -37,12 +48,20 @@ public class Ticket {
         this.ticketID = ticketID;
     }
 
-    public int getUserID() {
-        return userID;
+    public String getCccd() {
+        return cccd;
     }
 
-    public void setUserID(int userID) {
-        this.userID = userID;
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
+    }
+
+    public int getBookingID() {
+        return bookingID;
+    }
+
+    public void setBookingID(int bookingID) {
+        this.bookingID = bookingID;
     }
 
     public int getSeatID() {
@@ -61,22 +80,6 @@ public class Ticket {
         this.tripID = tripID;
     }
 
-    public String getTicketStatus() {
-        return ticketStatus;
-    }
-
-    public void setTicketStatus(String ticketStatus) {
-        this.ticketStatus = ticketStatus;
-    }
-
-    public String getBookingDate() {
-        return bookingDate;
-    }
-
-    public void setBookingDate(String bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
     public double getTicketPrice() {
         return ticketPrice;
     }
@@ -85,9 +88,12 @@ public class Ticket {
         this.ticketPrice = ticketPrice;
     }
 
-    @Override
-    public String toString() {
-        return "Ticket [ticketID=" + ticketID + ", userID=" + userID + ", seatID=" + seatID + ", tripID=" + tripID + ", ticketStatus=" + ticketStatus + ", bookingDate=" + bookingDate + ", ticketPrice=" + ticketPrice + "]";
+    public String getTicketStatus() {
+        return ticketStatus;
     }
-}
 
+    public void setTicketStatus(String ticketStatus) {
+        this.ticketStatus = ticketStatus;
+    }
+    
+}

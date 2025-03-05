@@ -14,9 +14,6 @@ Author     : Admin
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Lịch Trình Tàu - Đường Sắt Việt Nam</title>
         <link href="css/cart.css" rel="stylesheet" type="text/css"/>
-
-        <script src="wp-includes/js/jquery/jquery.js"></script>
-
         <jsp:include page="/navbar.jsp"/>
 
     </head>
@@ -26,15 +23,8 @@ Author     : Admin
             <div class="main-container">
                 <div class="schedule-container">
                     <h2>Lịch Trình Tàu</h2>
-
-                    <div class="search-summary">
-                        <p><strong>Ga đi:</strong> ${departureStation}</p>
-                        <p><strong>Ga đến:</strong> ${arrivalStation}</p>
-                        <p><strong>Ngày đi:</strong> ${departureDate}</p>
-                    </div>
-
                     <!-- Bảng hiển thị danh sách chuyến đi -->
-                    <h3>Chuyến Đi</h3>
+                    <h4>Chuyến Đi: ngày ${departureDate} từ ${departureStation} đến ${arrivalStation}  </h4>
                     <table class="table table-bordered">
                         <thead class="bg-primary text-white">
                             <tr>
@@ -46,14 +36,16 @@ Author     : Admin
                         </thead>
                         <tbody>
                             <c:choose>
-                                <c:when test="${empty scheduleList}">
+                                <c:when test="${empty sessionScope.scheduleList}">
                                     <tr><td colspan="4" class="text-center text-danger">Không có chuyến tàu nào phù hợp!</td></tr>
                                 </c:when>
                                 <c:otherwise>
-                                    <c:forEach var="trip" items="${scheduleList}">
+                                    <c:forEach var="trip" items="${sessionScope.scheduleList}">
+
                                         <tr>
                                             <td>
-                                                <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}">
+                                                <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}"
+                                                        data-isreturn="false">
                                                     ${trip.train.trainName}
                                                 </button>
                                             </td>
@@ -73,8 +65,8 @@ Author     : Admin
                     </table>
 
                     <!-- Nếu là vé khứ hồi, hiển thị danh sách chuyến về -->
-                    <c:if test="${not empty returnScheduleList}">
-                        <h3>Chuyến Về</h3>
+                    <c:if test="${not empty sessionScope.returnScheduleList}">
+                        <h4>Chuyến Về: ngày ${departureDate} từ ${arrivalStation} đến ${departureStation}      </h4>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -85,10 +77,11 @@ Author     : Admin
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="trip" items="${returnScheduleList}">
+                                <c:forEach var="trip" items="${sessionScope.returnScheduleList}">
                                     <tr>
                                         <td>
-                                            <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}">
+                                            <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}"
+                                                    data-isreturn="true">
                                                 ${trip.train.trainName}
                                             </button>
                                         </td>
@@ -126,29 +119,72 @@ Author     : Admin
         </section>
 
         <script>
+            // ---- CHỈ KHAI BÁO MỘT LẦN ----
+            const departureStationIDParam = "${param.departureStationID}";
+            const arrivalStationIDParam = "${param.arrivalStationID}";
+            const departureDayParam = "${param.departureDay}";
+            const tripTypeParam = "${param.tripType}";
+            const returnDateParam = "${param.returnDate}";
+
+            // Nếu bạn muốn, có thể khai báo THÊM biến attribute:
+            const departureStationName = "${departureStation}";
+            const arrivalStationName = "${arrivalStation}";
+            const departureDateVal = "${departureDate}";
+            const selectedTicketType = "${selectedTicketType}";
+            const returnDateVal = "${returnDate}";
+
             document.addEventListener("DOMContentLoaded", function () {
+                // 1) Gắn sự kiện .toggle-train
                 document.querySelectorAll(".toggle-train").forEach(button => {
                     button.addEventListener("click", function () {
                         let trainID = this.getAttribute("data-trainid");
-                        let detailsDiv = document.getElementById("train-" + trainID);
+                        let isReturnParam = this.getAttribute("data-isreturn");
                         let containerRow = document.getElementById("train-container-" + trainID);
-
-                        if (!detailsDiv || !containerRow) {
-                            console.error("Không tìm thấy container cho trainID:", trainID);
+                        let detailsDiv = document.getElementById("train-" + trainID);
+                        if (!detailsDiv)
                             return;
-                        }
 
+                        // Nếu chưa load ghế -> fetch
                         if (detailsDiv.innerHTML.trim() === "") {
-                            fetch("getcarriageseats?trainID=" + trainID)
+                            let url = "getcarriageseats"
+                                    + "?trainID=" + trainID
+                                    + "&departureStationID=" + encodeURIComponent(departureStationIDParam)
+                                    + "&arrivalStationID=" + encodeURIComponent(arrivalStationIDParam)
+                                    + "&departureDay=" + encodeURIComponent(departureDayParam)
+                                    + "&tripType=" + encodeURIComponent(tripTypeParam)
+                                    + "&returnDate=" + encodeURIComponent(returnDateParam)
+                                    + "&isReturnTrip=" + isReturnParam;  // <-- chuyến đi
+
+
+                            fetch(url)
                                     .then(response => response.text())
                                     .then(data => {
                                         detailsDiv.innerHTML = data;
                                         containerRow.style.display = "table-row";
                                     })
-                                    .catch(error => console.error("Lỗi tải dữ liệu ghế:", error));
+                                    .catch(err => console.error(err));
                         } else {
-                            containerRow.style.display = (containerRow.style.display === "none") ? "table-row" : "none";
+                            // Đóng/mở
+                            containerRow.style.display =
+                                    (containerRow.style.display === "none") ? "table-row" : "none";
                         }
+                    });
+                });
+
+                // 2) Tự động click lại train đã mở trước đó
+                let openedTrainID = sessionStorage.getItem("openedTrainID");
+                if (openedTrainID) {
+                    let btn = document.querySelector(`[data-trainid='${openedTrainID}']`);
+                    if (btn) {
+                        btn.click(); // Chỉ click nếu btn != null
+                    }
+                }
+
+                // 3) Lưu lại trainID khi click
+                document.querySelectorAll(".toggle-train").forEach(button => {
+                    button.addEventListener("click", function () {
+                        let trainID = this.getAttribute("data-trainid");
+                        sessionStorage.setItem("openedTrainID", trainID);
                     });
                 });
             });
@@ -171,6 +207,49 @@ Author     : Admin
                     });
                 });
             });
+            // Hiển thị tooltip khi di chuột vào ghế ngồi
+            function showTooltip(element) {
+                let tooltip = document.createElement("div");
+                tooltip.className = "tooltip";
+                tooltip.innerText = element.getAttribute("data-tooltip");
+                tooltip.style.position = "absolute";
+                tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                tooltip.style.color = "white";
+                tooltip.style.padding = "5px";
+                tooltip.style.fontSize = "12px";
+                tooltip.style.borderRadius = "5px";
+                tooltip.style.top = (element.offsetTop - 30) + "px";
+                tooltip.style.left = (element.offsetLeft + 20) + "px";
+                tooltip.style.whiteSpace = "nowrap";
+                tooltip.style.zIndex = "10";
+                element.appendChild(tooltip);
+            }
+
+// Ẩn tooltip khi di chuột ra khỏi ghế ngồi
+            function hideTooltip(element) {
+                let tooltip = element.querySelector(".tooltip");
+                if (tooltip) {
+                    element.removeChild(tooltip);
+                }
+            }
+
+        </script>
+        <script>
+            document.querySelectorAll(".seat").forEach(seat => {
+                seat.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    let form = this.closest("form");
+                    let formData = new FormData(form);
+                    fetch("cartitem", {
+                        method: "POST",
+                        body: formData
+                    }).then(response => response.text())
+                            .then(data => {
+                                document.querySelector(".cart-container").innerHTML = data; // Cập nhật giỏ vé mà không reload
+                            }).catch(error => console.error("Lỗi:", error));
+                });
+            });
+
         </script>
 
         <style>

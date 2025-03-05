@@ -106,6 +106,27 @@ public class RouteDAO extends DBContext {
         return false; // Tuyến chưa tồn tại
     }
 
+    public double getBasePriceByTrainID(int trainID) {
+        double basePrice = 0.0;
+        String sql = "SELECT BasePrice FROM Route "
+                + "JOIN Trip ON Route.RouteID = Trip.RouteID "
+                + "WHERE Trip.TrainID = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, trainID);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    basePrice = rs.getDouble("BasePrice");
+                } else {
+                    System.out.println("⚠️ Không tìm thấy BasePrice cho TrainID: " + trainID);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return basePrice;
+    }
+
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
