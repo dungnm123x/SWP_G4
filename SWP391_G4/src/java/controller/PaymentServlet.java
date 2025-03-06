@@ -192,7 +192,6 @@ public class PaymentServlet extends HttpServlet {
         }
         for (CartItem item : cartItems) {
             Ticket ticket = new Ticket();
-            // Tạm cứng CCCD = 0000000000, hoặc bạn lấy param
             ticket.setCccd(cccdBooking);
             ticket.setBookingID(bookingID);
 
@@ -204,12 +203,19 @@ public class PaymentServlet extends HttpServlet {
             ticket.setTicketStatus("Unused");
 
             try {
-                ticketDAO.insertTicket(ticket);
-                // Update ghế => Booked
+                // Chèn vé 1 lần duy nhất
+                int insertedTicketID = ticketDAO.insertTicket(ticket);
+
+                // Nếu muốn chuyển vé sang "Used" ngay lập tức (thường vé mới tạo sẽ là "Unused")
+                // thì updateTicketStatus như sau:
+                ticketDAO.updateTicketStatus(insertedTicketID, "Used");
+
+                // Đánh dấu ghế đã Booked
                 ticketDAO.updateSeatStatus(seatID, "Booked");
+
             } catch (Exception ex) {
                 ex.printStackTrace();
-                // Tuỳ bạn rollback...
+                // Xử lý rollback hoặc báo lỗi nếu cần
             }
         }
 
