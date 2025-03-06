@@ -1,4 +1,4 @@
-<%-- 
+    <%-- 
     Document   : AddRule
     Created on : Mar 5, 2025, 1:14:59 PM
     Author     : dung9
@@ -107,22 +107,6 @@
                 font-weight: bold;
                 text-align: center;
             }
-            #deleteThumbnail {
-                font-size: 1.5em; /* Increase the size of the icon */
-                background-color: rgba(255, 255, 255, 0.5); /* Add a semi-transparent background */
-                border-radius: 50%; /* Make the button round */
-                padding: 5px 10px;
-                cursor: pointer;
-            }
-
-            #deleteThumbnail:hover {
-                background-color: rgba(255, 255, 255, 0.8); /* Change background color on hover */
-            }
-
-            #deleteThumbnail i {
-                color: #ff0000; /* Set the color of the trash icon to red */
-            }
-
         </style>
 
         <!-- CKEditor 4 (full-all) CDN -->

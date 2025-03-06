@@ -18,30 +18,27 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
         <style>
-            body {
+             .slider-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 background-color: #f8f9fa;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 10px;
             }
-            .container {
-                max-width: 800px;
-                margin-top: 30px;
-            }
-            .form-group label {
+            .slider-title {
+                font-size: 2rem;
                 font-weight: bold;
-            }
-            .btn-custom {
-                background-color: #007bff;
-                color: white;
-                border: none;
-            }
-            .btn-custom:hover {
-                background-color: #0056b3;
+                text-align: center;
             }
         </style>
     </head>
     <body>
-
-        <div class="container">
-            <div class="card">
+         <div class="slider-container">
+            <h2 class="slider-title">Edit Category Rule</h2>              
+        </div>
+        <div class="container rounded bg-white mt-5 mb-5">
                 <div class="card-header bg-primary text-white text-center">
                     <h4>Edit Category Rule</h4>
                 </div>
@@ -56,7 +53,7 @@
 
                     <!-- Form gửi request đến Servlet -->
                     <form action="edit-categoryRule" method="post">
-                        <div class="row">
+                        <div class="row mt-4">
                             <div class="col-md-8">
                                 <input type="hidden" name="categoryRuleID" value="${categoryRule.categoryRuleID}">
                                 <div class="mb-3">
@@ -95,8 +92,7 @@
 
                 </div>
             </div>
-        </div>
-
+        
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 

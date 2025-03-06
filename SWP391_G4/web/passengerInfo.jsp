@@ -393,7 +393,7 @@
                         formnovalidate>
                     🗑 Xóa tất cả vé
                 </button>
-                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0</span> $</h5>
+                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0.0</span> $</h5>
             </div>
             <h4 class="text-primary mt-4">Thông tin người đặt vé</h4>
             <div class="row g-3">

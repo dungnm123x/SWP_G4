@@ -28,28 +28,7 @@
                 font-size: 2rem;
                 font-weight: bold;
                 text-align: center;
-            }
-            /* Style for the image preview */
-            #thumbnailPreview {
-                max-width: 100%; /* Ensure the image doesn't exceed the container's width */
-                border-radius: 5px; /* Rounded corners for the image */
-            }
-
-            /* Style for the delete button */
-            #thumbnailPreview + button {
-                font-size: 1.2em; /* Increase button font size */
-                background-color:#D19C97 ; /* Semi-transparent white background */
-                border-radius: 100%; /* Circular button */
-                padding: 5px 8px;
-                cursor: pointer;
-                z-index: 10; /* Ensure the button appears above the image */
-            }
-
-            /* Hover effect for the delete button */
-            #thumbnailPreview + button:hover {
-                background-color: #D19C97; /* Full white background on hover */
-            }
-
+            } 
             /* Optional: Add padding to the surrounding div to create spacing */
             .position-relative {
                 padding-top: 10px; /* Space above the image */
@@ -74,7 +53,7 @@
                 <div class="alert alert-success" role="alert">${successMessage}</div>
             </c:if>
 
-            <form action="edit-rule" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <form action="edit-rule" method="post">
                 <input type="hidden" name="ruleID" value="${rule.ruleID}">
 
                 <div class="row mt-4">
@@ -90,6 +69,8 @@
                     </div>
 
                     <div class="col-md-4">
+                        <input type="hidden" name="userID" value="${rule.userID}">
+
                         <div class="mb-3">
                             <label class="form-label">Category Rule</label>
                             <select class="form-control" name="categoryRuleID" required>
@@ -100,7 +81,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Update Date</label>
-                            <input type="text" class="form-control" value="${blog.updated_date}" readonly>
+                            <input type="text" class="form-control" value="${rule.update_date}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -120,51 +101,6 @@
 
         <script>
             CKEDITOR.replace('editor');
-
-            function validateForm() {
-                let title = document.querySelector('input[name="title"]').value;
-                let briefInfor = document.querySelector('textarea[name="brief_infor"]').value;
-                let category = document.querySelector('select[name="categoryBlog_id"]').value;
-
-                if (!title || !briefInfor || !category) {
-                    alert("Please fill out all required fields.");
-                    return false;
-                }
-                return true;
-            }
-
-            function updateImagePreview() {
-                var input = document.getElementById('thumbnailInput');
-                var preview = document.getElementById('thumbnailPreview');
-                var deleteButton = document.querySelector('#thumbnailPreview + button');
-
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block'; // Show image preview
-                        deleteButton.style.display = 'inline-block'; // Show delete button
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-
-            function removeImage() {
-                var preview = document.getElementById('thumbnailPreview');
-                var deleteButton = document.querySelector('#thumbnailPreview + button');
-                var input = document.getElementById('thumbnailInput');
-
-                // Clear the image preview and hide it
-                preview.src = "";
-                preview.style.display = 'none';
-
-                // Hide the delete button
-                deleteButton.style.display = 'none';
-
-                // Clear the file input
-                input.value = "";
-            }
-
         </script>
     </body>
 </html>
