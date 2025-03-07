@@ -56,9 +56,10 @@ public class TicketDAO extends DBContext {
             }
         }
     }
-        /**
-         * Cập nhật trạng thái ghế (seat) (Available, Booked, ...)
-         */
+
+    /**
+     * Cập nhật trạng thái ghế (seat) (Available, Booked, ...)
+     */
     public void updateSeatStatus(int seatID, String status) {
         String sql = "UPDATE Seat SET Status=? WHERE SeatID=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -79,6 +80,25 @@ public class TicketDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace(); // Hoặc log lỗi
         }
+    }
+
+    public boolean ticketExistsByCCCDAndPaid(String cccd, int tripID) {
+        String sql = "SELECT 1 "
+                + "FROM Ticket t "
+                + "JOIN Booking b ON t.BookingID = b.BookingID "
+                + "WHERE t.CCCD = ? "
+                + "  AND t.TripID = ? "
+                + "  AND b.PaymentStatus = 'Paid' ";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, cccd);
+            ps.setInt(2, tripID);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // nếu có row => true
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

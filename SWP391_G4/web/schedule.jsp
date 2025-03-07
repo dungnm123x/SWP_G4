@@ -1,7 +1,7 @@
 <%-- 
-Document   : schedule
-Created on : Feb 12, 2025, 11:46:05 PM
-Author     : Admin
+   Document   : schedule
+   Created on : Feb 12, 2025, 11:46:05 PM
+   Author     : Admin
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" %>
@@ -44,7 +44,7 @@ Author     : Admin
 
                                         <tr>
                                             <td>
-                                                <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}"
+                                                <button class="btn btn-primary toggle-train" data-tripid="${trip.tripID}"
                                                         data-isreturn="false">
                                                     ${trip.train.trainName}
                                                 </button>
@@ -53,9 +53,10 @@ Author     : Admin
                                             <td>${trip.arrivalTime}</td>
                                             <td>${trip.tripStatus}</td>
                                         </tr>
-                                        <tr class="train-details-container" id="train-container-${trip.train.trainID}" style="display: none;">
+                                        <tr class="train-details-container" id="trip-container-${trip.tripID}" style="display: none;">
                                             <td colspan="4">
-                                                <div class="train-details" id="train-${trip.train.trainID}"></div>
+
+                                                <div class="trip-details" id="trip-${trip.tripID}"></div>
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -80,7 +81,7 @@ Author     : Admin
                                 <c:forEach var="trip" items="${sessionScope.returnScheduleList}">
                                     <tr>
                                         <td>
-                                            <button class="btn btn-primary toggle-train" data-trainid="${trip.train.trainID}"
+                                            <button class="btn btn-primary toggle-train" data-tripid="${trip.tripID}"
                                                     data-isreturn="true">
                                                 ${trip.train.trainName}
                                             </button>
@@ -89,9 +90,9 @@ Author     : Admin
                                         <td>${trip.arrivalTime}</td>
                                         <td>${trip.tripStatus}</td>
                                     </tr>
-                                    <tr class="train-details-container" id="train-container-${trip.train.trainID}" style="display: none;">
+                                    <tr class="train-details-container" id="trip-container-${trip.tripID}" style="display: none;">
                                         <td colspan="4">
-                                            <div class="train-details" id="train-${trip.train.trainID}"></div>
+                                            <div class="trip-details" id="trip-${trip.tripID}"></div>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -137,17 +138,17 @@ Author     : Admin
                 // 1) Gắn sự kiện .toggle-train
                 document.querySelectorAll(".toggle-train").forEach(button => {
                     button.addEventListener("click", function () {
-                        let trainID = this.getAttribute("data-trainid");
+                        let tripID = this.getAttribute("data-tripid");
                         let isReturnParam = this.getAttribute("data-isreturn");
-                        let containerRow = document.getElementById("train-container-" + trainID);
-                        let detailsDiv = document.getElementById("train-" + trainID);
+                        let containerRow = document.getElementById("trip-container-" + tripID);
+                        let detailsDiv = document.getElementById("trip-" + tripID);
                         if (!detailsDiv)
                             return;
 
                         // Nếu chưa load ghế -> fetch
                         if (detailsDiv.innerHTML.trim() === "") {
                             let url = "getcarriageseats"
-                                    + "?trainID=" + trainID
+                                    + "?tripID=" + tripID
                                     + "&departureStationID=" + encodeURIComponent(departureStationIDParam)
                                     + "&arrivalStationID=" + encodeURIComponent(arrivalStationIDParam)
                                     + "&departureDay=" + encodeURIComponent(departureDayParam)
@@ -174,17 +175,18 @@ Author     : Admin
                 // 2) Tự động click lại train đã mở trước đó
                 let openedTrainID = sessionStorage.getItem("openedTrainID");
                 if (openedTrainID) {
-                    let btn = document.querySelector(`[data-trainid='${openedTrainID}']`);
+                    let btn = document.querySelector(`[data-tripid='${openedTrainID}']`);
                     if (btn) {
-                        btn.click(); // Chỉ click nếu btn != null
+                        btn.click();
                     }
                 }
+
 
                 // 3) Lưu lại trainID khi click
                 document.querySelectorAll(".toggle-train").forEach(button => {
                     button.addEventListener("click", function () {
-                        let trainID = this.getAttribute("data-trainid");
-                        sessionStorage.setItem("openedTrainID", trainID);
+                        let tripID = this.getAttribute("data-tripid");
+                        sessionStorage.setItem("openedTrainID", tripID);
                     });
                 });
             });
@@ -225,7 +227,7 @@ Author     : Admin
                 element.appendChild(tooltip);
             }
 
-// Ẩn tooltip khi di chuột ra khỏi ghế ngồi
+            // Ẩn tooltip khi di chuột ra khỏi ghế ngồi
             function hideTooltip(element) {
                 let tooltip = element.querySelector(".tooltip");
                 if (tooltip) {
@@ -270,5 +272,3 @@ Author     : Admin
 
     </body>
 </html>
-
-

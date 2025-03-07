@@ -63,6 +63,16 @@ public class BookingDAO extends DBContext {
         }
     }
 
+    public boolean updateBookingPaymentStatus(int bookingID, String paymentStatus) throws SQLException {
+        String sql = "UPDATE Booking SET PaymentStatus = ? WHERE BookingID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, paymentStatus);
+            stmt.setInt(2, bookingID);
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        }
+    }
+
     /**
      * Lấy danh sách toàn bộ Booking
      */

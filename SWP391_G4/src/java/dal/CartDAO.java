@@ -93,6 +93,7 @@ public class CartDAO extends DBContext {
     public Object get(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
     public static void main(String[] args) {
         CartDAO d = new CartDAO();
         System.out.println(d.getTicketID(1));

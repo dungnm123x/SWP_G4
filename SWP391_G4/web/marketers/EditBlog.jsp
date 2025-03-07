@@ -53,7 +53,7 @@
     </head>
     <body>
         <div class="slider-container">
-            <h2 class="slider-title">Add New Blog</h2>              
+            <h2 class="slider-title">Edit Blog</h2>              
         </div>
         <div class="container rounded bg-white mt-5 mb-5">           
             <div class="header text-center p-3 bg-primary text-white">
@@ -91,9 +91,9 @@
                         <div class="mb-3">
                             <label class="form-label">Author</label>
                             <c:set var="authorName" value="Không xác định"/>
-                            <c:forEach items="${authors}" var="a">
+                            <c:forEach items="${User}" var="a">
                                 <c:if test="${blog.author_id == a.userID}">
-                                    <c:set var="authorName" value="${a.firstName} ${a.lastName}"/>
+                                    <c:set var="authorName" value="${a.fullName} "/>
                                 </c:if>
                             </c:forEach>
                             <input type="text" class="form-control" name="authorName" value="${authorName}" readonly="readonly" />
