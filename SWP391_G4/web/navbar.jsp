@@ -12,7 +12,7 @@
     </a>
 
     <!-- Center section of the navbar - Menu items -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse d-flex justify-content-center" id="navbarSupportedContent">
         <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link text-white" href="home"><i class="fas fa-house"></i> <strong>Home</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-ticket-alt"></i> <strong>Hoàn vé</strong></a></li>
@@ -24,27 +24,46 @@
     </div>
 
     <!-- Kiểm tra xem người dùng đã đăng nhập chưa -->
-    <c:choose>
-        <c:when test="${sessionScope.user != null}">
-            <!-- Nếu người dùng đã đăng nhập, hiển thị tên và nút Đăng xuất -->
-            <div class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="updateuser"><i class="fas fa-user"></i> Hello, ${sessionScope.user.fullName}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
-                </li>
+    <div class="navbar-nav" id="userNav">
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white"  id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <strong>Hello</strong>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="userDropdown" id="userMenu">
+                <a class="dropdown-item" href="login.jsp" id="loginOption">Đăng Nhập</a>
             </div>
-        </c:when>
-        <c:otherwise>
-            <!-- Nếu chưa đăng nhập, hiển thị nút Đăng nhập -->
-            <div class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="login.jsp"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a>
-                </li>
-            </div>
-        </c:otherwise>
-    </c:choose>
-
+        </div>
+    </div>
 </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var user = ${sessionScope.user != null ? 'true' : 'false'};
+        var userName = "${sessionScope.user != null ? sessionScope.user.fullName : ''}";
+        var userDropdown = document.getElementById("userDropdown");
+        var userMenu = document.getElementById("userMenu");
+        var dropdownContainer = document.querySelector(".dropdown");
+
+        if (user) {
+            userDropdown.innerHTML = "<strong>Hello, " + userName + "</strong>";
+            userMenu.innerHTML = '<a class="dropdown-item" href="updateuser">Profile</a>' +
+                    '<a class="dropdown-item" href="logout">Logout</a>';
+        }
+
+        // Giữ dropdown mở khi click vào menu
+        dropdownContainer.addEventListener("click", function (event) {
+            event.stopPropagation(); // Ngăn dropdown đóng ngay lập tức
+            this.classList.toggle("show");
+            userMenu.classList.toggle("show");
+        });
+
+        // Đóng dropdown khi click ra ngoài
+        document.addEventListener("click", function (event) {
+            if (!dropdownContainer.contains(event.target)) {
+                userMenu.classList.remove("show");
+            }
+        });
+    });
+</script>
+
 <br>
