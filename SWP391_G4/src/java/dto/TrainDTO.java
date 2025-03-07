@@ -1,15 +1,18 @@
 package dto;
+
 import java.sql.*;
+import java.time.LocalDateTime;
 
 public class TrainDTO {
-     private int trainID;
+
+    private int trainID;
     private String trainName;
     private int totalCarriages;
     private int totalSeats;
     private String departureStation;
     private String arrivalStation;
-    private Date departureTime;
-    private Date arrivalTime;
+    private LocalDateTime departureTime;
+    private LocalDateTime arrivalTime;
     private double price;
 
     public TrainDTO() {
@@ -22,7 +25,7 @@ public class TrainDTO {
         this.totalSeats = totalSeats;
     }
 
-    public TrainDTO(int trainID, String trainName, int totalCarriages, int totalSeats, String departureStation, String arrivalStation, Date departureTime, Date arrivalTime, double price) {
+    public TrainDTO(int trainID, String trainName, int totalCarriages, int totalSeats, String departureStation, String arrivalStation, LocalDateTime departureTime, LocalDateTime arrivalTime, double price) {
         this.trainID = trainID;
         this.trainName = trainName;
         this.totalCarriages = totalCarriages;
@@ -82,19 +85,19 @@ public class TrainDTO {
         this.arrivalStation = arrivalStation;
     }
 
-    public Date getDepartureTime() {
+    public LocalDateTime getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(Date departureTime) {
+    public void setDepartureTime(LocalDateTime departureTime) {
         this.departureTime = departureTime;
     }
 
-    public Date getArrivalTime() {
+    public LocalDateTime getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(Date arrivalTime) {
+    public void setArrivalTime(LocalDateTime arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
@@ -106,5 +109,4 @@ public class TrainDTO {
         this.price = price;
     }
 
-    
 }

@@ -41,17 +41,27 @@ public class TrainDBContext extends DBContext<TrainDTO> {
             ResultSet rs = stm.executeQuery();
 
             while (rs.next()) {
-                TrainDTO train = new TrainDTO(rs.getInt("id"),
-                        rs.getString("tentau"),
-                        rs.getInt("tongtoa"),
-                        rs.getInt("tongghe"),
-                        rs.getString("gadi"),
-                        rs.getString("gaden"),
-                        rs.getDate("xuatphat"),
-                        rs.getDate("dennoi"),
-                        rs.getDouble("giave"));
-                trains.add(train);
+                TrainDTO train = new TrainDTO(); // Use the default constructor
+                train.setTrainID(rs.getInt("id"));
+                train.setTrainName(rs.getString("tentau"));
+                train.setTotalCarriages(rs.getInt("tongtoa"));
+                train.setTotalSeats(rs.getInt("tongghe"));
+                train.setDepartureStation(rs.getString("gadi"));
+                train.setArrivalStation(rs.getString("gaden"));
 
+                // Get Timestamp and convert to LocalDateTime, handling nulls
+                Timestamp departureTimestamp = rs.getTimestamp("xuatphat");
+                if (departureTimestamp != null) {
+                    train.setDepartureTime(departureTimestamp.toLocalDateTime());
+                }
+
+                Timestamp arrivalTimestamp = rs.getTimestamp("dennoi");
+                if (arrivalTimestamp != null) {
+                    train.setArrivalTime(arrivalTimestamp.toLocalDateTime());
+                }
+
+                train.setPrice(rs.getDouble("giave"));
+                trains.add(train);
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrainDBContext.class.getName()).log(Level.SEVERE, null, ex);
@@ -167,8 +177,15 @@ public class TrainDBContext extends DBContext<TrainDTO> {
                 train.setTotalSeats(rs.getInt("tongghe"));
                 train.setDepartureStation(rs.getString("gadi"));
                 train.setArrivalStation(rs.getString("gaden"));
-                train.setDepartureTime(rs.getDate("xuatphat"));
-                train.setArrivalTime(rs.getDate("dennoi"));
+                Timestamp departureTimestamp = rs.getTimestamp("xuatphat");
+                if (departureTimestamp != null) {
+                    train.setDepartureTime(departureTimestamp.toLocalDateTime());
+                }
+
+                Timestamp arrivalTimestamp = rs.getTimestamp("dennoi");
+                if (arrivalTimestamp != null) {
+                    train.setArrivalTime(arrivalTimestamp.toLocalDateTime());
+                }
                 train.setPrice(rs.getDouble("giave"));
                 trains.add(train);
             }
