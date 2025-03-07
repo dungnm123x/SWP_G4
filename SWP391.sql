@@ -100,16 +100,16 @@ CREATE TABLE Route (
 );  
 
 -- Bảng Trip với TripType  
-CREATE TABLE Trip (  
-    TripID INT PRIMARY KEY IDENTITY(1,1),  
-    TrainID INT,  
-    RouteID INT,  
-    DepartureTime DATETIME NOT NULL,  
-    ArrivalTime DATETIME NOT NULL,  
-    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),  
-    TripType NVARCHAR(50) NOT NULL DEFAULT 'One-way' CHECK (TripType IN ('One-way', 'Round-trip')),  
-    RoundTripReference INT NULL,  
-    FOREIGN KEY (TrainID) REFERENCES Train(TrainID),  
+CREATE TABLE Trip (
+    TripID INT PRIMARY KEY IDENTITY(1,1),
+    TrainID INT,
+    RouteID INT,
+    DepartureTime DATETIME NOT NULL,
+    ArrivalTime DATETIME NOT NULL,
+    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),
+    TripType INT NOT NULL DEFAULT 1 CHECK (TripType IN (1,2)),  -- 1=One-way, 2=Round-trip
+    RoundTripReference INT NULL,
+    FOREIGN KEY (TrainID) REFERENCES Train(TrainID),
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
     FOREIGN KEY (RoundTripReference) REFERENCES Trip(TripID)
 );
@@ -302,19 +302,58 @@ VALUES
 -- Thêm chuyến đi một chiều
 INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType) 
 VALUES 
-(1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled', 'Round-trip'), -- Chuyến đi
-(2, 2, '2025-02-15 18:00:00', '2025-02-15 20:00:00', 'Scheduled', 'Round-trip'), -- Chuyến về
-(3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled', 'One-way'),
-(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed', 'One-way'),
-(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed', 'One-way'),
-(1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled', 'One-way'),
-(2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled', 'One-way'),
-(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed', 'One-way');
+(1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled', 1), -- Chuyến đi
+(2, 2, '2025-02-15 18:00:00', '2025-02-15 20:00:00', 'Scheduled', 2), -- Chuyến về
+(3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled', 1),
+(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed', 1),
+(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed', 1),
+(1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled', 1),
+(2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled', 1),
+(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed', 1);
 
 -- Cập nhật RoundTripReference cho chuyến đi khứ hồi (chuyến về tham chiếu chuyến đi)
-UPDATE Trip SET RoundTripReference = 1 WHERE TripID = 2;
-UPDATE Trip SET RoundTripReference = 2 WHERE TripID = 1; -- Ngược lại để tham chiếu lẫn nhau
 
+DECLARE @CurrentDate DATE = '2025-03-06';
+DECLARE @EndDate    DATE = '2025-03-15';
+
+WHILE @CurrentDate <= @EndDate
+BEGIN
+    -- 1) Thêm chuyến “đi”
+    INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType)
+    VALUES (
+        1,  -- TrainID
+        1,  -- RouteID
+        DATEADD(HOUR, 8, CAST(@CurrentDate AS DATETIME)),  -- 8h sáng
+        DATEADD(HOUR, 10, CAST(@CurrentDate AS DATETIME)), -- 10h
+        'Scheduled',
+        2   -- Round-trip
+    );
+    DECLARE @TripID_Go INT = SCOPE_IDENTITY();
+
+    -- 2) Thêm chuyến “về”
+    INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType)
+    VALUES (
+        2,  -- TrainID
+        2,  -- RouteID
+        DATEADD(HOUR, 18, CAST(@CurrentDate AS DATETIME)),  -- 18h
+        DATEADD(HOUR, 20, CAST(@CurrentDate AS DATETIME)),  -- 20h
+        'Scheduled',
+        2   -- Round-trip
+    );
+    DECLARE @TripID_Return INT = SCOPE_IDENTITY();
+
+    -- 3) Update RoundTripReference
+    UPDATE Trip
+    SET RoundTripReference = @TripID_Return
+    WHERE TripID = @TripID_Go;
+
+    UPDATE Trip
+    SET RoundTripReference = @TripID_Go
+    WHERE TripID = @TripID_Return;
+
+    -- Tăng ngày
+    SET @CurrentDate = DATEADD(DAY, 1, @CurrentDate);
+END;
 
 
 
@@ -399,6 +438,27 @@ VALUES
 (N'Chính sách Bảo Mật Thông Tin', 
  N'Chính sách bảo mật thông tin cá nhân là cam kết của công ty trong việc bảo vệ dữ liệu cá nhân của khách hàng. Các thông tin như tên, địa chỉ, số điện thoại, thông tin thanh toán và các dữ liệu nhạy cảm khác sẽ chỉ được sử dụng với mục đích cung cấp dịch vụ và không bao giờ được chia sẻ cho bên thứ ba mà không có sự đồng ý của khách hàng. Công ty cam kết tuân thủ các quy định của pháp luật về bảo vệ thông tin cá nhân, và sử dụng các biện pháp bảo mật tiên tiến như mã hóa dữ liệu, hệ thống tường lửa và các công cụ giám sát để ngăn chặn truy cập trái phép. Khách hàng cũng có quyền yêu cầu quyền truy cập vào thông tin cá nhân của mình, yêu cầu sửa chữa hoặc xóa bỏ dữ liệu khi không còn cần thiết. Chính sách này cũng sẽ mô tả về cách thức công ty thông báo cho khách hàng trong trường hợp có sự cố bảo mật xảy ra, và những biện pháp khắc phục mà công ty sẽ thực hiện.', 
  NULL, GETDATE(), 1);
+
+ -- Thêm 3 Employee vào bảng User
+INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber, Address, RoleID, Status)
+VALUES
+    ('employee1', 'employee123', 'Employee One', 'employee1@example.com', '0111111111', 'Employee Address 1', 2, 1),
+    ('employee2', 'employee123', 'Employee Two', 'employee2@example.com', '0222222222', 'Employee Address 2', 2, 1),
+    ('employee3', 'employee123', 'Employee Three', 'employee3@example.com', '0333333333', 'Employee Address 3', 2, 1);
+
+-- Thêm 10 Customer vào bảng User
+INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber, Address, RoleID, Status)
+VALUES
+    ('customer4', 'customer123', 'Customer Four', 'customer4@example.com', '0444444444', 'Customer Address 4', 3, 1),
+    ('customer5', 'customer123', 'Customer Five', 'customer5@example.com', '0555555555', 'Customer Address 5', 3, 1),
+    ('customer6', 'customer123', 'Customer Six', 'customer6@example.com', '0666666666', 'Customer Address 6', 3, 1),
+    ('customer7', 'customer123', 'Customer Seven', 'customer7@example.com', '0777777777', 'Customer Address 7', 3, 1),
+    ('customer8', 'customer123', 'Customer Eight', 'customer8@example.com', '0888888888', 'Customer Address 8', 3, 1),
+    ('customer9', 'customer123', 'Customer Nine', 'customer9@example.com', '0999999999', 'Customer Address 9', 3, 1),
+    ('customer10', 'customer123', 'Customer Ten', 'customer10@example.com', '1010101010', 'Customer Address 10', 3, 1),
+    ('customer11', 'customer123', 'Customer Eleven', 'customer11@example.com', '1111111111', 'Customer Address 11', 3, 1),
+    ('customer12', 'customer123', 'Customer Twelve', 'customer12@example.com', '1212121212', 'Customer Address 12', 3, 1),
+    ('customer13', 'customer123', 'Customer Thirteen', 'customer13@example.com', '1313131313', 'Customer Address 13', 3, 1);
 
 -- Cập nhật bảng Rule với nội dung chi tiết hơn
 INSERT INTO [Rule] (Title, Content, Img, Update_Date, Status, UserID, CategoryRuleID)
