@@ -19,7 +19,7 @@
             <li class="nav-item"><a class="nav-link text-white" href="blog-list"><i class="fas fa-newspaper"></i> <strong>Blog</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="rule-list"><i class="fas fa-file-contract"></i> <strong>Quy Định</strong></a></li>
 
-            <li class="nav-item"><a class="nav-link text-white" href="contact.jsp"><i class="fas fa-phone"></i> <strong>Liên hệ</strong></a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="contact"><i class="fas fa-phone"></i> <strong>Liên hệ</strong></a></li>
         </ul>
     </div>
 
@@ -65,5 +65,4 @@
         });
     });
 </script>
-
 <br>
