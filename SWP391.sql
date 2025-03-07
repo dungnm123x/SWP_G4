@@ -479,10 +479,13 @@ VALUES
  N'Quy định thời gian hoàn tiền bao gồm các điều kiện và thời gian yêu cầu hoàn lại tiền cho khách hàng trong các trường hợp như hủy vé, không thể sử dụng dịch vụ do lý do bất khả kháng, hoặc khi khách hàng yêu cầu hoàn tiền sau khi sử dụng dịch vụ. Thời gian hoàn tiền có thể thay đổi tùy theo phương thức thanh toán mà khách hàng đã sử dụng. Ví dụ, nếu thanh toán qua thẻ tín dụng, thời gian hoàn tiền có thể từ 5 đến 10 ngày làm việc, trong khi thanh toán qua chuyển khoản ngân hàng có thể mất từ 7 đến 15 ngày. Chính sách hoàn tiền cũng quy định về các trường hợp không đủ điều kiện hoàn tiền, chẳng hạn như khi khách hàng không tuân thủ quy định về hủy vé hoặc thay đổi dịch vụ trong thời gian quy định.', 
  NULL, GETDATE(), 1, 2, 3);
 
+SET ANSI_NULLS ON
 GO
-CREATE PROCEDURE AddSeatsForNewCarriage
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[AddSeatsForNewCarriage]
     @CarriageID INT,
-    @CarriageType VARCHAR(50),
+    @CarriageType NVARCHAR(50),  
     @TrainID INT
 AS
 BEGIN
@@ -490,24 +493,21 @@ BEGIN
 
     DECLARE @NumberOfSeats INT;
     DECLARE @SeatNumber INT;
-    DECLARE @SeatType VARCHAR(50);
+    DECLARE @SeatType NVARCHAR(50);
 
     -- Xác định số ghế dựa trên loại toa
-    IF @CarriageType = 'VIP'
+    IF @CarriageType = N'Toa VIP'  
         SET @NumberOfSeats = 12;
-    ELSE IF @CarriageType = 'Standard'
+    ELSE IF @CarriageType = N'Toa Thường' 
         SET @NumberOfSeats = 10;
     ELSE
-        --  Xử lý trường hợp loại toa không hợp lệ (tùy chọn)
         RETURN;
-    -- Hoặc RAISERROR
 
-    -- Đặt loại ghế (có thể giống loại toa, hoặc tùy chỉnh)
-    IF @CarriageType = 'VIP'
-        SET @SeatType = 'VIP';
+    -- Đặt loại ghế
+    IF @CarriageType = N'Toa VIP'
+        SET @SeatType = N'Toa VIP'; 
     ELSE
-        SET @SeatType = 'Normal';
-    -- hoặc 'Standard', tùy vào cách bạn đặt tên.
+        SET @SeatType = N'Toa Thường'; 
 
     -- Vòng lặp để thêm ghế
     SET @SeatNumber = 1;
@@ -517,44 +517,61 @@ BEGIN
             (SeatNumber, Status, SeatType, CarriageID)
         VALUES
             (@SeatNumber, 'Available', @SeatType, @CarriageID);
-        -- 'Available' là trạng thái ghế.
 
         SET @SeatNumber = @SeatNumber + 1;
     END
 END
 GO
+
+SET ANSI_NULLS ON
 GO
-CREATE PROCEDURE DeleteCarriageAndSeats
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteCarriageAndSeats]
     @CarriageID INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    BEGIN TRANSACTION;
-    -- Bắt đầu transaction
+
+    IF EXISTS (SELECT 1 FROM Seat WHERE CarriageID = @CarriageID AND Status <> 'Available')
+    BEGIN
+        -- Ném ra lỗi (RAISERROR) hoặc trả về mã lỗi
+        RAISERROR('Không thể xóa toa.  Có ghế không ở trạng thái Available.', 16, 1); -- 16 là severity level (lỗi do người dùng), 1 là state.
+        RETURN;  -- Kết thúc procedure, không thực hiện xóa.
+    END
+
+    BEGIN TRANSACTION;  -- Bắt đầu transaction
 
     BEGIN TRY
-        -- Xóa ghế của toa
-        DELETE FROM Seat WHERE CarriageID = @CarriageID;
+        -- Xóa ghế của toa (chỉ các ghế 'Available')
+        DELETE FROM Seat
+        WHERE CarriageID = @CarriageID;
 
         -- Xóa toa
-        DELETE FROM Carriage WHERE CarriageID = @CarriageID;
+        DELETE FROM Carriage
+        WHERE CarriageID = @CarriageID;
 
         COMMIT TRANSACTION; -- Commit transaction nếu thành công
     END TRY
     BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION; -- Rollback nếu có lỗi
+        -- Nếu có lỗi xảy ra trong khối TRY
+        IF @@TRANCOUNT > 0  -- Kiểm tra xem transaction có đang active không
+            ROLLBACK TRANSACTION; -- Rollback transaction
 
         -- Xử lý lỗi (ghi log, ném exception, ...)
-        THROW; -- Hoặc xử lý lỗi theo cách khác
+        THROW;  -- Ném lại lỗi (hoặc xử lý theo cách khác, nhưng RAISERROR ở trên đã thông báo rồi)
     END CATCH
 END;
 GO
+
+SET ANSI_NULLS ON
 GO
-CREATE PROCEDURE UpdateCarriageAndSeats
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[UpdateCarriageAndSeats]
     @CarriageID INT,
     @CarriageNumber VARCHAR(50),
-    @CarriageType VARCHAR(50),
+    @CarriageType NVARCHAR(50), 
     @NewCapacity INT
 AS
 BEGIN
@@ -564,9 +581,7 @@ BEGIN
     BEGIN TRY
         -- Lấy số lượng ghế hiện tại
         DECLARE @CurrentCapacity INT;
-        SELECT @CurrentCapacity = Capacity
-    FROM Carriage
-    WHERE CarriageID = @CarriageID;
+        SELECT @CurrentCapacity = Capacity FROM Carriage WHERE CarriageID = @CarriageID;
 
         -- Cập nhật thông tin toa tàu
         UPDATE Carriage
@@ -579,56 +594,41 @@ BEGIN
         -- Điều chỉnh số lượng ghế
         IF @NewCapacity > @CurrentCapacity  -- Thêm ghế
         BEGIN
-        DECLARE @SeatsToAdd INT = @NewCapacity - @CurrentCapacity;
-        DECLARE @SeatNumber INT;
-        -- Tìm số ghế lớn nhất hiện tại + 1 của toa đó
-        SELECT @SeatNumber = ISNULL(MAX(CAST(SeatNumber AS INT)), 0) + 1
-        FROM Seat
-        WHERE CarriageID = @CarriageID;
+            DECLARE @SeatsToAdd INT = @NewCapacity - @CurrentCapacity;
+            DECLARE @SeatNumber INT;
+			      -- Tìm số ghế lớn nhất hiện tại + 1 của toa đó
+            SELECT @SeatNumber = ISNULL(MAX(CAST(SeatNumber AS INT)), 0) + 1 FROM Seat WHERE CarriageID = @CarriageID;
 
-        WHILE @SeatsToAdd > 0
+            WHILE @SeatsToAdd > 0
             BEGIN
-            DECLARE @SeatType VARCHAR(50);
-            IF @CarriageType = 'VIP'
-                    SET @SeatType = 'VIP';
+                 DECLARE @SeatType NVARCHAR(50);
+                IF @CarriageType = N'Toa VIP'  
+                    SET @SeatType = N'Toa VIP';
                 ELSE
-                    SET @SeatType = 'Normal';
+                    SET @SeatType = N'Toa Thường';
 
-            INSERT INTO Seat
-                (SeatNumber, Status, SeatType, CarriageID)
-            VALUES
-                (CAST(@SeatNumber AS VARCHAR(10)), 'Available', @SeatType, @CarriageID);
+                INSERT INTO Seat (SeatNumber, Status, SeatType, CarriageID)
+                VALUES (CAST(@SeatNumber AS VARCHAR(10)), 'Available', @SeatType, @CarriageID);
 
-            SET @SeatNumber = @SeatNumber + 1;
-            SET @SeatsToAdd = @SeatsToAdd - 1;
+                SET @SeatNumber = @SeatNumber + 1;
+                SET @SeatsToAdd = @SeatsToAdd - 1;
+            END
         END
-    END
         ELSE IF @NewCapacity < @CurrentCapacity  -- Xóa ghế
         BEGIN
-        DECLARE @SeatsToDelete INT = @CurrentCapacity - @NewCapacity;
+            DECLARE @SeatsToDelete INT = @CurrentCapacity - @NewCapacity;
 
-        -- Xóa những ghế có ID lớn nhất (giả sử ghế mới thêm vào có ID lớn hơn)
-        -- Cách 1 (dùng CTE, an toàn hơn, hoạt động tốt cả khi SeatNumber không phải số)
+            -- Xóa những ghế có ID lớn nhất (giả sử ghế mới thêm vào có ID lớn hơn)
+            -- Cách 1 (dùng CTE, an toàn hơn, hoạt động tốt cả khi SeatNumber không phải số)
 
-        ;WITH
-            SeatsToDelete
-            AS
-            (
-                SELECT TOP (@SeatsToDelete)
-                    SeatID
+            ;WITH SeatsToDelete AS (
+                SELECT TOP (@SeatsToDelete) SeatID
                 FROM Seat
                 WHERE CarriageID = @CarriageID
-                ORDER BY CAST(SeatNumber AS INT) DESC
-                -- Sắp xếp theo số ghế (dạng số) giảm dần.
+                ORDER BY CAST(SeatNumber AS INT) DESC -- Sắp xếp theo số ghế (dạng số) giảm dần.
             )
             DELETE FROM SeatsToDelete;
-
-
-    -- Cách 2 (Dùng DELETE TOP, chỉ dùng khi SeatNumber là số và tăng dần)
-    --DELETE TOP (@SeatsToDelete) FROM Seat
-    --WHERE CarriageID = @CarriageID
-    --ORDER BY SeatID DESC;
-    END
+        END
 
         COMMIT TRANSACTION;
     END TRY
