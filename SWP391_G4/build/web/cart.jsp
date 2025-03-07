@@ -64,8 +64,8 @@
 
 
                                     <div>
-                                        <small>Toa ${item.carriageNumber}, Chỗ ${item.seatNumber}</small><br/>
-                                        <small>Giá: <strong>${item.price}</strong></small>
+                                        <small>Toa ${item.carriageNumber}, Ghế ${item.seatNumber}</small><br/>
+                                        <small>Giá: <strong>${item.price} $</strong></small>
                                     </div>
                                 </div>
                                 <!-- Nút Xóa vé bên phải -->
