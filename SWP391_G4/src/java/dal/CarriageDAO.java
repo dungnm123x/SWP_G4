@@ -27,7 +27,6 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
                             rs.getString("CarriageType"),
                             train,
                             rs.getInt("Capacity")
-
                     ));
                 }
             }
@@ -74,7 +73,6 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
         }
     }
 
-
     // Phương thức gọi Stored Procedure
     private void addSeats(int carriageID, String carriageType, int trainID) throws SQLException {
         String sql = "{CALL AddSeatsForNewCarriage(?, ?, ?)}";
@@ -87,32 +85,32 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
     }
 
     public boolean updateCarriage(Carriage carriage) {
-    String sql = "{CALL UpdateCarriageAndSeats(?, ?, ?, ?)}";
-    try (CallableStatement cs = connection.prepareCall(sql)) {
-        cs.setInt(1, carriage.getCarriageID());
-        cs.setString(2, carriage.getCarriageNumber());
-        cs.setString(3, carriage.getCarriageType());
-        cs.setInt(4, carriage.getCapacity());
-        cs.execute();
-        return true;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+        String sql = "{CALL UpdateCarriageAndSeats(?, ?, ?, ?)}";
+        try (CallableStatement cs = connection.prepareCall(sql)) {
+            cs.setInt(1, carriage.getCarriageID());
+            cs.setString(2, carriage.getCarriageNumber());
+            cs.setString(3, carriage.getCarriageType());
+            cs.setInt(4, carriage.getCapacity());
+            cs.execute();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
     public boolean deleteCarriage(int carriageID) {
-    String sql = "{CALL DeleteCarriageAndSeats(?)}";
-    try (CallableStatement cs = connection.prepareCall(sql)) {
-        cs.setInt(1, carriageID);
-        cs.execute(); // Không cần kiểm tra kết quả, stored proc sẽ ném exception nếu có lỗi
-        return true;
+        String sql = "{CALL DeleteCarriageAndSeats(?)}";
+        try (CallableStatement cs = connection.prepareCall(sql)) {
+            cs.setInt(1, carriageID);
+            cs.execute(); // Không cần kiểm tra kết quả, stored proc sẽ ném exception nếu có lỗi
+            return true;
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
     public Carriage getCarriageById(int carriageID) {
         String query = "SELECT * FROM Carriage WHERE CarriageID = ?";
@@ -158,6 +156,5 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
     public RailwayDTO get(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-
 
 }

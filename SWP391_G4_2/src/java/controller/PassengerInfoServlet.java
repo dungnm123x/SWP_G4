@@ -98,11 +98,11 @@ public class PassengerInfoServlet extends HttpServlet {
         // true nếu khứ hồi
         String rDate = request.getParameter("returnDate");
         HttpSession session = request.getSession();
-//        session.setAttribute("selectedDeparture", departureStationID);
-//        session.setAttribute("selectedArrival", arrivalStationID);
-//        session.setAttribute("selectedDate", departureDay);
-//        session.setAttribute("selectedTripType", tripType);
-//        session.setAttribute("selectedReturnDate", returnDate);
+        session.setAttribute("selectedDeparture", departureStationID);
+        session.setAttribute("selectedArrival", arrivalStationID);
+        session.setAttribute("selectedDate", departureDay);
+        session.setAttribute("selectedTripType", tripType);
+        session.setAttribute("selectedReturnDate", returnDate);
         // Lấy session + giỏ
 
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
@@ -114,11 +114,11 @@ public class PassengerInfoServlet extends HttpServlet {
         System.out.println("Sau khi xóa, giỏ hàng còn: " + cartItems.size() + " vé.");
         // Kiểm tra null, nếu null thì thay bằng chuỗi rỗng
         String redirectURL = "schedule"
-                + "?departureStationID=" + URLEncoder.encode(departureStationID != null ? departureStationID : "", "UTF-8")
-                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID != null ? arrivalStationID : "", "UTF-8")
-                + "&departureDay=" + URLEncoder.encode(departureDay != null ? departureDay : "", "UTF-8")
-                + "&tripType=" + URLEncoder.encode(tripType != null ? tripType : "", "UTF-8")
-                + "&returnDate=" + URLEncoder.encode(returnDate != null ? returnDate : "", "UTF-8");
+                + "?departureStationID=" + URLEncoder.encode((String) session.getAttribute("selectedDeparture"), "UTF-8")
+                + "&arrivalStationID=" + URLEncoder.encode((String) session.getAttribute("selectedArrival"), "UTF-8")
+                + "&departureDay=" + URLEncoder.encode((String) session.getAttribute("selectedDate"), "UTF-8")
+                + "&tripType=" + URLEncoder.encode((String) session.getAttribute("selectedTripType"), "UTF-8")
+                + "&returnDate=" + URLEncoder.encode((String) session.getAttribute("selectedReturnDate"), "UTF-8");
 
         // Lưu vào session để sử dụng khi cần quay lại
         session.setAttribute("previousURL", redirectURL);
@@ -192,10 +192,6 @@ public class PassengerInfoServlet extends HttpServlet {
             String passengerType = request.getParameter("passengerType" + i);
             String idNumber = request.getParameter("idNumber" + i);
             String tripIDStr = request.getParameter("tripID" + i);  // lấy tripID cho item i
-// for (int i=0; i<passengerCount; i++){
-            String passengerCCCD = request.getParameter("passengerCCCD" + i);
-// Lưu vào sessionScope.idNumberList[i] = passengerCCCD
-// ...
 
             int tripID = 0;
             try {
@@ -394,7 +390,6 @@ public class PassengerInfoServlet extends HttpServlet {
         session.setAttribute("bookingEmail", bookingEmail);
         session.setAttribute("bookingPhone", bookingPhone);
         session.setAttribute("bookingCCCD", bookingCCCD);
-        System.out.println("DEBUG: bookingCCCD from param = " + bookingCCCD);
 
         // Lưu kết quả
         session.setAttribute("fullNameList", fullNameList);

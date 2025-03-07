@@ -43,7 +43,7 @@
                 margin-right: 10px;
             }
         </style>
-        <jsp:include page="/navbar.jsp"/>
+         <jsp:include page="/navbar.jsp"/>
     </head>
     <body>
         <div class="container payment-container">
@@ -60,9 +60,7 @@
 
             <!-- Form POST đến PaymentServlet (mapping = "payment") -->
             <form action="payment" method="post">
-                <input type="hidden" name="bookingCCCD" value="${sessionScope.bookingCCCD}" />
                 <div class="payment-methods mb-3">
-                    
                     <label class="d-block mb-2">
                         <input
                             type="radio"
