@@ -185,6 +185,7 @@
         <!-- FORM submit sang Servlet -->
         <form method="post" action="passengerinfo">
 
+
             <div class="table-responsive">
                 <table class="table table-bordered text-center">
                     <thead class="table-primary">
@@ -204,6 +205,7 @@
                             <tr>
                                 <!-- Cột nhập thông tin hành khách -->
                                 <td class="p-2">
+                                    <input type="hidden" name="passengerName${status.index}" />
                                     <input type="text" class="form-control mb-2"
                                            name="fullName${status.index}" 
                                            value="${sessionScope.fullNameList[status.index]}"
@@ -241,6 +243,11 @@
                                            name="idNumber${status.index}"
                                            value="${sessionScope.idNumberList[status.index]}"
                                            placeholder="Số CMND/Hộ chiếu" required />
+                                    <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
+                                    <!-- Mỗi ghế: ô input "Họ tên hành khách" và "CCCD hành khách" -->
+                                    
+                                    <input type="hidden" name="passengerCCCD${status.index}" />
+
                                 </td>
 
                                 <!-- Cột thông tin chỗ -->
@@ -393,7 +400,7 @@
                         formnovalidate>
                     🗑 Xóa tất cả vé
                 </button>
-                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0</span> $</h5>
+                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0.0</span> $</h5>
             </div>
             <h4 class="text-primary mt-4">Thông tin người đặt vé</h4>
             <div class="row g-3">
@@ -409,6 +416,8 @@
                 </div>
 
                 <div class="col-md-4">
+
+
                     <label class="form-label">CCCD/Hộ chiếu (người đặt)</label>
                     <input 
                         type="text" 

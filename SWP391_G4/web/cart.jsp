@@ -77,8 +77,9 @@
                                         <input type="hidden" name="departureDay"       value="${param.departureDay}" />
                                         <input type="hidden" name="tripType"           value="${param.tripType}" />
                                         <input type="hidden" name="returnDate"         value="${param.returnDate}" />
-                                        <input type="hidden" name="tripID" value="${param.trip.tripID}" />
-                                        <input type="hidden" name="isReturnTrip" value="${param.returnTrip}" />
+
+                                        <input type="hidden" name="tripID" value="${item.trip.tripID}" /> 
+
 
                                         <!-- Xóa vé -->
                                         <input type="hidden" name="removeSeatID" value="${item.seatID}" />
@@ -94,6 +95,8 @@
                     <!-- Nút "Mua vé" (checkout) -->
                     <form action="cartitem" method="post" class="text-end">
                         <input type="hidden" name="action" value="checkout">
+                        <input type="hidden" name="tripID" value="${cartItems[0].trip.tripID}" />
+
                         <button type="submit" class="btn btn-success">
                             Mua vé
                         </button>
@@ -111,5 +114,3 @@
         -->
     </body>
 </html>
-
-

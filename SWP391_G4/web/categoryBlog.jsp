@@ -160,14 +160,14 @@
                             <c:set var="currentPage" value="${currentPage != null ? currentPage : 1}" />
                             <c:set var="pageSize" value="${pageSize != null ? pageSize : 10}" />
 
-                            <table class="table table-hover">
-                                <thead class="table-primary" >
+                            <table class="table table-bordered">
+                                <thead class="bg-light">
                                     <tr>
-                                        <th>STT</th>
-                                        <th>Name</th>
-                                        <th>Status</th>
-                                        <th>Toggle Switch</th>
-                                        <th>Actions</th>
+                                        <th style="color: black;">STT</th>
+                                        <th style="color: black;">Name</th>
+                                        <th style="color: black;">Status</th>
+                                        <th style="color: black;">Toggle Switch</th>
+                                        <th style="color: black;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>

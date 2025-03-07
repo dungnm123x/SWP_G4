@@ -5,28 +5,55 @@
 package dal;
 
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import dto.RailwayDTO;
+
 import model.Ticket;
 
 public class TicketDAO extends DBContext {
 
-    public void insertTicket(Ticket ticket) {
+//    public void insertTicket(Ticket ticket) {
+//        String sql = "INSERT INTO Ticket (CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
+//                + "VALUES (?, ?, ?, ?, ?, ?)";
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, ticket.getCccd());
+//            ps.setInt(2, ticket.getBookingID());
+//            ps.setInt(3, ticket.getSeatID());
+//            ps.setInt(4, ticket.getTripID());
+//            ps.setDouble(5, ticket.getTicketPrice());
+//            ps.setString(6, ticket.getTicketStatus());
+//            ps.executeUpdate();
+//        } catch (SQLException e) {
+//
+//        }
+//    }
+    public int insertTicket(Ticket ticket) throws SQLException {
         String sql = "INSERT INTO Ticket (CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        // Tạo PreparedStatement có yêu cầu trả về khóa tự sinh
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, ticket.getCccd());
             ps.setInt(2, ticket.getBookingID());
             ps.setInt(3, ticket.getSeatID());
             ps.setInt(4, ticket.getTripID());
             ps.setDouble(5, ticket.getTicketPrice());
             ps.setString(6, ticket.getTicketStatus());
-            ps.executeUpdate();
-        }catch(SQLException e){
-            
+
+            ps.executeUpdate(); // Thực thi INSERT
+
+            // Lấy ResultSet chứa các khóa tự sinh
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // cột 1 là giá trị của ID vừa sinh
+                } else {
+                    throw new SQLException("No generated key returned.");
+                }
+            }
         }
     }
 
@@ -39,9 +66,39 @@ public class TicketDAO extends DBContext {
             ps.setString(1, status);
             ps.setInt(2, seatID);
             ps.executeUpdate();
-        }catch(SQLException e){
-            
+        } catch (SQLException e) {
+
         }
+    }
+
+    public void updateTicketStatus(int ticketID, String newStatus) {
+        String sql = "UPDATE Ticket SET TicketStatus = ? WHERE TicketID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, ticketID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace(); // Hoặc log lỗi
+        }
+    }
+
+    public boolean ticketExistsByCCCDAndPaid(String cccd, int tripID) {
+        String sql = "SELECT 1 "
+                + "FROM Ticket t "
+                + "JOIN Booking b ON t.BookingID = b.BookingID "
+                + "WHERE t.CCCD = ? "
+                + "  AND t.TripID = ? "
+                + "  AND b.PaymentStatus = 'Paid' ";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, cccd);
+            ps.setInt(2, tripID);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // nếu có row => true
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

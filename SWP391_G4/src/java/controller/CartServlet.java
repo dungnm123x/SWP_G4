@@ -67,20 +67,6 @@ public class CartServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        HttpSession session = request.getSession();
-//        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
-//
-//        if (cartItems == null) {
-//            cartItems = new ArrayList<>();
-//            session.setAttribute("cartItems", cartItems);
-//        }
-//
-//        request.setAttribute("cartItems", cartItems);
-//        request.getRequestDispatcher("cart.jsp").forward(request, response);
-//    }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -105,152 +91,6 @@ public class CartServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-//    @Override
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//        // 1) Nếu param removeSeatID != null => XÓA 1 vé
-//        String removeSeatID = request.getParameter("removeSeatID");
-//        if (removeSeatID != null && !removeSeatID.trim().isEmpty()) {
-//            removeItemFromCart(removeSeatID, request);
-//
-//            // Lấy lại param tìm kiếm (nếu muốn redirect kèm param)
-//            String departureStationID = request.getParameter("departureStationID");
-//            String arrivalStationID = request.getParameter("arrivalStationID");
-//            String day = request.getParameter("departureDay");
-//            String tripType = request.getParameter("tripType");
-//            String returnDate = request.getParameter("returnDate");
-//
-//            String redirectURL = "schedule"
-//                    + "?departureStationID=" + URLEncoder.encode(departureStationID == null ? "" : departureStationID, "UTF-8")
-//                    + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID == null ? "" : arrivalStationID, "UTF-8")
-//                    + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
-//                    + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
-//                    + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
-//
-//            response.sendRedirect(redirectURL);
-//            return;
-//        }
-//
-//        // 2) Nếu action=checkout => chuyển sang trang passengerinfo
-//        String action = request.getParameter("action");
-//        if ("checkout".equals(action)) {
-//            response.sendRedirect("passengerinfo");
-//            return;
-//        }
-//
-//        // 3) Ngược lại => THÊM vé vào giỏ
-//        String ticketID = request.getParameter("ticketID");
-//        String trainName = request.getParameter("trainName");
-//        String departureDate = request.getParameter("departureDate");
-//        String carriageNumber = request.getParameter("carriageNumber");
-//        String seatNumber = request.getParameter("seatNumber");
-//        String seatID = request.getParameter("seatID");
-//        String priceStr = request.getParameter("price");
-//
-//        // Param tìm kiếm
-//        String departureStationID = request.getParameter("departureStationID");
-//        String arrivalStationID = request.getParameter("arrivalStationID");
-//        String day = request.getParameter("departureDay");
-//        String tripType = request.getParameter("tripType");
-//        String returnDate = request.getParameter("returnDate");
-//
-//        // Bắt buộc: tripID (để set Trip)
-//        String tripIDStr = request.getParameter("tripID");
-//        if (tripIDStr == null || tripIDStr.trim().isEmpty()) {
-//            request.setAttribute("message", "Thiếu tripID!");
-//            request.getRequestDispatcher("cart.jsp").forward(request, response);
-//            return;
-//        }
-//        int tripID = Integer.parseInt(tripIDStr);
-//
-//        // Kiểm tra input
-//        if (ticketID == null || seatID == null || priceStr == null
-//                || ticketID.trim().isEmpty() || seatID.trim().isEmpty() || priceStr.trim().isEmpty()) {
-//            request.setAttribute("message", "Dữ liệu không hợp lệ!");
-//            request.getRequestDispatcher("cart.jsp").forward(request, response);
-//            return;
-//        }
-//
-//        double price;
-//        try {
-//            price = Double.parseDouble(priceStr);
-//        } catch (NumberFormatException e) {
-//            request.setAttribute("message", "Giá trị không hợp lệ!");
-//            request.getRequestDispatcher("cart.jsp").forward(request, response);
-//            return;
-//        }
-//
-//        // Tạo Trip
-//        Trip trip = new Trip();
-//        trip.setTripID(tripID);
-//
-//        // Lấy session + giỏ
-//        HttpSession session = request.getSession();
-//        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
-//        if (cartItems == null) {
-//            cartItems = new ArrayList<>();
-//        }
-//
-//        // Lấy tên ga đi / đến từ session (nếu bạn đã set sẵn)
-//        // Hoặc tạm dùng ID
-//        // Lấy ID ga đi/đến từ param
-//        String depID = request.getParameter("departureStationID");
-//        String arrID = request.getParameter("arrivalStationID");
-//
-//// Lấy tên ga từ DB
-//        StationDAO stationDAO = new StationDAO();
-//        String depStationName = stationDAO.getStationNameById(Integer.parseInt(depID));
-//        String arrStationName = stationDAO.getStationNameById(Integer.parseInt(arrID));
-//
-//        // Ví dụ: param "isReturnTrip" = "true" => set
-//        String isReturnParam = request.getParameter("isReturnTrip");
-//        boolean returnTrip = false;
-//        if ("true".equalsIgnoreCase(isReturnParam)) {
-//            returnTrip = true;
-//        }
-//        // Tạo CartItem (constructor mới)
-//        CartItem newItem = new CartItem(
-//                ticketID,
-//                trainName,
-//                departureDate,
-//                carriageNumber,
-//                seatNumber,
-//                seatID,
-//                price,
-//                trip,
-//                depStationName, // Tên ga đi
-//                arrStationName,
-//                returnTrip // Tên ga đến
-//        );
-//        System.out.println("isReturnTrip param = " + request.getParameter("isReturnTrip"));
-//        System.out.println("=> boolean = " + returnTrip);
-//
-//        // Kiểm tra vé này đã tồn tại chưa
-//        boolean exists = false;
-//        for (CartItem item : cartItems) {
-//            if (item.getSeatID().equals(seatID)) {
-//                exists = true;
-//                break;
-//            }
-//        }
-//        if (!exists) {
-//            cartItems.add(newItem);
-//        }
-//
-//        // Lưu lại giỏ
-//        session.setAttribute("cartItems", cartItems);
-//
-//        // Redirect về schedule kèm param
-//        String redirectURL = "schedule"
-//                + "?departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
-//                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")
-//                + "&departureDay=" + URLEncoder.encode(day, "UTF-8")
-//                + "&tripType=" + URLEncoder.encode(tripType, "UTF-8")
-//                + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
-//
-//        response.sendRedirect(redirectURL);
-//    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -288,10 +128,24 @@ public class CartServlet extends HttpServlet {
 
         // 2) Nếu action=checkout => chuyển sang trang passengerinfo
         String action = request.getParameter("action");
+//        if ("checkout".equals(action)) {
+//            // Chuyển sang servlet/URL "passengerinfo"
+//            response.sendRedirect("passengerinfo");
+//            return;
+//        }
         if ("checkout".equals(action)) {
-            // Chuyển sang servlet/URL "passengerinfo"
-            response.sendRedirect("passengerinfo");
-            return;
+            // Lấy tripID do form gửi lên
+            String tripID = request.getParameter("tripID");
+
+            // Nếu tripID bị null/rỗng => xử lý lỗi hoặc redirect
+            if (tripID == null || tripID.trim().isEmpty()) {
+                // ... Thông báo lỗi ...
+            } else {
+                // Gắn vào URL
+                String redirectURL = "passengerinfo?tripID=" + URLEncoder.encode(tripID, "UTF-8");
+                response.sendRedirect(redirectURL);
+                return;
+            }
         }
 
         // 3) Nếu không phải xóa, thì là THÊM vé vào giỏ
@@ -312,8 +166,8 @@ public class CartServlet extends HttpServlet {
         String returnDate = request.getParameter("returnDate");
 
         // Bắt buộc: tripID (để set Trip) - parse cẩn thận
-        int tripID = 0;
         String tripIDStr = request.getParameter("tripID");
+        int tripID = 0;
         if (tripIDStr == null || tripIDStr.trim().isEmpty()) {
             // Nếu thiếu tripID => có thể báo lỗi hoặc bỏ qua
             // Ở đây tạm báo lỗi
@@ -365,7 +219,7 @@ public class CartServlet extends HttpServlet {
 
         // Kiểm tra param isReturnTrip
         String isReturnParam = request.getParameter("isReturnTrip");
-        boolean returnTrip = "true".equalsIgnoreCase(request.getParameter("isReturnTrip"));
+        boolean returnTrip = "true".equalsIgnoreCase(isReturnParam);
 
         // Tạo CartItem
         CartItem newItem = new CartItem(
@@ -375,9 +229,10 @@ public class CartServlet extends HttpServlet {
         System.out.println("DEBUG: New CartItem added - " + newItem.getDepartureStationName()
                 + " -> " + newItem.getArrivalStationName() + " | Return: " + newItem.isReturnTrip());
 
-        cartItems.add(newItem);
+//        cartItems.add(newItem);
         session.setAttribute("cartItems", cartItems);
 
+        
         // Kiểm tra vé này đã tồn tại chưa
         boolean exists = false;
         for (CartItem item : cartItems) {
@@ -395,7 +250,7 @@ public class CartServlet extends HttpServlet {
         session.setAttribute("isReturnTrip", returnTrip);
         System.out.println("Session returnTrip value: " + session.getAttribute("isReturnTrip"));
 
-        // Redirect về schedule kèm param
+//         Redirect về schedule kèm param
         String redirectURL = "schedule"
                 + "?departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
                 + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")

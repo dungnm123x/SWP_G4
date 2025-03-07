@@ -5,6 +5,7 @@
 package controller;
 
 import dal.SeatDAO;
+import dal.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -91,14 +92,19 @@ public class PassengerInfoServlet extends HttpServlet {
         // Lấy param
         String departureStationID = request.getParameter("departureStationID");
         String arrivalStationID = request.getParameter("arrivalStationID");
-        String day = request.getParameter("departureDay");
+        String departureDay = request.getParameter("departureDay");
         String tripType = request.getParameter("tripType");
         String returnDate = request.getParameter("returnDate");
         // true nếu khứ hồi
         String rDate = request.getParameter("returnDate");
-
-        // Lấy session + giỏ
         HttpSession session = request.getSession();
+//        session.setAttribute("selectedDeparture", departureStationID);
+//        session.setAttribute("selectedArrival", arrivalStationID);
+//        session.setAttribute("selectedDate", departureDay);
+//        session.setAttribute("selectedTripType", tripType);
+//        session.setAttribute("selectedReturnDate", returnDate);
+        // Lấy session + giỏ
+
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
         if (cartItems == null) {
             cartItems = new ArrayList<>();
@@ -108,11 +114,11 @@ public class PassengerInfoServlet extends HttpServlet {
         System.out.println("Sau khi xóa, giỏ hàng còn: " + cartItems.size() + " vé.");
         // Kiểm tra null, nếu null thì thay bằng chuỗi rỗng
         String redirectURL = "schedule"
-                + "?departureStationID=" + URLEncoder.encode(departureStationID == null ? "" : departureStationID, "UTF-8")
-                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID == null ? "" : arrivalStationID, "UTF-8")
-                + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
-                + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
-                + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
+                + "?departureStationID=" + URLEncoder.encode(departureStationID != null ? departureStationID : "", "UTF-8")
+                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID != null ? arrivalStationID : "", "UTF-8")
+                + "&departureDay=" + URLEncoder.encode(departureDay != null ? departureDay : "", "UTF-8")
+                + "&tripType=" + URLEncoder.encode(tripType != null ? tripType : "", "UTF-8")
+                + "&returnDate=" + URLEncoder.encode(returnDate != null ? returnDate : "", "UTF-8");
 
         // Lưu vào session để sử dụng khi cần quay lại
         session.setAttribute("previousURL", redirectURL);
@@ -177,15 +183,29 @@ public class PassengerInfoServlet extends HttpServlet {
         List<String> idNumberList = new ArrayList<>();
         List<String> typeList = new ArrayList<>();
 
-        Set<String> nameSet = new HashSet<>();
         Set<String> cccdSet = new HashSet<>();
+        Set<String> cccdSetGo = new HashSet<>();
+        Set<String> cccdSetReturn = new HashSet<>();
 
-        // Tạo set để cấm trùng (nếu là 1 chiều)
         for (int i = 0; i < passengerCount; i++) {
             String fullName = request.getParameter("fullName" + i);
             String passengerType = request.getParameter("passengerType" + i);
             String idNumber = request.getParameter("idNumber" + i);
+            String tripIDStr = request.getParameter("tripID" + i);  // lấy tripID cho item i
+// for (int i=0; i<passengerCount; i++){
+            String passengerCCCD = request.getParameter("passengerCCCD" + i);
+// Lưu vào sessionScope.idNumberList[i] = passengerCCCD
+// ...
 
+            int tripID = 0;
+            try {
+                tripID = Integer.parseInt(tripIDStr);
+            } catch (NumberFormatException e) {
+                // Xử lý lỗi: tripID không hợp lệ
+                request.setAttribute("errorMessage", "Thiếu hoặc sai tripID ở vé thứ " + (i + 1));
+                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                return;
+            }
             // Lấy giá vé gốc
             double basePrice = 0.0;
             try {
@@ -193,11 +213,18 @@ public class PassengerInfoServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 basePrice = 0.0;
             }
-            // Chỉ kiểm tra trùng nếu là vé một chiều
+
             // Chỉ kiểm tra trùng nếu là vé một chiều
             // Chuẩn hóa tên và CCCD trước khi kiểm tra
             String normalizedFullName = normalizeString(fullName);
             String normalizedCCCD = normalizeString(idNumber);
+            TicketDAO ticketDAO = new TicketDAO();
+            if (ticketDAO.ticketExistsByCCCDAndPaid(idNumber, tripID)) {
+                request.setAttribute("errorMessage",
+                        "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
+                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                return;
+            }
 
 // Kiểm tra nếu tên hoặc CCCD chỉ chứa dấu cách hoặc rỗng
             if (normalizedFullName.isEmpty()) {
@@ -228,26 +255,29 @@ public class PassengerInfoServlet extends HttpServlet {
             }
 
 // Nếu là vé khứ hồi, không kiểm tra trùng tên
-            if (!(isRoundTrip && isReturnTrip)) {
-                String nameKey = normalizedFullName + "#" + departureStationID + "#" + arrivalStationID;
-                if (nameSet.contains(nameKey)) {
-                    request.setAttribute("errorMessage",
-                            "Không được trùng tên hành khách trong cùng một chiều: " + fullName);
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
-                    return;
-                }
-                nameSet.add(nameKey);
+            boolean thisIsReturnTrip = cartItems.get(i).isReturnTrip();
+            // Hoặc so sánh param "tripID" hay departureDate, 
+            // miễn xác định item i là đi hay về
 
-                String cccdKey = normalizedCCCD + "#" + departureStationID + "#" + arrivalStationID;
-                if (cccdSet.contains(cccdKey)) {
+            if (thisIsReturnTrip) {
+                // Kiểm tra cccdSetReturn
+                if (cccdSetReturn.contains(idNumber)) {
                     request.setAttribute("errorMessage",
-                            "Không được trùng CMND/Hộ chiếu trong cùng một chiều: " + idNumber);
+                            "Không được trùng CCCD/Hộ chiếu trong cùng chuyến về: " + idNumber);
                     request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                     return;
                 }
-                cccdSet.add(cccdKey);
+                cccdSetReturn.add(idNumber);
+            } else {
+                // Kiểm tra cccdSetGo
+                if (cccdSetGo.contains(idNumber)) {
+                    request.setAttribute("errorMessage",
+                            "Không được trùng CCCD/Hộ chiếu trong cùng chuyến đi: " + idNumber);
+                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    return;
+                }
+                cccdSetGo.add(idNumber);
             }
-
             // Tính discountRate
             double discountRate = 0.0;
             // Check type
@@ -342,11 +372,29 @@ public class PassengerInfoServlet extends HttpServlet {
             request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
             return;
         }
+//        String cccd = request.getParameter("idNumber"); // ví dụ
+//        String tripIDParam = request.getParameter("tripID");
+//        if (tripIDParam == null || tripIDParam.trim().isEmpty()) {
+//            request.setAttribute("errorMessage", "Thiếu thông tin tripID");
+//            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+//            return;
+//        }
+//        int tripID = Integer.parseInt(tripIDParam);
+//
+//        
+//        if (ticketDAO.ticketExistsByCCCDAndPaid(cccd, tripID)) {
+//            // Nếu trả về true, nghĩa là đã có vé trùng CCCD & trip
+//            request.setAttribute("errorMessage", "Vé với CCCD này đã tồn tại trên chuyến đi này.");
+//            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+//            return;
+//        }
+
         // Lưu session
         session.setAttribute("bookingName", bookingName);
         session.setAttribute("bookingEmail", bookingEmail);
         session.setAttribute("bookingPhone", bookingPhone);
         session.setAttribute("bookingCCCD", bookingCCCD);
+        System.out.println("DEBUG: bookingCCCD from param = " + bookingCCCD);
 
         // Lưu kết quả
         session.setAttribute("fullNameList", fullNameList);

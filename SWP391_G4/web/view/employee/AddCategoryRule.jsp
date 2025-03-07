@@ -12,30 +12,28 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
         <style>
-            body {
+            .slider-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 background-color: #f8f9fa;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 10px;
             }
-            .container {
-                max-width: 800px;
-                margin-top: 30px;
-            }
-            .form-group label {
+
+            .slider-title {
+                font-size: 2rem;
                 font-weight: bold;
-            }
-            .btn-custom {
-                background-color: #007bff;
-                color: white;
-                border: none;
-            }
-            .btn-custom:hover {
-                background-color: #0056b3;
+                text-align: center;
             }
         </style>
     </head>
     <body>
-
-        <div class="container">
-            <div class="card">
+        <div class="slider-container">
+            <h2 class="slider-title">Add New Rule</h2>              
+        </div>
+        <div class="container rounded mt-5 mb-5">
                 <div class="card-header bg-primary text-white text-center">
                     <h4>Add New Category Rule</h4>
                 </div>
@@ -63,17 +61,17 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status</label><br/>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" value="1" checked/>
-                                    <label class="form-check-label">Show</label>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label><br/>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" value="1" checked/>
+                                        <label class="form-check-label">Show</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" value="0"/>
+                                        <label class="form-check-label">Hiden</label>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" value="0"/>
-                                    <label class="form-check-label">Hiden</label>
-                                </div>
-                            </div>
                             </div>
                             <div class="mt-4 text-center">
                                 <a href="category-rule"><button class="btn btn-outline-custom" type="button">Again</button></a>
@@ -84,7 +82,6 @@
 
                 </div>
             </div>
-        </div>
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

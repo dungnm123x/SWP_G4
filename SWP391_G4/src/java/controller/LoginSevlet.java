@@ -80,7 +80,7 @@ public class LoginSevlet extends HttpServlet {
         System.out.println("DEBUG: Username nhập vào = " + username);
         System.out.println("DEBUG: Password nhập vào = " + password);
 
-               // Mã hóa mật khẩu nhập vào để so sánh với DB
+        // Mã hóa mật khẩu nhập vào để so sánh với DB
         String encryptedPassword = Encryptor.encryptPassword(password);
 
         System.out.println("DEBUG: Username nhập vào = " + username);
@@ -90,13 +90,13 @@ public class LoginSevlet extends HttpServlet {
         User user = userDAO.checkUserLogin(username, encryptedPassword);
 
         boolean hasError = false;
-        
+
         if (user == null) {
             request.setAttribute("loginError", "Tên đăng nhập hoặc mật khẩu không đúng!");
             request.setAttribute("username", username);
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
-        } 
+        }
         if (!user.isStatus()) { // Check the status!
             request.setAttribute("loginError", "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
             request.setAttribute("username", username);
@@ -131,13 +131,26 @@ public class LoginSevlet extends HttpServlet {
             clearCookies(response);
         }
 
-        if (user.getRoleID() == 2) {
-            response.sendRedirect("trip");
+//        if (user.getRoleID() == 2) {
+//            response.sendRedirect("trip");
+//        } else if (user.getRoleID() == 1) {
+//            response.sendRedirect("admin");
+//        } else {
+//            response.sendRedirect("home");
+//        }
+        String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
+        if (redirectUrl != null) {
+            session.removeAttribute("redirectAfterLogin");
+        } else if (user.getRoleID() == 2) {
+            redirectUrl = "trip";
         } else if (user.getRoleID() == 1) {
-            response.sendRedirect("admin");
+            redirectUrl = "admin";
         } else {
-            response.sendRedirect("home");
+            redirectUrl = "home";
         }
+
+        response.sendRedirect(redirectUrl);
+
     }
 
     /**
