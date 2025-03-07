@@ -103,12 +103,17 @@ public class CarriageDAO extends DBContext<RailwayDTO> {
         String sql = "{CALL DeleteCarriageAndSeats(?)}";
         try (CallableStatement cs = connection.prepareCall(sql)) {
             cs.setInt(1, carriageID);
-            cs.execute(); // Không cần kiểm tra kết quả, stored proc sẽ ném exception nếu có lỗi
-            return true;
-
+            cs.execute();
+            return true; // Nếu không có ngoại lệ, thì xóa thành công.
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            if (e.getMessage().contains("Không thể xóa toa.")) { // Kiểm tra thông báo lỗi.
+                System.err.println("Không thể xóa: " + e.getMessage());
+                // Hoặc:  throw new Exception("Không thể xóa toa vì có ghế đã được đặt.");
+                return false; //Xóa không thành công.
+            } else {
+                e.printStackTrace(); // Xử lý các loại SQLException khác
+                return false; // Xóa không thành công.
+            }
         }
     }
 
