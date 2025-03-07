@@ -1,19 +1,17 @@
 package dto;
-
-import java.time.LocalDateTime; // Import LocalDateTime
+import java.sql.*;
 
 public class TrainDTO {
-    private int trainID;
+     private int trainID;
     private String trainName;
     private int totalCarriages;
     private int totalSeats;
     private String departureStation;
     private String arrivalStation;
-    private LocalDateTime departureTime; // Sử dụng LocalDateTime
-    private LocalDateTime arrivalTime;   // Sử dụng LocalDateTime
+    private Date departureTime;
+    private Date arrivalTime;
     private double price;
 
-    // Constructors (bạn cần cập nhật các constructor)
     public TrainDTO() {
     }
 
@@ -23,10 +21,8 @@ public class TrainDTO {
         this.totalCarriages = totalCarriages;
         this.totalSeats = totalSeats;
     }
-    // Constructor đầy đủ, sử dụng LocalDateTime
-    public TrainDTO(int trainID, String trainName, int totalCarriages, int totalSeats,
-                    String departureStation, String arrivalStation, LocalDateTime departureTime,
-                    LocalDateTime arrivalTime, double price) {
+
+    public TrainDTO(int trainID, String trainName, int totalCarriages, int totalSeats, String departureStation, String arrivalStation, Date departureTime, Date arrivalTime, double price) {
         this.trainID = trainID;
         this.trainName = trainName;
         this.totalCarriages = totalCarriages;
@@ -37,8 +33,6 @@ public class TrainDTO {
         this.arrivalTime = arrivalTime;
         this.price = price;
     }
-
-    // Getters and Setters (cập nhật getters và setters cho LocalDateTime)
 
     public int getTrainID() {
         return trainID;
@@ -88,19 +82,19 @@ public class TrainDTO {
         this.arrivalStation = arrivalStation;
     }
 
-    public LocalDateTime getDepartureTime() { // Getter cho LocalDateTime
+    public Date getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(LocalDateTime departureTime) { // Setter cho LocalDateTime
+    public void setDepartureTime(Date departureTime) {
         this.departureTime = departureTime;
     }
 
-    public LocalDateTime getArrivalTime() { // Getter cho LocalDateTime
+    public Date getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(LocalDateTime arrivalTime) { // Setter cho LocalDateTime
+    public void setArrivalTime(Date arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
@@ -111,4 +105,6 @@ public class TrainDTO {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    
 }
