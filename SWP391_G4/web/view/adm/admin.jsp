@@ -15,11 +15,10 @@
                     <img src="./img/logo.jpg" alt="trainpicture">
                 </div>
                 <ul class="menu">
-                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="admin?view=dashboard">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
                     <li><a href="trip">Quản lý chuyến tàu</a></li>
-                    <li><a href="#">Thống kê</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
                 <form action="logout" method="GET">
@@ -27,13 +26,74 @@
                 </form>
             </div>
 
-
             <div class="main-content">
                 <div class="header">
                     <h1>Trang Quản Trị Hệ Thống Vé Tàu</h1>
                 </div>
                 <div class="content">
                     <c:choose>
+                        <c:when test="${type == 'dashboard'}">
+                            <h2>Dashboard</h2>
+                            <div class="dashboard">
+                                <div class="dashboard-item">
+                                    <h3>Thống kê người dùng</h3>
+                                    <canvas id="userChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="dashboard-item">
+                                    <h3>Thống kê tàu</h3>
+                                    <p>Tổng số tàu: ${totalTrains}</p>
+                                </div>
+                                <div class="dashboard-item">
+                                    <h3>Thống kê đặt vé</h3>
+                                    <p>Tổng số đặt vé: ${totalBookings}</p>
+                                </div>
+                                <div class="dashboard-item">
+                                    <h3>Thống kê chuyến đi</h3>
+                                    <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                </div>
+                                <div class="dashboard-item">
+                                    <h3>Thống kê Blog</h3>
+                                    <p>Tổng số Blog: ${totalBlogs}</p>
+                                </div>
+                                <div class="dashboard-item">
+                                    <h3>Thống kê Quy định</h3>
+                                    <p>Tổng số Quy định: ${totalRules}</p>
+                                </div>
+                            </div>
+
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            <script>
+                                var ctx = document.getElementById('userChart').getContext('2d');
+                                var myChart = new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: ['Người dùng', 'Nhân viên', 'Khách hàng'],
+                                        datasets: [{
+                                                label: 'Số lượng',
+                                                data: [${totalUsers}, ${totalEmployees}, ${totalCustomers}],
+                                                backgroundColor: [
+                                                    'rgba(255, 99, 132, 0.2)',
+                                                    'rgba(54, 162, 235, 0.2)',
+                                                    'rgba(255, 206, 86, 0.2)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(255, 99, 132, 1)',
+                                                    'rgba(54, 162, 235, 1)',
+                                                    'rgba(255, 206, 86, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            }]
+                                    },
+                                    options: {
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true
+                                            }
+                                        }
+                                    }
+                                });
+                            </script>
+                        </c:when>
                         <c:when test="${not empty list}">
                             <c:if test="${not empty list}">
                                 <div class="search-container">
@@ -45,7 +105,6 @@
                                     </form>
                                 </div>
 
-
                                 <table border="1">
                                     <thead>
                                         <tr>
@@ -56,11 +115,6 @@
                                                     <th>Full Name</th>
                                                     <th>Email</th>
                                                     <th>Phone</th>
-                                                    <th>Action</th>
-                                                    </c:when>
-                                                    <c:when test="${type == 'trains'}">
-                                                    <th>Train ID</th>
-                                                    <th>Train Name</th>
                                                     <th>Action</th>
                                                     </c:when>
                                                 </c:choose>
@@ -99,8 +153,8 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-
-                                            </c:forEach>
+                                            </tr>
+                                        </c:forEach>
                                     </tbody>
                                 </table>
 

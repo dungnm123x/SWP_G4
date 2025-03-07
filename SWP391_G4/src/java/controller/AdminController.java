@@ -1,6 +1,7 @@
 package controller;
 
 import dal.DAOAdmin;
+import dal.DashBoardDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,30 @@ public class AdminController extends HttpServlet {
         String search = request.getParameter("search");
 
         try {
-            if ("addEmployee".equals(view)) {
+            if ("dashboard".equals(view)) {
+                DashBoardDAO dashBoardDAO = new DashBoardDAO();
+                int totalUsers = dashBoardDAO.getTotalUsers();
+                int totalEmployees = dashBoardDAO.getTotalEmployees();
+                int totalCustomers = dashBoardDAO.getTotalCustomers();
+                int totalTrains = dashBoardDAO.getTotalTrains();
+                int totalBookings = dashBoardDAO.getTotalBookings();
+                int totalTrips = dashBoardDAO.getTotalTrips();
+                int totalBlogs = dashBoardDAO.getTotalBlogs();
+                int totalRules = dashBoardDAO.getTotalRules();
+
+                request.setAttribute("totalUsers", totalUsers);
+                request.setAttribute("totalEmployees", totalEmployees);
+                request.setAttribute("totalCustomers", totalCustomers);
+                request.setAttribute("totalTrains", totalTrains);
+                request.setAttribute("totalBookings", totalBookings);
+                request.setAttribute("totalTrips", totalTrips);
+                request.setAttribute("totalBlogs", totalBlogs);
+                request.setAttribute("totalRules", totalRules);
+
+                request.setAttribute("type", "dashboard");
+                request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
+                return;
+            } else if ("addEmployee".equals(view)) {
                 request.getRequestDispatcher("/view/adm/addEmployees.jsp").forward(request, response);
                 return;
             }
