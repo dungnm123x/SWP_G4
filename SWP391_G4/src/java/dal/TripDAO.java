@@ -13,6 +13,7 @@ import java.util.List;
 import model.Trip;
 import model.Train;
 import model.Route;
+import model.Seat;
 import model.Station;
 
 public class TripDAO extends DBContext<RailwayDTO> {
@@ -126,6 +127,8 @@ public class TripDAO extends DBContext<RailwayDTO> {
         }
         return trip;
     }
+
+    
 
 //    public Trip getTripByTrainID(int trainID) {
 //        Trip trip = null;

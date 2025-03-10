@@ -243,7 +243,8 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                         + " (" + carriage.getCarriageType() + ")</h5>");
                 out.println("<div class='seat-grid'>");
 
-                List<Seat> seats = seatDAO.getSeatsByCarriageID(carriage.getCarriageID());
+                List<Seat> seats = seatDAO.getSeatsForTrip(carriage.getCarriageID(), tripID);
+
                 for (Seat seat : seats) {
                     String seatStatus = (seat.getStatus() != null) ? seat.getStatus() : "Unknown";
 
