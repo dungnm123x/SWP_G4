@@ -68,19 +68,19 @@ public class PaymentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
-
-        // Nếu chưa đăng nhập
-        if (user == null) {
-            // Lưu lại trang hiện tại (đang yêu cầu) vào session
-            session.setAttribute("redirectAfterLogin", "payment.jsp");
-            // Chuyển hướng đến trang login
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
-        // Nếu đã đăng nhập, hiển thị trang payment
+//        HttpSession session = request.getSession();
+//        User user = (User) session.getAttribute("user");
+//
+//        // Nếu chưa đăng nhập
+//        if (user == null) {
+//            // Lưu lại trang hiện tại (đang yêu cầu) vào session
+//            session.setAttribute("redirectAfterLogin", "payment.jsp");
+//            // Chuyển hướng đến trang login
+//            response.sendRedirect("login.jsp");
+//            return;
+//        }
+//
+//        // Nếu đã đăng nhập, hiển thị trang payment
         request.getRequestDispatcher("payment.jsp").forward(request, response);
     }
 
