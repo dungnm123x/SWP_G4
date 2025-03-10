@@ -83,7 +83,7 @@
 
                     <p><strong>Tàu:</strong> ${item.trainName} - ${item.departureDate}</p>
                     <p><strong>Toa:</strong> ${item.carriageNumber} - Chỗ ${item.seatNumber}</p>
-                    <p><strong>Giá:</strong> ${item.price} VND</p>
+                    <p><strong>Giá:</strong> ${item.price} $</p>
                     <p><strong>Hành khách:</strong> ${requestScope.fullNameList[status.index]}</p>
                     <p><strong>Số CMND/Hộ chiếu:</strong> ${requestScope.idNumberList[status.index]}</p>
                 </div>
