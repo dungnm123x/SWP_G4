@@ -10,9 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import dto.RailwayDTO;
-
 import model.Ticket;
+import model.RailwayDTO;
 
 public class TicketDAO extends DBContext {
 
@@ -99,6 +98,75 @@ public class TicketDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<RailwayDTO> getDetailedTicketsByUserID(int userID) {
+        List<RailwayDTO> tickets = new ArrayList<>();
+        String sql = "SELECT t.TicketID, t.CCCD, s.SeatNumber, c.CarriageNumber, "
+                + "st1.StationName AS DepartureStation, st2.StationName AS ArrivalStation, "
+                + "tr.DepartureTime, tr.TrainID, t.TicketPrice, t.TicketStatus, "
+                + "CASE "
+                + "   WHEN b.RoundTripTripID IS NOT NULL AND b.RoundTripTripID = t.TripID THEN 'Chuyến về' "
+                + "   ELSE 'Chuyến đi' "
+                + "END AS TripType "
+                + // ✅ Xác định loại chuyến trực tiếp trong SQL
+                "FROM Ticket t "
+                + "JOIN Seat s ON t.SeatID = s.SeatID "
+                + "JOIN Carriage c ON s.CarriageID = c.CarriageID "
+                + "JOIN Trip tr ON t.TripID = tr.TripID "
+                + "JOIN Route r ON tr.RouteID = r.RouteID "
+                + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
+                + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
+                + "JOIN Booking b ON t.BookingID = b.BookingID "
+                + "WHERE b.UserID = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    tickets.add(new RailwayDTO(
+                            rs.getInt("TicketID"),
+                            rs.getString("CCCD"),
+                            rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation"),
+                            "Tàu " + rs.getInt("TrainID"),
+                            rs.getTimestamp("DepartureTime"),
+                            rs.getInt("CarriageNumber"),
+                            rs.getInt("SeatNumber"),
+                            rs.getDouble("TicketPrice"),
+                            rs.getString("TicketStatus"),
+                            rs.getString("TripType") // ✅ Lấy loại chuyến từ SQL
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getTicketsByUserID(int userID) {
+        List<Ticket> tickets = new ArrayList<>();
+        String sql = "SELECT * FROM Ticket WHERE BookingID IN (SELECT BookingID FROM Booking WHERE UserID = ?)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    tickets.add(new Ticket(
+                            rs.getInt("TicketID"),
+                            rs.getString("CCCD"),
+                            rs.getInt("BookingID"),
+                            rs.getInt("SeatID"),
+                            rs.getInt("TripID"),
+                            rs.getDouble("TicketPrice"),
+                            rs.getString("TicketStatus")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
     }
 
     @Override
