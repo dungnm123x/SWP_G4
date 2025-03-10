@@ -59,7 +59,7 @@
         </select>
 
         <label for="distance">Khoảng cách (km):</label>
-        <input type="number" name="distance" step="0.5" min="0" value="${editRoute.distance}" required>
+        <input type="number" name="distance" step="1" min="0" value="${editRoute.distance}" required>
 
         <label for="basePrice">Giá cơ bản:</label>
         <input type="number" name="basePrice" step="1" min="0" value="${editRoute.basePrice}" required>

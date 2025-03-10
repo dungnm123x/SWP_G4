@@ -18,13 +18,13 @@ import java.util.List;
 public class CarriageController extends HttpServlet {
 
     private CarriageDAO carriageDAO;
-    private TrainDAO trainDAO;
+    private TrainDAO trainDAO; // Có thể không cần dùng trực tiếp trong controller này, tùy thuộc logic
     private TrainDBContext trainDB;
 
     @Override
     public void init() throws ServletException {
         carriageDAO = new CarriageDAO();
-        trainDAO = new TrainDAO();
+        trainDAO = new TrainDAO(); // Khởi tạo nếu cần
         trainDB = new TrainDBContext();
     }
 
@@ -33,7 +33,9 @@ public class CarriageController extends HttpServlet {
         try {
             String action = request.getParameter("action");
             int trainID = Integer.parseInt(request.getParameter("trainID"));
-            TrainDTO train = trainDB.getTrainById(trainID);
+
+            // Dùng getFullTrainInfoById để lấy đầy đủ thông tin, bao gồm cả số toa và số ghế
+            TrainDTO train = trainDB.getFullTrainInfoById(trainID);
 
             if (action == null) {
                 // Hiển thị danh sách toa tàu
@@ -46,20 +48,23 @@ public class CarriageController extends HttpServlet {
                 int carriageID = Integer.parseInt(request.getParameter("carriageID"));
                 Carriage carriage = carriageDAO.getCarriageById(carriageID);
                 request.setAttribute("carriage", carriage);
-                request.setAttribute("train", train); // Đảm bảo rằng train được set cho trang jsp
-                List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID);
+                request.setAttribute("train", train); // Đảm bảo train được set
+                List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID); // Lấy lại danh sách (tùy chọn)
                 request.setAttribute("carriages", carriages);
                 request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
             } else if (action.equals("delete")) {
                 // Xóa toa tàu
                 int carriageID = Integer.parseInt(request.getParameter("carriageID"));
+
+                // Gọi stored procedure để xóa (cả ghế và toa)
                 boolean deleted = carriageDAO.deleteCarriage(carriageID);
+
                 if (deleted) {
                     request.setAttribute("message", "Xóa toa tàu thành công.");
                 } else {
                     request.setAttribute("error", "Xóa toa tàu thất bại.");
                 }
-                response.sendRedirect("carriage?trainID=" + trainID); // Chuyển hướng về trang quản lý toa tàu
+                response.sendRedirect("carriage?trainID=" + trainID); // Chuyển hướng về trang quản lý toa
             }
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Lỗi: " + e.getMessage());
@@ -67,50 +72,59 @@ public class CarriageController extends HttpServlet {
         }
     }
 
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            String action = request.getParameter("action");
-            int trainID = Integer.parseInt(request.getParameter("trainID"));
-            String carriageType = request.getParameter("carriageType");
-            String carriageNumber = request.getParameter("carriageNumber"); // Lấy số toa từ request
-            int seatCount = carriageType.equals("VIP") ? 12 : 10;
+        throws ServletException, IOException {
+    try {
+        String action = request.getParameter("action");
+        int trainID = Integer.parseInt(request.getParameter("trainID"));
+        String carriageType = request.getParameter("carriageType");
+        String carriageNumber = request.getParameter("carriageNumber");
 
-            if (action.equals("add")) {
-                // Thêm toa tàu mới
-                Carriage carriage = new Carriage();
-                carriage.setTrain(new Train(trainID));
-                carriage.setCarriageType(carriageType);
-                carriage.setCapacity(seatCount);
-                carriage.setCarriageNumber(carriageNumber); // Gán số toa
+        // Sửa lại phần xác định seatCount cho đúng với giá trị mới
+        int seatCount = carriageType.equals("Toa VIP") ? 12 : 10;
 
-                boolean added = carriageDAO.addCarriage(carriage);
-                if (added) {
-                    request.setAttribute("message", "Thêm toa tàu thành công.");
-                } else {
-                    request.setAttribute("error", "Thêm toa tàu thất bại.");
-                }
-            } else if (action.equals("update")) {
-                // Cập nhật toa tàu
-                int carriageID = Integer.parseInt(request.getParameter("carriageID"));
-                Carriage carriage = new Carriage();
-                carriage.setCarriageID(carriageID);
-                carriage.setTrain(new Train(trainID));
-                carriage.setCarriageType(carriageType);
-                carriage.setCapacity(seatCount);
-                carriage.setCarriageNumber(carriageNumber); // Gán số toa
 
-                boolean updated = carriageDAO.updateCarriage(carriage);
-                if (updated) {
-                    request.setAttribute("message", "Cập nhật toa tàu thành công.");
-                } else {
-                    request.setAttribute("error", "Cập nhật toa tàu thất bại.");
-                }
+        if (action.equals("add")) {
+
+            Carriage carriage = new Carriage();
+            carriage.setTrain(new Train(trainID));
+            carriage.setCarriageType(carriageType); // Dùng trực tiếp giá trị từ request
+            carriage.setCapacity(seatCount);  // Số ghế đã được tính toán ở trên
+            carriage.setCarriageNumber(carriageNumber);
+
+
+            boolean added = carriageDAO.addCarriage(carriage);
+            if (added) {
+                request.setAttribute("message", "Thêm toa tàu thành công.");
+            } else {
+                request.setAttribute("error", "Thêm toa tàu thất bại.");
             }
-            response.sendRedirect("carriage?trainID=" + trainID); // Chuyển hướng về trang quản lý toa tàu
-        } catch (NumberFormatException e) {
-            request.setAttribute("error", "Lỗi: " + e.getMessage());
-            request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
+
+
+        } else if (action.equals("update")) {
+            // Cập nhật toa
+            int carriageID = Integer.parseInt(request.getParameter("carriageID"));
+            Carriage carriage = new Carriage();
+            carriage.setCarriageID(carriageID);
+            carriage.setTrain(new Train(trainID));
+            carriage.setCarriageType(carriageType);  // Dùng trực tiếp giá trị từ request
+            carriage.setCapacity(seatCount);      // Số ghế đã được tính toán ở trên
+            carriage.setCarriageNumber(carriageNumber);
+
+
+            boolean updated = carriageDAO.updateCarriage(carriage);
+            if (updated) {
+                request.setAttribute("message", "Cập nhật toa tàu thành công.");
+            } else {
+                request.setAttribute("error", "Cập nhật toa tàu thất bại.");
+            }
+
         }
+        response.sendRedirect("carriage?trainID=" + trainID); // Chuyển hướng về trang quản lý toa
+    } catch (NumberFormatException e) {
+        request.setAttribute("error", "Lỗi: " + e.getMessage());
+        request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
+      }
     }
 }

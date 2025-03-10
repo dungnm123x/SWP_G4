@@ -4,6 +4,7 @@
  */
 package dal;
 
+import Utils.Encryptor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -262,43 +263,48 @@ public class UserDAO extends DBContext {
             return false;
         }
     }
-        public User getUserByEmail(String email) {
-    String sql = "SELECT * FROM [User] WHERE Email = ?";
-    try (Connection conn = connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, email);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            return new User(
-                rs.getInt("UserID"),
-                rs.getString("Username"),
-                rs.getString("Password"),
-                rs.getString("FullName"),
-                rs.getString("Email"),
-                rs.getString("PhoneNumber"),
-                rs.getString("Address"),
-                rs.getInt("RoleID"),
-                rs.getBoolean("Status")
-            );
+
+    public User getUserByEmail(String email) {
+        String sql = "SELECT * FROM [User] WHERE Email = ?";
+        try (Connection conn = connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("UserID"),
+                        rs.getString("Username"),
+                        rs.getString("Password"),
+                        rs.getString("FullName"),
+                        rs.getString("Email"),
+                        rs.getString("PhoneNumber"),
+                        rs.getString("Address"),
+                        rs.getInt("RoleID"),
+                        rs.getBoolean("Status")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return null;
     }
-    return null;
-}
-public boolean updateForgotPassword(String email, String newPassword) {
-    String sql = "UPDATE [User] SET Password = ? WHERE Email = ?";
-    try (Connection conn = connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, newPassword); // Lưu mật khẩu thẳng vào database
-        stmt.setString(2, email);
 
-        int rowsUpdated = stmt.executeUpdate();
-        System.out.println("DEBUG: Số dòng cập nhật: " + rowsUpdated); // Debug để kiểm tra số dòng bị ảnh hưởng
+    public boolean updateForgotPassword(String email, String newPassword) {
+        String sql = "UPDATE [User] SET Password = ? WHERE Email = ?";
+        try (Connection conn = connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Mã hóa mật khẩu trước khi lưu vào database
+            String encryptedPassword = Encryptor.encryptPassword(newPassword);
 
-        return rowsUpdated > 0; // Trả về true nếu cập nhật thành công
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+            stmt.setString(1, encryptedPassword);
+            stmt.setString(2, email);
+
+            int rowsUpdated = stmt.executeUpdate();
+            System.out.println("DEBUG: Số dòng cập nhật: " + rowsUpdated); // Debug để kiểm tra số dòng bị ảnh hưởng
+
+            return rowsUpdated > 0; // Trả về true nếu cập nhật thành công
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
-    
+
 }

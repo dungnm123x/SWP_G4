@@ -100,16 +100,16 @@ CREATE TABLE Route (
 );  
 
 -- Bảng Trip với TripType  
-CREATE TABLE Trip (  
-    TripID INT PRIMARY KEY IDENTITY(1,1),  
-    TrainID INT,  
-    RouteID INT,  
-    DepartureTime DATETIME NOT NULL,  
-    ArrivalTime DATETIME NOT NULL,  
-    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),  
-    TripType NVARCHAR(50) NOT NULL DEFAULT 'One-way' CHECK (TripType IN ('One-way', 'Round-trip')),  
-    RoundTripReference INT NULL,  
-    FOREIGN KEY (TrainID) REFERENCES Train(TrainID),  
+CREATE TABLE Trip (
+    TripID INT PRIMARY KEY IDENTITY(1,1),
+    TrainID INT,
+    RouteID INT,
+    DepartureTime DATETIME NOT NULL,
+    ArrivalTime DATETIME NOT NULL,
+    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),
+    TripType INT NOT NULL DEFAULT 1 CHECK (TripType IN (1,2)),  -- 1=One-way, 2=Round-trip
+    RoundTripReference INT NULL,
+    FOREIGN KEY (TrainID) REFERENCES Train(TrainID),
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
     FOREIGN KEY (RoundTripReference) REFERENCES Trip(TripID)
 );
@@ -302,19 +302,58 @@ VALUES
 -- Thêm chuyến đi một chiều
 INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType) 
 VALUES 
-(1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled', 'Round-trip'), -- Chuyến đi
-(2, 2, '2025-02-15 18:00:00', '2025-02-15 20:00:00', 'Scheduled', 'Round-trip'), -- Chuyến về
-(3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled', 'One-way'),
-(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed', 'One-way'),
-(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed', 'One-way'),
-(1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled', 'One-way'),
-(2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled', 'One-way'),
-(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed', 'One-way');
+(1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled', 1), -- Chuyến đi
+(2, 2, '2025-02-15 18:00:00', '2025-02-15 20:00:00', 'Scheduled', 2), -- Chuyến về
+(3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled', 1),
+(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed', 1),
+(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed', 1),
+(1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled', 1),
+(2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled', 1),
+(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed', 1);
 
 -- Cập nhật RoundTripReference cho chuyến đi khứ hồi (chuyến về tham chiếu chuyến đi)
-UPDATE Trip SET RoundTripReference = 1 WHERE TripID = 2;
-UPDATE Trip SET RoundTripReference = 2 WHERE TripID = 1; -- Ngược lại để tham chiếu lẫn nhau
 
+DECLARE @CurrentDate DATE = '2025-03-06';
+DECLARE @EndDate    DATE = '2025-03-15';
+
+WHILE @CurrentDate <= @EndDate
+BEGIN
+    -- 1) Thêm chuyến “đi”
+    INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType)
+    VALUES (
+        1,  -- TrainID
+        1,  -- RouteID
+        DATEADD(HOUR, 8, CAST(@CurrentDate AS DATETIME)),  -- 8h sáng
+        DATEADD(HOUR, 10, CAST(@CurrentDate AS DATETIME)), -- 10h
+        'Scheduled',
+        2   -- Round-trip
+    );
+    DECLARE @TripID_Go INT = SCOPE_IDENTITY();
+
+    -- 2) Thêm chuyến “về”
+    INSERT INTO Trip (TrainID, RouteID, DepartureTime, ArrivalTime, TripStatus, TripType)
+    VALUES (
+        2,  -- TrainID
+        2,  -- RouteID
+        DATEADD(HOUR, 18, CAST(@CurrentDate AS DATETIME)),  -- 18h
+        DATEADD(HOUR, 20, CAST(@CurrentDate AS DATETIME)),  -- 20h
+        'Scheduled',
+        2   -- Round-trip
+    );
+    DECLARE @TripID_Return INT = SCOPE_IDENTITY();
+
+    -- 3) Update RoundTripReference
+    UPDATE Trip
+    SET RoundTripReference = @TripID_Return
+    WHERE TripID = @TripID_Go;
+
+    UPDATE Trip
+    SET RoundTripReference = @TripID_Go
+    WHERE TripID = @TripID_Return;
+
+    -- Tăng ngày
+    SET @CurrentDate = DATEADD(DAY, 1, @CurrentDate);
+END;
 
 
 
@@ -400,6 +439,27 @@ VALUES
  N'Chính sách bảo mật thông tin cá nhân là cam kết của công ty trong việc bảo vệ dữ liệu cá nhân của khách hàng. Các thông tin như tên, địa chỉ, số điện thoại, thông tin thanh toán và các dữ liệu nhạy cảm khác sẽ chỉ được sử dụng với mục đích cung cấp dịch vụ và không bao giờ được chia sẻ cho bên thứ ba mà không có sự đồng ý của khách hàng. Công ty cam kết tuân thủ các quy định của pháp luật về bảo vệ thông tin cá nhân, và sử dụng các biện pháp bảo mật tiên tiến như mã hóa dữ liệu, hệ thống tường lửa và các công cụ giám sát để ngăn chặn truy cập trái phép. Khách hàng cũng có quyền yêu cầu quyền truy cập vào thông tin cá nhân của mình, yêu cầu sửa chữa hoặc xóa bỏ dữ liệu khi không còn cần thiết. Chính sách này cũng sẽ mô tả về cách thức công ty thông báo cho khách hàng trong trường hợp có sự cố bảo mật xảy ra, và những biện pháp khắc phục mà công ty sẽ thực hiện.', 
  NULL, GETDATE(), 1);
 
+ -- Thêm 3 Employee vào bảng User
+INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber, Address, RoleID, Status)
+VALUES
+    ('employee1', 'employee123', 'Employee One', 'employee1@example.com', '0111111111', 'Employee Address 1', 2, 1),
+    ('employee2', 'employee123', 'Employee Two', 'employee2@example.com', '0222222222', 'Employee Address 2', 2, 1),
+    ('employee3', 'employee123', 'Employee Three', 'employee3@example.com', '0333333333', 'Employee Address 3', 2, 1);
+
+-- Thêm 10 Customer vào bảng User
+INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber, Address, RoleID, Status)
+VALUES
+    ('customer4', 'customer123', 'Customer Four', 'customer4@example.com', '0444444444', 'Customer Address 4', 3, 1),
+    ('customer5', 'customer123', 'Customer Five', 'customer5@example.com', '0555555555', 'Customer Address 5', 3, 1),
+    ('customer6', 'customer123', 'Customer Six', 'customer6@example.com', '0666666666', 'Customer Address 6', 3, 1),
+    ('customer7', 'customer123', 'Customer Seven', 'customer7@example.com', '0777777777', 'Customer Address 7', 3, 1),
+    ('customer8', 'customer123', 'Customer Eight', 'customer8@example.com', '0888888888', 'Customer Address 8', 3, 1),
+    ('customer9', 'customer123', 'Customer Nine', 'customer9@example.com', '0999999999', 'Customer Address 9', 3, 1),
+    ('customer10', 'customer123', 'Customer Ten', 'customer10@example.com', '1010101010', 'Customer Address 10', 3, 1),
+    ('customer11', 'customer123', 'Customer Eleven', 'customer11@example.com', '1111111111', 'Customer Address 11', 3, 1),
+    ('customer12', 'customer123', 'Customer Twelve', 'customer12@example.com', '1212121212', 'Customer Address 12', 3, 1),
+    ('customer13', 'customer123', 'Customer Thirteen', 'customer13@example.com', '1313131313', 'Customer Address 13', 3, 1);
+
 -- Cập nhật bảng Rule với nội dung chi tiết hơn
 INSERT INTO [Rule] (Title, Content, Img, Update_Date, Status, UserID, CategoryRuleID)
 VALUES 
@@ -419,10 +479,13 @@ VALUES
  N'Quy định thời gian hoàn tiền bao gồm các điều kiện và thời gian yêu cầu hoàn lại tiền cho khách hàng trong các trường hợp như hủy vé, không thể sử dụng dịch vụ do lý do bất khả kháng, hoặc khi khách hàng yêu cầu hoàn tiền sau khi sử dụng dịch vụ. Thời gian hoàn tiền có thể thay đổi tùy theo phương thức thanh toán mà khách hàng đã sử dụng. Ví dụ, nếu thanh toán qua thẻ tín dụng, thời gian hoàn tiền có thể từ 5 đến 10 ngày làm việc, trong khi thanh toán qua chuyển khoản ngân hàng có thể mất từ 7 đến 15 ngày. Chính sách hoàn tiền cũng quy định về các trường hợp không đủ điều kiện hoàn tiền, chẳng hạn như khi khách hàng không tuân thủ quy định về hủy vé hoặc thay đổi dịch vụ trong thời gian quy định.', 
  NULL, GETDATE(), 1, 2, 3);
 
+SET ANSI_NULLS ON
 GO
-CREATE PROCEDURE AddSeatsForNewCarriage
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[AddSeatsForNewCarriage]
     @CarriageID INT,
-    @CarriageType VARCHAR(50),
+    @CarriageType NVARCHAR(50),  
     @TrainID INT
 AS
 BEGIN
@@ -430,24 +493,21 @@ BEGIN
 
     DECLARE @NumberOfSeats INT;
     DECLARE @SeatNumber INT;
-    DECLARE @SeatType VARCHAR(50);
+    DECLARE @SeatType NVARCHAR(50);
 
     -- Xác định số ghế dựa trên loại toa
-    IF @CarriageType = 'VIP'
+    IF @CarriageType = N'Toa VIP'  
         SET @NumberOfSeats = 12;
-    ELSE IF @CarriageType = 'Standard'
+    ELSE IF @CarriageType = N'Toa Thường' 
         SET @NumberOfSeats = 10;
     ELSE
-        --  Xử lý trường hợp loại toa không hợp lệ (tùy chọn)
         RETURN;
-    -- Hoặc RAISERROR
 
-    -- Đặt loại ghế (có thể giống loại toa, hoặc tùy chỉnh)
-    IF @CarriageType = 'VIP'
-        SET @SeatType = 'VIP';
+    -- Đặt loại ghế
+    IF @CarriageType = N'Toa VIP'
+        SET @SeatType = N'Toa VIP'; 
     ELSE
-        SET @SeatType = 'Normal';
-    -- hoặc 'Standard', tùy vào cách bạn đặt tên.
+        SET @SeatType = N'Toa Thường'; 
 
     -- Vòng lặp để thêm ghế
     SET @SeatNumber = 1;
@@ -457,44 +517,61 @@ BEGIN
             (SeatNumber, Status, SeatType, CarriageID)
         VALUES
             (@SeatNumber, 'Available', @SeatType, @CarriageID);
-        -- 'Available' là trạng thái ghế.
 
         SET @SeatNumber = @SeatNumber + 1;
     END
 END
 GO
+
+SET ANSI_NULLS ON
 GO
-CREATE PROCEDURE DeleteCarriageAndSeats
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteCarriageAndSeats]
     @CarriageID INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    BEGIN TRANSACTION;
-    -- Bắt đầu transaction
+
+    IF EXISTS (SELECT 1 FROM Seat WHERE CarriageID = @CarriageID AND Status <> 'Available')
+    BEGIN
+        -- Ném ra lỗi (RAISERROR) hoặc trả về mã lỗi
+        RAISERROR('Không thể xóa toa.  Có ghế không ở trạng thái Available.', 16, 1); -- 16 là severity level (lỗi do người dùng), 1 là state.
+        RETURN;  -- Kết thúc procedure, không thực hiện xóa.
+    END
+
+    BEGIN TRANSACTION;  -- Bắt đầu transaction
 
     BEGIN TRY
-        -- Xóa ghế của toa
-        DELETE FROM Seat WHERE CarriageID = @CarriageID;
+        -- Xóa ghế của toa (chỉ các ghế 'Available')
+        DELETE FROM Seat
+        WHERE CarriageID = @CarriageID;
 
         -- Xóa toa
-        DELETE FROM Carriage WHERE CarriageID = @CarriageID;
+        DELETE FROM Carriage
+        WHERE CarriageID = @CarriageID;
 
         COMMIT TRANSACTION; -- Commit transaction nếu thành công
     END TRY
     BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION; -- Rollback nếu có lỗi
+        -- Nếu có lỗi xảy ra trong khối TRY
+        IF @@TRANCOUNT > 0  -- Kiểm tra xem transaction có đang active không
+            ROLLBACK TRANSACTION; -- Rollback transaction
 
         -- Xử lý lỗi (ghi log, ném exception, ...)
-        THROW; -- Hoặc xử lý lỗi theo cách khác
+        THROW;  -- Ném lại lỗi (hoặc xử lý theo cách khác, nhưng RAISERROR ở trên đã thông báo rồi)
     END CATCH
 END;
 GO
+
+SET ANSI_NULLS ON
 GO
-CREATE PROCEDURE UpdateCarriageAndSeats
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[UpdateCarriageAndSeats]
     @CarriageID INT,
     @CarriageNumber VARCHAR(50),
-    @CarriageType VARCHAR(50),
+    @CarriageType NVARCHAR(50), 
     @NewCapacity INT
 AS
 BEGIN
@@ -504,9 +581,7 @@ BEGIN
     BEGIN TRY
         -- Lấy số lượng ghế hiện tại
         DECLARE @CurrentCapacity INT;
-        SELECT @CurrentCapacity = Capacity
-    FROM Carriage
-    WHERE CarriageID = @CarriageID;
+        SELECT @CurrentCapacity = Capacity FROM Carriage WHERE CarriageID = @CarriageID;
 
         -- Cập nhật thông tin toa tàu
         UPDATE Carriage
@@ -519,56 +594,41 @@ BEGIN
         -- Điều chỉnh số lượng ghế
         IF @NewCapacity > @CurrentCapacity  -- Thêm ghế
         BEGIN
-        DECLARE @SeatsToAdd INT = @NewCapacity - @CurrentCapacity;
-        DECLARE @SeatNumber INT;
-        -- Tìm số ghế lớn nhất hiện tại + 1 của toa đó
-        SELECT @SeatNumber = ISNULL(MAX(CAST(SeatNumber AS INT)), 0) + 1
-        FROM Seat
-        WHERE CarriageID = @CarriageID;
+            DECLARE @SeatsToAdd INT = @NewCapacity - @CurrentCapacity;
+            DECLARE @SeatNumber INT;
+			      -- Tìm số ghế lớn nhất hiện tại + 1 của toa đó
+            SELECT @SeatNumber = ISNULL(MAX(CAST(SeatNumber AS INT)), 0) + 1 FROM Seat WHERE CarriageID = @CarriageID;
 
-        WHILE @SeatsToAdd > 0
+            WHILE @SeatsToAdd > 0
             BEGIN
-            DECLARE @SeatType VARCHAR(50);
-            IF @CarriageType = 'VIP'
-                    SET @SeatType = 'VIP';
+                 DECLARE @SeatType NVARCHAR(50);
+                IF @CarriageType = N'Toa VIP'  
+                    SET @SeatType = N'Toa VIP';
                 ELSE
-                    SET @SeatType = 'Normal';
+                    SET @SeatType = N'Toa Thường';
 
-            INSERT INTO Seat
-                (SeatNumber, Status, SeatType, CarriageID)
-            VALUES
-                (CAST(@SeatNumber AS VARCHAR(10)), 'Available', @SeatType, @CarriageID);
+                INSERT INTO Seat (SeatNumber, Status, SeatType, CarriageID)
+                VALUES (CAST(@SeatNumber AS VARCHAR(10)), 'Available', @SeatType, @CarriageID);
 
-            SET @SeatNumber = @SeatNumber + 1;
-            SET @SeatsToAdd = @SeatsToAdd - 1;
+                SET @SeatNumber = @SeatNumber + 1;
+                SET @SeatsToAdd = @SeatsToAdd - 1;
+            END
         END
-    END
         ELSE IF @NewCapacity < @CurrentCapacity  -- Xóa ghế
         BEGIN
-        DECLARE @SeatsToDelete INT = @CurrentCapacity - @NewCapacity;
+            DECLARE @SeatsToDelete INT = @CurrentCapacity - @NewCapacity;
 
-        -- Xóa những ghế có ID lớn nhất (giả sử ghế mới thêm vào có ID lớn hơn)
-        -- Cách 1 (dùng CTE, an toàn hơn, hoạt động tốt cả khi SeatNumber không phải số)
+            -- Xóa những ghế có ID lớn nhất (giả sử ghế mới thêm vào có ID lớn hơn)
+            -- Cách 1 (dùng CTE, an toàn hơn, hoạt động tốt cả khi SeatNumber không phải số)
 
-        ;WITH
-            SeatsToDelete
-            AS
-            (
-                SELECT TOP (@SeatsToDelete)
-                    SeatID
+            ;WITH SeatsToDelete AS (
+                SELECT TOP (@SeatsToDelete) SeatID
                 FROM Seat
                 WHERE CarriageID = @CarriageID
-                ORDER BY CAST(SeatNumber AS INT) DESC
-                -- Sắp xếp theo số ghế (dạng số) giảm dần.
+                ORDER BY CAST(SeatNumber AS INT) DESC -- Sắp xếp theo số ghế (dạng số) giảm dần.
             )
             DELETE FROM SeatsToDelete;
-
-
-    -- Cách 2 (Dùng DELETE TOP, chỉ dùng khi SeatNumber là số và tăng dần)
-    --DELETE TOP (@SeatsToDelete) FROM Seat
-    --WHERE CarriageID = @CarriageID
-    --ORDER BY SeatID DESC;
-    END
+        END
 
         COMMIT TRANSACTION;
     END TRY

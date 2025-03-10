@@ -77,14 +77,12 @@ public class LoginSevlet extends HttpServlet {
         String username = request.getParameter("username").trim();
         String password = request.getParameter("password");
 
-        System.out.println("DEBUG: Username nhập vào = " + username);
-        System.out.println("DEBUG: Password nhập vào = " + password);
+  
 
         // Mã hóa mật khẩu nhập vào để so sánh với DB
         String encryptedPassword = Encryptor.encryptPassword(password);
 
-        System.out.println("DEBUG: Username nhập vào = " + username);
-        System.out.println("DEBUG: Password sau khi mã hóa = " + encryptedPassword);
+
 
         UserDAO userDAO = new UserDAO();
         User user = userDAO.checkUserLogin(username, encryptedPassword);
