@@ -205,7 +205,7 @@ public class PaymentServlet extends HttpServlet {
                 int insertedTicketID = ticketDAO.insertTicket(ticket);
 
                 // Update status
-                ticketDAO.updateTicketStatus(insertedTicketID, "Used");
+               // ticketDAO.updateTicketStatus(insertedTicketID, "Used");
                 ticketDAO.updateSeatStatus(seatID, "Booked");
 
             } catch (Exception ex) {
