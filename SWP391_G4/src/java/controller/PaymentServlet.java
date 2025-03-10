@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import dal.BookingDAO;
 import dal.TicketDAO;
+import java.util.HashSet;
+import java.util.Set;
 // Chú ý import các lớp bên model
 import model.Booking;
 import model.CartItem;
@@ -90,18 +92,17 @@ public class PaymentServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
 
-        // 1. Lấy param "bookingCCCD" từ form (nếu form payment.jsp gửi param này)
+        // (1) Lấy param "bookingCCCD" từ form (nếu có)
         String bookingCCCDParam = request.getParameter("bookingCCCD");
         System.out.println("DEBUG PaymentServlet - CCCD param = " + bookingCCCDParam);
 
-        // 2. Nếu param rỗng => fallback session
+        // Nếu param rỗng => fallback lấy từ session
         String cccdBooking;
         if (bookingCCCDParam != null && !bookingCCCDParam.trim().isEmpty()) {
             cccdBooking = bookingCCCDParam.trim();
@@ -114,107 +115,132 @@ public class PaymentServlet extends HttpServlet {
         }
         System.out.println("DEBUG PaymentServlet - CCCD final = " + cccdBooking);
 
-        // 3. Lấy giỏ hàng
+        // (2) Lấy giỏ hàng từ session
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
         if (cartItems == null || cartItems.isEmpty()) {
+            // Nếu giỏ trống => chuyển về trang schedule (hoặc home)
             response.sendRedirect("schedule");
             return;
         }
 
-        // 4. Kiểm tra user đăng nhập
+        // (3) Kiểm tra xem user đã đăng nhập chưa
         User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect("login.jsp");
             return;
         }
 
-        // 5. Lấy bookingName, bookingEmail, bookingPhone
+        // (4) Lấy thông tin người đặt vé (đã lưu trong session khi nhập passengerInfo)
         String bookingName = (String) session.getAttribute("bookingName");
         String bookingEmail = (String) session.getAttribute("bookingEmail");
         String bookingPhone = (String) session.getAttribute("bookingPhone");
 
-        // Tính tổng
-        double totalPrice = 0.0;
-        Trip firstTrip = cartItems.get(0).getTrip();
-        if (firstTrip == null) {
-            request.setAttribute("error", "CartItem chưa set Trip, không xác định được tripID!");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
-        }
-        int tripID = firstTrip.getTripID();
+        // (5) Phân tích các trip trong giỏ để xác định TripID và RoundTripTripID
+        Set<Integer> distinctTripIDs = new HashSet<>();
+        Integer goTripID = null;     // Chuyến đi
+        Integer returnTripID = null; // Chuyến về
 
         for (CartItem item : cartItems) {
+            // Nếu cartItem chưa set Trip => lỗi
             if (item.getTrip() == null) {
-                request.setAttribute("error", "Một CartItem chưa set Trip. Không thể thanh toán!");
+                request.setAttribute("error", "Một CartItem chưa có thông tin Trip. Không thể thanh toán!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
+            distinctTripIDs.add(item.getTrip().getTripID());
+
+            // Xác định đâu là chuyến đi, đâu là chuyến về
+            if (item.isReturnTrip()) {
+                returnTripID = item.getTrip().getTripID();
+            } else {
+                goTripID = item.getTrip().getTripID();
+            }
+        }
+
+        // (6) Tính tổng tiền từ giỏ
+        double totalPrice = 0.0;
+        for (CartItem item : cartItems) {
             totalPrice += item.getPrice();
         }
 
-        // 6. Tạo booking
+        // (7) Tạo đối tượng Booking
         Booking booking = new Booking();
         booking.setUserID(user.getUserId());
-        booking.setTripID(tripID);
-        booking.setRoundTripTripID(null);
         booking.setTotalPrice(totalPrice);
-        booking.setPaymentStatus("Paid");
-        booking.setBookingStatus("Active");
+        booking.setPaymentStatus("Paid");    // Giả sử đã thanh toán
+        booking.setBookingStatus("Active");  // Trạng thái booking còn hiệu lực
 
+        // - Nếu có cả chuyến đi và chuyến về => khứ hồi
+        if (goTripID != null && returnTripID != null) {
+            booking.setTripID(goTripID);
+            booking.setRoundTripTripID(returnTripID);
+        } else {
+            // - Nếu chỉ 1 chuyến => booking TripID = chuyến đầu tiên
+            //   RoundTripTripID = null
+            int singleTripID = cartItems.get(0).getTrip().getTripID();
+            booking.setTripID(singleTripID);
+            booking.setRoundTripTripID(null);
+        }
+
+        // (8) Insert Booking vào DB
         BookingDAO bookingDAO = new BookingDAO();
-        int bookingID = -1;
+        int bookingID;
         try {
             bookingID = bookingDAO.insertBooking(booking);
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tạo booking: " + e.getMessage());
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
-        }
-        if (bookingID < 0) {
-            request.setAttribute("error", "Không thể tạo Booking!");
+            request.setAttribute("error", "Lỗi khi tạo Booking: " + e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
-        // 7. Insert ticket
+        if (bookingID < 0) {
+            request.setAttribute("error", "Không thể tạo Booking (bookingID < 0)!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
+        // (9) Insert Ticket cho từng vé trong giỏ
         TicketDAO ticketDAO = new TicketDAO();
 
-        // Lấy danh sách CCCD hành khách (đã nhập ở passengerInfo.jsp)
-        // => sessionScope.idNumberList: index i tương ứng cartItems[i].
+        // Lấy danh sách CCCD hành khách (được lưu trong sessionScope.idNumberList)
         List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
+        if (idNumberList == null || idNumberList.size() != cartItems.size()) {
+            request.setAttribute("error", "Không khớp số lượng CCCD với số vé trong giỏ!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
 
+        // Duyệt qua từng CartItem để thêm Ticket
         for (int i = 0; i < cartItems.size(); i++) {
             CartItem item = cartItems.get(i);
+            String passengerCCCD = idNumberList.get(i);
 
+            // Tạo ticket
             Ticket ticket = new Ticket();
-            // Mỗi vé => CCCD hành khách = idNumberList[i]
-            // chứ KHÔNG phải bookingCCCD (người đặt vé).
-            ticket.setCccd(idNumberList.get(i));
-
-            ticket.setBookingID(bookingID);
-
+            ticket.setCccd(passengerCCCD);             // CCCD hành khách
+            ticket.setBookingID(bookingID);            // bookingID vừa tạo
             int seatID = Integer.parseInt(item.getSeatID());
-            ticket.setSeatID(seatID);
-
+            ticket.setSeatID(seatID);                  // ghế
             ticket.setTripID(item.getTrip().getTripID());
             ticket.setTicketPrice(item.getPrice());
             ticket.setTicketStatus("Unused");
 
             try {
                 int insertedTicketID = ticketDAO.insertTicket(ticket);
-
-                // Update status
-               // ticketDAO.updateTicketStatus(insertedTicketID, "Used");
+                // Đánh dấu ghế => "Booked"
                 ticketDAO.updateSeatStatus(seatID, "Booked");
 
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 ex.printStackTrace();
-                // rollback hoặc xử lý
+                // Nếu lỗi, có thể rollback Booking & các vé đã chèn => tùy yêu cầu
+                request.setAttribute("error", "Lỗi khi thêm vé: " + ex.getMessage());
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
         }
 
-        // 8. Update payment
+        // (10) Cập nhật PaymentStatus cho Booking = "Paid"
         try {
             boolean paymentUpdated = bookingDAO.updateBookingPaymentStatus(bookingID, "Paid");
             if (!paymentUpdated) {
@@ -224,16 +250,16 @@ public class PaymentServlet extends HttpServlet {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi cập nhật thanh toán: " + e.getMessage());
+            request.setAttribute("error", "Lỗi khi cập nhật thanh toán: " + e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
-        // 9. Xóa giỏ
+        // (11) Xóa giỏ hàng khỏi session
         request.setAttribute("cartItems", cartItems);
         session.removeAttribute("cartItems");
 
-        // 10. Forward success
+        // (12) Gửi thông tin sang success.jsp
         request.setAttribute("cartItems", cartItems);
         request.setAttribute("fullNameList", session.getAttribute("fullNameList"));
         request.setAttribute("idNumberList", session.getAttribute("idNumberList"));
@@ -241,6 +267,7 @@ public class PaymentServlet extends HttpServlet {
         request.setAttribute("bookingEmail", bookingEmail);
         request.setAttribute("bookingPhone", bookingPhone);
 
+        // (13) Forward sang trang "success.jsp"
         request.getRequestDispatcher("success.jsp").forward(request, response);
     }
 
