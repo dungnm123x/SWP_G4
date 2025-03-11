@@ -16,13 +16,12 @@
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
             rel="stylesheet"
-            />
+        />
 
         <!-- Link file CSS riêng (nếu có) -->
         <link href="css/payment.css" rel="stylesheet" type="text/css" />
 
         <style>
-            /* CSS tùy chỉnh (có thể bỏ vào file payment.css) */
             .payment-container {
                 max-width: 600px;
                 margin: 40px auto;
@@ -30,19 +29,17 @@
                 padding: 20px 30px;
                 border-radius: 8px;
             }
-
             .payment-container h3 {
                 margin-bottom: 20px;
             }
-
             .payment-methods {
                 margin-bottom: 20px;
             }
-
             .btn-space {
                 margin-right: 10px;
             }
         </style>
+
         <jsp:include page="/navbar.jsp"/>
     </head>
     <body>
@@ -60,25 +57,46 @@
 
             <!-- Form POST đến PaymentServlet (mapping = "payment") -->
             <form action="payment" method="post">
+                <!-- Ẩn CCCD người đặt (nếu cần) -->
                 <input type="hidden" name="bookingCCCD" value="${sessionScope.bookingCCCD}" />
+
                 <div class="payment-methods mb-3">
-                    
                     <label class="d-block mb-2">
                         <input
                             type="radio"
                             name="paymentMethod"
                             value="creditCard"
                             required
-                            />
+                        />
                         Thẻ tín dụng/ghi nợ
                     </label>
+
                     <label class="d-block mb-2">
-                        <input type="radio" name="paymentMethod" value="eWallet" />
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="eWallet"
+                        />
                         Ví điện tử (Momo, ZaloPay)
                     </label>
-                    <label class="d-block">
-                        <input type="radio" name="paymentMethod" value="bankTransfer" />
+
+                    <label class="d-block mb-2">
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="bankTransfer"
+                        />
                         Chuyển khoản ngân hàng
+                    </label>
+
+                    <!-- Nếu bạn muốn tích hợp VNPay -->
+                    <label class="d-block mb-2">
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="vnpay"
+                        />
+                        Thanh toán qua VNPay
                     </label>
                 </div>
 
@@ -89,7 +107,7 @@
             </form>
         </div>
 
-        <!-- Bootstrap JS (nếu cần JavaScript của Bootstrap) -->
+        <!-- Bootstrap JS -->
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         ></script>
