@@ -228,7 +228,7 @@ public class ReturnResult extends HttpServlet {
 
         } else {
             // Giao dịch không thành công => có thể về fail.jsp
-            request.getRequestDispatcher("fail.jsp").forward(request, response);
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 
