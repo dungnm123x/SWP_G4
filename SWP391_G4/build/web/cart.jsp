@@ -65,7 +65,7 @@
 
                                     <div>
                                         <small>Toa ${item.carriageNumber}, Ghế ${item.seatNumber}</small><br/>
-                                        <small>Giá: <strong>${item.price} $</strong></small>
+                                        <small>Giá: <strong>${item.price} VND</strong></small>
                                     </div>
                                 </div>
                                 <!-- Nút Xóa vé bên phải -->
