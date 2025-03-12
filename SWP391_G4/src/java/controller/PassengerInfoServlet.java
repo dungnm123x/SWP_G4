@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import model.CartItem;
+import model.User;
 
 /**
  *
@@ -70,6 +71,23 @@ public class PassengerInfoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
+        // Kiểm tra đăng nhập
+        if (user == null) {
+            // Chưa login => lưu link để quay lại
+            session.setAttribute("redirectAfterLogin", "passengerinfo");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        // Nếu đã login, ta có thể tự động điền thông tin người đặt vé:
+        request.setAttribute("bookingName", user.getFullName());
+        request.setAttribute("bookingEmail", user.getEmail());
+        request.setAttribute("bookingPhone", user.getPhoneNumber());
+
+        // Forward sang passengerInfo.jsp
         request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
     }
 

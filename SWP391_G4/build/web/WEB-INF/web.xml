@@ -68,6 +68,14 @@
         <servlet-name>PaymentServlet</servlet-name>
         <servlet-class>controller.PaymentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReturnResult</servlet-name>
+        <servlet-class>VNPay.ReturnResult</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VNPayServlet</servlet-name>
+        <servlet-class>VNPay.VNPayServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -183,5 +191,13 @@
     <servlet-mapping>
         <servlet-name>PaymentServlet</servlet-name>
         <url-pattern>/payment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReturnResult</servlet-name>
+        <url-pattern>/result</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VNPayServlet</servlet-name>
+        <url-pattern>/vnpay</url-pattern>
     </servlet-mapping>
 </web-app>

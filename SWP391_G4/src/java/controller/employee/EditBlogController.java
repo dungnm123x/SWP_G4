@@ -77,7 +77,7 @@ public class EditBlogController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.sendRedirect("edit-blog?blog_id=" + request.getParameter("blog_id") + "&success=true");
     }
 
     /**
