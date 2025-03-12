@@ -297,11 +297,11 @@
                                 <td>Không có khuyến mại</td>
 
                                 <!-- Bảo hiểm -->
-                                <td>1$</td>
+                                <td>1000 VND</td>
 
                                 <!-- Thành tiền tạm (client) -->
                                 <td id="displayTotal${status.index}">
-                                    <c:out value="${item.price + 1}" /> $
+                                    <c:out value="${item.price + 1000}" /> VND
                                 </td>
 
                                 <!-- Nút xóa -->

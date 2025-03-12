@@ -80,6 +80,26 @@ public class TicketDAO extends DBContext {
             e.printStackTrace(); // Hoặc log lỗi
         }
     }
+public void cancelTicket(int ticketID, int seatID) {
+    // Cập nhật trạng thái vé
+    String updateTicketSQL = "UPDATE Ticket SET TicketStatus = 'Refunded' WHERE TicketID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(updateTicketSQL)) {
+        ps.setInt(1, ticketID);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace(); // Log lỗi nếu có
+    }
+
+    // Cập nhật trạng thái ghế
+    String updateSeatSQL = "UPDATE Seat SET Status = 'Available' WHERE SeatID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(updateSeatSQL)) {
+        ps.setInt(1, seatID);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace(); // Log lỗi nếu có
+    }
+}
+
 
     public boolean ticketExistsByCCCDAndPaid(String cccd, int tripID) {
         String sql = "SELECT 1 "
@@ -104,16 +124,16 @@ public class TicketDAO extends DBContext {
         List<RailwayDTO> tickets = new ArrayList<>();
         String sql = "SELECT t.TicketID, t.CCCD, s.SeatNumber, c.CarriageNumber, "
                 + "st1.StationName AS DepartureStation, st2.StationName AS ArrivalStation, "
-                + "tr.DepartureTime, tr.TrainID, t.TicketPrice, t.TicketStatus, "
+                + "tr.DepartureTime, tr.TrainID, trn.TrainName, t.TicketPrice, t.TicketStatus, "
                 + "CASE "
                 + "   WHEN b.RoundTripTripID IS NOT NULL AND b.RoundTripTripID = t.TripID THEN 'Chuyến về' "
                 + "   ELSE 'Chuyến đi' "
                 + "END AS TripType "
-                + // ✅ Xác định loại chuyến trực tiếp trong SQL
-                "FROM Ticket t "
+                + "FROM Ticket t "
                 + "JOIN Seat s ON t.SeatID = s.SeatID "
                 + "JOIN Carriage c ON s.CarriageID = c.CarriageID "
                 + "JOIN Trip tr ON t.TripID = tr.TripID "
+                + "JOIN Train trn ON tr.TrainID = trn.TrainID "
                 + "JOIN Route r ON tr.RouteID = r.RouteID "
                 + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
                 + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
@@ -128,13 +148,13 @@ public class TicketDAO extends DBContext {
                             rs.getInt("TicketID"),
                             rs.getString("CCCD"),
                             rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation"),
-                            "Tàu " + rs.getInt("TrainID"),
+                            rs.getString("TrainName"), // Hiển thị tên tàu
                             rs.getTimestamp("DepartureTime"),
                             rs.getInt("CarriageNumber"),
                             rs.getInt("SeatNumber"),
                             rs.getDouble("TicketPrice"),
                             rs.getString("TicketStatus"),
-                            rs.getString("TripType") // ✅ Lấy loại chuyến từ SQL
+                            rs.getString("TripType")
                     ));
                 }
             }
