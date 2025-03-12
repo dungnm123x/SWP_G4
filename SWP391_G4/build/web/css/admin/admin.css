@@ -346,31 +346,37 @@ form {
 .btn btn-outline-success{
     background-color: green
 }
-        .dashboard {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    padding: 20px;
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cột bằng nhau */
+  gap: 8px; /* Giảm khoảng cách giữa các ô */
+  padding: 10px;
 }
 
 .dashboard-item {
-    width: 30%;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
+  background-color: #f8f9fa; /* Màu nền nhẹ nhàng */
+  border: 1px solid #dee2e6; /* Viền mỏng */
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  text-align: center;
 }
 
-.dashboard-item h3 {
-    margin-bottom: 10px;
-    color: #333;
+/* Điều chỉnh thêm cho các ô cụ thể */
+.dashboard-item:nth-child(4), /* Thống kê Blog */
+.dashboard-item:nth-child(5) { /* Thống kê Quy định */
+  grid-column: span 3; /* Chiếm toàn bộ chiều rộng hàng */
 }
 
-.dashboard-item p {
-    color: #666;
+.dashboard-item:nth-child(6), /* Thống kê doanh thu */
+.dashboard-item:nth-child(7) { /* Thống kê người dùng */
+  grid-column: span 2; /* Chiếm 2/3 chiều rộng hàng */
 }
+
+.dashboard-item canvas {
+    max-width: 100%; /* Đảm bảo canvas không vượt quá kích thước ô */
+}
+
 .success-message {
     background-color: #d4edda;
     color: #155724;
@@ -387,4 +393,23 @@ form {
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
+}
+.revenue-options {
+  display: flex;
+  justify-content: flex-end; /* Căn chỉnh sang phải */
+}
+
+.revenue-option {
+  background-color: transparent;
+  border: none;
+  padding: 8px 16px;
+  margin: 0 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+}
+
+.revenue-option.active {
+  background-color: #f0f0f0; /* Màu nền cho tùy chọn đang chọn */
+  border-radius: 4px;
 }

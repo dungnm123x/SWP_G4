@@ -5,12 +5,100 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class DashBoardDAO extends DBContext<Object> {
+    
+    public int getTotalTicketsSold() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Tickets";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public double getTotalRevenue() throws SQLException {
+        String sql = "SELECT SUM(total_amount) FROM Orders"; // Thay total_amount bằng tên cột doanh thu
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getDouble(1);
+            }
+        }
+        return 0.0;
+    }
+
+    public int getTotalOrders() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Orders";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public int getTotalEvents() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Events";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public double getRevenueToday() throws SQLException {
+        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE BookingDate >= CAST(GETDATE() AS DATE)";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                double revenue = rs.getDouble(1);
+                System.out.println("Revenue today: " + revenue); // Thêm dòng này
+                return revenue;
+            }
+        }
+        System.out.println("Revenue today: 0"); // Thêm dòng này
+        return 0;
+    }
+
+    public double getRevenueThisWeek() throws SQLException {
+        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE BookingDate >= DATEADD(wk,DATEDIFF(wk,7,GETDATE()),0)";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        }
+        return 0;
+    }
+
+    public double getRevenueThisMonth() throws SQLException {
+        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE MONTH(BookingDate) = MONTH(GETDATE()) AND YEAR(BookingDate) = YEAR(GETDATE())";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        }
+        return 0;
+    }
+
+    public double getRevenueThisYear() throws SQLException {
+        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE YEAR(BookingDate) = YEAR(GETDATE())";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        }
+        return 0;
+    }
 
     private int getCount(String sql) throws SQLException {
-        try (PreparedStatement stm = getConnection().prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
