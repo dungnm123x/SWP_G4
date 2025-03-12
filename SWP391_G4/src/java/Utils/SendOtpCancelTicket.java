@@ -81,7 +81,7 @@ public class SendOtpCancelTicket extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-            response.setContentType("text/plain;charset=UTF-8");
+        response.setContentType("text/plain;charset=UTF-8");
         HttpSession session = request.getSession();
         String email = request.getParameter("email");
 
@@ -90,15 +90,15 @@ public class SendOtpCancelTicket extends HttpServlet {
             return;
         }
 
-        // Tạo OTP ngẫu nhiên gồm 6 chữ số
+        // Tạo OTP ngẫu nhiên 6 chữ số
         int otp = generateOtp();
         long timestamp = System.currentTimeMillis();
 
-        // Lưu OTP vào session kèm thời gian gửi
+        // Lưu OTP vào session
         session.setAttribute("otp", otp);
         session.setAttribute("otpTimestamp", timestamp);
 
-        // Gửi OTP qua email
+        // Gửi OTP qua email với giao diện HTML
         boolean isSent = sendOtpEmail(email, otp);
 
         if (isSent) {
@@ -108,23 +108,23 @@ public class SendOtpCancelTicket extends HttpServlet {
         }
     }
 
-    // Hàm tạo OTP 6 chữ số
+    // Tạo mã OTP ngẫu nhiên (6 chữ số)
     private int generateOtp() {
         SecureRandom random = new SecureRandom();
-        return 100000 + random.nextInt(900000); // OTP từ 100000 đến 999999
+        return 100000 + random.nextInt(900000);
     }
 
-    // Hàm gửi email chứa OTP
+    // Hàm gửi email chứa OTP với giao diện HTML
     private boolean sendOtpEmail(String recipientEmail, int otp) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com"); // Thay đổi nếu dùng email khác
+        props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
-                return new javax.mail.PasswordAuthentication(EMAIL_SENDER, EMAIL_PASSWORD);
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(EMAIL_SENDER, EMAIL_PASSWORD);
             }
         });
 
@@ -132,9 +132,28 @@ public class SendOtpCancelTicket extends HttpServlet {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_SENDER));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Mã OTP xác nhận hủy vé");
-            message.setText("Mã OTP của bạn là: " + otp + "\nMã có hiệu lực trong 120 giây.");
+            message.setSubject("TrainTicketBooking: OTP Code for Ticket Cancellation");
 
+            // Nội dung email có định dạng HTML
+            String htmlContent = "<!DOCTYPE html>"
+                    + "<html>"
+                    + "<body style=\"font-family: Arial, sans-serif; background-color: #ffffff;\">"
+                    + "<div style=\"max-width: 600px; margin: auto; padding: 20px; border: 1px solid #cccccc; background-color: #ffffff;\">"
+                    + "<h2 style=\"color: #007bff;\">TrainTicketBooking</h2>"
+                    + "<p style=\"font-size: 16px; color: #333333;\">Xin chào,</p>"
+                    + "<p style=\"font-size: 16px; color: #333333;\">Mã OTP xác nhận hủy vé của bạn là:</p>"
+                    + "<h1 style=\"font-size: 24px; color: #007bff; text-align: center;\">" + otp + "</h1>"
+                    + "<p style=\"font-size: 16px; color: #333333;\">Mã có hiệu lực trong 120 giây.</p>"
+                    + "<p style=\"font-size: 16px; color: #333333;\">Nếu bạn không yêu cầu hủy vé, vui lòng bỏ qua email này.</p>"
+                    + "<br>"
+                    + "<p style=\"font-size: 16px; color: #333333;\">Trân trọng,<br>TrainTicketBooking</p>"
+                    + "</div>"
+                    + "</body>"
+                    + "</html>";
+
+            message.setContent(htmlContent, "text/html; charset=utf-8");
+
+            // Gửi email
             Transport.send(message);
             return true;
         } catch (MessagingException e) {
