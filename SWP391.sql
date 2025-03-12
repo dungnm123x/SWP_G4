@@ -287,15 +287,15 @@ WHERE CarriageType = N'Toa thường';
 -- Thêm dữ liệu cho bảng Route (10 dòng)
 INSERT INTO Route (DepartureStationID, ArrivalStationID, Distance, BasePrice) 
 VALUES 
-(1, 2, 150, 20.00),
-(2,1,150,20),
-(2, 3, 100, 15.00),
-(3, 4, 200, 30.00),
-(4, 5, 180, 25.00),
-(5, 6, 220, 35.00),
-(6, 7, 160, 20.00),
-(7, 8, 140, 18.00),
-(8, 1, 190, 28.00); -- Sửa ArrivalStationID để đảm bảo tồn tại
+(1, 2, 150, 200000.00),
+(2,1,150,200000.00),
+(2, 3, 100, 150000.00),
+(3, 4, 200, 300000.00),
+(4, 5, 180, 250000.00),
+(5, 6, 220, 350000.00),
+(6, 7, 160, 200000.00),
+(7, 8, 140, 180000.00),
+(8, 1, 190, 280000.00); -- Sửa ArrivalStationID để đảm bảo tồn tại
 
 
 -- Thêm dữ liệu cho bảng Trip (10 dòng)
@@ -359,24 +359,30 @@ END;
 
 
 -- Thêm dữ liệu cho bảng Booking (10 dòng)
-INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
-VALUES 
-(2, 1, NULL, 300.00, 'Paid', 'Active'); -- Chuyến đi một chiều từ Hà Nội -> Sài Gòn
-DECLARE @BookingID INT;
+DECLARE @OutboundBookingID INT, @ReturnBookingID INT;
 
--- Chuyến đi từ Hà Nội -> Sài Gòn
-INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
-VALUES (2, 1, NULL, 300.00, 'Paid', 'Active');
+BEGIN TRANSACTION;
 
--- Lấy BookingID của chuyến đi
-SET @BookingID = SCOPE_IDENTITY();
+    -- Chèn bản ghi cho chuyến đi (outbound)
+    INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
+    VALUES (2, 1, NULL, 300.00, 'Paid', 'Active');
+    SET @OutboundBookingID = SCOPE_IDENTITY();
 
--- Chuyến về từ Sài Gòn -> Hà Nội
-INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
-VALUES (2, 2, @BookingID, 300.00, 'Paid', 'Active');
+    -- Chèn bản ghi cho chuyến về (return)
+    INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
+    VALUES (2, 2, NULL, 300.00, 'Paid', 'Active');
+    SET @ReturnBookingID = SCOPE_IDENTITY();
 
--- Cập nhật RoundTripTripID của chuyến đi để liên kết với chuyến về
-UPDATE Booking SET RoundTripTripID = SCOPE_IDENTITY() WHERE BookingID = @BookingID;
+    -- Cập nhật RoundTripTripID cho cả 2 bản ghi để tham chiếu lẫn nhau
+    UPDATE Booking
+    SET RoundTripTripID = CASE
+                            WHEN BookingID = @OutboundBookingID THEN @ReturnBookingID
+                            WHEN BookingID = @ReturnBookingID THEN @OutboundBookingID
+                          END
+    WHERE BookingID IN (@OutboundBookingID, @ReturnBookingID);
+
+COMMIT TRANSACTION;
+
 
 
 -- Thêm dữ liệu cho bảng Ticket (10 dòng)
