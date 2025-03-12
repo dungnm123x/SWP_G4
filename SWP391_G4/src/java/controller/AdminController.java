@@ -20,7 +20,14 @@ public class AdminController extends HttpServlet {
         DAOAdmin dao = new DAOAdmin();
         String view = request.getParameter("view");
         String search = request.getParameter("search");
-
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1) {
+            response.sendRedirect("login");
+            return;
+        }
+        if (view == null) {
+            view = "dashboard";
+        }
         try {
             if ("dashboard".equals(view)) {
                 DashBoardDAO dashBoardDAO = new DashBoardDAO();
@@ -32,7 +39,16 @@ public class AdminController extends HttpServlet {
                 int totalTrips = dashBoardDAO.getTotalTrips();
                 int totalBlogs = dashBoardDAO.getTotalBlogs();
                 int totalRules = dashBoardDAO.getTotalRules();
+                double revenueToday = dashBoardDAO.getRevenueToday();
+                double revenueThisWeek = dashBoardDAO.getRevenueThisWeek();
+                double revenueThisMonth = dashBoardDAO.getRevenueThisMonth();
+                double revenueThisYear = dashBoardDAO.getRevenueThisYear();
+                
 
+                request.setAttribute("revenueToday", revenueToday);
+                request.setAttribute("revenueThisWeek", revenueThisWeek);
+                request.setAttribute("revenueThisMonth", revenueThisMonth);
+                request.setAttribute("revenueThisYear", revenueThisYear);
                 request.setAttribute("totalUsers", totalUsers);
                 request.setAttribute("totalEmployees", totalEmployees);
                 request.setAttribute("totalCustomers", totalCustomers);
