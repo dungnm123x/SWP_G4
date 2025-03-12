@@ -80,7 +80,7 @@
                         <td><%= ticket.getDepartureTime() %></td>
                         <td><%= ticket.getCarriageNumber() %></td>
                         <td><%= ticket.getSeatNumber() %></td>
-                        <td><%= ticket.getTicketPrice() %> $</td>
+                        <td><%= ticket.getTicketPrice() %> VND</td>
                         <td><%= ticket.getTicketStatus() %></td>
                     </tr>
                 <% }

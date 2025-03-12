@@ -80,6 +80,26 @@ public class TicketDAO extends DBContext {
             e.printStackTrace(); // Hoặc log lỗi
         }
     }
+public void cancelTicket(int ticketID, int seatID) {
+    // Cập nhật trạng thái vé
+    String updateTicketSQL = "UPDATE Ticket SET TicketStatus = 'Refunded' WHERE TicketID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(updateTicketSQL)) {
+        ps.setInt(1, ticketID);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace(); // Log lỗi nếu có
+    }
+
+    // Cập nhật trạng thái ghế
+    String updateSeatSQL = "UPDATE Seat SET Status = 'Available' WHERE SeatID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(updateSeatSQL)) {
+        ps.setInt(1, seatID);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace(); // Log lỗi nếu có
+    }
+}
+
 
     public boolean ticketExistsByCCCDAndPaid(String cccd, int tripID) {
         String sql = "SELECT 1 "
