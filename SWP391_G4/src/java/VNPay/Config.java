@@ -24,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Config {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/SWP391_G4/result";
+    public static String vnp_ReturnUrl = "http://localhost:9999/SWP391_G4/result";
     public static String vnp_TmnCode = "A3EYCX2G";
     public static String secretKey = "MQH1DMV9SJP3W6GGU8I3OONJJB3ELIMN";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
