@@ -1,14 +1,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.time.format.DateTimeFormatter" %> <%-- Not strictly needed if using formatted getters --%>
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Quản lí chuyến</title>
         <link rel="stylesheet" href="css/employee.css">
-        <title>Danh sách chuyến tàu</title>
+
     </head>
     <body>
 
         <div class="container">
+            <%--  Sidebar (assuming you have this) --%>
             <div class="sidebar">
                 <div class="logo">
                     <img src="./img/logo.jpg" alt="avatar">
@@ -27,64 +30,91 @@
                 <form action="logout" method="GET">
                     <button type="submit" class="logout-button">Logout</button>
                 </form>
-
             </div>
-            <h1>Danh sách chuyến tàu</h1>
+
+            <h1>Danh sách chuyến</h1>
+
+            <c:if test="${not empty message}">
+                <p style="color: green;">${message}</p>
+            </c:if>
+            <c:if test="${not empty error}">
+                <p style="color: red;">${error}</p>
+            </c:if>
+
+            <%-- Filter Form --%>
             <div class="filter-section">
-                <form action="filter" method="GET">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="departStation">Ga Đi</label>
-                            <input type="text" class="form-control" id="departStation" name="departStation" placeholder="Nhập Ga Đi">
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="arriveStation">Ga Đến</label>
-                            <input type="text" class="form-control" id="arriveStation" name="arriveStation" placeholder="Nhập Ga Đến">
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="departureDate">Ngày Khởi Hành</label>
-                            <input type="date" class="form-control" id="departureDate" name="departureDate">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Lọc</button>
-                    <a href="trip" class="returnbtn" onclick="resetForm()">Trở về</a>
-                    <script>
-                        function resetForm() {
-                            document.querySelector("form").reset();
-                        }
-                    </script>
-                </form>
-            </div>
-            <table border="1">
-                <tr>
-                    <th></th>
-                    <th>Tên tàu</th>
-                    <th>Tổng toa</th>
-                    <th>Tổng ghế</th>
-                    <th>Ga đi</th>
-                    <th>Ga đến</th>
-                    <th>Xuất phát</th>
-                    <th>Đến nơi</th>
-                    <th>Giá vé</th>
-                </tr>
-                <% int stt=1; %>
-                <tr>
-                    <c:forEach var="t" items="${trains}">
-                    <tr>
-                        <td><%= stt++ %></td>
-                        <td>${t.trainName}</td>
-                        <td>${t.totalCarriages}</td>
-                        <td>${t.totalSeats}</td>
-                        <td>${t.departureStation}</td>
-                        <td>${t.arrivalStation}</td>
-                        <td>${t.departureTime}</td>
-                        <td>${t.arrivalTime}</td>
-                        <td>${t.price}</td>
-                    </tr>
-                </c:forEach>
-                </tr>
+                <form action="trip" method="GET">
+                    <label for="departStation">Ga đi:</label>
+                    <input type="text" id="departStation" name="departStation" value="${param.departStation}">
 
+                    <label for="arriveStation">Ga đến:</label>
+                    <input type="text" id="arriveStation" name="arriveStation" value="${param.arriveStation}">
+
+                    <label for="departureDate">Ngày đi:</label>
+                    <input type="date" id="departureDate" name="departureDate" value="${param.departureDate}">
+
+                    <button type="submit">Lọc</button>
+                    <a href="trip"><button>Xóa lọc</button></a>
+                    <input type="hidden" name="action" value="list">
+                </form>
+                    <a href="trip?action=add"><button>Thêm chuyến</button></a>
+            </div>
+
+            
+
+
+            <%-- Trip List Table --%>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên tàu</th>
+                        <th>Tuyến</th>
+                        <th>Khởi hành</th>
+                        <th>Đến</th>
+                        <th>Tình trạng</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach items="${trips}" var="trip" varStatus="loop">
+                        <tr>
+                            <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
+                            <td>${trip.trainName}</td>
+                            <td>${trip.routeName}</td>
+                            <td>${trip.formattedDepartureTime}</td>
+                            <td>${trip.formattedArrivalTime}</td>
+                            <td>${trip.tripStatus}</td>
+                            <td class="actions">
+                                <a href="trip?action=edit&id=${trip.tripID}"><button>Sửa</button></a>
+                                <a href="trip?action=delete&id=${trip.tripID}" onclick="return confirm('Are you sure you want to delete this trip?');"><button>Xóa</button></a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
             </table>
+
+            <%-- Pagination Links --%>
+            <div class="pagination">
+                <c:if test="${currentPage > 1}">
+                    <a href="trip?page=${currentPage - 1}&departStation=${param.departStation}&arriveStation=${param.arriveStation}&departureDate=${param.departureDate}">Previous</a>
+                </c:if>
+
+                <c:forEach begin="1" end="${totalPages}" var="i">
+                    <c:choose>
+                        <c:when test="${currentPage == i}">
+                            <span>${i}</span> <%-- Current page - no link --%>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="trip?page=${i}&departStation=${param.departStation}&arriveStation=${param.arriveStation}&departureDate=${param.departureDate}">${i}</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+
+                <c:if test="${currentPage < totalPages}">
+                    <a href="trip?page=${currentPage + 1}&departStation=${param.departStation}&arriveStation=${param.arriveStation}&departureDate=${param.departureDate}">Next</a>
+                </c:if>
+            </div>
         </div>
     </body>
 </html>
