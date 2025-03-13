@@ -15,6 +15,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <script>
+            
             // Mức giảm giá TẠM TÍNH ở client
             const discountRates = {
                 "Người lớn": 0,

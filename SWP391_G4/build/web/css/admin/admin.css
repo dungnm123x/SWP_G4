@@ -346,70 +346,78 @@ form {
 .btn btn-outline-success{
     background-color: green
 }
-.dashboard {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cột bằng nhau */
-  gap: 8px; /* Giảm khoảng cách giữa các ô */
-  padding: 10px;
+
+/* Dashboard Statistics Enhancements */
+.dashboard-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 .dashboard-item {
-  background-color: #f8f9fa; /* Màu nền nhẹ nhàng */
-  border: 1px solid #dee2e6; /* Viền mỏng */
-  border-radius: 6px;
-  padding: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
-  text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    margin: 0 10px;
+    position: relative; /* Needed for absolute positioning of icons */
+    overflow: hidden; /* Hide any overflowing content */
 }
 
-/* Điều chỉnh thêm cho các ô cụ thể */
-.dashboard-item:nth-child(4), /* Thống kê Blog */
-.dashboard-item:nth-child(5) { /* Thống kê Quy định */
-  grid-column: span 3; /* Chiếm toàn bộ chiều rộng hàng */
+.dashboard-item:first-child {
+    margin-left: 0;
 }
 
-.dashboard-item:nth-child(6), /* Thống kê doanh thu */
-.dashboard-item:nth-child(7) { /* Thống kê người dùng */
-  grid-column: span 2; /* Chiếm 2/3 chiều rộng hàng */
+.dashboard-item:last-child {
+    margin-right: 0;
 }
 
-.dashboard-item canvas {
-    max-width: 100%; /* Đảm bảo canvas không vượt quá kích thước ô */
+/* Specific styling for each statistic */
+.dashboard-item.trains {
+    background-color: #FAEDCB;
 }
 
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+.dashboard-item.bookings {
+    background-color: #C9E4DF;
 }
 
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
-.revenue-options {
-  display: flex;
-  justify-content: flex-end; /* Căn chỉnh sang phải */
+.dashboard-item.trips {
+    background-color: #C5DEF2;
 }
 
-.revenue-option {
-  background-color: transparent;
-  border: none;
-  padding: 8px 16px;
-  margin: 0 4px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #333;
+.dashboard-item.rules {
+    background-color: #DBCDF0;
 }
 
-.revenue-option.active {
-  background-color: #f0f0f0; /* Màu nền cho tùy chọn đang chọn */
-  border-radius: 4px;
+/* Icon styling */
+.dashboard-item::before {
+    font-family: "bootstrap-icons"; /* Ensure this matches your icon library */
+    font-size: 2em;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: 0.6; /* Adjust opacity as needed */
 }
+
+.dashboard-item.trains::before {
+    content: "\F81B"; /* Unicode for bi-train-front */
+}
+
+.dashboard-item.bookings::before {
+    content: "\1F683"; /* Unicode for bi-ticket-perforated */
+}
+
+.dashboard-item.trips::before {
+    content: "\F2F6"; /* Unicode for bi-luggage */
+}
+
+.dashboard-item.rules::before {
+    content: "\F263"; /* Unicode for bi-file-ruled */
+}
+
+.dashboard-item h3 {
+    margin-top: 35px; /* Adjust spacing below the icon */
+}
+
