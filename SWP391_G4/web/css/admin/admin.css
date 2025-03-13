@@ -402,7 +402,7 @@ form {
 }
 
 .dashboard-item.trains::before {
-    content: "\F81B"; /* Unicode for bi-train-front */
+    content: "\F81A"; /* Unicode for bi-train-front-fill (or \F81B) */
 }
 
 .dashboard-item.bookings::before {
@@ -410,11 +410,11 @@ form {
 }
 
 .dashboard-item.trips::before {
-    content: "\F2F6"; /* Unicode for bi-luggage */
+    content: "\F2C7"; /* Unicode for bi-map-fill (or \F2C6) */
 }
 
 .dashboard-item.rules::before {
-    content: "\F263"; /* Unicode for bi-file-ruled */
+    content: "\F266"; /* Unicode for bi-file-earmark-text */
 }
 
 .dashboard-item h3 {

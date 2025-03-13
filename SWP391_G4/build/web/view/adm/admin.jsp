@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="./admin-scripts.js"></script>
-        
+
     </head>
     <body>
         <div class="container">
@@ -19,13 +19,8 @@
                 </div>
                 <ul class="menu">
                     <li><a href="admin?view=dashboard">Dashboard</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="toggleDropdown()">Quản lý người dùng <span class="caret"></span></a>
-                        <ul class="dropdown-menu" id="userDropdown">
-                            <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
-                            <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
+                    <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
                     <li><a href="trip">Quản lý chuyến tàu</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
@@ -37,61 +32,66 @@
             <div class="main-content">
                 <div class="header">
                     <h1>Trang Quản Trị Hệ Thống Vé Tàu</h1>
+                    <h1>haha</h1>
                 </div>
                 <div class="content">
                     <c:choose>
                         <c:when test="${type == 'dashboard'}">
                             <h2>Dashboard</h2>
-                            <div class="dashboard">
-                                <div class="dashboard-row">
-                                    <div class="dashboard-item trains">
-                                        <h3>Thống kê tàu</h3>
-                                        <p>Tổng số tàu: ${totalTrains}</p>
-                                    </div>
-                                    <div class="dashboard-item bookings">
-                                        <h3>Thống kê đặt vé</h3>
-                                        <p>Tổng số đặt vé: ${totalBookings}</i></p>
-                                    </div>
-                                    <div class="dashboard-item trips">
-                                        <h3>Thống kê chuyến đi</h3>
-                                        <p>Tổng số chuyến đi: ${totalTrips}</p>
-                                    </div>
-                                    <div class="dashboard-item rules">
-                                        <h3>Thống kê Quy định</h3>
-                                        <p>Tổng số Quy định: ${totalRules}</i></p>
-                                    </div>
-                                </div>
-                                <div class="dashboard-row">
-                                    <div class="dashboard-item" style="width: 60%;">
-                                        <h3>Thống kê doanh thu</h3>
-                                        <div class="revenue-chart-container">
-                                            <div class="revenue-options">
-                                                <button class="revenue-option active" data-type="month">Monthly</button>
-                                                <button class="revenue-option" data-type="week">Weekly</button>
-                                                <button class="revenue-option" data-type="year">Yearly</button>
-                                            </div>
-                                            <canvas id="revenueChart" width="600" height="300"></canvas>
-                                        </div>
-                                    </div>
-                                    <div class="dashboard-item" style="width: 40%;">
-                                        <h3>Thống kê người dùng</h3>
-                                        <canvas id="userChart" width="400" height="200"></canvas>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="dashboard">
+                                <div class="dashboard-row">
+                                    <div class="dashboard-item trains">
+                                        <h3>Thống kê tàu</h3>
+                                        <p>Tổng số tàu: ${totalTrains}</p>
+                                    </div>
+                                    <div class="dashboard-item bookings">
+                                        <h3>Thống kê đặt vé</h3>
+                                        <p>Tổng số đặt vé: ${totalBookings}</p>
+                                    </div>
+                                    <div class="dashboard-item trips">
+                                        <h3>Thống kê chuyến đi</h3>
+                                        <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                    </div>
+                                    <div class="dashboard-item rules">
+                                        <h3>Thống kê Quy định</h3>
+                                        <p>Tổng số Quy định: ${totalRules}</p>
+                                    </div>
+                                </div>
+                                <div class="dashboard-row">
+                                    <div class="dashboard-item" style="width: 60%;">
+                                        <h3>Thống kê doanh thu</h3>
+                                        <div class="revenue-chart-container">
+                                            <div class="revenue-options">
+                                                <button class="revenue-option active" data-type="month">Monthly</button>
+                                                <button class="revenue-option" data-type="week">Weekly</button>
+                                                <button class="revenue-option" data-type="year">Yearly</button>
+                                            </div>
+                                            <canvas id="revenueChart" width="600" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="dashboard-item" style="width: 40%;">
+                                        <h3>Thống kê người dùng</h3>
+                                        <canvas id="userChart" width="400" height="200"></canvas>
+                                    </div>
+                                </div>   
+                            </div>
+                                                        
 
                             <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    var dropdown = document.getElementById('userDropdown');
-                                    dropdown.style.display = 'none'; // Ẩn dropdown khi trang tải
-                                    window.toggleDropdown = function () {
-                                        if (dropdown.style.display === 'none') {
-                                            dropdown.style.display = 'block';
-                                        } else {
-                                            dropdown.style.display = 'none';
-                                        }
-                                    };
-                                });
+//                                
+//                                document.addEventListener('DOMContentLoaded', function () {
+//                                    var dropdown = document.getElementById('userDropdown');
+//                                    dropdown.style.display = 'none'
+//                                    window.toggleDropdown() = function (){
+//                                        if (dropdown.style.display == 'none') {
+//                                            dropdown.style.display = 'block';
+//                                        } else {
+//                                            dropdown.style.display = 'none';
+//                                        }
+//                                    }
+//                                    ;
+//                                });
+
                                 const revenueData = {
                                     week: ${revenueThisWeek},
                                     month: ${revenueThisMonth},
@@ -100,6 +100,8 @@
 
                                 const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
                                 let revenueChart;
+
+
 
                                 function renderRevenueChart(selectedType) {
                                     if (revenueChart) {
