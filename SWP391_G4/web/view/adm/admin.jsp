@@ -77,27 +77,29 @@
                                     </div>
                                 </div>
                                 <div class="dashboard-row">
-                                    <div class="dashboard-item" style="width: 50%;">
+                                    <div class="feedback-container">
                                         <h3>Phản hồi gần đây</h3>
                                         <c:choose>
                                             <c:when test="${not empty feedbackList}">
-                                                <ul>
+                                                <ul class="feedback-list">
                                                     <c:forEach var="feedback" items="${feedbackList}">
-                                                        <li>
-                                                            <strong>${feedback.content}</strong>
+                                                        <li class="feedback-item">
+                                                            <strong class="feedback-content">${feedback.content}</strong>
                                                             <br>
-                                                            Đánh giá: ${feedback.rating} sao
+                                                            <span class="feedback-rating">Đánh giá: ${feedback.rating} sao</span>
                                                             <br>
-                                                            Ngày gửi: ${feedback.feedbackDate}
+                                                            
+                                                            
+                                                            <span class="feedback-date">Ngày gửi: ${feedback.feedbackDate}</span>
                                                         </li>
                                                     </c:forEach>
                                                 </ul>
                                             </c:when>
                                             <c:otherwise>
-                                                <p>Không có phản hồi nào.</p>
+                                                <p class="no-feedback">Không có phản hồi nào.</p>
                                             </c:otherwise>
                                         </c:choose>
-                                    </div>
+                                    </div>  
                                 </div>
                             </div>
                                                         

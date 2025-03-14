@@ -421,3 +421,56 @@ form {
     margin-top: 35px; /* Adjust spacing below the icon */
 }
 
+/* CSS cho Feedback */
+.feedback-container {
+border: 1px solid #ddd;
+border-radius: 5px;
+padding: 20px;
+margin-bottom: 20px;
+background-color: #f9f9f9;
+}
+
+.feedback-container h3 {
+margin-top: 0;
+margin-bottom: 20px;
+font-size: 1.5em;
+color: #333;
+}
+
+.feedback-list {
+list-style: none;
+padding: 0;
+}
+
+.feedback-item {
+background-color: #fff;
+border: 1px solid #eee;
+padding: 15px;
+margin-bottom: 10px;
+border-radius: 5px;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-content {
+display: block;
+margin-bottom: 5px;
+color: #007bff;
+}
+
+.feedback-rating,
+.feedback-date,
+.feedback-email {
+display: block;
+margin-bottom: 3px;
+font-size: 0.9em;
+color: #666;
+}
+
+.feedback-item:last-child {
+margin-bottom: 0;
+}
+
+.no-feedback {
+color: #888;
+font-style: italic;
+}
