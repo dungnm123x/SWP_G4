@@ -72,11 +72,11 @@
                 </form>
 
             </div>
-            <h2 class="manager-title">Manager Rule</h2>
+            <h2 class="manager-title">Quản lý quy định </h2>
             <div class="action-buttons">
                 <!-- Nút "Add Blog" -->
                 <a class="btn btn-primary" href="add-rule">
-                    <i class="fas fa-plus-circle"></i> Add Rule
+                    <i class="fas fa-plus-circle"></i> Thêm quy định
                 </a>
             </div>
 
