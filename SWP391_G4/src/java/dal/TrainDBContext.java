@@ -194,6 +194,25 @@ public class TrainDBContext extends DBContext<TrainDTO> {
         return trains;
     }
 
+    public List<TrainDTO> getAllTrains() {
+        List<TrainDTO> trains = new ArrayList<>();
+        String sql = "SELECT TrainID, TrainName FROM Train";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TrainDTO train = new TrainDTO();
+                    train.setTrainID(rs.getInt("TrainID"));
+                    train.setTrainName(rs.getString("TrainName"));
+                    trains.add(train);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return trains;
+    }
+
     @Override
     public void insert(TrainDTO model) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
