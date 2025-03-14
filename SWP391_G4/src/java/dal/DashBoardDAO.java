@@ -106,7 +106,7 @@ public class DashBoardDAO extends DBContext<Object> {
 
     public List<Feedback> getLatestFeedbacks() throws SQLException {
     List<Feedback> feedbacks = new ArrayList<>();
-    String sql = "SELECT TOP 5 f.*, u.Email FROM Feedback f JOIN [User] u ON f.UserID = u.UserID ORDER BY f.FeedbackDate DESC"; // Get top 5 latest feedback with user email
+    String sql = "SELECT TOP 3 f.*, u.Email FROM Feedback f JOIN [User] u ON f.UserID = u.UserID ORDER BY f.FeedbackDate DESC"; // Get top 5 latest feedback with user email
     try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
         while (rs.next()) {
             Feedback feedback = new Feedback();

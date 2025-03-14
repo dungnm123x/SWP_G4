@@ -49,14 +49,23 @@
                                     <div class="dashboard-item bookings">
                                         <h3>Thống kê đặt vé</h3>
                                         <p>Tổng số đặt vé: ${totalBookings}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #96B4AA;">
+                                            <a href="train" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                     <div class="dashboard-item trips">
                                         <h3>Thống kê chuyến đi</h3>
                                         <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
+                                            <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                     <div class="dashboard-item rules">
                                         <h3>Thống kê Quy định</h3>
                                         <p>Tổng số Quy định: ${totalRules}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
+                                            <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="dashboard-row">
@@ -83,22 +92,20 @@
                                             <c:when test="${not empty feedbackList}">
                                                 <ul class="feedback-list">
                                                     <c:forEach var="feedback" items="${feedbackList}">
-                                                        <li class="feedback-item">
-                                                            <strong class="feedback-content">${feedback.content}</strong>
-                                                            <br>
-                                                            <span class="feedback-rating">
-                                                                Đánh giá: 
+                                                        <li class="feedback-item" style="with: 50%">
+                                                            <strong class="feedback-rating">
+                                                                <span class="feedback-email">Email: ${feedback.user.email}</span>
                                                                 <c:forEach var="i" begin="1" end="${feedback.rating}" step="1">
-                                                                    <i class="bi bi-star-fill text-warning" color="yellow"></i>
+                                                                    <i class="bi bi-star-fill text-warning" ></i>
                                                                 </c:forEach>
                                                                 <c:forEach var="i" begin="${feedback.rating + 1}" end="5" step="1">
-                                                                    <i class="bi bi-star text-warning" color="yellow"></i>
+                                                                    <i class="bi bi-star text-warning"></i>
                                                                 </c:forEach>
-                                                            </span>
+                                                            </strong>
                                                             <br>
-                                                            <span class="feedback-email">Email: ${feedback.user.email}</span>
-                                                            <br>
-                                                            <span class="feedback-date">Ngày gửi: ${feedback.feedbackDate}</span>
+                                                            
+                                                            <span class="feedback-content" style="color: black">${feedback.content}</span>
+                                                            
                                                         </li>
                                                     </c:forEach>
                                                 </ul>
