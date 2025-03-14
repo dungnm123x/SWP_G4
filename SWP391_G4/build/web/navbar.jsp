@@ -18,7 +18,7 @@
             <li class="nav-item"><a class="nav-link text-white" href="cancel-ticket"><i class="fas fa-ticket-alt"></i> <strong>Hoàn vé</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="blog-list"><i class="fas fa-newspaper"></i> <strong>Blog</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="rule-list"><i class="fas fa-file-contract"></i> <strong>Quy Định</strong></a></li>
-
+            <li class="nav-item"><a class="nav-link text-white" href="feedback"><i class="fas fa-comment-dots"></i> <strong>Feedback</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="contact"><i class="fas fa-phone"></i> <strong>Liên hệ</strong></a></li>
         </ul>
     </div>

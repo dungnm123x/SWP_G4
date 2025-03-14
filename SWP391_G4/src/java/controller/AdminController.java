@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import model.Feedback;
 import model.User;
 import model.Train;
 
@@ -43,7 +44,6 @@ public class AdminController extends HttpServlet {
                 double revenueThisWeek = dashBoardDAO.getRevenueThisWeek();
                 double revenueThisMonth = dashBoardDAO.getRevenueThisMonth();
                 double revenueThisYear = dashBoardDAO.getRevenueThisYear();
-                
 
                 request.setAttribute("revenueToday", revenueToday);
                 request.setAttribute("revenueThisWeek", revenueThisWeek);
@@ -57,6 +57,8 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalTrips", totalTrips);
                 request.setAttribute("totalBlogs", totalBlogs);
                 request.setAttribute("totalRules", totalRules);
+                List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
+                request.setAttribute("feedbackList", feedbackList);
 
                 request.setAttribute("type", "dashboard");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);

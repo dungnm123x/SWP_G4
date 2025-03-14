@@ -32,7 +32,6 @@
             <div class="main-content">
                 <div class="header">
                     <h1>Trang Quản Trị Hệ Thống Vé Tàu</h1>
-                    <h1>haha</h1>
                 </div>
                 <div class="content">
                     <c:choose>
@@ -43,6 +42,9 @@
                                     <div class="dashboard-item trains">
                                         <h3>Thống kê tàu</h3>
                                         <p>Tổng số tàu: ${totalTrains}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #F5E6C2;">
+                                            <a href="train" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                     <div class="dashboard-item bookings">
                                         <h3>Thống kê đặt vé</h3>
@@ -73,7 +75,30 @@
                                         <h3>Thống kê người dùng</h3>
                                         <canvas id="userChart" width="400" height="200"></canvas>
                                     </div>
-                                </div>   
+                                </div>
+                                <div class="dashboard-row">
+                                    <div class="dashboard-item" style="width: 50%;">
+                                        <h3>Phản hồi gần đây</h3>
+                                        <c:choose>
+                                            <c:when test="${not empty feedbackList}">
+                                                <ul>
+                                                    <c:forEach var="feedback" items="${feedbackList}">
+                                                        <li>
+                                                            <strong>${feedback.content}</strong>
+                                                            <br>
+                                                            Đánh giá: ${feedback.rating} sao
+                                                            <br>
+                                                            Ngày gửi: ${feedback.feedbackDate}
+                                                        </li>
+                                                    </c:forEach>
+                                                </ul>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <p>Không có phản hồi nào.</p>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </div>
                             </div>
                                                         
 

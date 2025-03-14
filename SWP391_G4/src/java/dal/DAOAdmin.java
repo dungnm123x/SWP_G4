@@ -5,6 +5,7 @@ import model.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Feedback;
 
 public class DAOAdmin extends DBContext {
 
@@ -229,6 +230,26 @@ public class DAOAdmin extends DBContext {
             }
         }
         return null; // Return null if the user is not found
+    }
+
+    public boolean addFeedback(Feedback feedback) {
+        String query = "INSERT INTO Feedback (UserID, Content, Rating) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, feedback.getUserId());
+            ps.setString(2, feedback.getContent());
+            ps.setInt(3, feedback.getRating());
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                return true;
+            } else {
+                System.err.println("Feedback not added: No rows affected.");
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print the full stack trace to the console
+            System.err.println("SQL Exception: " + e.getMessage()); // Log the specific SQL error
+            return false;
+        }
     }
 
     @Override
