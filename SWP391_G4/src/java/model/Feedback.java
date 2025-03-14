@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class Feedback {
     private int feedbackId;
-    private int userId;
+    private User user; // Thay đổi từ int userId sang User user
     private String content;
     private int rating;
     private Timestamp feedbackDate;
@@ -13,8 +13,8 @@ public class Feedback {
     public Feedback() {
     }
 
-    public Feedback(int userId, String content, int rating) {
-        this.userId = userId;
+    public Feedback(User user, String content, int rating) {
+        this.user = user; // Thay đổi để nhận đối tượng User
         this.content = content;
         this.rating = rating;
     }
@@ -27,12 +27,12 @@ public class Feedback {
         this.feedbackId = feedbackId;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getContent() {

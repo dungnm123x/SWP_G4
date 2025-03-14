@@ -235,7 +235,7 @@ public class DAOAdmin extends DBContext {
     public boolean addFeedback(Feedback feedback) {
         String query = "INSERT INTO Feedback (UserID, Content, Rating) VALUES (?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, feedback.getUserId());
+            ps.setInt(1, feedback.getUser().getUserId()); // Lấy UserID từ User object
             ps.setString(2, feedback.getContent());
             ps.setInt(3, feedback.getRating());
             int rowsAffected = ps.executeUpdate();
@@ -246,8 +246,8 @@ public class DAOAdmin extends DBContext {
                 return false;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Print the full stack trace to the console
-            System.err.println("SQL Exception: " + e.getMessage()); // Log the specific SQL error
+            e.printStackTrace();
+            System.err.println("SQL Exception: " + e.getMessage());
             return false;
         }
     }

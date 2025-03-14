@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import model.Feedback;
+import model.User;
 
 public class DashBoardDAO extends DBContext<Object> {
 
@@ -104,22 +105,26 @@ public class DashBoardDAO extends DBContext<Object> {
     }
 
     public List<Feedback> getLatestFeedbacks() throws SQLException {
-        List<Feedback> feedbacks = new ArrayList<>();
-        String sql = "SELECT TOP 5 * FROM Feedback ORDER BY FeedbackDate DESC"; // Get top 5 latest feedback
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                Feedback feedback = new Feedback();
-                feedback.setFeedbackId(rs.getInt("FeedbackID"));
-                feedback.setUserId(rs.getInt("UserID"));
-                feedback.setContent(rs.getString("Content"));
-                feedback.setRating(rs.getInt("Rating"));
-                feedback.setFeedbackDate(rs.getTimestamp("FeedbackDate"));
-                feedback.setStatus(rs.getBoolean("Status"));
-                feedbacks.add(feedback);
-            }
+    List<Feedback> feedbacks = new ArrayList<>();
+    String sql = "SELECT TOP 5 f.*, u.Email FROM Feedback f JOIN [User] u ON f.UserID = u.UserID ORDER BY f.FeedbackDate DESC"; // Get top 5 latest feedback with user email
+    try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+        while (rs.next()) {
+            Feedback feedback = new Feedback();
+            User user = new User();
+            user.setUserId(rs.getInt("UserID"));
+            user.setEmail(rs.getString("Email")); // Lấy email từ ResultSet
+            
+            feedback.setFeedbackId(rs.getInt("FeedbackID"));
+            feedback.setUser(user); // Set User object
+            feedback.setContent(rs.getString("Content"));
+            feedback.setRating(rs.getInt("Rating"));
+            feedback.setFeedbackDate(rs.getTimestamp("FeedbackDate"));
+            feedback.setStatus(rs.getBoolean("Status"));
+            feedbacks.add(feedback);
         }
-        return feedbacks;
     }
+    return feedbacks;
+}
 
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");

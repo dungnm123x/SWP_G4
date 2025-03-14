@@ -18,41 +18,31 @@ public class FeedbackController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Check if the user is logged in
         User user = (User) request.getSession().getAttribute("user");
         if (user == null) {
-            // Redirect to login page or display an error message
-            response.sendRedirect("login"); // Assuming "login" is your login servlet
-            return; // Stop further processing
+            response.sendRedirect("login");
+            return;
         }
-
-        // Display the feedback form
         request.getRequestDispatcher("view/adm/feedbackForm.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Check if the user is logged in
         User user = (User) request.getSession().getAttribute("user");
         if (user == null) {
-            // Redirect to login page or display an error message
-            response.sendRedirect("login"); // Assuming "login" is your login servlet
-            return; // Stop further processing
+            response.sendRedirect("login");
+            return;
         }
 
-        // Process and save feedback
-        int userId = user.getUserId(); // Get UserID from session
         String content = request.getParameter("content");
         int rating = Integer.parseInt(request.getParameter("rating"));
 
-        Feedback feedback = new Feedback(userId, content, rating);
+        Feedback feedback = new Feedback(user, content, rating); // Sử dụng User object từ session
         if (feedbackDAO.addFeedback(feedback)) {
-            // Feedback added successfully
             request.getSession().setAttribute("message", "Cảm ơn bạn đã gửi phản hồi!");
-            response.sendRedirect("home"); // Redirect to home or a thank you page
+            response.sendRedirect("home");
         } else {
-            // Handle error
             request.setAttribute("error", "Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.");
             request.getRequestDispatcher("view/adm/feedbackForm.jsp").forward(request, response);
         }

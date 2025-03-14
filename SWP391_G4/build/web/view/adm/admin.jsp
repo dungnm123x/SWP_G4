@@ -86,10 +86,18 @@
                                                         <li class="feedback-item">
                                                             <strong class="feedback-content">${feedback.content}</strong>
                                                             <br>
-                                                            <span class="feedback-rating">Đánh giá: ${feedback.rating} sao</span>
+                                                            <span class="feedback-rating">
+                                                                Đánh giá: 
+                                                                <c:forEach var="i" begin="1" end="${feedback.rating}" step="1">
+                                                                    <i class="bi bi-star-fill text-warning" color="yellow"></i>
+                                                                </c:forEach>
+                                                                <c:forEach var="i" begin="${feedback.rating + 1}" end="5" step="1">
+                                                                    <i class="bi bi-star text-warning" color="yellow"></i>
+                                                                </c:forEach>
+                                                            </span>
                                                             <br>
-                                                            
-                                                            
+                                                            <span class="feedback-email">Email: ${feedback.user.email}</span>
+                                                            <br>
                                                             <span class="feedback-date">Ngày gửi: ${feedback.feedbackDate}</span>
                                                         </li>
                                                     </c:forEach>
