@@ -57,10 +57,10 @@
                     <a href="trip"><button>Xóa lọc</button></a>
                     <input type="hidden" name="action" value="list">
                 </form>
-                    <a href="trip?action=add"><button>Thêm chuyến</button></a>
+                <a href="trip?action=add"><button>Thêm chuyến</button></a>
             </div>
 
-            
+
 
 
             <%-- Trip List Table --%>
