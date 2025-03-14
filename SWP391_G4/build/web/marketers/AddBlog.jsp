@@ -126,11 +126,11 @@
     </head>
     <body>
         <div class="slider-container">
-            <h2 class="slider-title">Add New Blog</h2>              
+            <h2 class="slider-title">Thêm Blog mới</h2>              
         </div>
         <div class="container rounded mt-5 mb-5">
             <div class="header">
-                <h4>Add New Blog</h4>
+                <h4>Thêm Blog mới</h4>
             </div>
 
             <!-- Hiển thị thông báo lỗi nếu có -->
@@ -194,7 +194,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="thumbnail" class="form-label">Title Thumbnail</label>
+                            <label for="thumbnail" class="form-label">Thumbnail</label>
                             <input type="file" name="thumbnail" class="form-control" id="thumbnailInput" accept="image/*" onchange="previewImage(event)"/>
                             <div class="mt-3" style="position: relative;">
                                 <img id="thumbnailPreview" src="" alt="Ảnh xem trước" style="max-width: 100%; display: none;"/>
@@ -203,10 +203,6 @@
                                 </button>
                             </div>
                         </div>
-
-
-
-
                     </div>
                 </div>
 

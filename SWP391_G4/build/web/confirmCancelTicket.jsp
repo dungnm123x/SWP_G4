@@ -46,6 +46,7 @@
                         <thead class="bg-dark text-white">
                             <tr>
                                 <th>Mã vé</th>
+                                <th>CCCD</th>
                                 <th>Hành trình</th>
                                 <th>Tàu</th>
                                 <th>Thời gian khởi hành</th>
@@ -64,6 +65,7 @@
                                 <c:set var="ticketCount" value="${ticketCount + 1}" />
                                 <tr>
                                     <td>${ticket.ticketID}</td>
+                                    <td>${ticket.cccd}</td>
                                     <td>${ticket.route}</td>
                                     <td>${ticket.trainCode}</td>
                                     <td>${ticket.departureTime}</td>
