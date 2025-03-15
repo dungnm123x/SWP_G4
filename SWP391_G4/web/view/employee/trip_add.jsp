@@ -92,7 +92,9 @@
         </select><br>
 
         <button type="submit">Thêm</button>
+        <a href="trip"><button>Quay lại</button></a>
     </form>
+        
   </div>
  </div>
 </body>

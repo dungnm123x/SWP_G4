@@ -95,7 +95,8 @@
                 <%-- Add other status options as needed --%>
         </select><br>
 
-        <button type="submit">Update Trip</button>
+        <button type="submit">Lưu</button>
+        <a href="trip"><button>Quay lại</button></a>
     </form>
  </div>
 </div>
