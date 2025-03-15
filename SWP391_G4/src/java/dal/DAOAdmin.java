@@ -251,7 +251,16 @@ public class DAOAdmin extends DBContext {
             return false;
         }
     }
-
+    public boolean grantAdminPrivileges(int userId) {
+    String query = "UPDATE [User] SET RoleID = 1 WHERE UserID = ? AND RoleID = 2"; // Nâng cấp từ Nhân viên (2) thành Quản trị viên (1)
+    try (PreparedStatement ps = connection.prepareStatement(query)) {
+        ps.setInt(1, userId);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet.");

@@ -63,6 +63,16 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("type", "dashboard");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                 return;
+            }
+            if ("grantAdmin".equals(view)) {
+                int userIdToElevate = Integer.parseInt(request.getParameter("id"));
+                if (dao.grantAdminPrivileges(userIdToElevate)) {
+                    request.getSession().setAttribute("message2", "✅ Đã nâng cấp nhân viên thành Quản trị viên!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Nâng cấp nhân viên thất bại.");
+                }
+                response.sendRedirect("admin?view=employees"); // Chuyển hướng về danh sách nhân viên
+                return;
             } else if ("addEmployee".equals(view)) {
                 request.getRequestDispatcher("/view/adm/addEmployees.jsp").forward(request, response);
                 return;

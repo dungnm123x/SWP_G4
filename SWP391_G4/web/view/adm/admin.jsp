@@ -103,9 +103,9 @@
                                                                 </c:forEach>
                                                             </strong>
                                                             <br>
-                                                            
+
                                                             <span class="feedback-content" style="color: black">${feedback.content}</span>
-                                                            
+
                                                         </li>
                                                     </c:forEach>
                                                 </ul>
@@ -318,7 +318,12 @@
                                                             onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
                                                         <i class="bi bi-eye"></i> Chi Tiết
                                                     </button>
-
+                                                    <c:if test="${user.roleID == 1 && item.roleID == 2}">
+                                                        <button class="btn btn-outline-warning btn-sm"
+                                                                onclick="location.href = 'admin?view=grantAdmin&id=${item.userId}'">
+                                                            <i class="bi bi-person-fill-up"></i> Cấp Quyền Quản trị viên
+                                                        </button>
+                                                    </c:if>
                                                     <c:choose>
                                                         <c:when test="${item.status}">
                                                             <button class="btn btn-outline-danger btn-sm" style="color: red; border-color: red;"
