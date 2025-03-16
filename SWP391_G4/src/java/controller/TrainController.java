@@ -31,13 +31,14 @@ public class TrainController extends HttpServlet {
                 case "edit":
                     showEditForm(request, response);
                     break;
-                case "delete":
+                case "delete": {
                     try {
                         deleteTrain(request, response);
                     } catch (SQLException ex) {
                         Logger.getLogger(TrainController.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    break;
+                }
+                break;
 
                 case "manageCarriages":
                     manageCarriages(request, response);
@@ -57,14 +58,16 @@ public class TrainController extends HttpServlet {
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
     }
 
-    //Show edit form
-    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int trainID = Integer.parseInt(request.getParameter("id"));
-        Train train = trainDAO.getTrainById(trainID);  // Get existing train
-        request.setAttribute("train", train); // Pass the Train object to the JSP
-        request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
-    }
+      private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    int trainID = Integer.parseInt(request.getParameter("id"));
+    Train train = trainDAO.getTrainById(trainID);  // Get existing train
+     // **IMPORTANT FIX:** Get the list of *all* trains for the table display
+    List<TrainDTO> trains = trainDAO.getAllTrains();
+    request.setAttribute("train", train); // Pass the Train object to the JSP
+    request.setAttribute("trains", trains);     // The list of *all* trains for the table
+    request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
+}
 
    //Delete Train
     private void deleteTrain(HttpServletRequest request, HttpServletResponse response)
@@ -185,7 +188,8 @@ public class TrainController extends HttpServlet {
         }
     }
 
-    private void updateTrain(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void updateTrain(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {  // Add ServletException
         int trainID = Integer.parseInt(request.getParameter("trainID"));
         String trainName = request.getParameter("trainName");
 
