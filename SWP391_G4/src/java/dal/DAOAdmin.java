@@ -251,16 +251,81 @@ public class DAOAdmin extends DBContext {
             return false;
         }
     }
-    public boolean grantAdminPrivileges(int userId) {
-    String query = "UPDATE [User] SET RoleID = 1 WHERE UserID = ? AND RoleID = 2"; // Nâng cấp từ Nhân viên (2) thành Quản trị viên (1)
-    try (PreparedStatement ps = connection.prepareStatement(query)) {
-        ps.setInt(1, userId);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+
+    // Phương thức kiểm tra xem người dùng có phải là Admin gốc hay không
+    public boolean isRootAdmin(int userId) throws SQLException {
+        String query = "SELECT 1 FROM [User] WHERE UserID = ? AND RoleID = 1";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
-}
+
+    // Phương thức kiểm tra xem người dùng có được phân quyền Admin hay không
+    public boolean isAuthorizedAdmin(int userId) throws SQLException {
+        String query = "SELECT 1 FROM AdminAuthorization WHERE UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    // Phương thức phân quyền Admin cho người dùng
+    public boolean authorizeAdmin(int userId, int authorizedBy) throws SQLException {
+        String query = "INSERT INTO AdminAuthorization (UserID, AuthorizedBy) VALUES (?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, authorizedBy);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                // Cập nhật roleID thành 2 (nhân viên)
+                updateUserRole(userId, 2);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // Phương thức thu hồi quyền Admin của người dùng
+    public boolean revokeAdminAuthorization(int userId) throws SQLException {
+        String query = "DELETE FROM AdminAuthorization WHERE UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // Phương thức lấy danh sách tất cả người dùng (để hiển thị trong trang phân quyền)
+    public List<User> getAllUsers() throws SQLException {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM [User] WHERE UserID != 1;"; // Loại bỏ Admin gốc
+        try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                users.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                        rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),
+                        rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status")));
+            }
+        }
+        return users;
+    }
+
+    // Phương thức cập nhật roleID của user
+    public boolean updateUserRole(int userId, int roleId) {
+        String query = "UPDATE [User] SET RoleID = ? WHERE UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, roleId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet.");

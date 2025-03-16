@@ -21,8 +21,12 @@
                     <li><a href="admin?view=dashboard">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
+                        <c:if test="${sessionScope.user.userId == 1}">
+                        <li><a href="admin?view=userauthorization">Phân quyền</a></li>
+                        </c:if>
                     <li><a href="trip">Quản lý chuyến tàu</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+
                 </ul>
                 <form action="logout" method="GET">
                     <button type="submit" class="logout-button">Logout</button>
@@ -275,6 +279,51 @@
                                 });
                             </script>
                         </c:when>
+                        <c:when test="${type == 'userauthorization'}">
+                            <h2>Phân quyền người dùng</h2>
+                            <table border="1">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="userItem" items="${list}" varStatus="status">
+                                        <tr>
+                                            <td>${userItem.userId}</td>
+                                            <td>${userItem.username}</td>
+                                            <td>${userItem.fullName}</td>
+                                            <td>${userItem.email}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${userItem.roleID == 1}">Admin</c:when>
+                                                    <c:when test="${userItem.roleID == 2}">Employee</c:when>
+                                                    <c:when test="${userItem.roleID == 3}">Customer</c:when>
+                                                    <c:otherwise>Unknown</c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <form method="post" action="admin">
+                                                    <input type="hidden" name="action" value="setUserRole">
+                                                    <input type="hidden" name="userId" value="${userItem.userId}">
+                                                    <select name="roleId">
+                                                        <option value="1" ${userItem.roleID == 1 ? 'selected' : ''}>Admin</option>
+                                                        <option value="2" ${userItem.roleID == 2 ? 'selected' : ''}>Employee</option>
+                                                        <option value="3" ${userItem.roleID == 3 ? 'selected' : ''}>Customer</option>
+                                                    </select>
+                                                    <button type="submit">Đặt Role</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:when>
                         <c:when test="${not empty list}">
                             <c:if test="${not empty list}">
                                 <div class="search-container">
@@ -318,12 +367,7 @@
                                                             onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
                                                         <i class="bi bi-eye"></i> Chi Tiết
                                                     </button>
-                                                    <c:if test="${user.roleID == 1 && item.roleID == 2}">
-                                                        <button class="btn btn-outline-warning btn-sm"
-                                                                onclick="location.href = 'admin?view=grantAdmin&id=${item.userId}'">
-                                                            <i class="bi bi-person-fill-up"></i> Cấp Quyền Quản trị viên
-                                                        </button>
-                                                    </c:if>
+
                                                     <c:choose>
                                                         <c:when test="${item.status}">
                                                             <button class="btn btn-outline-danger btn-sm" style="color: red; border-color: red;"
