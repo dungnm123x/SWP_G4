@@ -21,6 +21,11 @@ public class AdminController extends HttpServlet {
         DAOAdmin dao = new DAOAdmin();
         String view = request.getParameter("view");
         String search = request.getParameter("search");
+        int page = 1; // Default page
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
+        int pageSize = 10; // Number of items per page
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || user.getRoleID() != 1) {
             response.sendRedirect("login");
@@ -63,18 +68,56 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("type", "dashboard");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                 return;
+            } else if ("employees".equals(view)) {
+                List<User> employees;
+                int totalEmployees;
+                if (search == null || search.isEmpty()) {
+                    employees = dao.getAllEmployees(page, pageSize);
+                    totalEmployees = dao.countAllEmployees();
+                } else {
+                    employees = dao.searchEmployees(search, page, pageSize);
+                    totalEmployees = dao.countSearchEmployees(search);
+                }
+                request.setAttribute("list", employees);
+                request.setAttribute("type", "employees");
+                int totalPages = (int) Math.ceil((double) totalEmployees / pageSize);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("currentPage", page);
+            } else if ("customers".equals(view)) {
+                // Similar logic for customers
+                List<User> customers;
+                int totalCustomers;
+                if (search == null || search.isEmpty()) {
+                    customers = dao.getAllCustomers(page, pageSize);
+                    totalCustomers = dao.countAllCustomers();
+                } else {
+                    customers = dao.searchCustomers(search, page, pageSize);
+                    totalCustomers = dao.countSearchCustomers(search);
+                }
+                request.setAttribute("list", customers);
+                request.setAttribute("type", "customers");
+                int totalPages = (int) Math.ceil((double) totalCustomers / pageSize);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("currentPage", page);
             } else if ("userauthorization".equals(view)) {
+                // Similar logic for user authorization
                 if (user != null && user.getUserId() == 1) {
                     try {
                         String searchKeyword = request.getParameter("search");
                         List<User> users;
+                        int totalUsers;
                         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                            users = dao.searchUsers(searchKeyword); // Phương thức tìm kiếm mới trong DAO
+                            users = dao.searchUsers(searchKeyword, page, pageSize); // Phương thức tìm kiếm mới trong DAO
+                            totalUsers = dao.countSearchUsers(searchKeyword);
                         } else {
-                            users = dao.getAllUsers();
+                            users = dao.getAllUsers(page, pageSize);
+                            totalUsers = dao.countAllUsers();
                         }
                         request.setAttribute("list", users);
                         request.setAttribute("type", "userauthorization");
+                        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+                        request.setAttribute("totalPages", totalPages);
+                        request.setAttribute("currentPage", page);
                         request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                         return;
                     } catch (SQLException e) {
@@ -87,20 +130,6 @@ public class AdminController extends HttpServlet {
             } else if ("addEmployee".equals(view)) {
                 request.getRequestDispatcher("/view/adm/addEmployees.jsp").forward(request, response);
                 return;
-            }
-
-            if ("employees".equals(view)) {
-                List<User> employees = (search == null || search.isEmpty())
-                        ? dao.getAllEmployees()
-                        : dao.searchEmployees(search);
-                request.setAttribute("list", employees);
-                request.setAttribute("type", "employees");
-            } else if ("customers".equals(view)) {
-                List<User> customers = (search == null || search.isEmpty())
-                        ? dao.getAllCustomers()
-                        : dao.searchCustomers(search);
-                request.setAttribute("list", customers);
-                request.setAttribute("type", "customers");
             } else if ("details".equals(view)) { // Xử lý yêu cầu xem chi tiết
                 String type = request.getParameter("type");
                 int id = Integer.parseInt(request.getParameter("id"));

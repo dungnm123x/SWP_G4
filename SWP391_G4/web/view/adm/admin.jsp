@@ -336,6 +336,24 @@
                                     </c:forEach>
                                 </tbody>
                             </table>
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage - 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Previous</a>
+                                </c:if>
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <c:choose>
+                                        <c:when test="${i eq currentPage}">
+                                            <span>${i}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${i}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage + 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Next</a>
+                                </c:if>
+                            </div>
                         </c:when>
                         <c:when test="${not empty list}">
                             <c:if test="${not empty list}">
@@ -390,15 +408,15 @@
 
                                                     <c:choose>
                                                         <c:when test="${item.status}">
-                                                            <button class="btn btn-outline-danger btn-sm" style="color: red; border-color: red;"
+                                                            <button class="btn btn-outline-danger btn-sm" style="color: green; border-color: green;"
                                                                     onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
-                                                                <i class="bi bi-x-circle"></i> Vô Hiệu
+                                                                <i class="bi bi-check-circle"></i> Đang hoạt động
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <button class="btn btn-outline-success btn-sm" style="color: green; border-color: green;"
+                                                            <button class="btn btn-outline-success btn-sm" style="color: red; border-color: red;"
                                                                     onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
-                                                                <i class="bi bi-check-circle"></i> Khôi Phục
+                                                                <i class="bi bi-x-circle"></i> Đã tắt hoạt động
                                                             </button>
                                                         </c:otherwise>
                                                     </c:choose>
@@ -407,6 +425,24 @@
                                         </c:forEach>
                                     </tbody>
                                 </table>
+                                <div class="pagination">
+                                    <c:if test="${currentPage > 1}">
+                                        <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage - 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Previous</a>
+                                    </c:if>
+                                    <c:forEach var="i" begin="1" end="${totalPages}">
+                                        <c:choose>
+                                            <c:when test="${i eq currentPage}">
+                                                <span>${i}</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${i}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">${i}</a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                    <c:if test="${currentPage < totalPages}">
+                                        <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage + 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Next</a>
+                                    </c:if>
+                                </div>
 
                                 <c:if test="${type eq 'employees'}">
                                     <div class="add-button-container">
