@@ -1,6 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,7 +10,6 @@
     </head>
     <body>
         <div class="container">
-            <h2>Quản lý tàu</h2>
             <div class="sidebar">
                 <div class="logo">
                     <img src="./img/logo.jpg" alt="avatar">
@@ -29,20 +28,19 @@
                 <form action="logout" method="GET">
                     <button type="submit" class="logout-button">Logout</button>
                 </form>
-
             </div>
+            <h2>Quản lý tàu</h2>
 
-            <!-- Hiển thị thông báo -->
-            <c:if test="${not empty message}">
-                <p style="color: green;">${message}</p>
-            </c:if>
             <c:if test="${not empty error}">
-                <p style="color: red;">${error}</p>
+                <p class="error">${error}</p>
+            </c:if>
+            <c:if test="${not empty message}">
+                <p class="success">${message}</p>
             </c:if>
 
-            <!-- Form thêm hoặc chỉnh sửa tàu -->
             <form action="train" method="post">
                 <input type="hidden" name="action" value="${empty train ? 'add' : 'update'}">
+
                 <c:if test="${not empty train}">
                     <input type="hidden" name="trainID" value="${train.trainID}">
                 </c:if>
@@ -50,37 +48,37 @@
                 <label for="trainName">Tên tàu:</label>
                 <input type="text" id="trainName" name="trainName" value="${train.trainName}" required>
 
+                <label for="totalCarriages">Tổng số toa:</label>
+                <input type="number" id="totalCarriages" name="totalCarriages" value="${empty train ? '' : trainDTO.totalCarriages}" required>
+
+                <label for="vipCarriages">Số toa VIP:</label>
+                <input type="number" id="vipCarriages" name="vipCarriages" value="${empty train ? '' : trainDTO.vipCarriages}" required>
+
+
                 <button type="submit">${empty train ? 'Thêm tàu' : 'Cập nhật tàu'}</button>
             </form>
 
-            <!-- Bảng danh sách tàu -->
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Tên tàu</th>
-                        <th>Số toa</th>
-                        <th>Số ghế</th>
+                        <th>Tổng số toa</th>
+                        <th>Tổng số ghế</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="t" items="${trains}">
+                    <c:forEach var="train" items="${trains}">
                         <tr>
-                            <td>${t.trainID}</td>
-                            <td>${t.trainName}</td>
-                            <td>${t.totalCarriages}</td>
-                            <td>${t.totalSeats}</td>
+                            <td>${train.trainID}</td>
+                            <td>${train.trainName}</td>
+                            <td>${train.totalCarriages}</td>
+                            <td>${train.totalSeats}</td>
                             <td class="actions">
-                                <a href="train?action=edit&id=${t.trainID}">
-                                    <button>Chỉnh sửa</button>
-                                </a>
-                                <a href="train?action=delete&id=${t.trainID}" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                    <button style="background-color: red; color: white;">Xóa</button>
-                                </a>
-                                <a href="train?action=manageCarriages&id=${t.trainID}">
-                                    <button>Quản lý toa</button>
-                                </a>
+                                <a href="train?action=edit&id=${train.trainID}"><button>Chỉnh sửa</button></a>
+                                <a href="train?action=delete&id=${train.trainID}" onclick="return confirm('Bạn có chắc chắn muốn xóa tàu này (và tất cả các toa liên quan)?')"><button style="background-color: red; color: white;">Xóa</button></a>
+                                <a href="train?action=manageCarriages&id=${train.trainID}"><button>Quản lý toa</button></a>
                             </td>
                         </tr>
                     </c:forEach>
