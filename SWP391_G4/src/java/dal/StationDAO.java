@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dal;
 
 import java.sql.PreparedStatement;
@@ -14,14 +10,15 @@ import model.Station;
 
 public class StationDAO extends DBContext<RailwayDTO> {
 
+    // --- Existing Methods (Keep these!) ---
     public List<Station> getAllStations() {
         List<Station> stationList = new ArrayList<>();
         String sql = "SELECT * FROM Station";
         try (PreparedStatement stm = connection.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 stationList.add(new Station(
-                      rs.getInt("StationID"),
-                        rs.getString("StationName"), 
+                        rs.getInt("StationID"),
+                        rs.getString("StationName"),
                         rs.getString("Address")
                 ));
             }
@@ -29,20 +26,6 @@ public class StationDAO extends DBContext<RailwayDTO> {
             e.printStackTrace();
         }
         return stationList;
-    }
-
-    public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-        try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Station");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                stations.add(new Station(rs.getInt("StationID"), rs.getString("StationName"), rs.getString("Address")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return stations;
     }
 
     public String getStationNameById(int stationID) {
@@ -113,6 +96,65 @@ public class StationDAO extends DBContext<RailwayDTO> {
         }
     }
 
+    @Deprecated // Keep the old method, but mark it as deprecated
+    public List<Station> getStations() {
+        return getAllStations(); // Or, if getStations() had different logic, keep that logic here
+    }
+
+    // --- New Methods for Pagination ---
+    public List<Station> getStations(int page, int pageSize) {
+        List<Station> stations = new ArrayList<>();
+        String sql = "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (ORDER BY StationID) as row_num FROM Station) AS x WHERE row_num BETWEEN ? AND ?;";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, (page - 1) * pageSize + 1); // Correct start row
+            ps.setInt(2, page * pageSize);          // Correct end row
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    stations.add(new Station(
+                            rs.getInt("StationID"),
+                            rs.getString("StationName"),
+                            rs.getString("Address")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return stations;
+    }
+
+    public int getTotalStationCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS total FROM Station";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt("total"); // Use alias for clarity
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return count;
+    }
+    //Added to check if station is in use before deleting
+
+    public boolean isStationUsed(int stationID) {
+    String sql = "SELECT COUNT(*) FROM Route WHERE DepartureStationID = ? OR ArrivalStationID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, stationID);
+        ps.setInt(2, stationID);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Returns true if count > 0 (station is used)
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Log or handle the exception appropriately
+        return true; // Consider a station in use in case of database error
+    }
+    return false; // Station not used, safe to delete
+}
+
+
     @Override
     public void insert(RailwayDTO model) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -138,4 +180,3 @@ public class StationDAO extends DBContext<RailwayDTO> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
-    

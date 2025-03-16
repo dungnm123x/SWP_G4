@@ -6,7 +6,37 @@
     <head>
         <title>Quản lí chuyến</title>
         <link rel="stylesheet" href="css/employee.css">
+        <style>
+            /* Add some basic styling for pagination */
+            .pagination {
+                margin-top: 20px;
+                display:flex;
+                justify-content: center;
+            }
 
+            .pagination a, .pagination span {
+                padding: 8px 12px;
+                margin: 0 3px;
+                border: 1px solid #ddd;
+                text-decoration: none;
+                color: black;
+                background-color: white;
+            }
+
+            .pagination a:hover {
+                background-color: #ddd;
+            }
+
+            .pagination span { /* Style for the current page */
+                font-weight: bold;
+                background-color: #4CAF50; /* Or your preferred color */
+                color: white;
+                border-color: #4CAF50;
+            }
+            .error-message{
+                color: red;
+            }
+        </style>
     </head>
     <body>
 
