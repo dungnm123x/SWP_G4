@@ -15,6 +15,7 @@
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 
         <style>
+            
             body {
                 font-family: 'Arial', sans-serif;
                 background-color: #f4f6f9;
@@ -136,40 +137,54 @@
                                 <i class="bi bi-star star" data-value="5"></i>
                             </div>
                             <input type="hidden" id="rating" name="rating" value="0">
-                        </div>
+                            <span id="rating-text"></span>  </div>
                     </div>
                 </div>
-
-                <div class="mt-4 text-center">
-                    <a href="home"><button class="btn btn-outline-custom" type="button">Trang chủ</button></a>
-                    <input class="btn btn-primary" type="submit" value="Gửi"/>
-                </div>
-            </form>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const stars = document.querySelectorAll('.star');
-                const ratingInput = document.getElementById('rating');
+        <div class="mt-4 text-center">
+            <a href="home"><button class="btn btn-outline-custom" type="button">Trang chủ</button></a>
+            <input class="btn btn-primary" type="submit" value="Gửi"/>
+        </div>
+    </form>
+</div>
 
-                stars.forEach(star => {
-                    star.addEventListener('click', function () {
-                        const value = parseInt(this.dataset.value);
-                        ratingInput.value = value;
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('rating');
+        const ratingText = document.getElementById('rating-text');
 
-                        stars.forEach((s, index) => {
-                            if (index < value) {
-                                s.classList.add('bi-star-fill', 'filled');
-                                s.classList.remove('bi-star');
-                            } else {
-                                s.classList.remove('bi-star-fill', 'filled');
-                                s.classList.add('bi-star');
-                            }
-                        });
-                    });
+        const ratingLabels = {
+            1: "Tệ",
+            2: "Không hài lòng",
+            3: "Bình thường",
+            4: "Hài lòng",
+            5: "Tuyệt vời"
+        };
+
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                const value = parseInt(this.dataset.value);
+                ratingInput.value = value;
+                ratingText.textContent = ratingLabels[value];
+
+                stars.forEach((s, index) => {
+                    if (index < value) {
+                        s.classList.add('bi-star-fill', 'filled');
+                        s.classList.remove('bi-star');
+                        // Áp dụng gradient cho màu vàng
+                        s.style.color = `rgb(255, ${255 - (value - index - 1) * 50}, 0)`; // Tạo gradient màu vàng nhạt dần
+                    } else {
+                        s.classList.remove('bi-star-fill', 'filled');
+                        s.classList.add('bi-star');
+                        s.style.color = '#ccc'; // Màu xám
+                    }
                 });
             });
-        </script>
-    </body>
+        });
+    });
+</script>
+</body>
 </html>
