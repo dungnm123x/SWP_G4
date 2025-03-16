@@ -48,11 +48,13 @@
                 <label for="trainName">Tên tàu:</label>
                 <input type="text" id="trainName" name="trainName" value="${train.trainName}" required>
 
-                <label for="totalCarriages">Tổng số toa:</label>
-                <input type="number" id="totalCarriages" name="totalCarriages" value="${empty train ? '' : trainDTO.totalCarriages}" required>
+                <c:if test="${empty train}"> <%-- Only show these fields when adding a new train --%>
+                    <label for="totalCarriages">Tổng số toa:</label>
+                    <input type="number" id="totalCarriages" name="totalCarriages" required>
 
-                <label for="vipCarriages">Số toa VIP:</label>
-                <input type="number" id="vipCarriages" name="vipCarriages" value="${empty train ? '' : trainDTO.vipCarriages}" required>
+                    <label for="vipCarriages">Số toa VIP:</label>
+                    <input type="number" id="vipCarriages" name="vipCarriages" required>
+                </c:if>
 
 
                 <button type="submit">${empty train ? 'Thêm tàu' : 'Cập nhật tàu'}</button>

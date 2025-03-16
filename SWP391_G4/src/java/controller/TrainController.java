@@ -31,14 +31,13 @@ public class TrainController extends HttpServlet {
                 case "edit":
                     showEditForm(request, response);
                     break;
-                case "delete": {
+                case "delete":
                     try {
                         deleteTrain(request, response);
                     } catch (SQLException ex) {
                         Logger.getLogger(TrainController.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
-                break;
+                    break;
 
                 case "manageCarriages":
                     manageCarriages(request, response);
@@ -50,6 +49,7 @@ public class TrainController extends HttpServlet {
         }
     }
 
+    //Show list train
     private void listTrains(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<TrainDTO> trains = trainDAO.getAllTrains();
@@ -57,18 +57,30 @@ public class TrainController extends HttpServlet {
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
     }
 
+    //Show edit form
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int trainID = Integer.parseInt(request.getParameter("id"));
-        Train train = trainDAO.getTrainById(trainID);
-        request.setAttribute("train", train);
+        Train train = trainDAO.getTrainById(trainID);  // Get existing train
+        request.setAttribute("train", train); // Pass the Train object to the JSP
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
     }
 
+   //Delete Train
     private void deleteTrain(HttpServletRequest request, HttpServletResponse response)
             throws IOException, SQLException, ServletException {
         int trainID = Integer.parseInt(request.getParameter("id"));
-        boolean deleted = trainDAO.deleteTrain(trainID);
+        // Check if the train is used in any trips *before* attempting deletion
+        if (trainDAO.isTrainUsedInTrips(trainID)) {
+            // Train is used, so do NOT delete.  Set an error message and forward back to the list.
+            request.setAttribute("error", "Cannot delete train. It is currently used in one or more trips.");
+            List<TrainDTO> trains = trainDAO.getAllTrains(); // Re-fetch the train list
+            request.setAttribute("trains", trains);         // Make sure the train list is available
+            request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response); // Go back to train management page
+            return; // IMPORTANT:  Stop further processing!
+        }
+
+        boolean deleted = trainDAO.deleteTrain(trainID); // Use TrainDAO
 
         if (deleted) {
             // Redirect with a success message.
@@ -76,8 +88,8 @@ public class TrainController extends HttpServlet {
         } else {
             // Forward with an error message.
             request.setAttribute("error", "Failed to delete train. It might have associated carriages or other dependencies.");
-             List<TrainDTO> trains = trainDAO.getAllTrains();
-             request.setAttribute("trains", trains);
+            List<TrainDTO> trains = trainDAO.getAllTrains();
+            request.setAttribute("trains", trains);
             request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response); // Go back to the list, displaying the error.
 
         }
@@ -86,10 +98,10 @@ public class TrainController extends HttpServlet {
     private void manageCarriages(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int trainID = Integer.parseInt(request.getParameter("id"));
-        TrainDTO train = trainDAO.getFullTrainInfoById(trainID);
+        TrainDTO train = trainDAO.getFullTrainInfoById(trainID); // Get full info (needed for display)
 
         List<Carriage> carriages = carriageDAO.getCarByTrainID(trainID);
-        request.setAttribute("train", train);
+        request.setAttribute("train", train); // Use TrainDTO here
         request.setAttribute("carriages", carriages);
         request.getRequestDispatcher("view/employee/carriage_management.jsp").forward(request, response);
     }
@@ -98,6 +110,11 @@ public class TrainController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+
+        if (action == null) {
+            action = "list";  // Or some other default action
+        }
+
         switch (action) {
             case "add":
                 addTrain(request, response);
@@ -105,7 +122,7 @@ public class TrainController extends HttpServlet {
             case "update":
                 updateTrain(request, response);
                 break;
-            case "addCarriage":
+            case "addCarriage": // You'll likely need separate JSPs for carriage management
                 addCarriage(request, response);
                 break;
             case "updateCarriage":
@@ -114,15 +131,17 @@ public class TrainController extends HttpServlet {
             case "deleteCarriage":
                 deleteCarriage(request, response);
                 break;
+            default:
+                listTrains(request, response); // Default action
         }
     }
 
-    private void addTrain(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    private void addTrain(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String trainName = request.getParameter("trainName");
         int totalCarriages = 0;
         int vipCarriages = 0;
 
+        // Input validation (MUST be done)
         try {
             totalCarriages = Integer.parseInt(request.getParameter("totalCarriages"));
             vipCarriages = Integer.parseInt(request.getParameter("vipCarriages"));
@@ -151,7 +170,7 @@ public class TrainController extends HttpServlet {
             return;  // Important: Stop processing here!
         }
 
-        Train train = new Train(trainName); // Create Train object *after* duplicate check
+        Train train = new Train(trainName);
         train = trainDAO.addTrain(train, totalCarriages, vipCarriages); // Use corrected addTrain
 
         if (train != null) {
@@ -166,8 +185,7 @@ public class TrainController extends HttpServlet {
         }
     }
 
-    private void updateTrain(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    private void updateTrain(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int trainID = Integer.parseInt(request.getParameter("trainID"));
         String trainName = request.getParameter("trainName");
 
@@ -181,19 +199,19 @@ public class TrainController extends HttpServlet {
             return; // IMPORTANT: Stop processing here
         }
 
-
-        Train train = new Train(trainID, trainName); // Create Train object for update
-        if (trainDAO.updateTrain(train)) { // Call updateTrain method
-              response.sendRedirect("train?message=Updated successfully");
+        Train train = new Train(trainID, trainName);
+        if(trainDAO.updateTrain(train)){
+             response.sendRedirect("train?message=Train updated successfully");
         } else{
             request.setAttribute("error", "Update train failed!");
              List<TrainDTO> trains = trainDAO.getAllTrains();
              request.setAttribute("trains", trains);
             request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response); // Forward, don't redirect on error
         }
-    }
 
-    private void addCarriage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+      private void addCarriage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Train train = new Train(Integer.parseInt(request.getParameter("trainID")));
         String carriageType = request.getParameter("carriageType");
         int capacity = carriageType.equals("VIP") ? 12 : 10;
@@ -222,4 +240,5 @@ public class TrainController extends HttpServlet {
         carriageDAO.deleteCarriage(carriageID);
         response.sendRedirect("train?action=manageCarriages&id=" + trainID);
     }
+
 }

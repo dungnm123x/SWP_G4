@@ -9,7 +9,7 @@ import java.util.List;
 import dto.TrainDTO;
 import model.Carriage;
 import model.Train;
-import java.sql.CallableStatement; // **QUAN TRỌNG: Thêm import này**
+import java.sql.CallableStatement;
 
 public class TrainDAO extends DBContext<TrainDTO> {
 
@@ -33,7 +33,7 @@ public class TrainDAO extends DBContext<TrainDTO> {
 
     // Check if a train name already exists
     public boolean isTrainNameExist(String trainName) {
-      String sql = "SELECT COUNT(*) FROM Train WHERE TrainName = ?";
+        String sql = "SELECT COUNT(*) FROM Train WHERE TrainName = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, trainName);
             try (ResultSet rs = ps.executeQuery()) {
@@ -46,9 +46,10 @@ public class TrainDAO extends DBContext<TrainDTO> {
         }
         return false; // Assume no existence on error
     }
+
     // Get Train name by ID.
     public String getTrainNameById(int trainID) {
-       String trainName = null;
+        String trainName = null;
         String sql = "SELECT TrainName FROM Train WHERE TrainID = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, trainID);
@@ -86,8 +87,9 @@ public class TrainDAO extends DBContext<TrainDTO> {
         }
         return trains;
     }
+
     //Get train by id with total carriages and seats
-     public TrainDTO getFullTrainInfoById(int trainID) {
+    public TrainDTO getFullTrainInfoById(int trainID) {
         TrainDTO train = null;
         String sql = "SELECT t.TrainID, t.TrainName, "
                 + "COUNT(c.CarriageID) AS TotalCarriages, COALESCE(SUM(c.Capacity), 0) AS TotalSeats "
@@ -97,7 +99,7 @@ public class TrainDAO extends DBContext<TrainDTO> {
                 + "GROUP BY t.TrainID, t.TrainName"; // Correct GROUP BY
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-             ps.setInt(1, trainID);
+            ps.setInt(1, trainID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     train = new TrainDTO();
@@ -113,26 +115,28 @@ public class TrainDAO extends DBContext<TrainDTO> {
         return train;
     }
 
-     public Train addTrain(Train train, int totalCarriages, int vipCarriages) {
-        try (CallableStatement cstmt = connection.prepareCall("{? = call AddTrainWithCarriages(?, ?, ?)}")) { // Correct syntax
+    // Add new Train (using Stored Procedure)
+    public Train addTrain(Train train, int totalCarriages, int vipCarriages) {
+        try (CallableStatement cstmt = connection.prepareCall("{? = call AddTrainWithCarriages(?, ?, ?)}")) {
 
-            cstmt.registerOutParameter(1, java.sql.Types.INTEGER); // Register the output parameter
+            cstmt.registerOutParameter(1, java.sql.Types.INTEGER); // Register output parameter (TrainID)
             cstmt.setString(2, train.getTrainName());
             cstmt.setInt(3, totalCarriages);
             cstmt.setInt(4, vipCarriages);
 
             cstmt.execute(); // Execute the stored procedure
 
-            // Retrieve the returned TrainID from the output parameter
-            int trainId = cstmt.getInt(1);  // Get the output parameter (TrainID)
-            train.setTrainID(trainId);     // Set the TrainID in the Train object
-            return train; // Return the Train object
+            // Get the returned TrainID
+            int trainId = cstmt.getInt(1);
+            train.setTrainID(trainId);
+            return train;
 
         } catch (SQLException e) {
-            e.printStackTrace();  // Log the exception (use a logger in production)
-            return null;        // Indicate failure
+            e.printStackTrace(); // Log properly (use a logging framework in a real application)
+            return null;
         }
     }
+
 
 
     // Update train
@@ -148,43 +152,35 @@ public class TrainDAO extends DBContext<TrainDTO> {
         }
     }
 
-    // Delete Train
-    public boolean deleteTrain(int trainID) throws SQLException {
-        String deleteCarriages = "DELETE FROM Carriage WHERE TrainID = ?";
-        String deleteTrain = "DELETE FROM Train WHERE TrainID = ?";
-        connection.setAutoCommit(false);  // Start a transaction
-        try (PreparedStatement ps1 = connection.prepareStatement(deleteCarriages);
-             PreparedStatement ps2 = connection.prepareStatement(deleteTrain)) {
-
-            ps1.setInt(1, trainID);
-            ps1.executeUpdate(); // Delete carriages first (due to foreign key constraint)
-
-            ps2.setInt(1, trainID);
-            ps2.executeUpdate(); // Then delete the train
-
-            connection.commit(); // Commit the transaction
-            return true;
-
+     // Check if a train is used in any trips
+    public boolean isTrainUsedInTrips(int trainID) {
+        String sql = "SELECT COUNT(*) FROM Trip WHERE TrainID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trainID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Returns true if count > 0 (train is used)
+                }
+            }
         } catch (SQLException e) {
-            connection.rollback(); // Rollback if error
             e.printStackTrace();
+            // Handle or log the exception as needed
+        }
+        return false; // Assume not used if there's an error
+    }
+   // Delete Train - Using Stored Procedure
+    public boolean deleteTrain(int trainID) throws SQLException {
+        try (CallableStatement cstmt = connection.prepareCall("{call DeleteTrainIfUnused(?)}")) {
+            cstmt.setInt(1, trainID);
+            cstmt.execute();
+            return true; // Assume success.  The stored proc handles the check.
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log properly
             return false;
-        } finally {
-             connection.setAutoCommit(true); // Restore auto commit
         }
     }
 
-   //getList
     @Override
-    public ArrayList<TrainDTO> list() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    //get
-    @Override
-    public TrainDTO get(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-     @Override
     public void insert(TrainDTO model) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -199,4 +195,13 @@ public class TrainDAO extends DBContext<TrainDTO> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public ArrayList<TrainDTO> list() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public TrainDTO get(int id) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
