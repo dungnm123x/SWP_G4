@@ -33,7 +33,7 @@ public class TrainDAO extends DBContext<TrainDTO> {
 
     // Check if a train name already exists
     public boolean isTrainNameExist(String trainName) {
-        String sql = "SELECT COUNT(*) FROM Train WHERE TrainName = ?";
+      String sql = "SELECT COUNT(*) FROM Train WHERE TrainName = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, trainName);
             try (ResultSet rs = ps.executeQuery()) {
@@ -46,7 +46,6 @@ public class TrainDAO extends DBContext<TrainDTO> {
         }
         return false; // Assume no existence on error
     }
-
     // Get Train name by ID.
     public String getTrainNameById(int trainID) {
         String trainName = null;
@@ -87,9 +86,52 @@ public class TrainDAO extends DBContext<TrainDTO> {
         }
         return trains;
     }
-
+     // Get paginated list of trains
+    public List<TrainDTO> getTrains(int page, int pageSize) {
+        List<TrainDTO> trains = new ArrayList<>();
+        String sql = "SELECT * FROM (" +
+                "SELECT t.TrainID, t.TrainName, " +
+                "COUNT(c.CarriageID) AS TotalCarriages, COALESCE(SUM(c.Capacity), 0) AS TotalSeats, " +
+                "ROW_NUMBER() OVER (ORDER BY t.TrainID) as row_num " + // Row number is essential
+                "FROM Train t " +
+                "LEFT JOIN Carriage c ON t.TrainID = c.TrainID " +
+                "GROUP BY t.TrainID, t.TrainName" +
+                ") as x WHERE row_num BETWEEN ? AND ?"; // Add pagination
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+             ps.setInt(1, (page -1 ) * pageSize + 1);
+             ps.setInt(2, page * pageSize );
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                     TrainDTO train = new TrainDTO();
+                    train.setTrainID(rs.getInt("TrainID"));
+                    train.setTrainName(rs.getString("TrainName"));
+                    train.setTotalCarriages(rs.getInt("TotalCarriages"));
+                    train.setTotalSeats(rs.getInt("TotalSeats"));
+                    trains.add(train);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+             return null;
+        }
+        return trains;
+    }
+     // Get total number of trains
+    public int getTotalTrainsCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS total FROM Train";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
     //Get train by id with total carriages and seats
-    public TrainDTO getFullTrainInfoById(int trainID) {
+     public TrainDTO getFullTrainInfoById(int trainID) {
         TrainDTO train = null;
         String sql = "SELECT t.TrainID, t.TrainName, "
                 + "COUNT(c.CarriageID) AS TotalCarriages, COALESCE(SUM(c.Capacity), 0) AS TotalSeats "
@@ -99,7 +141,7 @@ public class TrainDAO extends DBContext<TrainDTO> {
                 + "GROUP BY t.TrainID, t.TrainName"; // Correct GROUP BY
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, trainID);
+             ps.setInt(1, trainID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     train = new TrainDTO();
@@ -138,7 +180,6 @@ public class TrainDAO extends DBContext<TrainDTO> {
     }
 
 
-
     // Update train
     public boolean updateTrain(Train train) {
         String sql = "UPDATE Train SET TrainName = ? WHERE TrainID = ?";
@@ -151,8 +192,7 @@ public class TrainDAO extends DBContext<TrainDTO> {
             return false;
         }
     }
-
-     // Check if a train is used in any trips
+      // Check if a train is used in any trips
     public boolean isTrainUsedInTrips(int trainID) {
         String sql = "SELECT COUNT(*) FROM Trip WHERE TrainID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -165,11 +205,14 @@ public class TrainDAO extends DBContext<TrainDTO> {
         } catch (SQLException e) {
             e.printStackTrace();
             // Handle or log the exception as needed
+             return false;
         }
+       
         return false; // Assume not used if there's an error
     }
-   // Delete Train - Using Stored Procedure
-    public boolean deleteTrain(int trainID) throws SQLException {
+
+    // Delete Train - Using Stored Procedure
+      public boolean deleteTrain(int trainID) throws SQLException {
         try (CallableStatement cstmt = connection.prepareCall("{call DeleteTrainIfUnused(?)}")) {
             cstmt.setInt(1, trainID);
             cstmt.execute();
@@ -197,11 +240,11 @@ public class TrainDAO extends DBContext<TrainDTO> {
 
     @Override
     public ArrayList<TrainDTO> list() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public TrainDTO get(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
