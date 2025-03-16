@@ -9,13 +9,15 @@ import model.Booking;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.sql.Types;
+import dto.BookingDTO;
+import dto.TicketDTO;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.sql.Statement; 
 
-/**
- *
- * @author Admin
- */
 public class BookingDAO extends DBContext {
 
     public int insertBooking(Booking booking) throws SQLException {
@@ -117,6 +119,325 @@ public class BookingDAO extends DBContext {
             }
         }
         return bookings;
+    }
+
+    public List<BookingDTO> getBookings(int page, int pageSize, String customerName, String phone, String email, String status, LocalDate startDate, LocalDate endDate, Integer routeId) {
+        List<BookingDTO> bookings = new ArrayList<>();
+        // IMPORTANT: Build this SQL query carefully to prevent SQL injection.
+        // Use PreparedStatement and set parameters correctly.
+        String sql = "SELECT * FROM (SELECT b.*, u.FullName, u.PhoneNumber, u.Email, "
+                + "t.TrainName, "
+                + "CONCAT(st1.StationName, ' - ', st2.StationName) AS RouteName, "
+                + "tr.DepartureTime, tr.ArrivalTime, "
+                + "ROW_NUMBER() OVER (ORDER BY b.BookingID) as row_num "
+                + // Row number for pagination
+                "FROM Booking b "
+                + "JOIN [User] u ON b.UserID = u.UserID "
+                + "JOIN Trip tr ON b.TripID = tr.TripID "
+                + "JOIN Train t ON tr.TrainID = t.TrainID "
+                + // Join with Train
+                "JOIN Route r ON tr.RouteID = r.RouteID "
+                + // Join with Route
+                "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
+                + // Join for departure station
+                "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
+                + // Join for arrival station
+                "WHERE 1=1 "; // Makes it easy to add conditions
+
+        // Add WHERE clauses for filtering.  Use PreparedStatement parameters!
+        if (customerName != null && !customerName.isEmpty()) {
+            sql += " AND u.FullName LIKE ? ";
+        }
+        if (phone != null && !phone.isEmpty()) {
+            sql += " AND u.PhoneNumber LIKE ? ";
+        }
+        if (email != null && !email.isEmpty()) {
+            sql += " AND u.Email LIKE ? ";
+        }
+        if (status != null && !status.isEmpty() && !status.equals("All")) {
+            sql += " AND b.PaymentStatus = ? "; // Use PaymentStatus for filtering
+        }
+
+        if (startDate != null) {
+            sql += " AND b.BookingDate >= ? ";
+        }
+        if (endDate != null) {
+            sql += " AND b.BookingDate <= ? ";
+        }
+        if (routeId != null) {
+            sql += " AND tr.RouteID = ? ";
+        }
+        sql += ") as x WHERE row_num BETWEEN ? AND ?"; // Add pagination
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+            if (customerName != null && !customerName.isEmpty()) {
+                ps.setString(paramIndex++, "%" + customerName + "%"); // Use % for LIKE
+            }
+            if (phone != null && !phone.isEmpty()) {
+                ps.setString(paramIndex++, "%" + phone + "%");
+            }
+            if (email != null && !email.isEmpty()) {
+                ps.setString(paramIndex++, "%" + email + "%");
+            }
+            if (status != null && !status.isEmpty() && !status.equals("All")) {
+                ps.setString(paramIndex++, status);
+            }
+            if (startDate != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.valueOf(startDate.atStartOfDay())); // Convert LocalDate to Timestamp
+            }
+            if (endDate != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.valueOf(endDate.atTime(23, 59, 59))); // End of day
+            }
+            if (routeId != null) {
+                ps.setInt(paramIndex++, routeId);
+            }
+
+            ps.setInt(paramIndex++, (page - 1) * pageSize + 1); // Offset
+            ps.setInt(paramIndex++, page * pageSize); // Limit
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    BookingDTO booking = new BookingDTO();
+                    // Populate the BookingDTO from the ResultSet
+                    booking.setBookingID(rs.getInt("BookingID"));
+                    booking.setUserID(rs.getInt("UserID"));
+                    booking.setTripID(rs.getInt("TripID"));
+                    // ... set other Booking fields ...
+                    booking.setTotalPrice(rs.getDouble("TotalPrice"));
+                    booking.setPaymentStatus(rs.getString("PaymentStatus"));
+                    booking.setBookingStatus(rs.getString("BookingStatus"));
+                    Timestamp bookingTimestamp = rs.getTimestamp("BookingDate");
+                    if (bookingTimestamp != null) {
+                        booking.setBookingDate(bookingTimestamp.toLocalDateTime());
+                    }
+
+                    // Set related object data (from JOINs)
+                    booking.setCustomerName(rs.getString("FullName")); // From User table
+                    booking.setCustomerPhone(rs.getString("PhoneNumber"));
+                    booking.setCustomerEmail(rs.getString("Email"));
+                    booking.setTrainName(rs.getString("TrainName"));
+                    booking.setRouteName(rs.getString("RouteName")); // Combined station names
+
+                    Timestamp departureTimestamp = rs.getTimestamp("DepartureTime");
+                    if (departureTimestamp != null) {
+                        booking.setDepartureTime(departureTimestamp.toLocalDateTime());
+                    }
+
+                    Timestamp arrivalTimestamp = rs.getTimestamp("ArrivalTime");
+                    if (arrivalTimestamp != null) {
+                        booking.setArrivalTime(arrivalTimestamp.toLocalDateTime());
+                    }
+
+                    bookings.add(booking);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+        }
+        return bookings;
+    }
+
+    // Method to get the total count of bookings (for pagination)
+    public int getTotalBookingCount(String customerName, String phone, String email, String status, LocalDate startDate, LocalDate endDate, Integer routeId) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS total "
+                + "FROM Booking b "
+                + "JOIN [User] u ON b.UserID = u.UserID "
+                + // Join with User
+                "JOIN Trip tr ON b.TripID = tr.TripID "
+                + // Join with Trip
+                "JOIN Route r ON tr.RouteID = r.RouteID "
+                + "WHERE 1=1 ";
+
+        // Add WHERE clauses for filtering.  Use PreparedStatement parameters!
+        if (customerName != null && !customerName.isEmpty()) {
+            sql += " AND u.FullName LIKE ? ";
+        }
+        if (phone != null && !phone.isEmpty()) {
+            sql += " AND u.PhoneNumber LIKE ? ";
+        }
+        if (email != null && !email.isEmpty()) {
+            sql += " AND u.Email LIKE ? ";
+        }
+        if (status != null && !status.isEmpty() && !status.equals("All")) {
+            sql += " AND b.PaymentStatus = ? ";
+        }
+        if (startDate != null) {
+            sql += " AND b.BookingDate >= ? ";
+        }
+        if (endDate != null) {
+            sql += " AND b.BookingDate <= ? ";
+        }
+        if (routeId != null) {
+            sql += " AND tr.RouteID = ? ";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
+            if (customerName != null && !customerName.isEmpty()) {
+                ps.setString(paramIndex++, "%" + customerName + "%"); // Use % for LIKE
+            }
+            if (phone != null && !phone.isEmpty()) {
+                ps.setString(paramIndex++, "%" + phone + "%");
+            }
+            if (email != null && !email.isEmpty()) {
+                ps.setString(paramIndex++, "%" + email + "%");
+            }
+            if (status != null && !status.isEmpty() && !status.equals("All")) {
+                ps.setString(paramIndex++, status);
+            }
+
+            if (startDate != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.valueOf(startDate.atStartOfDay()));
+            }
+            if (endDate != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.valueOf(endDate.atTime(23, 59, 59)));
+            }
+            if (routeId != null) {
+                ps.setInt(paramIndex++, routeId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("total"); // Use the alias
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public BookingDTO getBookingById(int bookingID) {
+        BookingDTO booking = null;
+        String sql = "SELECT b.*, u.FullName, u.PhoneNumber, u.Email, "
+                + "t.TrainName, "
+                + "CONCAT(st1.StationName, ' - ', st2.StationName) AS RouteName, "
+                + "tr.DepartureTime, tr.ArrivalTime "
+                + "FROM Booking b "
+                + "JOIN [User] u ON b.UserID = u.UserID "
+                + "JOIN Trip tr ON b.TripID = tr.TripID "
+                + "JOIN Train t ON tr.TrainID = t.TrainID "
+                + "JOIN Route r ON tr.RouteID = r.RouteID"
+                + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
+                + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
+                + "WHERE b.BookingID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    booking = new BookingDTO();
+                    booking.setBookingID(rs.getInt("BookingID"));
+                    booking.setUserID(rs.getInt("UserID"));
+                    booking.setTripID(rs.getInt("TripID"));
+                    // ... set other Booking fields ...
+                    booking.setTotalPrice(rs.getDouble("TotalPrice"));
+                    booking.setPaymentStatus(rs.getString("PaymentStatus"));
+                    booking.setBookingStatus(rs.getString("BookingStatus"));
+                    Timestamp bookingTimestamp = rs.getTimestamp("BookingDate");
+                    if (bookingTimestamp != null) {
+                        booking.setBookingDate(bookingTimestamp.toLocalDateTime());
+                    }
+                    // Set related object data (from JOINs)
+                    booking.setCustomerName(rs.getString("FullName"));  // From User table
+                    booking.setCustomerPhone(rs.getString("PhoneNumber"));
+                    booking.setCustomerEmail(rs.getString("Email"));
+                    booking.setTrainName(rs.getString("TrainName"));     // From Train table
+                    booking.setRouteName(rs.getString("RouteName")); // Combined station names
+
+                    Timestamp departureTimestamp = rs.getTimestamp("DepartureTime");
+                    if (departureTimestamp != null) {
+                        booking.setDepartureTime(departureTimestamp.toLocalDateTime());
+                    }
+
+                    Timestamp arrivalTimestamp = rs.getTimestamp("ArrivalTime");
+                    if (arrivalTimestamp != null) {
+                        booking.setArrivalTime(arrivalTimestamp.toLocalDateTime());
+                    }
+                    // Don't set tickets here!  Handle that separately in the controller.
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return booking;
+    }
+
+    // Add other methods (add, update, delete, etc.) as needed.  Make sure to use
+    // PreparedStatements and handle SQLExceptions.
+    public boolean addBooking(BookingDTO booking) {
+        // ... (Implementation for adding a booking) ...
+        String sql = "INSERT INTO Booking (UserID, TripID, TotalPrice, PaymentStatus, BookingStatus) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, booking.getUserID());
+            ps.setInt(2, booking.getTripID());
+            ps.setDouble(3, booking.getTotalPrice());
+            ps.setString(4, booking.getPaymentStatus());
+            ps.setString(5, booking.getBookingStatus());
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                return false; // Indicate failure
+            }
+            //Get ID
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int bookingId = generatedKeys.getInt(1);
+                    booking.setBookingID(bookingId); // Cập nhật ID cho đối tượng Booking
+
+                    return true;
+                } else {
+                    return false; // Không lấy được ID
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateBooking(BookingDTO booking) {
+        String sql = "UPDATE Booking SET UserID = ?, TripID = ?, TotalPrice = ?, PaymentStatus = ?, BookingStatus = ? WHERE BookingID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, booking.getUserID());
+            ps.setInt(2, booking.getTripID());
+            ps.setDouble(3, booking.getTotalPrice());
+            ps.setString(4, booking.getPaymentStatus());
+            ps.setString(5, booking.getBookingStatus());
+            ps.setInt(6, booking.getBookingID());
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean cancelBooking(int bookingID) {
+        String sql = "UPDATE Booking SET BookingStatus = 'Cancelled' WHERE BookingID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingID);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteBooking(int bookingID) {
+        String sql = "DELETE FROM Booking WHERE BookingID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingID);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0; // Return true if rows were deleted
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
