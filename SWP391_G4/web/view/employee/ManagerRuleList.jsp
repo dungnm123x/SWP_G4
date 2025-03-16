@@ -9,10 +9,27 @@
 
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link rel="stylesheet" href="css/employee.css">
         <style>
+            .admin-back-button {
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #2C3E50;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                border: none;
+                font-size: 16px;
+                transition: background-color 0.3s ease
+            }
+
+            .admin-back-button:hover {
+                background-color: #00509E;
+            }
+            .admin-back-button i {
+                margin-right: 8px;
+            }
             /* Căn giữa tiêu đề */
             .manager-title {
                 text-align: center;
@@ -72,6 +89,11 @@
                 </form>
 
             </div>
+            <c:if test="${sessionScope.user.roleID == 1}">
+                <a href="admin?view=dashboard" class="admin-back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
+                </a>
+            </c:if>
             <h2 class="manager-title">Manager Rule</h2>
             <div class="action-buttons">
                 <!-- Nút "Add Blog" -->

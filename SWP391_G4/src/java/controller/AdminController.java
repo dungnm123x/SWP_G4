@@ -64,9 +64,15 @@ public class AdminController extends HttpServlet {
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                 return;
             } else if ("userauthorization".equals(view)) {
-                if (user != null && user.getUserId() == 1) { // Kiểm tra UserID
+                if (user != null && user.getUserId() == 1) {
                     try {
-                        List<User> users = dao.getAllUsers();
+                        String searchKeyword = request.getParameter("search");
+                        List<User> users;
+                        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                            users = dao.searchUsers(searchKeyword); // Phương thức tìm kiếm mới trong DAO
+                        } else {
+                            users = dao.getAllUsers();
+                        }
                         request.setAttribute("list", users);
                         request.setAttribute("type", "userauthorization");
                         request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
@@ -75,8 +81,7 @@ public class AdminController extends HttpServlet {
                         throw new ServletException(e);
                     }
                 } else {
-                    // Người dùng không có quyền truy cập, chuyển hướng hoặc hiển thị thông báo
-                    response.sendRedirect("admin?view=dashboard"); // Hoặc trang nào đó phù hợp
+                    response.sendRedirect("admin?view=dashboard");
                     return;
                 }
             } else if ("addEmployee".equals(view)) {

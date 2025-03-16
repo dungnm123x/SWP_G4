@@ -298,6 +298,26 @@ public class DAOAdmin extends DBContext {
             return ps.executeUpdate() > 0;
         }
     }
+    // Phương thức tìm kiếm người dùng
+
+    public List<User> searchUsers(String keyword) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM [User] WHERE UserID != 1 AND (Username LIKE ? OR FullName LIKE ? OR Email LIKE ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+                            rs.getString("FullName"), rs.getString("Email"), rs.getString("PhoneNumber"),
+                            rs.getString("Address"), rs.getInt("RoleID"), rs.getBoolean("Status")));
+                }
+            }
+        }
+        return users;
+    }
 
     // Phương thức lấy danh sách tất cả người dùng (để hiển thị trong trang phân quyền)
     public List<User> getAllUsers() throws SQLException {

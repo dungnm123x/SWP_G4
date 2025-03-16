@@ -9,7 +9,13 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="./admin-scripts.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+        <script>
+            function submitRoleForm(userId) {
+                document.getElementById('roleForm' + userId).submit();
+            }
+        </script>
     </head>
     <body>
         <div class="container">
@@ -280,22 +286,30 @@
                             </script>
                         </c:when>
                         <c:when test="${type == 'userauthorization'}">
+                            <div class="search-container">
+                                <form method="get" action="admin">
+                                    <input type="hidden" name="view" value="userauthorization">
+                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
+                                    <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
+                                    <a href="admin?view=userauthorization" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
+                                </form>
+                            </div>
                             <h2>Phân quyền người dùng</h2>
                             <table border="1">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>Full Name</th>
+                                        <th></th>
+                                        <th>Tên người dùng</th>
+                                        <th>Họ và tân</th>
                                         <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Action</th>
+                                        <th>Vai trò</th>
+                                        <th>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach var="userItem" items="${list}" varStatus="status">
                                         <tr>
-                                            <td>${userItem.userId}</td>
+                                            <td>${status.index + 1}</td>
                                             <td>${userItem.username}</td>
                                             <td>${userItem.fullName}</td>
                                             <td>${userItem.email}</td>
@@ -308,15 +322,14 @@
                                                 </c:choose>
                                             </td>
                                             <td>
-                                                <form method="post" action="admin">
+                                                <form id="roleForm${userItem.userId}" method="post" action="admin">
                                                     <input type="hidden" name="action" value="setUserRole">
                                                     <input type="hidden" name="userId" value="${userItem.userId}">
-                                                    <select name="roleId">
-                                                        <option value="1" ${userItem.roleID == 1 ? 'selected' : ''}>Admin</option>
-                                                        <option value="2" ${userItem.roleID == 2 ? 'selected' : ''}>Employee</option>
-                                                        <option value="3" ${userItem.roleID == 3 ? 'selected' : ''}>Customer</option>
+                                                    <select name="roleId" class="form-select" onchange="submitRoleForm('${userItem.userId}')">
+                                                        <option value="1" ${userItem.roleID == 1 ? 'selected' : ''}><i class="bi bi-person-fill-gear"></i> Admin</option>
+                                                        <option value="2" ${userItem.roleID == 2 ? 'selected' : ''}><i class="bi bi-person-badge-fill"></i> Employee</option>
+                                                        <option value="3" ${userItem.roleID == 3 ? 'selected' : ''}><i class="bi bi-person-fill"></i> Customer</option>
                                                     </select>
-                                                    <button type="submit">Đặt Role</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -334,18 +347,25 @@
                                         <a href="admin?view=${type}" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
                                     </form>
                                 </div>
-
+                                <c:choose>
+                                    <c:when test="${type == 'employees'}">
+                                        <h2>Danh sách nhân viên</h2>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <h2>Danh sách khách hàng</h2>
+                                    </c:otherwise>
+                                </c:choose>
                                 <table border="1">
                                     <thead>
                                         <tr>
                                             <c:choose>
                                                 <c:when test="${type == 'employees' || type == 'customers'}">
                                                     <th></th>
-                                                    <th>Username</th>
-                                                    <th>Full Name</th>
+                                                    <th>Tên người dung</th>
+                                                    <th>Họ và tên</th>
                                                     <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Action</th>
+                                                    <th>SDT</th>
+                                                    <th>Hành động</th>
                                                     </c:when>
                                                 </c:choose>
                                         </tr>
