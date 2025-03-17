@@ -5,25 +5,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class BookingDTO {
+
     private int bookingID;
     private int userID;
     private int tripID;
-    private Integer roundTripTripID; // Use Integer, as it can be null
+    private Integer roundTripTripID;
     private LocalDateTime bookingDate;
     private double totalPrice;
     private String paymentStatus;
     private String bookingStatus;
     private TripDTO trip;
-    // Add fields to store related object data *for display purposes*:
+    private int totalTickets;
     private String customerName;
     private String customerPhone;
     private String customerEmail;
-    private String trainName; // From Train table
-    private String routeName; // e.g., "Hanoi - Saigon"
-    private LocalDateTime departureTime; // From Trip table
+    private String trainName;
+    private String routeName;
+    private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-     // Add this field to store ticket information
-    private List<TicketDTO> tickets; // VERY important for the details view
+    private List<TicketDTO> tickets;
 
     public BookingDTO() {
     }
@@ -65,6 +65,35 @@ public class BookingDTO {
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.tickets = tickets;
+    }
+
+    public BookingDTO(int bookingID, int userID, int tripID, Integer roundTripTripID, LocalDateTime bookingDate, double totalPrice, String paymentStatus, String bookingStatus, TripDTO trip, int totalTickets, String customerName, String customerPhone, String customerEmail, String trainName, String routeName, LocalDateTime departureTime, LocalDateTime arrivalTime, List<TicketDTO> tickets) {
+        this.bookingID = bookingID;
+        this.userID = userID;
+        this.tripID = tripID;
+        this.roundTripTripID = roundTripTripID;
+        this.bookingDate = bookingDate;
+        this.totalPrice = totalPrice;
+        this.paymentStatus = paymentStatus;
+        this.bookingStatus = bookingStatus;
+        this.trip = trip;
+        this.totalTickets = totalTickets;
+        this.customerName = customerName;
+        this.customerPhone = customerPhone;
+        this.customerEmail = customerEmail;
+        this.trainName = trainName;
+        this.routeName = routeName;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.tickets = tickets;
+    }
+
+    public int getTotalTickets() {
+        return totalTickets;
+    }
+
+    public void setTotalTickets(int totalTickets) {
+        this.totalTickets = totalTickets;
     }
 
     public TripDTO getTrip() {
@@ -195,24 +224,27 @@ public class BookingDTO {
         this.arrivalTime = arrivalTime;
     }
 
-
-    
     public String getFormattedBookingDate() {
-        if (bookingDate == null) return "";
+        if (bookingDate == null) {
+            return "";
+        }
         return bookingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public String getFormattedDepartureTime() {
-        if (departureTime == null) return "";
+        if (departureTime == null) {
+            return "";
+        }
         return departureTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public String getFormattedArrivalTime() {
-        if (arrivalTime == null) return "";
+        if (arrivalTime == null) {
+            return "";
+        }
         return arrivalTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
-    // Getters and setters for the list of tickets
     public List<TicketDTO> getTickets() {
         return tickets;
     }

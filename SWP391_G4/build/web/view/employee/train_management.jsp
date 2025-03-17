@@ -62,7 +62,7 @@
                                     </form>
             </div>
 
-            <h2>Quản lý tàu</h2>
+            <h1>Danh sách tàu</h1>
 
             <c:if test="${not empty error}">
                 <p class="error">${error}</p>

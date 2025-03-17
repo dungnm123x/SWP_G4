@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.sql.Statement; 
+import java.sql.Statement;
 
 public class BookingDAO extends DBContext {
 
@@ -123,28 +123,25 @@ public class BookingDAO extends DBContext {
 
     public List<BookingDTO> getBookings(int page, int pageSize, String customerName, String phone, String email, String status, LocalDate startDate, LocalDate endDate, Integer routeId) {
         List<BookingDTO> bookings = new ArrayList<>();
-        // IMPORTANT: Build this SQL query carefully to prevent SQL injection.
-        // Use PreparedStatement and set parameters correctly.
         String sql = "SELECT * FROM (SELECT b.*, u.FullName, u.PhoneNumber, u.Email, "
                 + "t.TrainName, "
                 + "CONCAT(st1.StationName, ' - ', st2.StationName) AS RouteName, "
                 + "tr.DepartureTime, tr.ArrivalTime, "
-                + "ROW_NUMBER() OVER (ORDER BY b.BookingID) as row_num "
-                + // Row number for pagination
-                "FROM Booking b "
+                + "COUNT(ti.TicketID) AS TicketCount, "
+                + // Thêm đếm số vé
+                "ROW_NUMBER() OVER (ORDER BY b.BookingID) as row_num "
+                + "FROM Booking b "
                 + "JOIN [User] u ON b.UserID = u.UserID "
                 + "JOIN Trip tr ON b.TripID = tr.TripID "
                 + "JOIN Train t ON tr.TrainID = t.TrainID "
-                + // Join with Train
-                "JOIN Route r ON tr.RouteID = r.RouteID "
-                + // Join with Route
-                "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
-                + // Join for departure station
-                "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
-                + // Join for arrival station
-                "WHERE 1=1 "; // Makes it easy to add conditions
+                + "JOIN Route r ON tr.RouteID = r.RouteID "
+                + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
+                + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
+                + "LEFT JOIN Ticket ti ON b.BookingID = ti.BookingID "
+                + // LEFT JOIN với bảng Ticket
+                "WHERE 1=1 ";
 
-        // Add WHERE clauses for filtering.  Use PreparedStatement parameters!
+        // ... (Phần lọc giữ nguyên, không thay đổi) ...
         if (customerName != null && !customerName.isEmpty()) {
             sql += " AND u.FullName LIKE ? ";
         }
@@ -165,12 +162,16 @@ public class BookingDAO extends DBContext {
             sql += " AND b.BookingDate <= ? ";
         }
         if (routeId != null) {
-            sql += " AND tr.RouteID = ? ";
+            sql += " AND tr.RouteID = ? "; // Add condition for routeId
         }
+
+        // Thêm GROUP BY vào cuối câu truy vấn (TRƯỚC pagination)
+        sql += " GROUP BY b.BookingID, u.FullName, u.PhoneNumber, u.Email, t.TrainName, st1.StationName, st2.StationName, tr.DepartureTime, tr.ArrivalTime, b.TotalPrice, b.PaymentStatus,b.BookingStatus,b.BookingDate,b.UserID,b.TripID,b.RoundTripTripID, r.RouteID";
         sql += ") as x WHERE row_num BETWEEN ? AND ?"; // Add pagination
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
+            // ... (Đặt các tham số lọc, y như cũ) ...
             int paramIndex = 1;
             if (customerName != null && !customerName.isEmpty()) {
                 ps.setString(paramIndex++, "%" + customerName + "%"); // Use % for LIKE
@@ -184,6 +185,7 @@ public class BookingDAO extends DBContext {
             if (status != null && !status.isEmpty() && !status.equals("All")) {
                 ps.setString(paramIndex++, status);
             }
+
             if (startDate != null) {
                 ps.setTimestamp(paramIndex++, Timestamp.valueOf(startDate.atStartOfDay())); // Convert LocalDate to Timestamp
             }
@@ -200,7 +202,7 @@ public class BookingDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     BookingDTO booking = new BookingDTO();
-                    // Populate the BookingDTO from the ResultSet
+                    // ... (Lấy các trường thông tin của Booking như cũ) ...
                     booking.setBookingID(rs.getInt("BookingID"));
                     booking.setUserID(rs.getInt("UserID"));
                     booking.setTripID(rs.getInt("TripID"));
@@ -212,14 +214,12 @@ public class BookingDAO extends DBContext {
                     if (bookingTimestamp != null) {
                         booking.setBookingDate(bookingTimestamp.toLocalDateTime());
                     }
-
                     // Set related object data (from JOINs)
-                    booking.setCustomerName(rs.getString("FullName")); // From User table
+                    booking.setCustomerName(rs.getString("FullName"));  // From User table
                     booking.setCustomerPhone(rs.getString("PhoneNumber"));
                     booking.setCustomerEmail(rs.getString("Email"));
-                    booking.setTrainName(rs.getString("TrainName"));
-                    booking.setRouteName(rs.getString("RouteName")); // Combined station names
-
+                    booking.setTrainName(rs.getString("TrainName"));     // From Train table
+                    booking.setRouteName(rs.getString("RouteName"));
                     Timestamp departureTimestamp = rs.getTimestamp("DepartureTime");
                     if (departureTimestamp != null) {
                         booking.setDepartureTime(departureTimestamp.toLocalDateTime());
@@ -230,13 +230,32 @@ public class BookingDAO extends DBContext {
                         booking.setArrivalTime(arrivalTimestamp.toLocalDateTime());
                     }
 
+                    // Quan trọng: Lấy số lượng vé
+                    booking.setTotalTickets(rs.getInt("TicketCount"));
+
                     bookings.add(booking);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace(); // Xử lý exception
         }
         return bookings;
+    }
+
+    public int getBookingCountByStatus(String status) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS total FROM Booking WHERE PaymentStatus = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return count;
     }
 
     // Method to get the total count of bookings (for pagination)

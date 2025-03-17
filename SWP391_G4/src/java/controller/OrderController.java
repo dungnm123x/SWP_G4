@@ -105,8 +105,8 @@ public class OrderController extends HttpServlet {
             try {
                 page = Integer.parseInt(pageParam);
             } catch (NumberFormatException e) {
-                // Log error, set to default page
-                page = 1;
+                // Handle invalid page number (e.g., redirect to page 1 or show an error)
+                page = 1; // Reset to page 1 if parsing fails
             }
         }
 
@@ -117,13 +117,14 @@ public class OrderController extends HttpServlet {
         String status = request.getParameter("status");
         String startDateStr = request.getParameter("startDate");
         String endDateStr = request.getParameter("endDate");
-        String routeIdStr = request.getParameter("routeId"); // Get RouteID
-        Integer routeId = null;
-        if (routeIdStr != null && !routeIdStr.trim().isEmpty()) {
-            try {
+        String routeIdStr = request.getParameter("routeId");
+        Integer routeId = null; // Use Integer, not int, to allow for null
+
+        if(routeIdStr != null && !routeIdStr.trim().isEmpty()){
+            try{
                 routeId = Integer.parseInt(routeIdStr);
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid Route ID format.");
+            } catch (NumberFormatException e){
+                 request.setAttribute("error", "Invalid Route ID format.");
                 request.getRequestDispatcher("view/employee/order_management.jsp").forward(request, response);
                 return;
             }
@@ -147,16 +148,22 @@ public class OrderController extends HttpServlet {
             return; // Stop processing
         }
 
+
         // Get the filtered, paginated list of bookings
         List<BookingDTO> bookings = bookingDAO.getBookings(page, pageSize, customerName, phone, email, status, startDate, endDate, routeId);
         int totalBookings = bookingDAO.getTotalBookingCount(customerName, phone, email, status, startDate, endDate, routeId);
         int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
+
+        // Get all routes (for the filter dropdown) *before* setting attributes
+        List<RouteDTO> routes = routeDB.getAllRoutes();  // *** ADD THIS LINE ***
+        request.setAttribute("routes", routes); // *** AND THIS LINE ***
 
         // Set attributes for the JSP
         request.setAttribute("bookings", bookings);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("pageSize", pageSize); // Good practice to pass this
+
         // Pass filter parameters back to the JSP (for "sticky" filters)
         request.setAttribute("customerName", customerName);
         request.setAttribute("phone", phone);
@@ -165,6 +172,17 @@ public class OrderController extends HttpServlet {
         request.setAttribute("startDate", startDateStr); // Pass back the raw strings
         request.setAttribute("endDate", endDateStr);
         request.setAttribute("routeId", routeIdStr);
+
+        // --- Statistics ---  (Keep these lines, they are correct)
+        int totalOrders = bookingDAO.getTotalBookingCount(null, null, null, null, null, null,null); // Get *unfiltered* total
+        int paidOrders = bookingDAO.getBookingCountByStatus("Paid");
+        int pendingOrders = bookingDAO.getBookingCountByStatus("Pending"); // Assuming "Pending" is your "Chưa thanh toán" status
+        int cancelledOrders = bookingDAO.getBookingCountByStatus("Cancelled");
+
+        request.setAttribute("totalOrders", totalOrders);
+        request.setAttribute("paidOrders", paidOrders);
+        request.setAttribute("pendingOrders", pendingOrders);
+        request.setAttribute("cancelledOrders", cancelledOrders);
 
         request.getRequestDispatcher("view/employee/order_management.jsp").forward(request, response);
     }

@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Order Management</title>
+        <title>Quản lí hóa đơn</title>
         <link rel="stylesheet" href="css/employee.css">
         <style>
             /* Add some basic styling for pagination */
@@ -63,7 +63,7 @@
                 </form>
             </div>
 
-            <h1>Order Management</h1>
+            <h1>Danh sách hóa đơn</h1>
 
             <c:if test="${not empty message}">
                 <p style="color: green;">${message}</p>
@@ -85,62 +85,69 @@
             <div class="filter-section">
                 <form action="order" method="GET"> <%-- Submit to the OrderController --%>
                     <input type="hidden" name="action" value="list">
-                    <label for="customerName">Customer Name:</label>
+                    <label for="customerName">Tên:</label>
                     <input type="text" id="customerName" name="customerName" value="${param.customerName}">
 
-                    <label for="phone">Phone:</label>
+                    <label for="phone">SĐT</label>
                     <input type="text" id="phone" name="phone" value="${param.phone}">
 
                     <label for="email">Email:</label>
                     <input type="text" id="email" name="email" value="${param.email}">
 
-                    <label for="status">Status:</label>
+                    <label for="status">Tình trạng</label>
                     <select id="status" name="status">
-                        <option value="" ${param.status == '' ? 'selected' : ''}>All</option>
-                        <option value="Pending" ${param.status == 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="Confirmed" ${param.status == 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                        <option value="Paid" ${param.status == 'Paid' ? 'selected' : ''}>Paid</option>
-                        <option value="Cancelled" ${param.status == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-                        <option value="Refunded" ${param.status == 'Refunded' ? 'selected' : ''}>Refunded</option>
-                        <option value="Completed" ${param.status == 'Completed' ? 'selected' : ''}>Completed</option>
-                        <%-- Add other status options --%>
+                        <option value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
+                        <option value="Pending" ${param.status == 'Pending' ? 'selected' : ''}>Chờ</option>
+
+                        <option value="Paid" ${param.status == 'Paid' ? 'selected' : ''}>Thanh toán</option>
+                        <option value="Cancelled" ${param.status == 'Cancelled' ? 'selected' : ''}>Hủy</option>
+                        <option value="Refunded" ${param.status == 'Refunded' ? 'selected' : ''}>Hoàn vé</option>
+
                     </select>
-                    <label for="startDate">Start Booking Date:</label>
+                    <label for="startDate">Từ ngày:</label>
                     <input type="date" id="startDate" name="startDate" value="${param.startDate}">
-                    <label for="endDate">End Booking Date </label>
+                    <label for="endDate">Đến ngày </label>
                     <input type="date" id="endDate" name="endDate" value="${param.endDate}">
 
-                    <label for="routeId">Route:</label>
+                    <label for="routeId">Tuyến</label>
                     <select id="routeId" name="routeId">
-                        <option value="" ${param.routeId == '' ? 'selected' : ''}>All</option>
+                        <option value="" ${param.routeId == '' ? 'selected' : ''}>Tất cả</option>
                         <c:forEach items="${routes}" var="route">
                             <option value="${route.routeID}" ${param.routeId == route.routeID ? 'selected' : ''}>
                                 ${route.routeID} - ${route.departureStationName} to ${route.arrivalStationName}
                             </option>
                         </c:forEach>
                     </select>
-                    <button type="submit">Filter</button>
-                    <a href="order">Clear Filter</a>
+
+                    <button type="submit">Lọc</button>
+                    <a href="order">Xóa lọc</a>
                 </form>
+                <div style="margin-bottom: 20px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <strong style="font-size: 18px; color: #333; display: block; margin-bottom: 10px;">Thống kê</strong>
+                    <span style="font-weight: bold;">Tổng: ${totalOrders}</span> |
+                    <span style="font-weight: bold;">Đã Thanh Toán: ${paidOrders}</span> |
+                    <span style="font-weight: bold;">Chờ giải quyết: ${pendingOrders}</span> |
+                    <span style="font-weight: bold;">Hủy: ${cancelledOrders}</span>
+                </div>
             </div>
 
             <%-- Order List Table --%>
             <table border="1">
                 <thead>
                     <tr>
-                        <th>Order ID</th>
-                        <th>Customer Name</th>
-                        <th>Phone</th>
+                        <th>ID</th>
+                        <th>Tên khách hàng</th>
+                        <th>SĐT</th>
                         <th>Email</th>
-                        <th>Train</th>
-                        <th>Route</th>
-                        <th>Departure</th>
-                        <th>Arrival</th>
-                        <th>Tickets</th>
-                        <th>Total Price</th>
-                        <th>Status</th>
-                        <th>Booking Date</th>
-                        <th>Actions</th>
+                        <th>Tàu</th>
+                        <th>Tuyến</th>
+                        <th>Khởi hành</th>
+                        <th>Đến nơi</th>
+                        <th>Số vé</th>
+                        <th>Tổng tiền</th>
+                        <th>Tình trạng</th>
+                        <th>Ngày mua</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -154,17 +161,17 @@
                             <td>${booking.routeName}</td>
                             <td>${booking.formattedDepartureTime}</td>
                             <td>${booking.formattedArrivalTime}</td>
-                            <td>${booking.tickets.size()}</td> <%--  Number of tickets --%>
+                            <td>${booking.totalTickets}</td>
                             <td>
-                                <fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="$" />
+                                <fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" />
                             </td>
                             <td>${booking.paymentStatus}</td> <%-- Display payment status --%>
                             <td>${booking.formattedBookingDate}</td>
 
                             <td>
-                                <a href="order?action=view&id=${booking.bookingID}">View</a>
+                                <a href="order?action=view&id=${booking.bookingID}">Xem</a>
                                 <c:if test="${booking.paymentStatus != 'Cancelled'}">
-                                    <a href="order?action=cancel&id=${booking.bookingID}" onclick="return confirm('Are you sure you want to cancel this order?');">Cancel</a>
+                                    <a href="order?action=cancel&id=${booking.bookingID}" onclick="return confirm('Are you sure you want to cancel this order?');">Hủy</a>
                                 </c:if>
                                 <%--  <a href="order?action=edit&id=${booking.bookingID}">Edit</a> --%>  <%-- Optional Edit --%>
                             </td>

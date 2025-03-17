@@ -64,7 +64,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Số toa</th> 
+                        <th>Toa số</th> 
                         <th>Loại Toa</th>
                         <th>Số ghế</th>
                         <th>Hành động</th>

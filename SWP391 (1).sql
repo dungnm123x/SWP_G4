@@ -40,6 +40,25 @@ CREATE TABLE [User] (
     Status BIT NOT NULL DEFAULT 1,  
     FOREIGN KEY (RoleID) REFERENCES Role(RoleID)  
 );  
+CREATE TABLE AdminAuthorization (
+    AuthorizationID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    AuthorizedBy INT NOT NULL,  -- Người phân quyền
+    AuthorizationDate DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES [User](UserID),
+    FOREIGN KEY (AuthorizedBy) REFERENCES [User](UserID)
+);
+GO
+CREATE TABLE Feedback (
+    FeedbackID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT, -- Link to the user who gave feedback
+    Content NVARCHAR(MAX) NOT NULL,
+    Rating INT,   -- You can add a rating system (e.g., 1-5 stars)
+    FeedbackDate DATETIME DEFAULT GETDATE(),
+    Status BIT NOT NULL DEFAULT 1, -- e.g., to manage visibility
+    FOREIGN KEY (UserID) REFERENCES [User](UserID)
+);
+
 
 -- Trigger mã hóa mật khẩu trước khi insert
 GO  
@@ -106,7 +125,7 @@ CREATE TABLE Trip (
     RouteID INT,
     DepartureTime DATETIME NOT NULL,
     ArrivalTime DATETIME NOT NULL,
-    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Completed', 'Delayed')),
+    TripStatus NVARCHAR(50) NOT NULL CHECK (TripStatus IN ('Scheduled', 'Departed', 'Arrived', 'Cancelled')),
     TripType INT NOT NULL DEFAULT 1 CHECK (TripType IN (1,2)),  -- 1=One-way, 2=Round-trip
     RoundTripReference INT NULL,
     FOREIGN KEY (TrainID) REFERENCES Train(TrainID),
@@ -123,7 +142,7 @@ CREATE TABLE Booking (
     RoundTripTripID INT NULL,  
     BookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,  
     TotalPrice DECIMAL(10,2) NOT NULL,  
-    PaymentStatus NVARCHAR(50) NOT NULL CHECK (PaymentStatus IN ('Pending', 'Paid', 'Cancelled')),  
+    PaymentStatus NVARCHAR(50) NOT NULL CHECK (PaymentStatus IN ('Refund', 'Paid', 'Cancelled')),  
     BookingStatus NVARCHAR(50) NOT NULL CHECK (BookingStatus IN ('Active', 'Expired')),  
     FOREIGN KEY (UserID) REFERENCES [User](UserID),
     FOREIGN KEY (TripID) REFERENCES Trip(TripID),
@@ -134,6 +153,7 @@ CREATE TABLE Booking (
 -- Bảng Ticket  
 CREATE TABLE Ticket (  
     TicketID INT PRIMARY KEY IDENTITY(1,1),  
+	PassengerName NVARCHAR(255),
     CCCD NVARCHAR(20) NOT NULL,  
     BookingID INT,  
     SeatID INT,  
@@ -186,6 +206,11 @@ CREATE TABLE [dbo].[CategoryBlog](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 Go
+ALTER TABLE Blog
+ADD CONSTRAINT FK_CategoryBlog
+FOREIGN KEY (categoryBlog_id)
+REFERENCES CategoryBlog(categoryBlog_id);
+GO
 CREATE TABLE CategoryRule (
     CategoryRuleID INT PRIMARY KEY IDENTITY(1,1),
     CategoryRuleName NVARCHAR(255) NOT NULL UNIQUE,
@@ -218,6 +243,7 @@ INSERT INTO Role (RoleName) VALUES ('Customer');
 INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber,Address, RoleID, Status) 
 VALUES ('admin', 'admin123', 'Admin User', 'admin@example.com', '0123456789','Vinh Phuc', 1,1),
 ('customer', 'customer123', 'Customer User', 'customer@example.com', '0987654321','Ha Noi', 3,1),
+('dungdung', '123456@', N'Nguyễn Mạnh Dũng', 'dungnmhe173094@fpt.edu.vn', '0866435003','Vinh Phuc', 3,1),
 ('employer', 'employer123', 'Employer User', 'employer@example.com', '0912345678','Hai Phong', 2,1);
 
 -- Thêm dữ liệu cho bảng Station
@@ -305,11 +331,11 @@ VALUES
 (1, 1, '2025-02-15 08:00:00', '2025-02-15 10:00:00', 'Scheduled', 1), -- Chuyến đi
 (2, 2, '2025-02-15 18:00:00', '2025-02-15 20:00:00', 'Scheduled', 2), -- Chuyến về
 (3, 3, '2025-02-17 07:00:00', '2025-02-17 09:00:00', 'Scheduled', 1),
-(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Delayed', 1),
-(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Completed', 1),
+(4, 4, '2025-02-18 10:00:00', '2025-02-18 12:00:00', 'Scheduled', 1),
+(5, 5, '2025-02-19 06:30:00', '2025-02-19 08:30:00', 'Scheduled', 1),
 (1, 6, '2025-02-20 07:45:00', '2025-02-20 09:45:00', 'Scheduled', 1),
 (2, 7, '2025-02-21 08:15:00', '2025-02-21 10:15:00', 'Scheduled', 1),
-(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Completed', 1);
+(3, 8, '2025-02-22 09:30:00', '2025-02-22 11:30:00', 'Scheduled', 1);
 
 -- Cập nhật RoundTripReference cho chuyến đi khứ hồi (chuyến về tham chiếu chuyến đi)
 
@@ -363,15 +389,8 @@ DECLARE @OutboundBookingID INT, @ReturnBookingID INT;
 
 BEGIN TRANSACTION;
 
-    -- Chèn bản ghi cho chuyến đi (outbound)
-    INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
-    VALUES (2, 1, NULL, 300.00, 'Paid', 'Active');
-    SET @OutboundBookingID = SCOPE_IDENTITY();
 
-    -- Chèn bản ghi cho chuyến về (return)
-    INSERT INTO Booking (UserID, TripID, RoundTripTripID, TotalPrice, PaymentStatus, BookingStatus)
-    VALUES (2, 2, NULL, 300.00, 'Paid', 'Active');
-    SET @ReturnBookingID = SCOPE_IDENTITY();
+
 
     -- Cập nhật RoundTripTripID cho cả 2 bản ghi để tham chiếu lẫn nhau
     UPDATE Booking
@@ -383,20 +402,6 @@ BEGIN TRANSACTION;
 
 COMMIT TRANSACTION;
 
-
-
--- Thêm dữ liệu cho bảng Ticket (10 dòng)
-INSERT INTO Ticket (CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) 
-VALUES 
-('123456789012', 1, 1, 1, 20.00, 'Unused'),
-('987654321098', 2, 2, 2, 30.00, 'Used');
-
--- Thêm dữ liệu cho bảng OrderDetail
-INSERT INTO OrderDetail (TicketID, UserID, SeatID, TripID, OrderStatus) 
-VALUES 
-(1, 2, 1, 1, 'Pending'),
-(2, 3, 2, 2, 'Completed');
--- Thêm dữ liệu cho bảng CategoryBlog
 INSERT INTO CategoryBlog (categoryBlogName, status)  
 VALUES  
 (N'Tin tức ngành đường sắt', 1),  
@@ -644,4 +649,132 @@ BEGIN
         THROW;  -- Rethrow the error
     END CATCH
 END;
+GO
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[AddTrainWithCarriages] (
+    @p_TrainName NVARCHAR(255),  -- Use NVARCHAR for Vietnamese
+    @p_TotalCarriages INT,
+    @p_VipCarriages INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @v_TrainID INT;
+    DECLARE @v_CarriageNumber INT; -- Keep as INT for automatic incrementing
+    DECLARE @v_CarriageType NVARCHAR(20); -- Use NVARCHAR
+    DECLARE @v_Capacity INT;
+    DECLARE @v_Counter INT;
+
+    -- Start transaction
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Insert the train
+        INSERT INTO Train (TrainName) VALUES (@p_TrainName);
+        SET @v_TrainID = SCOPE_IDENTITY(); -- Get the generated TrainID
+
+        -- Insert carriages
+        SET @v_Counter = 1;  -- Counter for carriages
+        WHILE @v_Counter <= @p_TotalCarriages
+        BEGIN
+            -- Determine carriage type and capacity
+            IF @v_Counter <= @p_VipCarriages
+            BEGIN
+                SET @v_CarriageType = N'Toa VIP';  -- Use N'...' for Unicode
+                SET @v_Capacity = 12;
+            END
+            ELSE
+            BEGIN
+                SET @v_CarriageType = N'Toa Thường'; -- Use N'...' for Unicode
+                SET @v_Capacity = 10;
+            END;
+
+            -- Carriage Number:  Just use the counter!
+            SET @v_CarriageNumber = @v_Counter;
+
+            -- Insert carriage
+            INSERT INTO Carriage (TrainID, CarriageNumber, CarriageType, Capacity)
+            VALUES (@v_TrainID, @v_CarriageNumber, @v_CarriageType, @v_Capacity);
+
+            -- Get the generated CarriageID
+            DECLARE @v_CarriageID INT = SCOPE_IDENTITY();
+
+            -- Insert seats for the carriage
+            DECLARE @v_SeatCounter INT = 1;
+            WHILE @v_SeatCounter <= @v_Capacity
+            BEGIN
+                -- Insert Seat, setting SeatType based on CarriageType
+                INSERT INTO Seat (CarriageID, SeatNumber, Status, SeatType)
+                VALUES (@v_CarriageID, @v_SeatCounter, N'Available', @v_CarriageType);
+                SET @v_SeatCounter = @v_SeatCounter + 1;
+            END;
+
+            SET @v_Counter = @v_Counter + 1;
+        END;
+
+        -- Commit transaction
+        COMMIT TRANSACTION;
+
+        -- Return the new TrainID
+        SELECT @v_TrainID;
+
+    END TRY
+    BEGIN CATCH
+        -- If an error occurred, rollback and re-throw
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END;
+GO
+GO
+-- Stored procedure to delete a train IF it's not used in any trips
+CREATE OR ALTER PROCEDURE DeleteTrainIfUnused (@TrainID INT)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check if the train is used in any trips
+    IF NOT EXISTS (SELECT 1 FROM Trip WHERE TrainID = @TrainID)
+    BEGIN
+        -- Start a transaction to ensure atomicity
+        BEGIN TRANSACTION;
+
+        BEGIN TRY
+            -- Delete seats associated with the train's carriages
+            DELETE FROM Seat
+            WHERE CarriageID IN (SELECT CarriageID FROM Carriage WHERE TrainID = @TrainID);
+
+            -- Delete carriages associated with the train
+            DELETE FROM Carriage WHERE TrainID = @TrainID;
+
+            -- Delete the train itself
+            DELETE FROM Train WHERE TrainID = @TrainID;
+
+            -- Commit the transaction if all deletions are successful
+            COMMIT TRANSACTION;
+        END TRY
+        BEGIN CATCH
+            -- If any error occurred, rollback the transaction
+            IF @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+
+            -- Re-throw the error  (or handle it as needed)
+             THROW;
+            -- Optional:  Return an error code or message
+            -- SELECT -1 AS ErrorCode, ERROR_MESSAGE() AS ErrorMessage;
+
+        END CATCH
+    END
+    -- Optional:  Could return 0 if the train was not deleted (because it's used)
+    -- ELSE
+    --   SELECT 0 AS Result;  -- Train was used, not deleted.
+END;
+GO
 GO
