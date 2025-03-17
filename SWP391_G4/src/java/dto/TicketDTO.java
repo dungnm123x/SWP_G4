@@ -1,6 +1,7 @@
 package dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TicketDTO {
 
@@ -162,4 +163,17 @@ public class TicketDTO {
         this.arrivalTime = arrivalTime;
     }
 
+    public String getFormattedDepartureTime() {
+        if (departureTime == null) {
+            return "";
+        }
+        return departureTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
+    public String getFormattedArrivalTime() {
+        if (arrivalTime == null) {
+            return "";
+        }
+        return arrivalTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
 }

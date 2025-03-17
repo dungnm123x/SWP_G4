@@ -85,9 +85,10 @@
                     <input type="date" id="departureDate" name="departureDate" value="${param.departureDate}">
 
                     <button type="submit">Lọc</button>
-                    <a href="trip"><button>Xóa lọc</button></a>
+                    
                     <input type="hidden" name="action" value="list">
                 </form>
+                    <a href="trip"><button>Xóa lọc</button></a>
                 <a href="trip?action=add"><button>Thêm chuyến</button></a>
             </div>
 

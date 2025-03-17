@@ -97,7 +97,7 @@ public class OrderController extends HttpServlet {
     private void listOrders(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Pagination parameters
+        // ... (Pagination parameters - no changes) ...
         int page = 1;
         int pageSize = 10;  // You can make this configurable
         String pageParam = request.getParameter("page");
@@ -109,8 +109,7 @@ public class OrderController extends HttpServlet {
                 page = 1; // Reset to page 1 if parsing fails
             }
         }
-
-        // Filtering parameters
+        // ... (Filtering parameters - ensure routeId is handled) ...
         String customerName = request.getParameter("customerName");
         String phone = request.getParameter("phone");
         String email = request.getParameter("email");
@@ -120,16 +119,15 @@ public class OrderController extends HttpServlet {
         String routeIdStr = request.getParameter("routeId");
         Integer routeId = null; // Use Integer, not int, to allow for null
 
-        if(routeIdStr != null && !routeIdStr.trim().isEmpty()){
-            try{
+        if (routeIdStr != null && !routeIdStr.trim().isEmpty()) {
+            try {
                 routeId = Integer.parseInt(routeIdStr);
-            } catch (NumberFormatException e){
-                 request.setAttribute("error", "Invalid Route ID format.");
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Invalid Route ID format.");
                 request.getRequestDispatcher("view/employee/order_management.jsp").forward(request, response);
                 return;
             }
         }
-
         LocalDate startDate = null;
         LocalDate endDate = null;
 
@@ -147,14 +145,14 @@ public class OrderController extends HttpServlet {
             request.getRequestDispatcher("view/employee/order_management.jsp").forward(request, response); //Show error message
             return; // Stop processing
         }
-
-
-        // Get the filtered, paginated list of bookings
+        // Get the filtered, paginated list of bookings (using the modified BookingDAO method)
         List<BookingDTO> bookings = bookingDAO.getBookings(page, pageSize, customerName, phone, email, status, startDate, endDate, routeId);
+
+        // ... (Get totalPages - should now work correctly with route filtering) ...
         int totalBookings = bookingDAO.getTotalBookingCount(customerName, phone, email, status, startDate, endDate, routeId);
         int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
 
-        // Get all routes (for the filter dropdown) *before* setting attributes
+        // ... (Set request attributes - no changes) ...
         List<RouteDTO> routes = routeDB.getAllRoutes();  // *** ADD THIS LINE ***
         request.setAttribute("routes", routes); // *** AND THIS LINE ***
 
@@ -174,7 +172,7 @@ public class OrderController extends HttpServlet {
         request.setAttribute("routeId", routeIdStr);
 
         // --- Statistics ---  (Keep these lines, they are correct)
-        int totalOrders = bookingDAO.getTotalBookingCount(null, null, null, null, null, null,null); // Get *unfiltered* total
+        int totalOrders = bookingDAO.getTotalBookingCount(null, null, null, null, null, null, null); // Get *unfiltered* total
         int paidOrders = bookingDAO.getBookingCountByStatus("Paid");
         int pendingOrders = bookingDAO.getBookingCountByStatus("Pending"); // Assuming "Pending" is your "Chưa thanh toán" status
         int cancelledOrders = bookingDAO.getBookingCountByStatus("Cancelled");
@@ -183,7 +181,6 @@ public class OrderController extends HttpServlet {
         request.setAttribute("paidOrders", paidOrders);
         request.setAttribute("pendingOrders", pendingOrders);
         request.setAttribute("cancelledOrders", cancelledOrders);
-
         request.getRequestDispatcher("view/employee/order_management.jsp").forward(request, response);
     }
 
@@ -198,66 +195,84 @@ public class OrderController extends HttpServlet {
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-     throws ServletException, IOException {
+            throws ServletException, IOException {
 
-     int bookingID = Integer.parseInt(request.getParameter("id"));
-     BookingDTO booking = bookingDAO.getBookingById(bookingID); // Get the Booking
+        int bookingID = Integer.parseInt(request.getParameter("id"));
+        BookingDTO booking = bookingDAO.getBookingById(bookingID); // Get the Booking
 
-     if (booking == null) {
-         response.sendRedirect("order"); // Handle booking not found
-         return;
-     }
+        if (booking == null) {
+            response.sendRedirect("order"); // Handle booking not found
+            return;
+        }
 
-     // Get user information
-     UserDTO user = userDAO.gett(booking.getUserID());
+        // Get user information
+        UserDTO user = userDAO.gett(booking.getUserID());
 
-     // Get tickets
-     List<TicketDTO> tickets = ticketDAO.getTicketsByBookingId(bookingID);
-     booking.setTickets(tickets);
+        // Get tickets
+        List<TicketDTO> tickets = ticketDAO.getTicketsByBookingId(bookingID);
+        booking.setTickets(tickets);
 
-     // Get all trains for the dropdown
-     List<TrainDTO> trains = trainDAO.getAllTrains();
-     request.setAttribute("trains", trains);
+        // Get all trains for the dropdown
+        List<TrainDTO> trains = trainDAO.getAllTrains();
+        request.setAttribute("trains", trains);
 
-     // Get available trips by trainId for the dropdown.  Option 2 (LESS GOOD)
-     // 1.  Get the TripDTO from the BookingDTO
-     TripDTO trip = booking.getTrip();
+        // Get available trips by trainId for the dropdown.  Option 2 (LESS GOOD)
+        // 1.  Get the TripDTO from the BookingDTO
+        TripDTO trip = booking.getTrip();
 
-     List<TripDTO> trips = new ArrayList<>(); // Initialize to empty list
+        List<TripDTO> trips = new ArrayList<>(); // Initialize to empty list
 
-     // 2. Check if trip is NOT null (important for robustness)
-     if (trip != null) {
-         // 3. Get the TrainID from the TripDTO (using getTrainID(), which MUST be in TripDTO)
-          trips = tripDAO.getTripsByTrainId(trip.getTrainID()); // Get train ID from TRIP
-     } // else:  trips will remain an empty list, which is fine
+        // 2. Check if trip is NOT null (important for robustness)
+        if (trip != null) {
+            // 3. Get the TrainID from the TripDTO (using getTrainID(), which MUST be in TripDTO)
+            trips = tripDAO.getTripsByTrainId(trip.getTrainID()); // Get train ID from TRIP
+        } // else:  trips will remain an empty list, which is fine
 
-     request.setAttribute("booking", booking);
-     request.setAttribute("trips", trips); // Pass trip list
-     request.setAttribute("user", user); // Pass user info
-     request.setAttribute("ticket", tickets.isEmpty() ? null : tickets.get(0)); //Safe
+        request.setAttribute("booking", booking);
+        request.setAttribute("trips", trips); // Pass trip list
+        request.setAttribute("user", user); // Pass user info
+        request.setAttribute("ticket", tickets.isEmpty() ? null : tickets.get(0)); //Safe
 
-     request.getRequestDispatcher("view/employee/order_edit.jsp").forward(request, response);
- }
+        request.getRequestDispatcher("view/employee/order_edit.jsp").forward(request, response);
+    }
 
+    // In OrderController.java
     private void showOrderDetails(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int bookingID = Integer.parseInt(request.getParameter("id"));
+        int bookingID;
+        try {
+            bookingID = Integer.parseInt(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid booking ID.");
+            request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
+            return;
+        }
+
         BookingDTO booking = bookingDAO.getBookingById(bookingID);
 
         if (booking == null) {
-            response.sendRedirect("order");
+            request.setAttribute("error", "Booking not found.");
+            request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
             return;
         }
-        // Get user information
-        UserDAO userDAO = new UserDAO();
+
+        // Get user information.  No need to create a new UserDAO here.
         UserDTO user = userDAO.gett(booking.getUserID());
+
+        if (user == null) {
+            request.setAttribute("error", "User not found.");
+            request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
+            return;
+        }
+
         // Get tickets for the booking.
         List<TicketDTO> tickets = ticketDAO.getTicketsByBookingId(bookingID);
         booking.setTickets(tickets);
 
         request.setAttribute("booking", booking);
-        request.setAttribute("user", user); // Pass user for getting address and cccd
-        request.setAttribute("ticket", tickets.get(0)); // Get the first ticket for cccd.
+        request.setAttribute("user", user);
+        // No longer need request.setAttribute("ticket", ...);  We have the full list.
+
         request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
     }
 

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%-- For date formatting --%>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -104,7 +104,8 @@
                         <option value="Refunded" ${param.status == 'Refunded' ? 'selected' : ''}>Hoàn vé</option>
 
                     </select>
-                    <label for="startDate">Từ ngày:</label>
+                    </br>
+                    <label for="startDate">Mua từ ngày:</label>
                     <input type="date" id="startDate" name="startDate" value="${param.startDate}">
                     <label for="endDate">Đến ngày </label>
                     <input type="date" id="endDate" name="endDate" value="${param.endDate}">
@@ -120,8 +121,9 @@
                     </select>
 
                     <button type="submit">Lọc</button>
-                    <a href="order">Xóa lọc</a>
+                    
                 </form>
+                        <a href="order"><button>Xóa lọc</button></a>
                 <div style="margin-bottom: 20px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                     <strong style="font-size: 18px; color: #333; display: block; margin-bottom: 10px;">Thống kê</strong>
                     <span style="font-weight: bold;">Tổng: ${totalOrders}</span> |
@@ -133,52 +135,61 @@
 
             <%-- Order List Table --%>
             <table border="1">
-                <thead>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên khách hàng</th>
+                <th>SĐT</th>
+                <th>Email</th>
+                <th>Tàu</th>
+                <th>Tuyến</th>
+                <%--<th>Khởi hành</th>--%>
+                <%--<th>Đến nơi</th>--%>
+                <%-- <th>Mã vé</th>--%>
+                <%--<th>Số ghế</th>--%>
+                <th>Tổng tiền</th>
+                <th>Tình trạng</th>
+                <th>Ngày mua</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+       <tbody>
+            <c:forEach items="${bookings}" var="booking">
+                <c:forEach items="${booking.tickets}" var="ticket" varStatus="loop">
                     <tr>
-                        <th>ID</th>
-                        <th>Tên khách hàng</th>
-                        <th>SĐT</th>
-                        <th>Email</th>
-                        <th>Tàu</th>
-                        <th>Tuyến</th>
-                        <th>Khởi hành</th>
-                        <th>Đến nơi</th>
-                        <th>Số vé</th>
-                        <th>Tổng tiền</th>
-                        <th>Tình trạng</th>
-                        <th>Ngày mua</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${bookings}" var="booking" varStatus="loop">
-                        <tr>
-                            <td><a href="order?action=view&id=${booking.bookingID}">${booking.bookingID}</a></td>
-                            <td>${booking.customerName}</td>
-                            <td>${booking.customerPhone}</td>
-                            <td>${booking.customerEmail}</td>
-                            <td>${booking.trainName}</td>
-                            <td>${booking.routeName}</td>
-                            <td>${booking.formattedDepartureTime}</td>
-                            <td>${booking.formattedArrivalTime}</td>
-                            <td>${booking.totalTickets}</td>
-                            <td>
-                                <fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" />
-                            </td>
-                            <td>${booking.paymentStatus}</td> <%-- Display payment status --%>
-                            <td>${booking.formattedBookingDate}</td>
+                        <c:if test="${loop.first}">
+                            <%-- Only display booking-level details on the first row --%>
+                            <td rowspan="${fn:length(booking.tickets)}"><a href="order?action=view&id=${booking.bookingID}">${booking.bookingID}</a></td>
+                            <td rowspan="${fn:length(booking.tickets)}">${booking.customerName}</td>
+                            <td rowspan="${fn:length(booking.tickets)}">${booking.customerPhone}</td>
+                            <td rowspan="${fn:length(booking.tickets)}">${booking.customerEmail}</td>
+                        </c:if>
 
-                            <td>
+                        <td>${ticket.trainName}</td>
+                        <td>${ticket.routeName}</td>
+                        <%--<td>${ticket.formattedDepartureTime}</td>--%>
+                        <%--<td>${ticket.formattedArrivalTime}</td>--%>
+                        <%--<td>${ticket.ticketID}</td>--%>
+                        <%--<td>${ticket.seatNumber}</td>--%>
+
+                        <c:if test="${loop.first}">
+                             <%--Only display booking-level details on the first row--%>
+                            <td rowspan="${fn:length(booking.tickets)}"><fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" /></td>
+                            <td rowspan="${fn:length(booking.tickets)}">${booking.paymentStatus}</td>
+                            <td rowspan="${fn:length(booking.tickets)}">${booking.formattedBookingDate}</td>
+                            <td rowspan="${fn:length(booking.tickets)}">
                                 <a href="order?action=view&id=${booking.bookingID}">Xem</a>
-                                <c:if test="${booking.paymentStatus != 'Cancelled'}">
+                                 <c:if test="${booking.bookingStatus != 'Cancelled'}">
                                     <a href="order?action=cancel&id=${booking.bookingID}" onclick="return confirm('Are you sure you want to cancel this order?');">Hủy</a>
-                                </c:if>
-                                <%--  <a href="order?action=edit&id=${booking.bookingID}">Edit</a> --%>  <%-- Optional Edit --%>
+                                 </c:if>
                             </td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
+                        </c:if>
+
+                    </tr>
+                </c:forEach>
+            </c:forEach>
+        </tbody>
+    </table>
 
             <%-- Pagination Links --%>
             <div class="pagination">

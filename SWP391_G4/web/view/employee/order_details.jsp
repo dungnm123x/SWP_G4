@@ -1,180 +1,337 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Order Details</title>
-    <link rel="stylesheet" href="css/employee.css"> <%-- Your stylesheet --%>
-    <style>
-        /* Add some basic styling */
-        .detail-section {
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-        .detail-label {
-            font-weight: bold;
-            display: inline-block; /* Labels on the same line as values */
-            width: 150px; /* Or whatever width you like */
-        }
-        .detail-value {
-            display: inline-block;
-        }
-        .ticket-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .ticket-table th, .ticket-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .ticket-table th {
-            background-color: #f2f2f2;
-        }
-        .actions {
-            margin-top: 20px;
-        }
-        .actions a {
-            margin-right: 10px;
-            text-decoration: none;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            background-color: white;
-            color: black;
-        }
-        .actions a:hover {
-             background-color: #ddd;
-        }
-        .back-button { /* Style for the back button */
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #007bff; /* Blue */
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .back-button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-        }
+    <head>
+        <title>Chi tiết hóa đơn</title>
+        <style>
+            /* Reset mặc định để đảm bảo giao diện đồng nhất */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
 
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="sidebar">
-        <div class="logo">
-                <img src="./img/logo.jpg" alt="avatar">
+            /* Định dạng chung cho trang */
+            body {
+                background: linear-gradient(135deg, #e6f0fa 0%, #f5f7fa 100%);
+                padding: 30px;
+                color: #2C3E50;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                min-height: 100vh;
+            }
+
+            /* Container chính để căn giữa nội dung */
+            .order-details-container {
+                max-width: 1000px;
+                width: 100%;
+                background: #fff;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                margin: 0 auto;
+            }
+
+            /* Tiêu đề chính */
+            h1 {
+                text-align: center;
+                color: #1a73e8;
+                margin-bottom: 30px;
+                font-size: 32px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            /* Thông báo lỗi */
+            .error-message {
+                background-color: #fce4e4;
+                color: #d32f2f;
+                padding: 12px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                text-align: center;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            /* Tiêu đề phần */
+            .section-title {
+                font-size: 20px;
+                color: #2C3E50;
+                margin-bottom: 15px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #1a73e8;
+                display: inline-block;
+                font-weight: 600;
+            }
+
+            /* Block chung cho Booking và Customer Information */
+            .info-block {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                margin-bottom: 30px;
+                background-color: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            /* Mỗi phần Booking và Customer chiếm 50% */
+            .info-block .info-section {
+                flex: 1;
+                min-width: 300px;
+            }
+
+            /* Định dạng các đoạn thông tin */
+            .info-section p {
+                font-size: 16px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+            }
+
+            .info-section p strong {
+                color: #2c3e50;
+                font-weight: 600;
+                display: inline-block;
+                width: 180px;
+                min-width: 180px;
+            }
+
+            /* Định dạng bảng thông tin vé */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+                background-color: #fff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            table th, table td {
+                padding: 12px 10px; /* Giảm padding để tiết kiệm không gian */
+                text-align: left;
+                border-bottom: 1px solid #e0e0e0;
+                white-space: nowrap; /* Ngăn text bị xuống dòng */
+            }
+
+            table th {
+                background-color: #1a73e8;
+                color: #fff;
+                font-weight: 600;
+                font-size: 12px; /* Giảm kích thước chữ trong tiêu đề để tiết kiệm không gian */
+                text-transform: uppercase;
+            }
+
+            table td {
+                font-size: 13px; /* Giảm kích thước chữ trong nội dung */
+                color: #2C3E50;
+            }
+
+            /* Đảm bảo bảng cuộn ngang khi cần */
+            .table-wrapper {
+                overflow-x: auto;
+                margin-bottom: 20px;
+            }
+
+            table tr:last-child td {
+                border-bottom: none;
+            }
+
+            table tr:nth-child(even) {
+                background-color: #f8f9fa;
+            }
+
+            table tr:hover {
+                background-color: #e3f0ff;
+                transition: background-color 0.3s ease;
+            }
+
+            /* Định dạng thông báo khi không có vé */
+            .no-tickets {
+                color: #d32f2f;
+                font-style: italic;
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 16px;
+                background-color: #fff3f3;
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            /* Định dạng nút quay lại */
+            .back-link {
+                display: inline-block;
+                padding: 12px 24px;
+                background-color: #6c757d;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 500;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                text-align: center;
+            }
+
+            .back-link:hover {
+                background-color: #5a6268;
+                transform: translateY(-2px);
+            }
+
+            /* Responsive cho màn hình nhỏ */
+            @media (max-width: 768px) {
+                body {
+                    padding: 15px;
+                }
+
+                .order-details-container {
+                    padding: 20px;
+                }
+
+                h1 {
+                    font-size: 26px;
+                }
+
+                .section-title {
+                    font-size: 18px;
+                }
+
+                .info-block {
+                    flex-direction: column;
+                }
+
+                .info-section p {
+                    font-size: 14px;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .info-section p strong {
+                    width: auto;
+                    margin-bottom: 5px;
+                }
+
+                .table-wrapper {
+                    overflow-x: auto;
+                }
+
+                table th, table td {
+                    padding: 8px;
+                    font-size: 11px;
+                }
+
+                .back-link {
+                    padding: 10px 20px;
+                    font-size: 14px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                h1 {
+                    font-size: 22px;
+                }
+
+                .section-title {
+                    font-size: 16px;
+                }
+
+                .info-section p {
+                    font-size: 13px;
+                }
+
+                table th, table td {
+                    font-size: 10px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="order-details-container">
+            <h1>Chi tiết hóa đơn</h1>
+
+            <c:if test="${not empty error}">
+                <p class="error-message">${error}</p>
+            </c:if>
+
+            <!-- Block chung cho Booking Information và Customer Information -->
+            <div class="info-block">
+                <!-- Booking Information -->
+                <div class="info-section">
+                    <div class="section-title">Thông tin đặt vé:</div>
+                    <p><strong>Id hóa đơn:</strong> ${booking.bookingID}</p>
+                    <p><strong>Ngày đặt:</strong> ${booking.formattedBookingDate}</p>
+                    <p><strong>Tình trạng:</strong> ${booking.paymentStatus}</p>
+                    <p><strong>Số vé:</strong> ${fn:length(booking.tickets)}</p>
+                    <p><strong>Tổng giá:</strong> <fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" /></p>
+                </div>
+
+                <!-- Customer Information -->
+                <div class="info-section">
+                    <div class="section-title">Thông tin người đặt:</div>
+                    <p><strong>Tên:</strong> ${user.fullName}</p>
+                    <p><strong>SĐT:</strong> ${user.phoneNumber}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Địa chỉ:</strong> ${user.address}</p>
+                </div>
+            </div>
+
+            <!-- Ticket Information -->
+            <div class="section-title">Thông tin vé:</div>
+            <div class="table-wrapper">
+                <c:choose>
+                    <c:when test="${not empty booking.tickets}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tuyến</th>
+                                    <th>Tàu</th>
+                                    <th>Khởi hành</th>
+                                    <th>Đến nơi</th>
+                                    <th>Toa</th>
+                                    <th>Ghế</th>
+                                    <th>Loại toa</th>
+                                    <th>Tên KH</th>
+                                    <th>CCCD</th>
+                                    <th>Giá vé</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${booking.tickets}" var="ticket">
+                                    <tr>
+                                        <td>${ticket.ticketID}</td>
+                                        <td>${ticket.routeName}</td>
+                                        <td>${ticket.trainName}</td>
+                                        <td>${ticket.formattedDepartureTime}</td>
+                                        <td>${ticket.formattedArrivalTime}</td>
+                                        <td>${ticket.carriageNumber}</td>
+                                        <td>${ticket.seatNumber}</td>
+                                        <td>${ticket.carriageType}</td>
+                                        <td>${ticket.passengerName}</td>
+                                        <td>${ticket.cccd}</td>
+                                        <td><fmt:formatNumber value="${ticket.ticketPrice}" type="currency" currencySymbol="VND" /></td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </c:when>
+                    <c:otherwise>
+                        <p class="no-tickets">Không có vé.</p>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="order" class="back-link">Trở về</a>
+            </div>
         </div>
-        <ul>
-           <li><a href="train">Quản lý tàu</a></li>
-            <li><a href="trip">Quản lý chuyến</a></li>
-            <li><a href="route">Quản lý tuyến tàu</a></li>
-            <li><a href="station">Quản lý ga</a></li>
-            <li><a href="order">Quản lý hóa đơn</a></li>
-            <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
-            <li><a href="posts-list">Quản lý Blog</a></li>
-            <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
-            <li><a href="manager-rule-list">Quản lý quy định</a></li>
-            <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
-         </ul>
-         <form action="logout" method="GET">
-              <button type="submit" class="logout-button">Logout</button>
-        </form>
-
-    </div>
-    <h2>Order Details - ID: ${booking.bookingID}</h2>
-
-    <c:if test="${not empty error}">
-        <p style="color: red;">${error}</p>
-    </c:if>
-
-    <%-- Order Information Section --%>
-    <div class="detail-section">
-        <h3>Order Information</h3>
-        <p><span class="detail-label">Order ID:</span> <span class="detail-value">${booking.bookingID}</span></p>
-        <p><span class="detail-label">Booking Date:</span> <span class="detail-value">${booking.formattedBookingDate}</span></p>
-        <p><span class="detail-label">Status:</span> <span class="detail-value">${booking.bookingStatus}</span></p>
-        <p><span class="detail-label">Total Price:</span> <span class="detail-value"><fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="$" /></span></p>
-        <p><span class="detail-label">Payment Status:</span><span class="detail-value">${booking.paymentStatus}</span></p>
-    </div>
-
-    <%-- Customer Information Section --%>
-    <div class="detail-section">
-        <h3>Customer Information</h3>
-        <p><span class="detail-label">Name:</span> <span class="detail-value">${booking.customerName}</span></p>
-        <p><span class="detail-label">Phone:</span> <span class="detail-value">${booking.customerPhone}</span></p>
-        <p><span class="detail-label">Email:</span> <span class="detail-value">${booking.customerEmail}</span></p>
-        <%-- Add address and CCCD if you have them in your DTO --%>
-         <p><span class="detail-label">Address:</span> <span class="detail-value">${user.address}</span></p>
-         <p><span class="detail-label">CCCD:</span> <span class="detail-value">${ticket.cccd}</span></p>
-    </div>
-
-    <%-- Trip information Section--%>
-     <div class="detail-section">
-        <h3>Trip Information</h3>
-        <p><span class="detail-label">Train:</span> <span class="detail-value">${booking.trainName}</span></p>
-        <p><span class="detail-label">Route:</span> <span class="detail-value">${booking.routeName}</span></p>
-        <p><span class="detail-label">Departure Time:</span> <span class="detail-value">${booking.formattedDepartureTime}</span></p>
-         <p><span class="detail-label">Arrival Time:</span> <span class="detail-value">${booking.formattedArrivalTime}</span></p>
-    </div>
-
-    <%-- Ticket Information Section --%>
-    <div class="detail-section">
-        <h3>Tickets</h3>
-        <table class="ticket-table">
-            <thead>
-                <tr>
-                    <th>Ticket ID</th>
-                    <th>Passenger Name</th>
-                    <th>Seat Number</th>
-                    <th>Carriage</th>
-                     <th>Type</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach items="${booking.tickets}" var="ticket">
-                    <tr>
-                        <td>${ticket.ticketID}</td>
-                        <td>${ticket.passengerName}</td>
-                        <td>${ticket.seatNumber}</td>
-                        <td>${ticket.carriageNumber}</td>
-                         <td>${ticket.seatType}</td>
-                        <td><fmt:formatNumber value="${ticket.ticketPrice}" type="currency" currencySymbol="$" /></td>
-                        <td>${ticket.ticketStatus}</td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-    </div>
-
-    <%-- Order History Section (Optional) --%>
-    <%--
-    <div class="detail-section">
-        <h3>Order History</h3>
-        <ul>
-            <c:forEach items="${orderHistory}" var="event">
-                <li>${event.timestamp} - ${event.status} - ${event.description}</li>
-            </c:forEach>
-        </ul>
-    </div>
-    --%>
-
-
-    <%-- Action Buttons --%>
-    <div class="actions">
-        <c:if test="${booking.bookingStatus != 'Cancelled'}">
-            <a href="order?action=cancel&id=${booking.bookingID}" onclick="return confirm('Are you sure you want to cancel this order?');">Cancel Order</a>
-           <%-- <a href="order?action=edit&id=${booking.bookingID}">Edit Order</a>--%>
-        </c:if>
-
-        <a href="#" onclick="window.print();return false;">Print Ticket</a>  <%-- Basic print functionality --%>
-        <a href="order" class="back-button">Go Back</a>
-    </div>
-</div>
-</body>
+    </body>
 </html>

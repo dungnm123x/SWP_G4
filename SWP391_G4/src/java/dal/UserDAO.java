@@ -41,6 +41,7 @@ public class UserDAO extends DBContext {
     public Object get(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
 
     public UserDTO gett(int userID) {
         UserDTO user = null;
