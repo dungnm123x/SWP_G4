@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Carriage;
 import model.Train;
+import model.User;
 
 public class TrainController extends HttpServlet {
 
@@ -24,9 +25,15 @@ public class TrainController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         if (action == null) {
             action = "list"; // Set a default action
         }
+        
 
         switch (action) {
             case "edit":

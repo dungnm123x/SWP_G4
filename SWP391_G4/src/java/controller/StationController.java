@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import model.Station;
+import model.User;
 
 public class StationController extends HttpServlet {
 
@@ -18,6 +19,11 @@ public class StationController extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
 
         if (action == null || "list".equals(action)) {
             listStations(request, response);

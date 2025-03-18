@@ -4,6 +4,24 @@
 <head>
     <title>Quản lý Tuyến Tàu</title>
     <link rel="stylesheet" href="css/employee.css">
+    <style>.admin-back-button {
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #2C3E50;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                border: none;
+                font-size: 16px;
+                transition: background-color 0.3s ease
+            }
+
+            .admin-back-button:hover {
+                background-color: #00509E;
+            }
+            .admin-back-button i {
+                margin-right: 8px;
+            }</style>
 </head>
 <body>
     <div class="container">
@@ -28,6 +46,11 @@
                 </form>
                 
             </div>
+        <c:if test="${sessionScope.user.roleID == 1}">
+                <a href="admin?view=dashboard" class="admin-back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
+                </a>
+            </c:if>
     <h1>Danh sách Tuyến Tàu</h1>
      <c:if test="${not empty message}">
         <p style="color:green;">${message}</p>

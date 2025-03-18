@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Station;
 import dal.StationDAO;
+import model.User;
 
 public class EditStationController extends HttpServlet {
 
@@ -19,6 +20,11 @@ public class EditStationController extends HttpServlet {
 protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
     String action = request.getParameter("action");
+    User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
 
     if ("edit".equals(action)) {
         int id = Integer.parseInt(request.getParameter("stationID"));

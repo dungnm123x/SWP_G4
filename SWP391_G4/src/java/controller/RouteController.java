@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Route;
 import model.Station;
+import model.User;
 
 public class RouteController extends HttpServlet {
 
@@ -22,6 +23,11 @@ public class RouteController extends HttpServlet {
 
         request.setAttribute("routes", routes);
         request.setAttribute("stations", stations);
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
 
         // Kiểm tra nếu có ID cần chỉnh sửa
         String editId = request.getParameter("editId");

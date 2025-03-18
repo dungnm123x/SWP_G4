@@ -17,6 +17,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.ArrayList;
 import java.time.LocalDate;
+import model.User;
 
 public class TripController extends HttpServlet {
 
@@ -35,6 +36,11 @@ public class TripController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         if (action == null) {
             action = "list"; // Default action is to list trips
         }

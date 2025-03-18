@@ -21,7 +21,11 @@ public class TicketListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         // Nếu chưa có session hoặc chưa đăng nhập, lưu lại trang hiện tại rồi chuyển hướng đến login
         if (session == null || session.getAttribute("user") == null) {
             session = request.getSession(true);
@@ -30,7 +34,6 @@ public class TicketListServlet extends HttpServlet {
             return;
         }
 
-        User user = (User) session.getAttribute("user");
         int userID = user.getUserId();
 
         TicketDAO ticketDAO = new TicketDAO();
