@@ -9,27 +9,10 @@
 
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link rel="stylesheet" href="css/employee.css">
         <style>
-            .admin-back-button {
-                display: inline-block;
-                padding: 10px 20px;
-                background-color: #2C3E50;
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                border: none;
-                font-size: 16px;
-                transition: background-color 0.3s ease
-            }
-
-            .admin-back-button:hover {
-                background-color: #00509E;
-            }
-            .admin-back-button i {
-                margin-right: 8px;
-            }
             /* Căn giữa tiêu đề */
             .manager-title {
                 text-align: center;
@@ -78,6 +61,7 @@
                     <li><a href="trip">Quản lý chuyến</a></li>
                     <li><a href="route">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
+                    <li><a href="order">Quản lý hóa đơn</a></li>
                     <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                     <li><a href="posts-list">Quản lý Blog</a></li>
                     <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
@@ -89,16 +73,11 @@
                 </form>
 
             </div>
-            <c:if test="${sessionScope.user.roleID == 1}">
-                <a href="admin?view=dashboard" class="admin-back-button">
-                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
-                </a>
-            </c:if>
-            <h2 class="manager-title">Manager Rule</h2>
+            <h2 class="manager-title">Quản lý quy định </h2>
             <div class="action-buttons">
                 <!-- Nút "Add Blog" -->
                 <a class="btn btn-primary" href="add-rule">
-                    <i class="fas fa-plus-circle"></i> Add Rule
+                    <i class="fas fa-plus-circle"></i> Thêm quy định
                 </a>
             </div>
 

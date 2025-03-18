@@ -11,7 +11,7 @@ public class TripDTO {
     private String routeName; // Store route name (departure - arrival)
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    private String tripStatus; // e.g., "Scheduled," "Departed," "Arrived," "Cancelled"
+    private String tripStatus; 
 
     // Constructors
     public TripDTO() {}
@@ -99,6 +99,4 @@ public class TripDTO {
         if (arrivalTime == null) return "";
         return arrivalTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
-    
-    //akshjkdsd
 }

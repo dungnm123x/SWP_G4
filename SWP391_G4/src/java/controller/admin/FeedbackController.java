@@ -40,8 +40,8 @@ public class FeedbackController extends HttpServlet {
 
         Feedback feedback = new Feedback(user, content, rating); // Sử dụng User object từ session
         if (feedbackDAO.addFeedback(feedback)) {
-            request.getSession().setAttribute("message", "Cảm ơn bạn đã gửi phản hồi!");
-            response.sendRedirect("home");
+            request.getSession().setAttribute("message3", "Cảm ơn bạn đã gửi phản hồi!");
+            response.sendRedirect("feedback");
         } else {
             request.setAttribute("error", "Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.");
             request.getRequestDispatcher("view/adm/feedbackForm.jsp").forward(request, response);

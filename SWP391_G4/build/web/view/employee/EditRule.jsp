@@ -38,11 +38,11 @@
     </head>
     <body>
         <div class="slider-container">
-            <h2 class="slider-title">Edit Rule</h2>              
+            <h2 class="slider-title">Chỉnh sửa quy định</h2>              
         </div>
         <div class="container rounded bg-white mt-5 mb-5">           
             <div class="header text-center p-3 bg-primary text-white">
-                <h4>Edit Rule</h4>
+                <h4>Chỉnh sửa quy định</h4>
             </div>
 
             <!-- Hiển thị thông báo lỗi hoặc thành công -->
