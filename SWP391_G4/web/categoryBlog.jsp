@@ -61,7 +61,7 @@
         </div>
         <div class="container my-5">
             <div class="slider-container">
-                <h2 class="slider-title">Manager Category Blog</h2>              
+                <h2 class="slider-title">Quản lý tiêu đề Blog</h2>              
             </div>
             <%-- Hiển thị thông báo --%>
             <c:if test="${not empty sessionScope.message}">

@@ -5,17 +5,15 @@
 package dal;
 
 import Utils.Encryptor;
+import dto.UserDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import model.User;
+import java.util.List;
 
-/**
- *
- * @author dung9
- */
 public class UserDAO extends DBContext {
 
     @Override
@@ -42,6 +40,89 @@ public class UserDAO extends DBContext {
     @Override
     public Object get(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+
+    public UserDTO gett(int userID) {
+        UserDTO user = null;
+        String sql = "SELECT * FROM [User] WHERE UserID = ?"; // Use square brackets if needed
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    user = new UserDTO();
+                    user.setUserID(rs.getInt("UserID"));
+                    user.setUsername(rs.getString("Username"));
+                    user.setPassword(rs.getString("Password"));
+                    user.setFullName(rs.getString("FullName"));
+                    user.setEmail(rs.getString("Email"));
+                    user.setPhoneNumber(rs.getString("PhoneNumber"));
+                    user.setAddress(rs.getString("Address"));
+                    user.setRoleID(rs.getInt("RoleID"));
+                    user.setStatus(rs.getBoolean("Status"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return user;
+    }
+
+    public boolean addUser(User user) {
+        String sql = "INSERT INTO [User] (Username, Password, FullName, Email, PhoneNumber, Address, RoleID, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword()); // Again, this should be a *hash*
+            ps.setString(3, user.getFullName());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, user.getPhoneNumber());
+            ps.setString(6, user.getAddress());
+            ps.setInt(7, user.getRoleID());
+            ps.setBoolean(8, user.isStatus());
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateUser(User user) {
+        String sql = "UPDATE [User] SET Username = ?, FullName = ?, Email = ?, PhoneNumber = ?, "
+                + "Address = ?, RoleID = ?, Status = ? WHERE UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, user.getUsername());
+            // Don't update the password here unless you have a separate change password feature.
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getEmail());
+            ps.setString(4, user.getPhoneNumber());
+            ps.setString(5, user.getAddress());
+            ps.setInt(6, user.getRoleID());
+            ps.setBoolean(7, user.isStatus());
+            ps.setInt(8, user.getUserId());
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    // Soft delete by setting status to false
+
+    public boolean deleteUser(int userId) {
+        String sql = "UPDATE [User] SET Status = 0 WHERE UserID = ?"; //Soft delete
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private User mapUser(ResultSet rs) throws SQLException {

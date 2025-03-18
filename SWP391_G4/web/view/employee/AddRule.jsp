@@ -116,11 +116,11 @@
     </head>
     <body>
         <div class="slider-container">
-            <h2 class="slider-title">Add New Rule</h2>              
+            <h2 class="slider-title">Thêm quy định mới</h2>              
         </div>
         <div class="container rounded mt-5 mb-5">
             <div class="header">
-                <h4>Add New Rule</h4>
+                <h4>Thêm quy định mới</h4>
             </div>
 
             <c:if test="${not empty error}">
