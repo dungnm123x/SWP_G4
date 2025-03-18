@@ -99,4 +99,6 @@ public class TripDTO {
         if (arrivalTime == null) return "";
         return arrivalTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
+    
+    //akshjkdsd
 }
