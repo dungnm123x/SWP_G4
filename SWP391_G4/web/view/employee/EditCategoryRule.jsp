@@ -36,11 +36,11 @@
     </head>
     <body>
          <div class="slider-container">
-            <h2 class="slider-title">Chỉnh sửa tiêu đề quy định </h2>              
+            <h2 class="slider-title">Edit Category Rule</h2>              
         </div>
         <div class="container rounded bg-white mt-5 mb-5">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4>Chỉnh sửa tiêu đề quy định</h4>
+                    <h4>Edit Category Rule</h4>
                 </div>
                 <div class="card-body">
 

@@ -31,11 +31,11 @@
     </head>
     <body>
         <div class="slider-container">
-            <h2 class="slider-title">Thêm tiêu đề quy định mới</h2>              
+            <h2 class="slider-title">Add New Rule</h2>              
         </div>
         <div class="container rounded mt-5 mb-5">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4>Thêm tiêu đề quy định mới</h4>
+                    <h4>Add New Category Rule</h4>
                 </div>
                 <div class="card-body">
 

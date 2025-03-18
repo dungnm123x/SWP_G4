@@ -9,8 +9,15 @@ package model;
  * @author dung9
  */
 public class Ticket {
+//    private int ticketID;
+//    private int userID;
+//    private int seatID;
+//    private int tripID;
+//    private String ticketStatus;
+//    private String bookingDate;
+//    private double ticketPrice;
+
     private int ticketID; // auto
-    private String passengerName;
     private String cccd;  // CMND/Hộ chiếu
     private int bookingID;
     private int seatID;
@@ -23,9 +30,8 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(int ticketID, String passengerName, String cccd, int bookingID, int seatID, int tripID, double ticketPrice, String ticketStatus) {
+    public Ticket(int ticketID, String cccd, int bookingID, int seatID, int tripID, double ticketPrice, String ticketStatus) {
         this.ticketID = ticketID;
-        this.passengerName = passengerName;
         this.cccd = cccd;
         this.bookingID = bookingID;
         this.seatID = seatID;
@@ -40,14 +46,6 @@ public class Ticket {
 
     public void setTicketID(int ticketID) {
         this.ticketID = ticketID;
-    }
-
-    public String getPassengerName() {
-        return passengerName;
-    }
-
-    public void setPassengerName(String passengerName) {
-        this.passengerName = passengerName;
     }
 
     public String getCccd() {
@@ -97,7 +95,5 @@ public class Ticket {
     public void setTicketStatus(String ticketStatus) {
         this.ticketStatus = ticketStatus;
     }
-
-    
     
 }

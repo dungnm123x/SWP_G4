@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import dto.RailwayDTO;
-import dto.TripDTO;
 import java.util.ArrayList;
 import java.util.List;
 import model.Trip;
@@ -16,9 +15,6 @@ import model.Train;
 import model.Route;
 import model.Seat;
 import model.Station;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public class TripDAO extends DBContext<RailwayDTO> {
 
@@ -90,48 +86,6 @@ public class TripDAO extends DBContext<RailwayDTO> {
         return tripList;
     }
 
-    public List<TripDTO> getTripsByTrainId(int trainId) {
-        List<TripDTO> trips = new ArrayList<>();
-        String sql = "SELECT tr.TripID, tr.TrainID, t.TrainName, tr.RouteID, "
-                + "CONCAT(st1.StationName, ' - ', st2.StationName) AS RouteName, "
-                + "tr.DepartureTime, tr.ArrivalTime, tr.TripStatus "
-                + "FROM Trip tr "
-                + "JOIN Train t ON tr.TrainID = t.TrainID "
-                + "JOIN Route r ON tr.RouteID = r.RouteID "
-                + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
-                + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
-                + "WHERE tr.TrainID = ?"; // Filter by TrainID
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, trainId); // Set the TrainID parameter
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    TripDTO trip = new TripDTO();
-                    trip.setTripID(rs.getInt("TripID"));
-                    trip.setTrainID(rs.getInt("TrainID"));
-                    trip.setTrainName(rs.getString("TrainName"));
-                    trip.setRouteID(rs.getInt("RouteID"));
-                    trip.setRouteName(rs.getString("RouteName"));
-
-                    Timestamp departureTimestamp = rs.getTimestamp("DepartureTime");
-                    if (departureTimestamp != null) {
-                        trip.setDepartureTime(departureTimestamp.toLocalDateTime());
-                    }
-
-                    Timestamp arrivalTimestamp = rs.getTimestamp("ArrivalTime");
-                    if (arrivalTimestamp != null) {
-                        trip.setArrivalTime(arrivalTimestamp.toLocalDateTime());
-                    }
-                    trip.setTripStatus(rs.getString("TripStatus"));
-                    trips.add(trip);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
-        }
-        return trips;
-    }
-
     public Trip getTripByID(int tripID) {
         Trip trip = null;
         String sql = "SELECT t.TripID, t.TrainID, tr.TrainName, "
@@ -174,46 +128,36 @@ public class TripDAO extends DBContext<RailwayDTO> {
         return trip;
     }
 
-    public TripDTO getTripById(int tripID) {
-        TripDTO trip = null;
-        String sql = "SELECT tr.TripID, tr.TrainID, t.TrainName, tr.RouteID, "
-                + "CONCAT(st1.StationName, ' - ', st2.StationName) AS RouteName, "
-                + "tr.DepartureTime, tr.ArrivalTime, tr.TripStatus "
-                + "FROM Trip tr "
-                + "JOIN Train t ON tr.TrainID = t.TrainID "
-                + "JOIN Route r ON tr.RouteID = r.RouteID "
-                + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
-                + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
-                + "WHERE tr.TripID = ?";
+    
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, tripID);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    trip = new TripDTO();
-                    trip.setTripID(rs.getInt("TripID"));
-                    trip.setTrainID(rs.getInt("TrainID"));
-                    trip.setTrainName(rs.getString("TrainName")); // Set train name
-                    trip.setRouteID(rs.getInt("RouteID"));
-                    trip.setRouteName(rs.getString("RouteName")); // Set route name
-                    Timestamp departureTimestamp = rs.getTimestamp("DepartureTime");
-                    if (departureTimestamp != null) {
-                        trip.setDepartureTime(departureTimestamp.toLocalDateTime());
-                    }
-
-                    Timestamp arrivalTimestamp = rs.getTimestamp("ArrivalTime");
-                    if (arrivalTimestamp != null) {
-                        trip.setArrivalTime(arrivalTimestamp.toLocalDateTime());
-                    }
-                    trip.setTripStatus(rs.getString("TripStatus"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Or use a logger
-        }
-        return trip;
-    }
-
+//    public Trip getTripByTrainID(int trainID) {
+//        Trip trip = null;
+//        String sql = "SELECT t.TripID, t.TrainID, tr.TrainName, t.DepartureTime "
+//                + "FROM Trip t "
+//                + "JOIN Train tr ON t.TrainID = tr.TrainID "
+//                + "WHERE t.TrainID = ?";
+//
+//        try (
+//                PreparedStatement ps = connection.prepareStatement(sql)) {
+//
+//            ps.setInt(1, trainID);
+//            ResultSet rs = ps.executeQuery();
+//
+//            if (rs.next()) {
+//                trip = new Trip();
+//                Train train = new Train();
+//
+//                train.setTrainID(rs.getInt("TrainID"));
+//                train.setTrainName(rs.getString("TrainName"));
+//                trip.setTripID(rs.getInt("TripID"));
+//                trip.setTrain(train);
+//                trip.setDepartureTime(rs.getTimestamp("DepartureTime"));
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return trip;
+//    }
     @Override
     public void insert(RailwayDTO model) {
         throw new UnsupportedOperationException("Not supported yet.");

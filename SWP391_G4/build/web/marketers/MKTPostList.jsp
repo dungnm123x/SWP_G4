@@ -77,13 +77,13 @@
 
             </div>
             <!-- Tiêu đề chính -->
-            <h2 class="manager-title">Quản Lý Blog</h2>
+            <h2 class="manager-title">Manager Blog</h2>
 
             <!-- Nhóm nút Add / Refresh -->
             <div class="action-buttons">
                 <!-- Nút "Add Blog" -->
                 <a class="btn btn-primary" href="add-post">
-                    <i class="fas fa-plus-circle"></i> Thêm Blog
+                    <i class="fas fa-plus-circle"></i> Add Blog
                 </a>
             </div>
 
@@ -256,10 +256,10 @@
                                         </form>
                                     </td>
                                     <td>
-<!--                                         Nút Xem Chi Tiết 
+                                        <!-- Nút Xem Chi Tiết -->
                                         <a href="view-blog?blog_id=${b.blog_id}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-eye"></i> 
-                                        </a>-->
+                                        </a>
 
                                         <!-- Nút Sửa -->
                                         <a href="edit-blog?blog_id=${b.blog_id}" class="btn btn-warning btn-sm">

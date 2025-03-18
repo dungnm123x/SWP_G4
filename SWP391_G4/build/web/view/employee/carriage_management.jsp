@@ -18,7 +18,6 @@
                     <li><a href="trip">Quản lý chuyến</a></li>
                     <li><a href="route">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
-                    <li><a href="order">Quản lý hóa đơn</a></li>
                     <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                     <li><a href="posts-list">Quản lý Blog</a></li>
                     <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
@@ -64,7 +63,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Toa số</th> 
+                        <th>Số toa</th> 
                         <th>Loại Toa</th>
                         <th>Số ghế</th>
                         <th>Hành động</th>

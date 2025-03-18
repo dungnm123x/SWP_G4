@@ -77,11 +77,11 @@
 
             </div>
             <!-- Tiêu đề chính -->
-            <h2 class="manager-title">Quản lý tiêu đề quy định</h2>
+            <h2 class="manager-title">Manager Category Rule</h2>
             <div class="action-buttons">
                 <!-- Nút "Add Category Rule" -->
                 <a class="btn btn-primary" href="add-categoryRule">
-                    <i class="fas fa-plus-circle"></i> Thêm tiêu đề quy định
+                    <i class="fas fa-plus-circle"></i> Add Category Rule
                 </a>
             </div>
 

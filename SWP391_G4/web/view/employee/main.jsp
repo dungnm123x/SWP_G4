@@ -6,37 +6,7 @@
     <head>
         <title>Quản lí chuyến</title>
         <link rel="stylesheet" href="css/employee.css">
-        <style>
-            /* Add some basic styling for pagination */
-            .pagination {
-                margin-top: 20px;
-                display:flex;
-                justify-content: center;
-            }
 
-            .pagination a, .pagination span {
-                padding: 8px 12px;
-                margin: 0 3px;
-                border: 1px solid #ddd;
-                text-decoration: none;
-                color: black;
-                background-color: white;
-            }
-
-            .pagination a:hover {
-                background-color: #ddd;
-            }
-
-            .pagination span { /* Style for the current page */
-                font-weight: bold;
-                background-color: #4CAF50; /* Or your preferred color */
-                color: white;
-                border-color: #4CAF50;
-            }
-            .error-message{
-                color: red;
-            }
-        </style>
     </head>
     <body>
 
@@ -51,7 +21,6 @@
                     <li><a href="trip">Quản lý chuyến</a></li>
                     <li><a href="route">Quản lý tuyến tàu</a></li>
                     <li><a href="station">Quản lý ga</a></li>
-                    <li><a href="order">Quản lý hóa đơn</a></li>
                     <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                     <li><a href="posts-list">Quản lý Blog</a></li>
                     <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
@@ -85,14 +54,13 @@
                     <input type="date" id="departureDate" name="departureDate" value="${param.departureDate}">
 
                     <button type="submit">Lọc</button>
-                    
+                    <a href="trip"><button>Xóa lọc</button></a>
                     <input type="hidden" name="action" value="list">
                 </form>
-                    <a href="trip"><button>Xóa lọc</button></a>
-                <a href="trip?action=add"><button>Thêm chuyến</button></a>
+                    <a href="trip?action=add"><button>Thêm chuyến</button></a>
             </div>
 
-
+            
 
 
             <%-- Trip List Table --%>

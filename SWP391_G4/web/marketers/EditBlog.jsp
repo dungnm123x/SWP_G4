@@ -53,11 +53,11 @@
     </head>
     <body>
         <div class="slider-container">
-            <h2 class="slider-title">Chỉnh sửa Blog</h2>              
+            <h2 class="slider-title">Edit Blog</h2>              
         </div>
         <div class="container rounded bg-white mt-5 mb-5">           
             <div class="header text-center p-3 bg-primary text-white">
-                <h4>Chỉnh sửa Blog</h4>
+                <h4>Edit Blog</h4>
             </div>
 
             <!-- Hiển thị thông báo lỗi hoặc thành công -->

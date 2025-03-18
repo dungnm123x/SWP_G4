@@ -11,7 +11,7 @@ public class TripDTO {
     private String routeName; // Store route name (departure - arrival)
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    private String tripStatus; 
+    private String tripStatus; // e.g., "Scheduled," "Departed," "Arrived," "Cancelled"
 
     // Constructors
     public TripDTO() {}

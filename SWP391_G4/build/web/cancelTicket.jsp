@@ -36,7 +36,6 @@
                             <tr>
                                 <th>Chọn</th>
                                 <th>Mã vé</th>
-                                <th>CCCD</th>
                                 <th>Hành trình</th>
                                 <th>Tàu</th>
                                 <th>Thời gian khởi hành</th>
@@ -51,7 +50,6 @@
                                 <tr>
                                     <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
                                     <td>${ticket.ticketID}</td>
-                                    <td>${ticket.cccd}</td>
                                     <td>${ticket.route}</td>
                                     <td>${ticket.trainCode}</td>
                                     <td>${ticket.departureTime}</td>
