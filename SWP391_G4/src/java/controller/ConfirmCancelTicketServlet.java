@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dal.BookingDAO;
 import dal.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.RailwayDTO;
 import model.Ticket;
+import model.User;
 
 /**
  *
@@ -83,38 +85,52 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<RailwayDTO> pendingTickets = (List<RailwayDTO>) request.getSession().getAttribute("pendingCancelTickets");
+        HttpSession session = request.getSession();
+        List<RailwayDTO> pendingTickets = (List<RailwayDTO>) session.getAttribute("pendingCancelTickets");
+        User user = (User) session.getAttribute("user");
 
-        if (pendingTickets == null || pendingTickets.isEmpty()) {
-            response.sendRedirect("cancel-ticket"); // Nếu không có vé, quay lại trang chọn vé
+        if (pendingTickets == null || pendingTickets.isEmpty() || user == null) {
+            response.sendRedirect("cancel-ticket"); // Nếu không có vé hợp lệ, quay lại trang chọn vé
             return;
         }
 
-        // Lấy mã OTP từ request
-        String enteredOtp = request.getParameter("otp");
+        // 🔹 Bước 1: Tính tổng số tiền hoàn (80% tổng giá vé)
+        double totalRefund = 0;
+        for (RailwayDTO ticket : pendingTickets) {
+            totalRefund += ticket.getTicketPrice() * 0.8; // Hoàn lại 80%
+        }
 
-        // Lấy mã OTP từ session và đảm bảo nó là String
-        Object sessionOtpObj = request.getSession().getAttribute("otp");
-        String sessionOtp = (sessionOtpObj != null) ? String.valueOf(sessionOtpObj) : null;
+        // 🔹 Bước 2: Lấy userID
+        int userID = user.getUserId();
 
-        if (sessionOtp == null || !sessionOtp.equals(enteredOtp)) {
-            // OTP không hợp lệ, gửi lại thông báo lỗi
-            request.setAttribute("errorMessage", "Mã OTP không chính xác. Vui lòng thử lại!");
+        // 🔹 Bước 3: Gọi insertRefund() để lưu vào database
+        BookingDAO bookingDAO = new BookingDAO();
+        int refundBookingID = -1;
+        try {
+            refundBookingID = bookingDAO.insertRefund(userID, totalRefund);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Lỗi khi xử lý hoàn tiền. Vui lòng thử lại sau.");
             request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
             return;
         }
 
-        // Gọi DAO để hủy từng vé
+        if (refundBookingID == -1) {
+            request.setAttribute("errorMessage", "Không thể hoàn tiền, vui lòng thử lại sau.");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
+        }
+
+        // 🔹 Bước 4: Hủy vé sau khi hoàn tiền thành công
         TicketDAO ticketDAO = new TicketDAO();
         for (RailwayDTO ticket : pendingTickets) {
             ticketDAO.cancelTicket(ticket.getTicketID(), ticket.getSeatNumber());
         }
 
-        // Xóa session sau khi hủy vé
-        request.getSession().removeAttribute("pendingCancelTickets");
-        request.getSession().removeAttribute("otp");
+        // Xóa session sau khi hoàn tất
+        session.removeAttribute("pendingCancelTickets");
 
-        // Chuyển hướng đến trang thành công
+        // Hiển thị thông báo thành công
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.println("<!DOCTYPE html>");
@@ -130,7 +146,7 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
         out.println("Swal.fire({");
         out.println("  icon: 'success',");
         out.println("  title: 'Bạn đã hủy vé thành công!',");
-        out.println("  text: 'Vui lòng đợi tiền gửi về.',");
+        out.println("  text: 'Số tiền hoàn lại: " + totalRefund + " VND',");
         out.println("  confirmButtonText: 'OK'");
         out.println("}).then((result) => {");
         out.println("  if (result.isConfirmed) {");

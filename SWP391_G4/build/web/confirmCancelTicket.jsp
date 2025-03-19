@@ -18,10 +18,20 @@
             .table-container {
                 box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
                 border-radius: 10px;
-                overflow: hidden;
                 background: white;
-                padding: 15px;
+                padding: 20px;
                 margin-top: 20px;
+                overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+            }
+
+            @media (max-width: 768px) {
+                .table-container {
+                    padding: 10px;
+                }
+
+                table {
+                    font-size: 14px; /* Giảm kích thước chữ trên màn hình nhỏ */
+                }
             }
             #otpMessage {
                 margin-top: 10px;
@@ -46,6 +56,8 @@
                         <thead class="bg-dark text-white">
                             <tr>
                                 <th>Mã vé</th>
+                                <th>Tên</th>
+                                <th>CCCD</th>
                                 <th>Hành trình</th>
                                 <th>Tàu</th>
                                 <th>Thời gian khởi hành</th>
@@ -64,6 +76,8 @@
                                 <c:set var="ticketCount" value="${ticketCount + 1}" />
                                 <tr>
                                     <td>${ticket.ticketID}</td>
+                                    <td>${ticket.passengerName}</td>
+                                    <td>${ticket.cccd}</td>
                                     <td>${ticket.route}</td>
                                     <td>${ticket.trainCode}</td>
                                     <td>${ticket.departureTime}</td>

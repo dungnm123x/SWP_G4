@@ -55,7 +55,7 @@ public class BookingDAO extends DBContext {
 
     public int insertRefund(int userID, double totalRefund) throws SQLException {
         String sql = "INSERT INTO Booking (UserID, TripID, RoundTripTripID, BookingDate, TotalPrice, PaymentStatus, BookingStatus) "
-                + "VALUES (?, NULL, NULL, GETDATE(), ?, 'Refund', 'Expired')";
+                + "VALUES (?, NULL, NULL, CURRENT_TIMESTAMP, ?, 'Refund', 'Expired')";
 
         try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, userID);
