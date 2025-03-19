@@ -32,27 +32,52 @@
     </head>
     <body>
         <div class="container">
-            <div class="sidebar">
-                <div class="logo">
-                    <img src="./img/logo.jpg" alt="avatar">
+            <c:if test="${sessionScope.user.roleID == 2}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="avatar">
+                    </div>
+                    <ul>
+                        <li><a href="train">Quản lý tàu</a></li>
+                        <li><a href="trip">Quản lý chuyến</a></li>
+                        <li><a href="route">Quản lý tuyến tàu</a></li>
+                        <li><a href="station">Quản lý ga</a></li>
+                        <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
+                        <li><a href="posts-list">Quản lý Blog</a></li>
+                        <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                        <li><a href="manager-rule-list">Quản lý quy định</a></li>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
                 </div>
-                <ul>
-                    <li><a href="train">Quản lý tàu</a></li>
-                    <li><a href="trip">Quản lý chuyến</a></li>
-                    <li><a href="route">Quản lý tuyến tàu</a></li>
-                    <li><a href="station">Quản lý ga</a></li>
-                    <li><a href="order">Quản lý hóa đơn</a></li>
-                    <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
-                    <li><a href="posts-list">Quản lý Blog</a></li>
-                    <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
-                    <li><a href="manager-rule-list">Quản lý quy định</a></li>
-                    <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
-                </ul>
-                <form action="logout" method="GET">
-                    <button type="submit" class="logout-button">Logout</button>
-                </form>
+            </c:if>
+            <c:if test="${sessionScope.user.roleID == 1}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="trainpicture">
+                    </div>
+                    <ul class="menu">
+                        <li><a href="admin?view=dashboard">Dashboard</a></li>
+                        <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
+                        <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
+                            <c:if test="${sessionScope.user.userId == 1}">
+                            <li><a href="admin?view=userauthorization">Phân quyền</a></li>
+                            </c:if>
+                        <li><a href="trip">Quản lý chuyến tàu</a></li>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
-            </div>
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+                <a href="admin?view=dashboard" class="admin-back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
+                </a>
+            </c:if>
             <div class="form-container">
                 <h1>Edit Trip</h1>
 
