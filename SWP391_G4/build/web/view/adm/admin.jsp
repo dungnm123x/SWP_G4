@@ -30,7 +30,7 @@
                         <c:if test="${sessionScope.user.userId == 1}">
                         <li><a href="admin?view=userauthorization">Phân quyền</a></li>
                         </c:if>
-                    <li><a href="trip">Quản lý chuyến tàu</a></li>
+                    
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
                 </ul>
@@ -57,10 +57,11 @@
                                         </button>
                                     </div>
                                     <div class="dashboard-item bookings">
-                                        <h3>Thống kê đặt vé</h3>
-                                        <p>Tổng số đặt vé: ${totalBookings}</p>
+                                        <h3>Thống kê đơn</h3>
+                                        <p>Tổng số đơn: ${totalBookings}</p>
+                                        <p>Tổng số vé: </p>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #96B4AA;">
-                                            <a href="train" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                            <a href="order" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                     <div class="dashboard-item trips">
@@ -130,19 +131,7 @@
                                                         
 
                             <script>
-//                                
-//                                document.addEventListener('DOMContentLoaded', function () {
-//                                    var dropdown = document.getElementById('userDropdown');
-//                                    dropdown.style.display = 'none'
-//                                    window.toggleDropdown() = function (){
-//                                        if (dropdown.style.display == 'none') {
-//                                            dropdown.style.display = 'block';
-//                                        } else {
-//                                            dropdown.style.display = 'none';
-//                                        }
-//                                    }
-//                                    ;
-//                                });
+
 
                                 const revenueData = {
                                     week: ${revenueThisWeek},

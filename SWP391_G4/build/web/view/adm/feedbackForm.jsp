@@ -15,7 +15,7 @@
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 
         <style>
-            
+
             body {
                 font-family: 'Arial', sans-serif;
                 background-color: #f4f6f9;
@@ -103,6 +103,9 @@
             .star.filled {
                 color: gold;
             }
+            .alert-danger-green{
+                background-color:#E3F2E1;
+            }
         </style>
     </head>
     <body>
@@ -141,6 +144,7 @@
                     </div>
                 </div>
         </div>
+        
 
         <div class="mt-4 text-center">
             <a href="home"><button class="btn btn-outline-custom" type="button">Trang chủ</button></a>
