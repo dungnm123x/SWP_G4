@@ -22,7 +22,7 @@ public class TicketListServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+        if (user == null) {
             response.sendRedirect("login");
             return;
         }

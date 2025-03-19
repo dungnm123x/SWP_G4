@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
+import model.User;
 
 /**
  *
@@ -44,7 +45,13 @@ public class AddPostController extends HttpServlet {
 
         List<CategoryBlog> categories = bd.getAllCategories();
         request.setAttribute("categories", categories);
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         request.getRequestDispatcher("/marketers/AddBlog.jsp").forward(request, response);
+        
     }
 @Override
 protected void doPost(HttpServletRequest request, HttpServletResponse response)

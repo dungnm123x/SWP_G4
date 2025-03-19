@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.CategoryRule;
+import model.User;
 
 /**
  *
@@ -59,6 +60,11 @@ public class AddCategoryRuleController extends HttpServlet {
         String content = request.getParameter("content");
         String img = request.getParameter("img");
         boolean status = "1".equals(request.getParameter("status")); // Chuyển đổi từ radio button
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
 
         System.out.println("🔹 Dữ liệu nhận được: " + name + ", " + content + ", " + img + ", " + status);
 

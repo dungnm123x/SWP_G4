@@ -66,7 +66,6 @@
                             <c:if test="${sessionScope.user.userId == 1}">
                             <li><a href="admin?view=userauthorization">Phân quyền</a></li>
                             </c:if>
-                        <li><a href="trip">Quản lý chuyến tàu</a></li>
                         <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
                     </ul>

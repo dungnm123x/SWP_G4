@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.User;
 
 /**
  *
@@ -60,7 +61,8 @@ public class BlogDetailsController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        User user = (User) request.getSession().getAttribute("user");
+        
         // Lấy blogId từ tham số URL (thường là từ link bài viết chi tiết)
         int blogId = Integer.parseInt(request.getParameter("blogId"));
         BlogDAO bd = new BlogDAO();

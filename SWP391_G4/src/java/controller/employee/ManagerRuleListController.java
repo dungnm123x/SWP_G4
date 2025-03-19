@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.CategoryRule;
 import model.Rule;
+import model.User;
 
 @WebServlet(name = "ManagerRuleListController", urlPatterns = {"/manager-rule-list"})
 public class ManagerRuleListController extends HttpServlet {
@@ -25,6 +26,11 @@ public class ManagerRuleListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         String sortByParam = request.getParameter("sortBy");
         String statusParam = request.getParameter("status");
 
