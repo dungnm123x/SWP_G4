@@ -184,7 +184,6 @@
                     </div>
                     <% session.removeAttribute("success"); %>
                 </c:if>
-
                 <form action="edit-blog" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
                     <input type="hidden" name="blog_id" value="${blog.blog_id}">
 
@@ -253,7 +252,6 @@
                 </form>
             </div>
         </div>
-
         <script>
             CKEDITOR.replace('editor');
 
@@ -300,7 +298,6 @@
                 // Clear the file input
                 input.value = "";
             }
-
         </script>
     </body>
 </html>

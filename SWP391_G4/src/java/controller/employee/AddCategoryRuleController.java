@@ -46,7 +46,11 @@ public class AddCategoryRuleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         List<CategoryRule> categories = rd.getAllCategories();
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/view/employee/AddCategoryRule.jsp").forward(request, response);

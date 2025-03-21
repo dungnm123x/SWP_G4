@@ -439,7 +439,8 @@ public class BlogDAO extends DBContext {
     }
 
     public boolean updateBlog(int blogId, String title, String briefInfor, String content, int categoryId, boolean status, String thumbnail) {
-        String sql = "UPDATE Blog SET title=?, brief_infor=?, content=?, categoryBlog_id=?, status=?, updated_date=GETDATE(), thumbnail=? WHERE blog_id=?";
+        // Sửa updated_date -> update_date
+        String sql = "UPDATE Blog SET title=?, brief_infor=?, content=?, categoryBlog_id=?, status=?, update_date=GETDATE(), thumbnail=? WHERE blog_id=?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, title);
             st.setString(2, briefInfor);
@@ -450,6 +451,11 @@ public class BlogDAO extends DBContext {
             st.setInt(7, blogId);
 
             int rowsUpdated = st.executeUpdate();
+            if (rowsUpdated == 0) {
+                System.out.println("Không có blog nào được cập nhật! Blog ID: " + blogId);
+            } else {
+                System.out.println("Cập nhật blog thành công! Blog ID: " + blogId);
+            }
             return rowsUpdated > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -812,7 +818,7 @@ public class BlogDAO extends DBContext {
 
     public List<User> getAllUser() {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT *  WHERE Role = 2";
+        String sql = "SELECT *  form User where RoleID = 2";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -845,14 +851,13 @@ public class BlogDAO extends DBContext {
     }
 
     public boolean isTitleExistsExceptCurrent(String title, int blogId) {
-        String sql = "SELECT COUNT(*) FROM Blog WHERE title = ? AND BlogID != ?";
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
+        String sql = "SELECT COUNT(*) FROM Blog WHERE title = ? AND blog_id != ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, title);
             st.setInt(2, blogId);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1) > 0; // Trả về true nếu có tiêu đề trùng với bài khác
+                return rs.getInt(1) > 0; // Trả về true nếu có tiêu đề trùng
             }
         } catch (SQLException e) {
             e.printStackTrace(); // In lỗi ra console để debug

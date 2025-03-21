@@ -104,7 +104,7 @@
             }
         </style>
     </head>
-     <body class="bg-light">
+    <body class="bg-light">
         <div class="main-container">
             <c:if test="${sessionScope.user.roleID == 2}">
                 <div class="sidebar">
@@ -151,72 +151,72 @@
                     <i class="fas fa-arrow-left"></i> Quay lại trang Admin
                 </a>
             </c:if>         
-        <div class="slider-container">
-            <h2 class="slider-title">Chỉnh sửa tiêu</h2>              
-        </div>
-        <div class="container rounded bg-white mt-5 mb-5">
-            <div class="card-header bg-primary text-white text-center">
-                <h4>Chỉnh sửa tiêu đề quy định</h4>
+            <div class="slider-container">
+                <h2 class="slider-title">Chỉnh sửa tiêu</h2>              
             </div>
-            <div class="card-body">
+            <div class="container rounded bg-white mt-5 mb-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Chỉnh sửa tiêu đề quy định</h4>
+                </div>
+                <div class="card-body">
 
-                <!-- Hiển thị thông báo thành công/thất bại -->
-                <c:if test="${not empty message}">
-                    <div class="alert ${message.contains('thành công') ? 'alert-success' : 'alert-danger'}" role="alert">
-                        ${message}
-                    </div>
-                </c:if>
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger" role="alert">${errorMessage}</div>
+                    </c:if>
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success" role="alert">${successMessage}</div>
+                    </c:if>
 
-                <!-- Form gửi request đến Servlet -->
-                <form action="edit-categoryRule" method="post">
-                    <div class="row mt-4">
-                        <div class="col-md-8">
-                            <input type="hidden" name="categoryRuleID" value="${categoryRule.categoryRuleID}">
-                            <div class="mb-3">
-                                <label for="categoryRuleName" class="form-label">Category Rule Name</label>
-                                <input type="text" name="categoryRuleName" class="form-control" required value="${categoryRule.categoryRuleName}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="content" class="form-label">Content</label>
-                                <textarea name="content" id="editor" class="form-control">${categoryRule.content}</textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">Update Date</label>
-                                <input type="text" class="form-control" value="${categoryRule.update_date}" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status</label><br/>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" value="1" ${categoryRule.status ? 'checked' : ''}/>
-                                    <label class="form-check-label">Show</label>
+                    <!-- Form gửi request đến Servlet -->
+                    <form action="edit-categoryRule" method="post">
+                        <div class="row mt-4">
+                            <div class="col-md-8">
+                                <input type="hidden" name="categoryRuleID" value="${categoryRule.categoryRuleID}">
+                                <div class="mb-3">
+                                    <label for="categoryRuleName" class="form-label">Category Rule Name</label>
+                                    <input type="text" name="categoryRuleName" class="form-control" required value="${categoryRule.categoryRuleName}">
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" value="0" ${!categoryRule.status ? 'checked' : ''}/>
-                                    <label class="form-check-label">Hide</label>
+
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Content</label>
+                                    <textarea name="content" id="editor" class="form-control">${categoryRule.content}</textarea>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Update Date</label>
+                                    <input type="text" class="form-control" value="${categoryRule.update_date}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label><br/>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" value="1" ${categoryRule.status ? 'checked' : ''}/>
+                                        <label class="form-check-label">Show</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" value="0" ${!categoryRule.status ? 'checked' : ''}/>
+                                        <label class="form-check-label">Hide</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <a href="category-rule"><button class="btn btn-outline-custom" type="button">Cancel</button></a>
+                                <input class="btn btn-outline-custom" type="submit" value="Update"/>
+                            </div>
                         </div>
-                        <div class="mt-4 text-center">
-                            <a href="category-rule"><button class="btn btn-outline-custom" type="button">Cancel</button></a>
-                            <input class="btn btn-outline-custom" type="submit" value="Update"/>
-                        </div>
-                    </div>
-                </form>
+                    </form>
 
+                </div>
             </div>
-        </div>
 
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- CKEditor -->
-        <script src="https://cdn.ckeditor.com/4.16.2/full-all/ckeditor.js"></script>
-        <script>
-            CKEDITOR.replace('editor');
-        </script>
+            <!-- CKEditor -->
+            <script src="https://cdn.ckeditor.com/4.16.2/full-all/ckeditor.js"></script>
+            <script>
+                CKEDITOR.replace('editor');
+            </script>
 
     </body>
 </html>
