@@ -826,6 +826,38 @@ public class BlogDAO extends DBContext {
             System.out.println(e);
         }
         return list;
+
+    }
+
+    public boolean isTitleExists(String title) {
+        String sql = "SELECT COUNT(*) FROM Blog WHERE title = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, title);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Trả về true nếu có ít nhất một bài viết trùng tiêu đề
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return false; // Trả về false nếu không có tiêu đề trùng hoặc có lỗi xảy ra
+    }
+
+    public boolean isTitleExistsExceptCurrent(String title, int blogId) {
+        String sql = "SELECT COUNT(*) FROM Blog WHERE title = ? AND BlogID != ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, title);
+            st.setInt(2, blogId);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Trả về true nếu có tiêu đề trùng với bài khác
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // In lỗi ra console để debug
+        }
+        return false; // Mặc định trả về false nếu không có tiêu đề trùng hoặc lỗi xảy ra
     }
 
     @Override

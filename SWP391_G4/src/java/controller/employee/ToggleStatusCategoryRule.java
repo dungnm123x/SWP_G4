@@ -88,6 +88,7 @@ public class ToggleStatusCategoryRule extends HttpServlet {
             boolean result = rd.updateCategoryRuleStatus(categoryRuleID, status);
 
             if (result) {
+                request.getSession().setAttribute("message", "Status updated successfully!");
                 response.sendRedirect("category-rule");
             } else {
                 response.getWriter().println("Error updating status");

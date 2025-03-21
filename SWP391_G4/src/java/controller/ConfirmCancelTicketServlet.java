@@ -4,6 +4,7 @@
  */
 package controller;
 
+import Utils.SendEmailCancelTicket;
 import dal.BookingDAO;
 import dal.TicketDAO;
 import java.io.IOException;
@@ -90,73 +91,88 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         if (pendingTickets == null || pendingTickets.isEmpty() || user == null) {
-            response.sendRedirect("cancel-ticket"); // Nếu không có vé hợp lệ, quay lại trang chọn vé
+            response.sendRedirect("cancel-ticket");
             return;
         }
 
-        // 🔹 Bước 1: Tính tổng số tiền hoàn (80% tổng giá vé)
         double totalRefund = 0;
-        for (RailwayDTO ticket : pendingTickets) {
-            totalRefund += ticket.getTicketPrice() * 0.8; // Hoàn lại 80%
-        }
-
-        // 🔹 Bước 2: Lấy userID
-        int userID = user.getUserId();
-
-        // 🔹 Bước 3: Gọi insertRefund() để lưu vào database
-        BookingDAO bookingDAO = new BookingDAO();
-        int refundBookingID = -1;
-        try {
-            refundBookingID = bookingDAO.insertRefund(userID, totalRefund);
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi khi xử lý hoàn tiền. Vui lòng thử lại sau.");
-            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
-            return;
-        }
-
-        if (refundBookingID == -1) {
-            request.setAttribute("errorMessage", "Không thể hoàn tiền, vui lòng thử lại sau.");
-            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
-            return;
-        }
-
-        // 🔹 Bước 4: Hủy vé sau khi hoàn tiền thành công
         TicketDAO ticketDAO = new TicketDAO();
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append("<html><head><style>")
+                .append("body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }")
+                .append(".container { max-width: 800px; background: white; padding: 30px; margin: auto; border-radius: 10px; ")
+                .append("box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15); text-align: left; }")
+                .append("h2 { color: #007bff; font-size: 24px; margin-bottom: 20px; text-align: center; }")
+                .append("p { font-size: 16px; color: #333; line-height: 1.6; }")
+                .append("table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd; }")
+                .append("th, td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 16px; }")
+                .append("th { background-color: #007bff; color: white; font-weight: bold; }")
+                .append("tr:nth-child(even) { background-color: #f8f9fa; }")
+                .append(".summary { margin-top: 15px; font-size: 17px; }")
+                .append(".total-count { font-weight: bold; }")
+                .append(".total-refund { font-weight: bold; color: #28a745; }")
+                .append("</style></head><body>");
+
+        emailContent.append("<div class='container'>")
+                .append("<h2>Xác nhận hủy vé thành công</h2>")
+                .append("<p>Chào <strong>").append(user.getFullName()).append("</strong>,</p>")
+                .append("<p>Hệ thống xác nhận rằng vé của bạn đã được hủy thành công. Dưới đây là chi tiết vé:</p>");
+
+        emailContent.append("<table><tr>")
+                .append("<th>Mã vé</th><th>Tên</th><th>CCCD</th><th>Hành trình</th><th>Tàu</th><th>Thời gian khởi hành</th><th>Toa</th><th>Chỗ ngồi</th><th>Giá vé</th><th>Tiền hoàn</th></tr>");
+
+        int totalTickets = 0;
         for (RailwayDTO ticket : pendingTickets) {
-            ticketDAO.cancelTicket(ticket.getTicketID(), ticket.getSeatNumber());
+            double refundAmount = ticket.getTicketPrice() * 0.8;
+            totalRefund += refundAmount;
+            totalTickets++;
+
+            emailContent.append("<tr>")
+                    .append("<td>").append(ticket.getTicketID()).append("</td>")
+                    .append("<td>").append(ticket.getPassengerName()).append("</td>")
+                    .append("<td>").append(ticket.getCccd()).append("</td>")
+                    .append("<td>").append(ticket.getRoute()).append("</td>")
+                    .append("<td>").append(ticket.getTrainCode()).append("</td>")
+                    .append("<td>").append(ticket.getDepartureTime()).append("</td>")
+                    .append("<td>").append(ticket.getCarriageNumber()).append("</td>")
+                    .append("<td>").append(ticket.getSeatNumber()).append("</td>")
+                    .append("<td>").append(ticket.getTicketPrice()).append(" VND</td>")
+                    .append("<td>").append(refundAmount).append(" VND</td>")
+                    .append("</tr>");
         }
 
-        // Xóa session sau khi hoàn tất
-        session.removeAttribute("pendingCancelTickets");
+        emailContent.append("</table>");
 
-        // Hiển thị thông báo thành công
+        emailContent.append("<p class='summary'><span class='total-count'>Tổng số vé: ")
+                .append(totalTickets)
+                .append("</span></p>");
+
+        emailContent.append("<p class='summary'><span class='total-refund'>Tổng tiền hoàn: ")
+                .append(totalRefund)
+                .append(" VND</span></p>");
+
+
+        emailContent.append("<p class='footer'>Cảm ơn bạn đã sử dụng dịch vụ đặt vé tàu của chúng tôi!<br>Trân trọng, Hệ thống đặt vé tàu</p>");
+        emailContent.append("</div></body></html>");
+
+        SendEmailCancelTicket.sendEmail(user.getEmail(), "Xác nhận hủy vé thành công", emailContent.toString());
+
+        // 🔹 Hiển thị thông báo SweetAlert2
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<meta charset='UTF-8'>");
-        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
-        out.println("<title>Hủy vé thành công</title>");
-        out.println("<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<script type='text/javascript'>");
-        out.println("Swal.fire({");
-        out.println("  icon: 'success',");
-        out.println("  title: 'Bạn đã hủy vé thành công!',");
-        out.println("  text: 'Số tiền hoàn lại: " + totalRefund + " VND',");
-        out.println("  confirmButtonText: 'OK'");
-        out.println("}).then((result) => {");
-        out.println("  if (result.isConfirmed) {");
-        out.println("    window.location.href='home.jsp';"); // Điều hướng về trang chủ
-        out.println("  }");
-        out.println("});");
-        out.println("</script>");
-        out.println("</body>");
-        out.println("</html>");
-        out.close();
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<html><head>");
+            out.println("<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>");
+            out.println("</head><body>");
+            out.println("<script>");
+            out.println("Swal.fire({");
+            out.println("  icon: 'success',");
+            out.println("  title: 'Bạn đã hủy vé thành công!',");
+            out.println("  text: 'Số tiền hoàn lại: " + totalRefund + " VND',");
+            out.println("  confirmButtonText: 'OK'");
+            out.println("}).then(() => window.location.href='home.jsp');");
+            out.println("</script>");
+            out.println("</body></html>");
+        }
     }
 
     /**

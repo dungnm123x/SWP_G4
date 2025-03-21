@@ -21,7 +21,7 @@
             src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" 
             crossorigin="anonymous">
         </script>
-
+        <link rel="stylesheet" href="css/employee.css">
         <style>
             body {
                 font-family: 'Arial', sans-serif;
@@ -116,7 +116,12 @@
             #deleteThumbnail i {
                 color: #ff0000; /* Set the color of the trash icon to red */
             }
-
+            .admin-back-button:hover {
+                background-color: #00509E;
+            }
+            .admin-back-button i {
+                margin-right: 8px;
+            }
         </style>
 
         <!-- CKEditor 4 (full-all) CDN -->
@@ -124,97 +129,144 @@
         <!-- CKFinder 3 CDN -->
         <script src="https://cdn.ckeditor.com/ckfinder/3.5.2/ckfinder.js"></script>
     </head>
-    <body>
-        <div class="slider-container">
-            <h2 class="slider-title">Add New Blog</h2>              
-        </div>
-        <div class="container rounded mt-5 mb-5">
-            <div class="header">
-                <h4>Add New Blog</h4>
-            </div>
-
-            <!-- Hiển thị thông báo lỗi nếu có -->
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger" role="alert">
-                    ${error}
-                </div>
-            </c:if>
-            <!-- Hiển thị thông báo thành công nếu có -->
-            <c:if test="${not empty success}">
-                <div class="alert alert-success" role="alert">
-                    ${success}
-                </div>
-            </c:if>
-            <form action="add-post" method="post" enctype="multipart/form-data" class="inner-form">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input type="text" name="title" class="form-control" placeholder="Enter title" required/>
-                        </div>
-                        <div class="mb-3">
-                            <label for="brief_infor" class="form-label">Brief Information</label>
-                            <textarea class="form-control" name="brief_infor" rows="4" placeholder="Descrip short about blog..."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="content" class="form-label">Content</label>
-                            <textarea cols="20" rows="10" id="editor" name="content"></textarea>
-                        </div>
+    <body class="bg-light">
+        <div class="main-container">
+            <c:if test="${sessionScope.user.roleID == 2}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="avatar">
                     </div>
+                    <ul>
+                        <li><a href="train">Quản lý tàu</a></li>
+                        <li><a href="trip">Quản lý chuyến</a></li>
+                        <li><a href="route">Quản lý tuyến tàu</a></li>
+                        <li><a href="station">Quản lý ga</a></li>
+                        <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
+                        <li><a href="posts-list">Quản lý Blog</a></li>
+                        <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                        <li><a href="manager-rule-list">Quản lý quy định</a></li>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+            </c:if>
+            <c:if test="${sessionScope.user.roleID == 1}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="trainpicture">
+                    </div>
+                    <ul class="menu">
+                        <li><a href="admin?view=dashboard">Dashboard</a></li>
+                        <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
+                        <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
+                            <c:if test="${sessionScope.user.userId == 1}">
+                            <li><a href="admin?view=userauthorization">Phân quyền</a></li>
+                            </c:if>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
-                    <div class="col-md-4">
-                        <div class="mb-3 position-relative">
-                            <label for="category" class="form-label" style="cursor: pointer; color: #007bff; font-weight: bold;">Category Blog</label>
-                            <select class="form-select" name="categoryId" id="categorySelect">
-                                <c:forEach var="category" items="${categories}">
-                                    <option value="${category.categoryBlogId}">${category.categoryBlogName}</option>
-                                </c:forEach>
-                            </select>
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+                <a href="admin?view=dashboard" class="admin-back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
+                </a>
+            </c:if>
+            <div class="slider-container">
+                <h2 class="slider-title">Add New Blog</h2>              
+            </div>
+            <div class="container rounded mt-5 mb-5">
+                <div class="header">
+                    <h4>Tạo Blog Mới</h4>
+                </div>
+
+                <!-- Hiển thị thông báo lỗi nếu có -->
+                <c:if test="${not empty sessionScope.error}">
+                    <div class="alert alert-danger" role="alert">
+                        ${sessionScope.error}
+                    </div>
+                    <% session.removeAttribute("error"); %>
+                </c:if>
+
+                <c:if test="${not empty sessionScope.success}">
+                    <div class="alert alert-success" role="alert">
+                        ${sessionScope.success}
+                    </div>
+                    <% session.removeAttribute("success"); %>
+                </c:if>
+
+                <form action="add-post" method="post" enctype="multipart/form-data" class="inner-form">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" name="title" class="form-control" placeholder="Enter title" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="brief_infor" class="form-label">Brief Information</label>
+                                <textarea class="form-control" name="brief_infor" rows="4" placeholder="Descrip short about blog..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea cols="20" rows="10" id="editor" name="content"></textarea>
+                            </div>
                         </div>
 
+                        <div class="col-md-4">
+                            <div class="mb-3 position-relative">
+                                <label for="category" class="form-label" style="cursor: pointer; color: #007bff; font-weight: bold;">Category Blog</label>
+                                <select class="form-select" name="categoryId" id="categorySelect">
+                                    <c:forEach var="category" items="${categories}">
+                                        <option value="${category.categoryBlogId}">${category.categoryBlogName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
 
-                        <script>
+
+                            <script>
                 function toggleCategorySelect() {
                     var selectBox = document.getElementById("categorySelect");
                     if (selectBox.classList.contains("d-none")) {
                         selectBox.classList.remove("d-none");
                     }
                 }
-                        </script>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label><br/>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="1" checked/>
-                                <label class="form-check-label">Show</label>
+                            </script>
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label><br/>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="status" value="1" checked/>
+                                    <label class="form-check-label">Show</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="status" value="0"/>
+                                    <label class="form-check-label">Hiden</label>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="0"/>
-                                <label class="form-check-label">Hiden</label>
+
+                            <div class="mb-3">
+                                <label for="thumbnail" class="form-label">Title Thumbnail</label>
+                                <input type="file" name="thumbnail" class="form-control" id="thumbnailInput" accept="image/*" onchange="previewImage(event)"/>
+                                <div class="mt-3" style="position: relative;">
+                                    <img id="thumbnailPreview" src="" alt="Ảnh xem trước" style="max-width: 100%; display: none;"/>
+                                    <button id="deleteThumbnail" type="button" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.5); border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="deleteImage()">
+                                        <i class="bi bi-trash" style="color: #ff0000;"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="mb-3">
-                            <label for="thumbnail" class="form-label">Title Thumbnail</label>
-                            <input type="file" name="thumbnail" class="form-control" id="thumbnailInput" accept="image/*" onchange="previewImage(event)"/>
-                            <div class="mt-3" style="position: relative;">
-                                <img id="thumbnailPreview" src="" alt="Ảnh xem trước" style="max-width: 100%; display: none;"/>
-                                <button id="deleteThumbnail" type="button" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.5); border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="deleteImage()">
-                                    <i class="bi bi-trash" style="color: #ff0000;"></i>
-                                </button>
-                            </div>
-                        </div>
-
-
-
-
                     </div>
-                </div>
 
-                <div class="mt-4 text-center">
-                    <a href="posts-list"><button class="btn btn-outline-custom" type="button">Again</button></a>
-                    <input class="btn btn-primary" type="submit" value="Add"/>
-                </div>
-            </form>
+                    <div class="mt-4 text-center">
+                        <a href="posts-list"><button class="btn btn-outline-custom" type="button">Again</button></a>
+                        <input class="btn btn-outline-custom" type="submit" value="Add"/>
+                    </div>
+                </form>
+            </div>
+
 
             <script>
                 function previewImage(event) {

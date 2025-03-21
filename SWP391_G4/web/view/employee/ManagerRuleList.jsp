@@ -104,7 +104,22 @@
                     <i class="fas fa-plus-circle"></i> Thêm quy định
                 </a>
             </div>
+            <%-- Hiển thị thông báo --%>
+            <c:if test="${not empty sessionScope.message}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${sessionScope.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <% session.removeAttribute("message"); %>
+            </c:if>
 
+            <c:if test="${not empty sessionScope.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${sessionScope.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <% session.removeAttribute("error"); %>
+            </c:if>
             <!-- Bộ lọc giữ nguyên form cũ -->
             <div class="filter-row">
                 <div class="filter-group">

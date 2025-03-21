@@ -121,11 +121,11 @@
                 </a>
             </c:if>
             <!-- Tiêu đề chính -->
-            <h2 class="manager-title">Manager Category Rule</h2>
+            <h2 class="manager-title">Quản lý tiêu đề Quy định</h2>
             <div class="action-buttons">
                 <!-- Nút "Add Category Rule" -->
                 <a class="btn btn-primary" href="add-categoryRule">
-                    <i class="fas fa-plus-circle"></i> Add Category Rule
+                    <i class="fas fa-plus-circle"></i> Tạo tiêu đề Quy định mới
                 </a>
             </div>
 
@@ -134,7 +134,22 @@
                     window.location.href = 'category-rule';
                 }
             </script>
+            <%-- Hiển thị thông báo --%>
+            <c:if test="${not empty sessionScope.message}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${sessionScope.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <% session.removeAttribute("message"); %>
+            </c:if>
 
+            <c:if test="${not empty sessionScope.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${sessionScope.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <% session.removeAttribute("error"); %>
+            </c:if>
             <div class="filter-row">
                 <!-- Per Page -->
                 <div class="filter-group">
@@ -205,43 +220,6 @@
                     </form>
                 </div>
             </div>
-
-            <!-- Kết thúc phần filter-row -->
-            <c:if test="${empty categories}">
-                <script>
-                    Swal.fire({
-                        title: 'No Data Found',
-                        text: 'Please check again or try another search.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    });
-                </script>
-            </c:if>
-
-
-            <c:if test="${not empty sessionScope.success}">
-                <script>
-                    Swal.fire({
-                        title: 'Xóa thành công!',
-                        text: '${sessionScope.success}',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-                </script>
-                <% session.removeAttribute("success"); %> <!-- Xóa thông báo sau khi hiển thị -->
-            </c:if>
-            <!-- Hiển thị thông báo nếu không có dữ liệu -->
-            <c:if test="${empty categories}">
-                <script>
-                    Swal.fire({
-                        title: 'No Data',
-                        text: 'Please search again to find the data you want :))',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    });
-                </script>
-            </c:if>
-
             <!-- Bảng danh sách Category Rule -->
 
             <div class="card shadow ">
@@ -302,14 +280,15 @@
                     </table>
                 </div>
             </div>
+        </div>
 
-            <c:if test="${empty categories}">
-                <p>Không có dữ liệu CategoryRule!</p>
-            </c:if>
+        <c:if test="${empty categories}">
+            <p>Không có dữ liệu CategoryRule!</p>
+        </c:if>
 
 
-            <!-- Bootstrap JS -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>

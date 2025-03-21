@@ -54,11 +54,8 @@ public class BlogController extends HttpServlet {
             throws ServletException, IOException {
         String blogName = request.getParameter("blogName");
         String category_Id_Raw = request.getParameter("categoryId");
-        User user = (User) request.getSession().getAttribute("user");
-        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
-            response.sendRedirect("login");
-            return;
-        }
+        
+        
         int categoryId = 0;
         int index = 1;
         int pageSize = 5;
