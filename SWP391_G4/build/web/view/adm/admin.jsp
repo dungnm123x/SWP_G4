@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="./css/admin/admin.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="./admin-scripts.js"></script>
+s
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
         <script>
@@ -30,7 +30,7 @@
                         <c:if test="${sessionScope.user.userId == 1}">
                         <li><a href="admin?view=userauthorization">Phân quyền</a></li>
                         </c:if>
-                    
+
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
                 </ul>
@@ -64,17 +64,55 @@
                                             <a href="order" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
-                                    <div class="dashboard-item trips">
-                                        <h3>Thống kê chuyến đi</h3>
-                                        <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                    <div class="dashboard-item routes" style="background-color: #DBE1E1">
+                                        <h3>Thống kê tuyến tàu</h3>
+                                        <br>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
                                             <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
-                                    <div class="dashboard-item rules">
+                                    <div class="dashboard-item rules" >
                                         <h3>Thống kê Quy định</h3>
                                         <p>Tổng số Quy định: ${totalRules}</p>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
+                                            <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="dashboard-row">
+                                    <div class="dashboard-item stations"   style="background-color: #E0BBE4">
+                                        <h3>Thống kê Ga</h3>
+                                        <p>Tổng số ga: ${totalStations}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #E6C2F5;">
+                                            <a href="station" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
+                                    </div>
+                                    <div class="dashboard-item trips" style="background-color: #A9DEF9">
+                                        <h3>Thống kê chuyến đi</h3>
+                                        <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
+                                            <a href="trip" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
+                                    </div>
+                                    <div class="dashboard-item category-blogs" style="background-color: #FCE6C9">
+                                        <h3>Tiêu đề blog</h3>
+                                        <br>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
+                                            <a href="category-blog" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
+                                    </div>
+                                    <div class="dashboard-item blogs" style="background-color: #D4E9B9">
+                                        <h3>Thống kê Blog</h3>
+                                        <p>Tổng số blog: ${totalBlogs}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #D8B4A9;">
+                                            <a href="posts-list" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
+                                    </div>
+                                    <div class="dashboard-item category-rules" style="background-color: #CDFBBD">
+                                        <h3>Tiêu đề quy định:</h3>
+                                        <br>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #D8B4A9;">
                                             <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>

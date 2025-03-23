@@ -45,6 +45,7 @@ public class AdminController extends HttpServlet {
                 int totalTrips = dashBoardDAO.getTotalTrips();
                 int totalBlogs = dashBoardDAO.getTotalBlogs();
                 int totalRules = dashBoardDAO.getTotalRules();
+                int totalStations = dashBoardDAO.getTotalStations();
                 double revenueToday = dashBoardDAO.getRevenueToday();
                 double revenueThisWeek = dashBoardDAO.getRevenueThisWeek();
                 double revenueThisMonth = dashBoardDAO.getRevenueThisMonth();
@@ -62,6 +63,7 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalTrips", totalTrips);
                 request.setAttribute("totalBlogs", totalBlogs);
                 request.setAttribute("totalRules", totalRules);
+                request.setAttribute("totalStations", totalStations);
                 List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
                 request.setAttribute("feedbackList", feedbackList);
 

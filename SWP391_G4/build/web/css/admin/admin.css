@@ -348,6 +348,9 @@ form {
 }
 
 /* Dashboard Statistics Enhancements */
+/* ... (your existing CSS) ... */
+
+/* Dashboard Statistics Enhancements */
 .dashboard-row {
     display: flex;
     justify-content: space-between;
@@ -362,8 +365,8 @@ form {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     flex: 1;
     margin: 0 10px;
-    position: relative; /* Needed for absolute positioning of icons */
-    overflow: hidden; /* Hide any overflowing content */
+    position: relative;
+    overflow: hidden;
 }
 
 .dashboard-item:first-child {
@@ -374,52 +377,94 @@ form {
     margin-right: 0;
 }
 
-/* Specific styling for each statistic */
+/* Specific styling for each statistic (Pastel colors) */
 .dashboard-item.trains {
-    background-color: #FAEDCB;
+    background-color: #FAEDCB; /* Light Yellow */
 }
 
 .dashboard-item.bookings {
-    background-color: #C9E4DF;
+    background-color: #C9E4DF; /* Light Teal */
 }
 
 .dashboard-item.trips {
-    background-color: #C5DEF2;
+    background-color: #A9DEF9;
 }
 
 .dashboard-item.rules {
-    background-color: #DBCDF0;
+    background-color: #DBCDF0; /* Light Purple */
+}
+
+.dashboard-item.stations {
+    background-color: #E0BBE4;
+}
+
+.dashboard-item.routes {
+    background-color: #DBE1E1; /* Light Gray */
+}
+
+.dashboard-item.category-blogs {
+    background-color: #FCE6C9;
+}
+
+.dashboard-item.blogs {
+    background-color: #D4E9B9;
+}
+
+.dashboard-item.category-rules {
+    background-color: #CDFBBD;
 }
 
 /* Icon styling */
 .dashboard-item::before {
-    font-family: "bootstrap-icons"; /* Ensure this matches your icon library */
+    font-family: "bootstrap-icons";
     font-size: 2em;
     position: absolute;
     top: 10px;
     left: 10px;
-    opacity: 0.6; /* Adjust opacity as needed */
+    opacity: 0.6;
 }
 
 .dashboard-item.trains::before {
-    content: "\F81A"; /* Unicode for bi-train-front-fill (or \F81B) */
+    content: "\\F81A"; /* bi-train-front-fill */
 }
 
 .dashboard-item.bookings::before {
-    content: "\1F683"; /* Unicode for bi-ticket-perforated */
+    content: "\\F28E"; /* bi-ticket-perforated */
 }
 
 .dashboard-item.trips::before {
-    content: "\F2C7"; /* Unicode for bi-map-fill (or \F2C6) */
+    content: "\\F78C"; /* bi-map */
 }
 
 .dashboard-item.rules::before {
-    content: "\F266"; /* Unicode for bi-file-earmark-text */
+    content: "\\F266"; /* bi-file-earmark-text */
+}
+
+.dashboard-item.stations::before {
+    content: "\\F6E1"; /* bi-signpost-2-fill */
+}
+
+.dashboard-item.routes::before {
+    content: "\\F631"; /* bi-directions */
+}
+
+.dashboard-item.category-blogs::before {
+    content: "\\F28A"; /* bi-bookmarks-fill */
+}
+
+.dashboard-item.blogs::before {
+    content: "\\F28C"; /* bi-book-fill */
+}
+
+.dashboard-item.category-rules::before {
+    content: "\\F26A"; /* bi-file-earmark-ruled-fill */
 }
 
 .dashboard-item h3 {
-    margin-top: 35px; /* Adjust spacing below the icon */
+    margin-top: 35px;
 }
+
+/* ... (rest of your CSS) ... */
 
 /* CSS cho Feedback */
 .feedback-container {
