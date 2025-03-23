@@ -6,6 +6,7 @@ package controller;
 
 import Utils.SendEmailCancelTicket;
 import dal.BookingDAO;
+import dal.RefundDAO;
 import dal.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import model.RailwayDTO;
 import model.Ticket;
@@ -94,9 +96,58 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
             response.sendRedirect("cancel-ticket");
             return;
         }
+        String bankAccountID = request.getParameter("bankAccount");
+        String bankName = request.getParameter("bankName");
 
+        // Kiểm tra nếu không nhập tài khoản ngân hàng
+        if (bankAccountID == null || bankName == null || bankAccountID.isEmpty() || bankName.isEmpty()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập thông tin tài khoản ngân hàng để hoàn tiền!");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
+        }
+        String enteredOtp = request.getParameter("otp");
+        Object sessionOtpObj = request.getSession().getAttribute("otp");
+        String sessionOtp = (sessionOtpObj != null) ? String.valueOf(sessionOtpObj) : null;
+
+        if (sessionOtp == null || !sessionOtp.equals(enteredOtp)) {
+            // OTP không hợp lệ, gửi lại thông báo lỗi
+            request.setAttribute("errorMessage", "Mã OTP không chính xác. Vui lòng thử lại!");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
+        }
         double totalRefund = 0;
+        int toalTickets=0;
+        List<Integer> ticketIDs = new ArrayList<>();
         TicketDAO ticketDAO = new TicketDAO();
+        for (RailwayDTO ticket : pendingTickets) {
+            ticketDAO.cancelTicket(ticket.getTicketID(), ticket.getSeatNumber());
+            totalRefund += ticket.getTicketPrice() * 0.8;
+            toalTickets ++;
+            ticketIDs.add(ticket.getTicketID()); // Lưu danh sách TicketID
+        }
+        RefundDAO refundDAO = new RefundDAO();
+        try {
+            int refundID = refundDAO.insertRefund(user.getUserId(), bankAccountID, bankName, totalRefund);
+            if (refundID == -1) {
+                request.setAttribute("errorMessage", "Lỗi khi lưu thông tin hoàn tiền. Vui lòng thử lại!");
+                request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+                return;
+            }
+
+            // Cập nhật RefundID trong Ticket
+            boolean updated = refundDAO.updateTicketsWithRefundID(refundID, ticketIDs);
+            if (!updated) {
+                request.setAttribute("errorMessage", "Lỗi khi cập nhật RefundID cho vé. Vui lòng thử lại!");
+                request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Lỗi cơ sở dữ liệu. Vui lòng thử lại sau!");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
+        }
+
         StringBuilder emailContent = new StringBuilder();
         emailContent.append("<html><head><style>")
                 .append("body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }")
@@ -123,10 +174,6 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
 
         int totalTickets = 0;
         for (RailwayDTO ticket : pendingTickets) {
-            double refundAmount = ticket.getTicketPrice() * 0.8;
-            totalRefund += refundAmount;
-            totalTickets++;
-
             emailContent.append("<tr>")
                     .append("<td>").append(ticket.getTicketID()).append("</td>")
                     .append("<td>").append(ticket.getPassengerName()).append("</td>")
@@ -137,25 +184,31 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
                     .append("<td>").append(ticket.getCarriageNumber()).append("</td>")
                     .append("<td>").append(ticket.getSeatNumber()).append("</td>")
                     .append("<td>").append(ticket.getTicketPrice()).append(" VND</td>")
-                    .append("<td>").append(refundAmount).append(" VND</td>")
+                    .append("<td>").append(totalRefund).append(" VND</td>")
                     .append("</tr>");
         }
 
         emailContent.append("</table>");
 
         emailContent.append("<p class='summary'><span class='total-count'>Tổng số vé: ")
-                .append(totalTickets)
+                .append(toalTickets)
                 .append("</span></p>");
 
         emailContent.append("<p class='summary'><span class='total-refund'>Tổng tiền hoàn: ")
                 .append(totalRefund)
                 .append(" VND</span></p>");
-
-
-        emailContent.append("<p class='footer'>Cảm ơn bạn đã sử dụng dịch vụ đặt vé tàu của chúng tôi!<br>Trân trọng, Hệ thống đặt vé tàu</p>");
+        emailContent.append("<p class='summary'><span class='total-count'>Ngân hàng: ")
+                .append(bankName)
+                .append("</span></p>");
+        emailContent.append("<p class='summary'><span class='total-count'>Số tài khoản: ")
+                .append(bankAccountID)
+                .append("</span></p>");
+        emailContent.append("<p class='footer'>Cảm ơn bạn đã sử dụng dịch vụ đặt vé tàu của chúng tôi!<br>Trân trọng,Online Booing Ticket Train</p>");
         emailContent.append("</div></body></html>");
 
         SendEmailCancelTicket.sendEmail(user.getEmail(), "Xác nhận hủy vé thành công", emailContent.toString());
+        request.getSession().removeAttribute("pendingCancelTickets");
+        request.getSession().removeAttribute("otp");
 
         // 🔹 Hiển thị thông báo SweetAlert2
         response.setContentType("text/html;charset=UTF-8");
