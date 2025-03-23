@@ -89,6 +89,7 @@ public class ToggleStatusRuleController extends HttpServlet {
             boolean result = ruleDAO.updateRuleStatus(ruleID, status);
 
             if (result) {
+                 request.getSession().setAttribute("message", "Status updated successfully!");
                 response.sendRedirect("manager-rule-list?success=updated");
             } else {
                 response.sendRedirect("manager-rule-list?error=updateFailed");

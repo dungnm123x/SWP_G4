@@ -80,6 +80,7 @@ public class ToggleStatusBlogController extends HttpServlet {
 
         if (result) {
             // Thành công, chuyển hướng lại trang danh sách bài viết
+            request.getSession().setAttribute("message", "Status updated successfully!");
             response.sendRedirect("posts-list");
         } else {
             // Thất bại, hiển thị thông báo lỗi (có thể dùng request.setAttribute())

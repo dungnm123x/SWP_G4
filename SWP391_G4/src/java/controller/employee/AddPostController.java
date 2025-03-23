@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
+import model.User;
 
 /**
  *
@@ -44,55 +45,79 @@ public class AddPostController extends HttpServlet {
 
         List<CategoryBlog> categories = bd.getAllCategories();
         request.setAttribute("categories", categories);
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         request.getRequestDispatcher("/marketers/AddBlog.jsp").forward(request, response);
-    }
-@Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    String title = request.getParameter("title");
-    String briefInfo = request.getParameter("brief_infor");
-    String content = request.getParameter("content");
-    int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-    int status = Integer.parseInt(request.getParameter("status"));
-    int authorId = 3; 
-    Part filePart = request.getPart("thumbnail");
 
-    if (filePart == null || filePart.getSize() == 0) {
-        request.setAttribute("error", "Vui lòng chọn ảnh thumbnail!");
-        doGet(request, response);
-        return;
     }
 
-    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-    String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String title = request.getParameter("title");
+        String briefInfo = request.getParameter("brief_infor");
+        String content = request.getParameter("content");
+        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        int status = Integer.parseInt(request.getParameter("status"));
+        int authorId = 3;
+        Part filePart = request.getPart("thumbnail");
 
-    if (!fileExtension.equals("jpg") && !fileExtension.equals("png")) {
-        request.setAttribute("error", "Ảnh thumbnail phải có định dạng JPG hoặc PNG!");
-        doGet(request, response);
-        return;
+        BlogDAO bd = new BlogDAO(); // Khởi tạo BlogDAO
+
+        // Kiểm tra tiêu đề có bị trùng không
+        if (bd.isTitleExists(title)) {
+            request.getSession().setAttribute("error", "Tiêu đề bài viết đã tồn tại. Vui lòng chọn tiêu đề khác!");
+            response.sendRedirect("add-post");
+            return;
+        }
+
+        // Kiểm tra có chọn ảnh chưa
+        if (filePart == null || filePart.getSize() == 0) {
+            request.getSession().setAttribute("error", "Vui lòng chọn ảnh thumbnail!");
+            response.sendRedirect("add-post");
+            return;
+        }
+
+        // Kiểm tra định dạng ảnh
+        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+        if (!fileExtension.equals("jpg") && !fileExtension.equals("png")) {
+            request.getSession().setAttribute("error", "Ảnh thumbnail phải có định dạng JPG hoặc PNG!");
+            response.sendRedirect("add-post");
+            return;
+        }
+
+        // Chuyển ảnh sang Base64
+        String thumbnailBase64 = convertImageToBase64(filePart);
+
+        // Lưu bài viết vào database
+        bd.addNewBlog(title, authorId, content, briefInfo, categoryId, status, thumbnailBase64);
+
+        // Thêm thông báo thành công
+        request.getSession().setAttribute("success", "Thêm bài viết thành công!");
+        response.sendRedirect("add-post");
     }
 
-    String thumbnailBase64 = convertImageToBase64(filePart);
-
-    bd.addNewBlog(title, authorId, content, briefInfo, categoryId, status, thumbnailBase64);
-    response.sendRedirect("posts-list");
-}
-private String convertImageToBase64(Part part) throws IOException {
-    byte[] fileBytes = inputStreamToByteArray(part.getInputStream());
-    String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-    String mimeType = part.getContentType();
-    return "data:" + mimeType + ";base64," + base64Encoded;
-}
-
-private byte[] inputStreamToByteArray(InputStream is) throws IOException {
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    byte[] data = new byte[8192]; // 8 KB buffer size
-    int bytesRead;
-    while ((bytesRead = is.read(data)) != -1) {
-        buffer.write(data, 0, bytesRead);
+    private String convertImageToBase64(Part part) throws IOException {
+        byte[] fileBytes = inputStreamToByteArray(part.getInputStream());
+        String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
+        String mimeType = part.getContentType();
+        return "data:" + mimeType + ";base64," + base64Encoded;
     }
-    return buffer.toByteArray();
-}
+
+    private byte[] inputStreamToByteArray(InputStream is) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[8192]; // 8 KB buffer size
+        int bytesRead;
+        while ((bytesRead = is.read(data)) != -1) {
+            buffer.write(data, 0, bytesRead);
+        }
+        return buffer.toByteArray();
+    }
 
     @Override
     public String getServletInfo() {

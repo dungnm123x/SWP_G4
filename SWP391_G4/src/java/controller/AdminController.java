@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import model.Feedback;
 import model.User;
 import model.Train;
 
@@ -20,6 +21,11 @@ public class AdminController extends HttpServlet {
         DAOAdmin dao = new DAOAdmin();
         String view = request.getParameter("view");
         String search = request.getParameter("search");
+        int page = 1; // Default page
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
+        int pageSize = 10; // Number of items per page
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || user.getRoleID() != 1) {
             response.sendRedirect("login");
@@ -43,7 +49,6 @@ public class AdminController extends HttpServlet {
                 double revenueThisWeek = dashBoardDAO.getRevenueThisWeek();
                 double revenueThisMonth = dashBoardDAO.getRevenueThisMonth();
                 double revenueThisYear = dashBoardDAO.getRevenueThisYear();
-                
 
                 request.setAttribute("revenueToday", revenueToday);
                 request.setAttribute("revenueThisWeek", revenueThisWeek);
@@ -57,27 +62,74 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalTrips", totalTrips);
                 request.setAttribute("totalBlogs", totalBlogs);
                 request.setAttribute("totalRules", totalRules);
+                List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
+                request.setAttribute("feedbackList", feedbackList);
 
                 request.setAttribute("type", "dashboard");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                 return;
+            } else if ("employees".equals(view)) {
+                List<User> employees;
+                int totalEmployees;
+                if (search == null || search.isEmpty()) {
+                    employees = dao.getAllEmployees(page, pageSize);
+                    totalEmployees = dao.countAllEmployees();
+                } else {
+                    employees = dao.searchEmployees(search, page, pageSize);
+                    totalEmployees = dao.countSearchEmployees(search);
+                }
+                request.setAttribute("list", employees);
+                request.setAttribute("type", "employees");
+                int totalPages = (int) Math.ceil((double) totalEmployees / pageSize);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("currentPage", page);
+            } else if ("customers".equals(view)) {
+                // Similar logic for customers
+                List<User> customers;
+                int totalCustomers;
+                if (search == null || search.isEmpty()) {
+                    customers = dao.getAllCustomers(page, pageSize);
+                    totalCustomers = dao.countAllCustomers();
+                } else {
+                    customers = dao.searchCustomers(search, page, pageSize);
+                    totalCustomers = dao.countSearchCustomers(search);
+                }
+                request.setAttribute("list", customers);
+                request.setAttribute("type", "customers");
+                int totalPages = (int) Math.ceil((double) totalCustomers / pageSize);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("currentPage", page);
+            } else if ("userauthorization".equals(view)) {
+                // Similar logic for user authorization
+                if (user != null && user.getUserId() == 1) {
+                    try {
+                        String searchKeyword = request.getParameter("search");
+                        List<User> users;
+                        int totalUsers;
+                        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                            users = dao.searchUsers(searchKeyword, page, pageSize); // Phương thức tìm kiếm mới trong DAO
+                            totalUsers = dao.countSearchUsers(searchKeyword);
+                        } else {
+                            users = dao.getAllUsers(page, pageSize);
+                            totalUsers = dao.countAllUsers();
+                        }
+                        request.setAttribute("list", users);
+                        request.setAttribute("type", "userauthorization");
+                        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+                        request.setAttribute("totalPages", totalPages);
+                        request.setAttribute("currentPage", page);
+                        request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
+                        return;
+                    } catch (SQLException e) {
+                        throw new ServletException(e);
+                    }
+                } else {
+                    response.sendRedirect("admin?view=dashboard");
+                    return;
+                }
             } else if ("addEmployee".equals(view)) {
                 request.getRequestDispatcher("/view/adm/addEmployees.jsp").forward(request, response);
                 return;
-            }
-
-            if ("employees".equals(view)) {
-                List<User> employees = (search == null || search.isEmpty())
-                        ? dao.getAllEmployees()
-                        : dao.searchEmployees(search);
-                request.setAttribute("list", employees);
-                request.setAttribute("type", "employees");
-            } else if ("customers".equals(view)) {
-                List<User> customers = (search == null || search.isEmpty())
-                        ? dao.getAllCustomers()
-                        : dao.searchCustomers(search);
-                request.setAttribute("list", customers);
-                request.setAttribute("type", "customers");
             } else if ("details".equals(view)) { // Xử lý yêu cầu xem chi tiết
                 String type = request.getParameter("type");
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -191,6 +243,55 @@ public class AdminController extends HttpServlet {
                 e.printStackTrace();
                 request.setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
                 response.sendRedirect("admin?view=" + request.getParameter("type"));
+            }
+        } else if ("authorizeUser".equals(action)) {
+            try {
+                int userId = Integer.parseInt(request.getParameter("userId"));
+                int authorizedBy = ((User) request.getSession().getAttribute("user")).getUserId();
+
+                if (dao.authorizeAdmin(userId, authorizedBy)) {
+                    request.getSession().setAttribute("message2", "✅ Phân quyền Admin thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Phân quyền Admin thất bại.");
+                }
+                response.sendRedirect("admin?view=userauthorization");
+                return;
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            }
+        } // Action: Thu hồi quyền người dùng
+        else if ("revokeUser".equals(action)) {
+            try {
+                int userId = Integer.parseInt(request.getParameter("userId"));
+
+                if (dao.revokeAdminAuthorization(userId)) {
+                    request.getSession().setAttribute("message2", "✅ Thu hồi quyền thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Thu hồi quyền thất bại.");
+                }
+                response.sendRedirect("admin?view=userauthorization");
+                return;
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            }
+        } // Action: Đặt Role cho User
+        else if ("setUserRole".equals(action)) {
+            try {
+                int userId = Integer.parseInt(request.getParameter("userId"));
+                int roleId = Integer.parseInt(request.getParameter("roleId"));
+
+                if (dao.updateUserRole(userId, roleId)) {
+                    request.getSession().setAttribute("message2", "✅ Đặt Role thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Đặt Role thất bại.");
+                }
+                response.sendRedirect("admin?view=userauthorization");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                response.sendRedirect("admin?view=userauthorization");
+                return;
             }
         }
 

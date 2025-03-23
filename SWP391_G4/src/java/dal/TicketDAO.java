@@ -13,23 +13,62 @@ import java.util.List;
 import model.Ticket;
 import model.RailwayDTO;
 
+import dto.TicketDTO;
+import dto.TrainDTO;
+import dto.TripDTO;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import model.Train;
+import model.Carriage;
+
 public class TicketDAO extends DBContext {
 
-//    public void insertTicket(Ticket ticket) {
-//        String sql = "INSERT INTO Ticket (CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
-//                + "VALUES (?, ?, ?, ?, ?, ?)";
-//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-//            ps.setString(1, ticket.getCccd());
-//            ps.setInt(2, ticket.getBookingID());
-//            ps.setInt(3, ticket.getSeatID());
-//            ps.setInt(4, ticket.getTripID());
-//            ps.setDouble(5, ticket.getTicketPrice());
-//            ps.setString(6, ticket.getTicketStatus());
-//            ps.executeUpdate();
-//        } catch (SQLException e) {
-//
-//        }
-//    }
+    public List<TicketDTO> getTicketsByBookingId(int bookingID) {
+        List<TicketDTO> tickets = new ArrayList<>();
+        String sql = "SELECT t.*, s.SeatNumber, c.CarriageNumber, c.CarriageType, tr.TrainID, tr.RouteID "
+                + "FROM Ticket t "
+                + "JOIN Seat s ON t.SeatID = s.SeatID "
+                + "JOIN Carriage c ON s.CarriageID = c.CarriageID "
+                + "JOIN Trip tr ON t.TripID = tr.TripID "
+                + //Join with Trip
+                "WHERE t.BookingID = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TicketDTO ticket = new TicketDTO();
+                    ticket.setTicketID(rs.getInt("TicketID"));
+                    ticket.setPassengerName(rs.getString("PassengerName"));
+                    ticket.setCccd(rs.getString("CCCD"));
+                    ticket.setBookingID(rs.getInt("BookingID"));
+                    ticket.setSeatID(rs.getInt("SeatID"));
+                    ticket.setTripID(rs.getInt("TripID"));
+                    ticket.setTicketPrice(rs.getDouble("TicketPrice"));
+                    ticket.setTicketStatus(rs.getString("TicketStatus"));
+                    ticket.setSeatNumber(rs.getString("SeatNumber")); // From Seat table
+                    ticket.setCarriageNumber(rs.getString("CarriageNumber"));//From Carriage table
+                    ticket.setCarriageType(rs.getString("CarriageType"));
+                    //Get Train name
+                    TrainDAO trainDAO = new TrainDAO();
+                    TrainDTO train = trainDAO.getFullTrainInfoById(rs.getInt("TrainID"));
+                    ticket.setTrainName(train.getTrainName());
+                    //Get Route Name
+                    TripDAO tripDAO = new TripDAO();
+                    TripDTO trip = tripDAO.getTripById(rs.getInt("TripID"));
+                    ticket.setRouteName(trip.getRouteName());
+                    ticket.setDepartureTime(trip.getDepartureTime());
+                    ticket.setArrivalTime(trip.getArrivalTime());
+
+                    tickets.add(ticket);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger in a real application
+        }
+        return tickets;
+    }
+
     public int insertTicket(Ticket ticket) throws SQLException {
         String sql = "INSERT INTO Ticket (PassengerName,CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -81,26 +120,26 @@ public class TicketDAO extends DBContext {
             e.printStackTrace(); // Hoặc log lỗi
         }
     }
-public void cancelTicket(int ticketID, int seatID) {
-    // Cập nhật trạng thái vé
-    String updateTicketSQL = "UPDATE Ticket SET TicketStatus = 'Refunded' WHERE TicketID = ?";
-    try (PreparedStatement ps = connection.prepareStatement(updateTicketSQL)) {
-        ps.setInt(1, ticketID);
-        ps.executeUpdate();
-    } catch (SQLException e) {
-        e.printStackTrace(); // Log lỗi nếu có
-    }
 
-    // Cập nhật trạng thái ghế
-    String updateSeatSQL = "UPDATE Seat SET Status = 'Available' WHERE SeatID = ?";
-    try (PreparedStatement ps = connection.prepareStatement(updateSeatSQL)) {
-        ps.setInt(1, seatID);
-        ps.executeUpdate();
-    } catch (SQLException e) {
-        e.printStackTrace(); // Log lỗi nếu có
-    }
-}
+    public void cancelTicket(int ticketID, int seatID) {
+        // Cập nhật trạng thái vé
+        String updateTicketSQL = "UPDATE Ticket SET TicketStatus = 'Refunded' WHERE TicketID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(updateTicketSQL)) {
+            ps.setInt(1, ticketID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log lỗi nếu có
+        }
 
+        // Cập nhật trạng thái ghế
+        String updateSeatSQL = "UPDATE Seat SET Status = 'Available' WHERE SeatID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(updateSeatSQL)) {
+            ps.setInt(1, seatID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log lỗi nếu có
+        }
+    }
 
     public boolean ticketExistsByCCCDAndPaid(String cccd, int tripID) {
         String sql = "SELECT 1 "
@@ -123,7 +162,7 @@ public void cancelTicket(int ticketID, int seatID) {
 
     public List<RailwayDTO> getDetailedTicketsByUserID(int userID) {
         List<RailwayDTO> tickets = new ArrayList<>();
-        String sql = "SELECT t.TicketID, t.CCCD, s.SeatNumber, c.CarriageNumber, "
+        String sql = "SELECT t.TicketID,t.PassengerName, t.CCCD, s.SeatNumber, c.CarriageNumber, "
                 + "st1.StationName AS DepartureStation, st2.StationName AS ArrivalStation, "
                 + "tr.DepartureTime, tr.TrainID, trn.TrainName, t.TicketPrice, t.TicketStatus, "
                 + "CASE "
@@ -147,6 +186,7 @@ public void cancelTicket(int ticketID, int seatID) {
                 while (rs.next()) {
                     tickets.add(new RailwayDTO(
                             rs.getInt("TicketID"),
+                            rs.getString("PassengerName"),
                             rs.getString("CCCD"),
                             rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation"),
                             rs.getString("TrainName"), // Hiển thị tên tàu
@@ -180,6 +220,7 @@ public void cancelTicket(int ticketID, int seatID) {
                             rs.getInt("BookingID"),
                             rs.getInt("SeatID"),
                             rs.getInt("TripID"),
+                            rs.getInt("RefundID"),
                             rs.getDouble("TicketPrice"),
                             rs.getString("TicketStatus")
                     ));

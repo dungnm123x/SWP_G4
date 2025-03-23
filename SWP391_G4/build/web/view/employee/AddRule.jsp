@@ -1,7 +1,7 @@
-    <%-- 
-    Document   : AddRule
-    Created on : Mar 5, 2025, 1:14:59 PM
-    Author     : dung9
+<%-- 
+Document   : AddRule
+Created on : Mar 5, 2025, 1:14:59 PM
+Author     : dung9
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -27,7 +27,7 @@
             src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" 
             crossorigin="anonymous">
         </script>
-
+        <link rel="stylesheet" href="css/employee.css">
         <style>
             body {
                 font-family: 'Arial', sans-serif;
@@ -107,6 +107,12 @@
                 font-weight: bold;
                 text-align: center;
             }
+            .admin-back-button:hover {
+                background-color: #00509E;
+            }
+            .admin-back-button i {
+                margin-right: 8px;
+            }
         </style>
 
         <!-- CKEditor 4 (full-all) CDN -->
@@ -114,108 +120,114 @@
         <!-- CKFinder 3 CDN -->
         <script src="https://cdn.ckeditor.com/ckfinder/3.5.2/ckfinder.js"></script>
     </head>
-    <body>
-        <div class="slider-container">
-            <h2 class="slider-title">Thêm quy định mới</h2>              
-        </div>
-        <div class="container rounded mt-5 mb-5">
-            <div class="header">
-                <h4>Thêm quy định mới</h4>
+    <body class="bg-light">
+        <div class="main-container">
+            <c:if test="${sessionScope.user.roleID == 2}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="avatar">
+                    </div>
+                    <ul>
+                        <li><a href="train">Quản lý tàu</a></li>
+                        <li><a href="trip">Quản lý chuyến</a></li>
+                        <li><a href="route">Quản lý tuyến tàu</a></li>
+                        <li><a href="station">Quản lý ga</a></li>
+                        <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
+                        <li><a href="posts-list">Quản lý Blog</a></li>
+                        <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                        <li><a href="manager-rule-list">Quản lý quy định</a></li>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+            </c:if>
+            <c:if test="${sessionScope.user.roleID == 1}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="trainpicture">
+                    </div>
+                    <ul class="menu">
+                        <li><a href="admin?view=dashboard">Dashboard</a></li>
+                        <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
+                        <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
+                            <c:if test="${sessionScope.user.userId == 1}">
+                            <li><a href="admin?view=userauthorization">Phân quyền</a></li>
+                            </c:if>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+                <a href="admin?view=dashboard" class="admin-back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
+                </a>
+            </c:if>           
+            <div class="slider-container">
+                <h2 class="slider-title">Add New Blog</h2>              
             </div>
-
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger" role="alert">
-                    ${error}
+            <div class="container">
+                <div class="header">
+                    <h4>Thêm quy định mới</h4>
                 </div>
-            </c:if>
-            <c:if test="${not empty message}">
-                <div class="alert alert-info" role="alert">
-                    ${message}
-                </div>
-            </c:if>
-            <form action="add-rule" method="POST" enctype="multipart/form-data" class="inner-form">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="mb-3">
-                            <label for="ruleName" class="form-label">Title</label>
-                            <input type="text" name="ruleName" class="form-control" placeholder="Enter title" required/>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger" role="alert">
+                        ${error}
+                    </div>
+                </c:if>
+                <c:if test="${not empty message}">
+                    <div class="alert alert-info" role="alert">
+                        ${message}
+                    </div>
+                </c:if>
+                <form action="add-rule" method="POST" enctype="multipart/form-data" class="inner-form">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="ruleName" class="form-label">Title</label>
+                                <input type="text" name="ruleName" class="form-control" placeholder="Enter title" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea cols="20" rows="10" id="editor" name="content"></textarea>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="content" class="form-label">Content</label>
-                            <textarea cols="20" rows="10" id="editor" name="content"></textarea>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="categoryRuleID" class="form-label">Category Rule</label>
+                                <select class="form-select" name="categoryRuleID">
+                                    <c:forEach var="category" items="${categories}">
+                                        <option value="${category.categoryRuleID}">${category.categoryRuleName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label><br/>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="status" value="1" checked/>
+                                    <label class="form-check-label">Show</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="status" value="0"/>
+                                    <label class="form-check-label">Hidden</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label for="categoryRuleID" class="form-label">Category Rule</label>
-                            <select class="form-select" name="categoryRuleID">
-                                <c:forEach var="category" items="${categories}">
-                                    <option value="${category.categoryRuleID}">${category.categoryRuleName}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label><br/>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="1" checked/>
-                                <label class="form-check-label">Show</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="0"/>
-                                <label class="form-check-label">Hidden</label>
-                            </div>
-                        </div>
+                    <input type="hidden" name="userID" value="1"/> <%-- Cần lấy userID từ session nếu có --%>
+
+                    <div class="mt-4 text-center">
+                        <a href="manager-rule-list"><button class="btn btn-outline-custom" type="button">Again</button></a>
+                        <input class="btn btn-outline-custom" type="submit" value="Add"/>
                     </div>
-                </div>
-
-                <input type="hidden" name="userID" value="1"/> <%-- Cần lấy userID từ session nếu có --%>
-
-                <div class="mt-4 text-center">
-                    <a href="manager-rule-list"><button class="btn btn-outline-custom" type="button">Again</button></a>
-                    <input class="btn btn-primary" type="submit" value="Add"/>
-                </div>
-            </form>
-            <script>
-                function previewImage(event) {
-                    var input = event.target;
-                    var preview = document.getElementById('thumbnailPreview');
-                    var deleteButton = document.getElementById('deleteThumbnail');
-
-                    if (input.files && input.files[0]) {
-                        var reader = new FileReader();
-                        reader.onload = function (e) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
-                            deleteButton.style.display = 'inline-block'; // Show delete button when an image is selected
-                        };
-                        reader.readAsDataURL(input.files[0]);
-                    } else {
-                        preview.src = "";
-                        preview.style.display = 'none';
-                        deleteButton.style.display = 'none'; // Hide delete button if no image is selected
-                    }
-                }
-
-                function deleteImage() {
-                    var preview = document.getElementById('thumbnailPreview');
-                    var deleteButton = document.getElementById('deleteThumbnail');
-                    var input = document.getElementById('thumbnailInput');
-
-                    // Clear the image preview and hide it
-                    preview.src = "";
-                    preview.style.display = 'none';
-
-                    // Hide the delete button
-                    deleteButton.style.display = 'none';
-
-                    // Clear the file input
-                    input.value = "";
-                }
-
-
-            </script>
-
+                </form>
+            </div>
         </div>
 
         <!-- Bootstrap 5.3.0 JS -->

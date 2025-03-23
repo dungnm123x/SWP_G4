@@ -13,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.User;
 
 /**
  *
@@ -55,6 +56,11 @@ public class DeleteBlogController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
       try {
             int blogId = Integer.parseInt(request.getParameter("blog_id"));
             

@@ -7,13 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import model.Feedback;
+import model.User;
 
 public class DashBoardDAO extends DBContext<Object> {
-    
+
     public int getTotalTicketsSold() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Tickets";
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             }
@@ -23,8 +24,7 @@ public class DashBoardDAO extends DBContext<Object> {
 
     public double getTotalRevenue() throws SQLException {
         String sql = "SELECT SUM(total_amount) FROM Orders"; // Thay total_amount bằng tên cột doanh thu
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
                 return resultSet.getDouble(1);
             }
@@ -34,8 +34,7 @@ public class DashBoardDAO extends DBContext<Object> {
 
     public int getTotalOrders() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Orders";
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             }
@@ -45,8 +44,7 @@ public class DashBoardDAO extends DBContext<Object> {
 
     public int getTotalEvents() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Events";
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             }
@@ -105,6 +103,28 @@ public class DashBoardDAO extends DBContext<Object> {
         }
         return 0;
     }
+
+    public List<Feedback> getLatestFeedbacks() throws SQLException {
+    List<Feedback> feedbacks = new ArrayList<>();
+    String sql = "SELECT TOP 3 f.*, u.Email FROM Feedback f JOIN [User] u ON f.UserID = u.UserID ORDER BY f.FeedbackDate DESC"; // Get top 5 latest feedback with user email
+    try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+        while (rs.next()) {
+            Feedback feedback = new Feedback();
+            User user = new User();
+            user.setUserId(rs.getInt("UserID"));
+            user.setEmail(rs.getString("Email")); // Lấy email từ ResultSet
+            
+            feedback.setFeedbackId(rs.getInt("FeedbackID"));
+            feedback.setUser(user); // Set User object
+            feedback.setContent(rs.getString("Content"));
+            feedback.setRating(rs.getInt("Rating"));
+            feedback.setFeedbackDate(rs.getTimestamp("FeedbackDate"));
+            feedback.setStatus(rs.getBoolean("Status"));
+            feedbacks.add(feedback);
+        }
+    }
+    return feedbacks;
+}
 
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");

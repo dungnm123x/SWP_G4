@@ -12,17 +12,14 @@ body {
     display: flex;
 }
 
-/* Sidebar */
 .sidebar {
     width: 250px;
-    background: #2C3E50;
-    color: white;
-    padding: 20px;
-    height: 100vh;
     position: fixed;
     left: 0;
     top: 0;
-    overflow-y: auto;
+    height: 100vh;
+    background: #2C3E50;
+    padding: 20px;
 }
 
 .sidebar h2 {
@@ -33,17 +30,24 @@ body {
 
 .sidebar ul {
     list-style: none;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100%;
 }
 
 .sidebar ul li {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100%;
 }
 
 .sidebar ul li a {
+    display: block;
     color: white;
     text-decoration: none;
-    display: block;
+    padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .sidebar ul li:hover {
@@ -59,12 +63,15 @@ body {
 
 /* Container chính */
 .container {
-    margin-left: 250px;
-    padding: 20px;
-    width: calc(100% - 250px);
-    margin-top: 60px;
+    margin-left: 250px; /* Phải khớp với width của sidebar */
+    width: calc(100vw - 250px); /* Đảm bảo không bị lệch */
+    min-height: 100vh;
+    overflow-x: hidden; /* Tránh tràn ngang */
 }
 
+.main-container {
+    display: flex;
+}
 h1 {
     text-align: center;
     margin-bottom: 20px;
@@ -151,13 +158,22 @@ table {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
+.table-container {
+    width: 100%;
+    padding: 0;  /* Xóa padding để bảng sát mép */
+    margin: 0;  /* Xóa margin để không bị thừa khoảng trắng */
+}
 
 th, td {
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid #ddd;
 }
-
+.actions button {
+    padding: 8px;
+    font-size: 14px;
+    margin: 3px;
+}
 th {
     background: #2C3E50;
     color: white;
@@ -195,7 +211,7 @@ tr:hover {
 }
 
 .logout-button {
-    background: #d9534f; 
+    background: #d9534f;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -204,7 +220,7 @@ tr:hover {
     font-size: 16px;
     width: 100%;
     position: absolute;
-    bottom: 20px; 
+    bottom: 20px;
     left: 0;
     transition: 0.3s;
 }

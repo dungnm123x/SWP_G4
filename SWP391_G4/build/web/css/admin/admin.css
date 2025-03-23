@@ -421,3 +421,151 @@ form {
     margin-top: 35px; /* Adjust spacing below the icon */
 }
 
+/* CSS cho Feedback */
+.feedback-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+.feedback-container h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.feedback-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feedback-item {
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-content {
+    display: block;
+    margin-bottom: 5px;
+    color: #007bff;
+}
+
+.feedback-rating,
+.feedback-date,
+.feedback-email {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.feedback-item:last-child {
+    margin-bottom: 0;
+}
+
+.no-feedback {
+    color: #888;
+    font-style: italic;
+}
+.feedback-rating .bi-star-fill.text-warning {
+    color: gold; /* Màu vàng giống feedbackForm */
+}
+.feedback-rating .bi-star.text-warning {
+    color: gold; /* Màu vàng giống feedbackForm */
+}
+.form-select {
+    border: 1px solid #ced4da; /* Viền */
+    border-radius: 0.25rem; /* Góc bo tròn */
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem; /* Padding */
+    font-size: 1rem; /* Kích thước font chữ */
+    line-height: 1.5; /* Khoảng cách dòng */
+    color: #495057; /* Màu chữ */
+    background-color: #fff; /* Màu nền */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); /* Icon mũi tên */
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    -webkit-appearance: none; /* Loại bỏ kiểu dáng mặc định trên Safari */
+    -moz-appearance: none; /* Loại bỏ kiểu dáng mặc định trên Firefox */
+    appearance: none; /* Loại bỏ kiểu dáng mặc định */
+}
+
+.form-select:focus {
+    border-color: #80bdff; /* Màu viền khi focus */
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Hiệu ứng box shadow khi focus */
+}
+
+.form-select option {
+    display: flex; /* Hiển thị icon và text trên cùng một dòng */
+    align-items: center;
+}
+
+.form-select option i {
+    margin-right: 0.5rem; /* Tạo khoảng cách giữa icon và text */
+}
+
+/* General Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center; /* Center the pagination horizontally */
+    margin-top: 20px;
+    margin-bottom: 20px; /* Add some space below the pagination */
+}
+
+.pagination a,
+.pagination span {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+    min-width: 30px; /* Ensure consistent button sizes */
+    text-align: center; /* Center text within buttons */
+}
+
+/* Hover Effect */
+.pagination a:hover {
+    background-color: #f0f0f0;
+    color: #0056b3; /* Darker color on hover for better contrast */
+}
+
+/* Active Page Style */
+.pagination span {
+    background-color: #007bff; /* Primary color for active page */
+    color: white;
+    border: 1px solid #007bff;
+}
+
+/* Disabled State (For Previous/Next) */
+.pagination a.disabled {
+    pointer-events: none; /* Prevent clicks */
+    opacity: 0.6; /* Indicate disabled state */
+    cursor: not-allowed; /* Change cursor on hover */
+}
+
+/* Spacing for First and Last Elements */
+.pagination a:first-child {
+    margin-right: 10px;
+}
+
+.pagination a:last-child {
+    margin-left: 10px;
+}
+
+/* Ellipsis Style (Optional) */
+.pagination .ellipsis {
+    padding: 8px 12px;
+    margin: 0 5px;
+    color: #777;
+}

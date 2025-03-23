@@ -9,7 +9,13 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="./admin-scripts.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+        <script>
+            function submitRoleForm(userId) {
+                document.getElementById('roleForm' + userId).submit();
+            }
+        </script>
     </head>
     <body>
         <div class="container">
@@ -21,8 +27,12 @@
                     <li><a href="admin?view=dashboard">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                    <li><a href="trip">Quản lý chuyến tàu</a></li>
+                        <c:if test="${sessionScope.user.userId == 1}">
+                        <li><a href="admin?view=userauthorization">Phân quyền</a></li>
+                        </c:if>
+                    
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+
                 </ul>
                 <form action="logout" method="GET">
                     <button type="submit" class="logout-button">Logout</button>
@@ -32,7 +42,6 @@
             <div class="main-content">
                 <div class="header">
                     <h1>Trang Quản Trị Hệ Thống Vé Tàu</h1>
-                    <h1>haha</h1>
                 </div>
                 <div class="content">
                     <c:choose>
@@ -43,18 +52,31 @@
                                     <div class="dashboard-item trains">
                                         <h3>Thống kê tàu</h3>
                                         <p>Tổng số tàu: ${totalTrains}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #F5E6C2;">
+                                            <a href="train" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                     <div class="dashboard-item bookings">
-                                        <h3>Thống kê đặt vé</h3>
-                                        <p>Tổng số đặt vé: ${totalBookings}</p>
+                                        <h3>Thống kê đơn</h3>
+                                        <p>Tổng số đơn: ${totalBookings}</p>
+                                        <p>Tổng số vé: </p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #96B4AA;">
+                                            <a href="order" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                     <div class="dashboard-item trips">
                                         <h3>Thống kê chuyến đi</h3>
                                         <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
+                                            <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                     <div class="dashboard-item rules">
                                         <h3>Thống kê Quy định</h3>
                                         <p>Tổng số Quy định: ${totalRules}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
+                                            <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="dashboard-row">
@@ -73,24 +95,43 @@
                                         <h3>Thống kê người dùng</h3>
                                         <canvas id="userChart" width="400" height="200"></canvas>
                                     </div>
-                                </div>   
+                                </div>
+                                <div class="dashboard-row">
+                                    <div class="feedback-container">
+                                        <h3>Phản hồi gần đây</h3>
+                                        <c:choose>
+                                            <c:when test="${not empty feedbackList}">
+                                                <ul class="feedback-list">
+                                                    <c:forEach var="feedback" items="${feedbackList}">
+                                                        <li class="feedback-item" style="with: 50%">
+                                                            <strong class="feedback-rating">
+                                                                <span class="feedback-email">Email: ${feedback.user.email}</span>
+                                                                <c:forEach var="i" begin="1" end="${feedback.rating}" step="1">
+                                                                    <i class="bi bi-star-fill text-warning" ></i>
+                                                                </c:forEach>
+                                                                <c:forEach var="i" begin="${feedback.rating + 1}" end="5" step="1">
+                                                                    <i class="bi bi-star text-warning"></i>
+                                                                </c:forEach>
+                                                            </strong>
+                                                            <br>
+
+                                                            <span class="feedback-content" style="color: black">${feedback.content}</span>
+
+                                                        </li>
+                                                    </c:forEach>
+                                                </ul>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <p class="no-feedback">Không có phản hồi nào.</p>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>  
+                                </div>
                             </div>
                                                         
 
                             <script>
-//                                
-//                                document.addEventListener('DOMContentLoaded', function () {
-//                                    var dropdown = document.getElementById('userDropdown');
-//                                    dropdown.style.display = 'none'
-//                                    window.toggleDropdown() = function (){
-//                                        if (dropdown.style.display == 'none') {
-//                                            dropdown.style.display = 'block';
-//                                        } else {
-//                                            dropdown.style.display = 'none';
-//                                        }
-//                                    }
-//                                    ;
-//                                });
+
 
                                 const revenueData = {
                                     week: ${revenueThisWeek},
@@ -233,6 +274,76 @@
                                 });
                             </script>
                         </c:when>
+                        <c:when test="${type == 'userauthorization'}">
+                            <div class="search-container">
+                                <form method="get" action="admin">
+                                    <input type="hidden" name="view" value="userauthorization">
+                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
+                                    <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
+                                    <a href="admin?view=userauthorization" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
+                                </form>
+                            </div>
+                            <h2>Phân quyền người dùng</h2>
+                            <table border="1">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Tên người dùng</th>
+                                        <th>Họ và tân</th>
+                                        <th>Email</th>
+                                        <th>Vai trò</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="userItem" items="${list}" varStatus="status">
+                                        <tr>
+                                            <td>${status.index + 1}</td>
+                                            <td>${userItem.username}</td>
+                                            <td>${userItem.fullName}</td>
+                                            <td>${userItem.email}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${userItem.roleID == 1}">Admin</c:when>
+                                                    <c:when test="${userItem.roleID == 2}">Employee</c:when>
+                                                    <c:when test="${userItem.roleID == 3}">Customer</c:when>
+                                                    <c:otherwise>Unknown</c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <form id="roleForm${userItem.userId}" method="post" action="admin">
+                                                    <input type="hidden" name="action" value="setUserRole">
+                                                    <input type="hidden" name="userId" value="${userItem.userId}">
+                                                    <select name="roleId" class="form-select" onchange="submitRoleForm('${userItem.userId}')">
+                                                        <option value="1" ${userItem.roleID == 1 ? 'selected' : ''}><i class="bi bi-person-fill-gear"></i> Admin</option>
+                                                        <option value="2" ${userItem.roleID == 2 ? 'selected' : ''}><i class="bi bi-person-badge-fill"></i> Employee</option>
+                                                        <option value="3" ${userItem.roleID == 3 ? 'selected' : ''}><i class="bi bi-person-fill"></i> Customer</option>
+                                                    </select>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage - 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Previous</a>
+                                </c:if>
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <c:choose>
+                                        <c:when test="${i eq currentPage}">
+                                            <span>${i}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${i}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage + 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Next</a>
+                                </c:if>
+                            </div>
+                        </c:when>
                         <c:when test="${not empty list}">
                             <c:if test="${not empty list}">
                                 <div class="search-container">
@@ -243,18 +354,25 @@
                                         <a href="admin?view=${type}" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
                                     </form>
                                 </div>
-
+                                <c:choose>
+                                    <c:when test="${type == 'employees'}">
+                                        <h2>Danh sách nhân viên</h2>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <h2>Danh sách khách hàng</h2>
+                                    </c:otherwise>
+                                </c:choose>
                                 <table border="1">
                                     <thead>
                                         <tr>
                                             <c:choose>
                                                 <c:when test="${type == 'employees' || type == 'customers'}">
                                                     <th></th>
-                                                    <th>Username</th>
-                                                    <th>Full Name</th>
+                                                    <th>Tên người dung</th>
+                                                    <th>Họ và tên</th>
                                                     <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Action</th>
+                                                    <th>SDT</th>
+                                                    <th>Hành động</th>
                                                     </c:when>
                                                 </c:choose>
                                         </tr>
@@ -279,15 +397,15 @@
 
                                                     <c:choose>
                                                         <c:when test="${item.status}">
-                                                            <button class="btn btn-outline-danger btn-sm" style="color: red; border-color: red;"
+                                                            <button class="btn btn-outline-danger btn-sm" style="color: green; border-color: green;"
                                                                     onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
-                                                                <i class="bi bi-x-circle"></i> Vô Hiệu
+                                                                <i class="bi bi-check-circle"></i> Đang hoạt động
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <button class="btn btn-outline-success btn-sm" style="color: green; border-color: green;"
+                                                            <button class="btn btn-outline-success btn-sm" style="color: red; border-color: red;"
                                                                     onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
-                                                                <i class="bi bi-check-circle"></i> Khôi Phục
+                                                                <i class="bi bi-x-circle"></i> Đã tắt hoạt động
                                                             </button>
                                                         </c:otherwise>
                                                     </c:choose>
@@ -296,6 +414,24 @@
                                         </c:forEach>
                                     </tbody>
                                 </table>
+                                <div class="pagination">
+                                    <c:if test="${currentPage > 1}">
+                                        <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage - 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Previous</a>
+                                    </c:if>
+                                    <c:forEach var="i" begin="1" end="${totalPages}">
+                                        <c:choose>
+                                            <c:when test="${i eq currentPage}">
+                                                <span>${i}</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${i}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">${i}</a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                    <c:if test="${currentPage < totalPages}">
+                                        <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage + 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Next</a>
+                                    </c:if>
+                                </div>
 
                                 <c:if test="${type eq 'employees'}">
                                     <div class="add-button-container">

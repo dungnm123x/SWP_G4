@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.CategoryRule;
 import model.Rule;
+import model.User;
 
 /**
  *
@@ -67,6 +68,11 @@ public class EditCategoryRuleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || (user.getRoleID() != 1 && user.getRoleID() != 2)) {
+            response.sendRedirect("login");
+            return;
+        }
         try {
             int categoryRuleID = Integer.parseInt(request.getParameter("categoryRuleID"));
             RuleDAO ruleDAO = new RuleDAO();
@@ -74,6 +80,13 @@ public class EditCategoryRuleController extends HttpServlet {
 
             if (categoryRule != null) {
                 request.setAttribute("categoryRule", categoryRule);
+
+                // Lấy thông báo từ session và xóa để tránh hiển thị lại nhiều lần
+                request.setAttribute("successMessage", request.getSession().getAttribute("successMessage"));
+                request.setAttribute("errorMessage", request.getSession().getAttribute("errorMessage"));
+                request.getSession().removeAttribute("successMessage");
+                request.getSession().removeAttribute("errorMessage");
+
                 request.getRequestDispatcher("/view/employee/EditCategoryRule.jsp").forward(request, response);
             } else {
                 response.sendRedirect("category-rule?error=notfound");
@@ -106,11 +119,13 @@ public class EditCategoryRuleController extends HttpServlet {
             boolean result = ruleDAO.updateCategory(categoryRuleID, categoryRuleName, content, "", status);
 
             if (result) {
-                response.sendRedirect("category-rule?message=updateSuccess");
+                request.getSession().setAttribute("successMessage", "Cập nhật thành công!");
             } else {
-                request.setAttribute("message", "Cập nhật thất bại.");
-                doGet(request, response);
+                request.getSession().setAttribute("errorMessage", "Cập nhật thất bại.");
             }
+
+            // Chuyển hướng sau khi cập nhật
+            response.sendRedirect("edit-categoryRule?categoryRuleID=" + categoryRuleID);
         } catch (NumberFormatException e) {
             response.sendRedirect("category-rule?error=invalidData");
         } catch (Exception e) {

@@ -13,10 +13,12 @@ public class RailwayDTO {
     private double ticketPrice;
     private String ticketStatus;
     private String tripType; // ✅ Thêm trường này
+    private String passengerName;
 
-    public RailwayDTO(int ticketID, String cccd, String route, String trainCode, Timestamp departureTime,
+    public RailwayDTO(int ticketID,String passengerName, String cccd, String route, String trainCode, Timestamp departureTime,
                       int carriageNumber, int seatNumber, double ticketPrice, String ticketStatus, String tripType) {
         this.ticketID = ticketID;
+        this.passengerName=passengerName;
         this.cccd = cccd;
         this.route = route;
         this.trainCode = trainCode;
@@ -29,6 +31,7 @@ public class RailwayDTO {
     }
 
     public int getTicketID() { return ticketID; }
+    public String getPassengerName(){return passengerName;};
     public String getCccd() { return cccd; }
     public String getRoute() { return route; }
     public String getTrainCode() { return trainCode; }

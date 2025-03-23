@@ -17,6 +17,7 @@ import jakarta.servlet.http.Part;
 import java.sql.SQLException;
 import java.util.List;
 import model.CategoryRule;
+import model.User;
 
 /**
  *
@@ -72,8 +73,17 @@ public class AddRuleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         List<CategoryRule> categories = rd.getAllCategories();
         request.setAttribute("categories", categories);
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         request.getRequestDispatcher("/view/employee/AddRule.jsp").forward(request, response);
 
     }

@@ -4,6 +4,9 @@
  */
 package controller;
 
+import Utils.SendEmailCancelTicket;
+import dal.BookingDAO;
+import dal.RefundDAO;
 import dal.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,9 +16,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import model.RailwayDTO;
 import model.Ticket;
+import model.User;
 
 /**
  *
@@ -83,17 +88,24 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<RailwayDTO> pendingTickets = (List<RailwayDTO>) request.getSession().getAttribute("pendingCancelTickets");
+        HttpSession session = request.getSession();
+        List<RailwayDTO> pendingTickets = (List<RailwayDTO>) session.getAttribute("pendingCancelTickets");
+        User user = (User) session.getAttribute("user");
 
-        if (pendingTickets == null || pendingTickets.isEmpty()) {
-            response.sendRedirect("cancel-ticket"); // Nếu không có vé, quay lại trang chọn vé
+        if (pendingTickets == null || pendingTickets.isEmpty() || user == null) {
+            response.sendRedirect("cancel-ticket");
             return;
         }
+        String bankAccountID = request.getParameter("bankAccount");
+        String bankName = request.getParameter("bankName");
 
-        // Lấy mã OTP từ request
+        // Kiểm tra nếu không nhập tài khoản ngân hàng
+        if (bankAccountID == null || bankName == null || bankAccountID.isEmpty() || bankName.isEmpty()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập thông tin tài khoản ngân hàng để hoàn tiền!");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
+        }
         String enteredOtp = request.getParameter("otp");
-
-        // Lấy mã OTP từ session và đảm bảo nó là String
         Object sessionOtpObj = request.getSession().getAttribute("otp");
         String sessionOtp = (sessionOtpObj != null) ? String.valueOf(sessionOtpObj) : null;
 
@@ -103,44 +115,117 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
             request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
             return;
         }
-
-        // Gọi DAO để hủy từng vé
+        double totalRefund = 0;
+        int toalTickets=0;
+        List<Integer> ticketIDs = new ArrayList<>();
         TicketDAO ticketDAO = new TicketDAO();
         for (RailwayDTO ticket : pendingTickets) {
             ticketDAO.cancelTicket(ticket.getTicketID(), ticket.getSeatNumber());
+            totalRefund += ticket.getTicketPrice() * 0.8;
+            toalTickets ++;
+            ticketIDs.add(ticket.getTicketID()); // Lưu danh sách TicketID
+        }
+        RefundDAO refundDAO = new RefundDAO();
+        try {
+            int refundID = refundDAO.insertRefund(user.getUserId(), bankAccountID, bankName, totalRefund);
+            if (refundID == -1) {
+                request.setAttribute("errorMessage", "Lỗi khi lưu thông tin hoàn tiền. Vui lòng thử lại!");
+                request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+                return;
+            }
+
+            // Cập nhật RefundID trong Ticket
+            boolean updated = refundDAO.updateTicketsWithRefundID(refundID, ticketIDs);
+            if (!updated) {
+                request.setAttribute("errorMessage", "Lỗi khi cập nhật RefundID cho vé. Vui lòng thử lại!");
+                request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Lỗi cơ sở dữ liệu. Vui lòng thử lại sau!");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
         }
 
-        // Xóa session sau khi hủy vé
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append("<html><head><style>")
+                .append("body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }")
+                .append(".container { max-width: 800px; background: white; padding: 30px; margin: auto; border-radius: 10px; ")
+                .append("box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15); text-align: left; }")
+                .append("h2 { color: #007bff; font-size: 24px; margin-bottom: 20px; text-align: center; }")
+                .append("p { font-size: 16px; color: #333; line-height: 1.6; }")
+                .append("table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd; }")
+                .append("th, td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 16px; }")
+                .append("th { background-color: #007bff; color: white; font-weight: bold; }")
+                .append("tr:nth-child(even) { background-color: #f8f9fa; }")
+                .append(".summary { margin-top: 15px; font-size: 17px; }")
+                .append(".total-count { font-weight: bold; }")
+                .append(".total-refund { font-weight: bold; color: #28a745; }")
+                .append("</style></head><body>");
+
+        emailContent.append("<div class='container'>")
+                .append("<h2>Xác nhận hủy vé thành công</h2>")
+                .append("<p>Chào <strong>").append(user.getFullName()).append("</strong>,</p>")
+                .append("<p>Hệ thống xác nhận rằng vé của bạn đã được hủy thành công. Dưới đây là chi tiết vé:</p>");
+
+        emailContent.append("<table><tr>")
+                .append("<th>Mã vé</th><th>Tên</th><th>CCCD</th><th>Hành trình</th><th>Tàu</th><th>Thời gian khởi hành</th><th>Toa</th><th>Chỗ ngồi</th><th>Giá vé</th><th>Tiền hoàn</th></tr>");
+
+        int totalTickets = 0;
+        for (RailwayDTO ticket : pendingTickets) {
+            emailContent.append("<tr>")
+                    .append("<td>").append(ticket.getTicketID()).append("</td>")
+                    .append("<td>").append(ticket.getPassengerName()).append("</td>")
+                    .append("<td>").append(ticket.getCccd()).append("</td>")
+                    .append("<td>").append(ticket.getRoute()).append("</td>")
+                    .append("<td>").append(ticket.getTrainCode()).append("</td>")
+                    .append("<td>").append(ticket.getDepartureTime()).append("</td>")
+                    .append("<td>").append(ticket.getCarriageNumber()).append("</td>")
+                    .append("<td>").append(ticket.getSeatNumber()).append("</td>")
+                    .append("<td>").append(ticket.getTicketPrice()).append(" VND</td>")
+                    .append("<td>").append(totalRefund).append(" VND</td>")
+                    .append("</tr>");
+        }
+
+        emailContent.append("</table>");
+
+        emailContent.append("<p class='summary'><span class='total-count'>Tổng số vé: ")
+                .append(toalTickets)
+                .append("</span></p>");
+
+        emailContent.append("<p class='summary'><span class='total-refund'>Tổng tiền hoàn: ")
+                .append(totalRefund)
+                .append(" VND</span></p>");
+        emailContent.append("<p class='summary'><span class='total-count'>Ngân hàng: ")
+                .append(bankName)
+                .append("</span></p>");
+        emailContent.append("<p class='summary'><span class='total-count'>Số tài khoản: ")
+                .append(bankAccountID)
+                .append("</span></p>");
+        emailContent.append("<p class='footer'>Cảm ơn bạn đã sử dụng dịch vụ đặt vé tàu của chúng tôi!<br>Trân trọng,Online Booing Ticket Train</p>");
+        emailContent.append("</div></body></html>");
+
+        SendEmailCancelTicket.sendEmail(user.getEmail(), "Xác nhận hủy vé thành công", emailContent.toString());
         request.getSession().removeAttribute("pendingCancelTickets");
         request.getSession().removeAttribute("otp");
 
-        // Chuyển hướng đến trang thành công
+        // 🔹 Hiển thị thông báo SweetAlert2
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<meta charset='UTF-8'>");
-        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
-        out.println("<title>Hủy vé thành công</title>");
-        out.println("<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<script type='text/javascript'>");
-        out.println("Swal.fire({");
-        out.println("  icon: 'success',");
-        out.println("  title: 'Bạn đã hủy vé thành công!',");
-        out.println("  text: 'Vui lòng đợi tiền gửi về.',");
-        out.println("  confirmButtonText: 'OK'");
-        out.println("}).then((result) => {");
-        out.println("  if (result.isConfirmed) {");
-        out.println("    window.location.href='home.jsp';"); // Điều hướng về trang chủ
-        out.println("  }");
-        out.println("});");
-        out.println("</script>");
-        out.println("</body>");
-        out.println("</html>");
-        out.close();
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<html><head>");
+            out.println("<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>");
+            out.println("</head><body>");
+            out.println("<script>");
+            out.println("Swal.fire({");
+            out.println("  icon: 'success',");
+            out.println("  title: 'Bạn đã hủy vé thành công!',");
+            out.println("  text: 'Số tiền hoàn lại: " + totalRefund + " VND',");
+            out.println("  confirmButtonText: 'OK'");
+            out.println("}).then(() => window.location.href='home.jsp');");
+            out.println("</script>");
+            out.println("</body></html>");
+        }
     }
 
     /**

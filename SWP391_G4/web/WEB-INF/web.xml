@@ -76,6 +76,10 @@
         <servlet-name>VNPayServlet</servlet-name>
         <servlet-class>VNPay.VNPayServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>OrderController</servlet-name>
+        <servlet-class>controller.OrderController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -199,5 +203,9 @@
     <servlet-mapping>
         <servlet-name>VNPayServlet</servlet-name>
         <url-pattern>/vnpay</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderController</servlet-name>
+        <url-pattern>/order</url-pattern>
     </servlet-mapping>
 </web-app>
