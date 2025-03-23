@@ -149,7 +149,6 @@
             <table border="1">
                 <thead>
                     <tr>
-                         <th>STT</th>
                         <th>Mã Tuyến</th>
                         <th>Điểm Xuất Phát</th>
                         <th>Điểm Đến</th>
@@ -161,7 +160,6 @@
             <tbody>
                <c:forEach var="route" items="${routes}" varStatus="loop">
     <tr>
-        <td>${(currentPage - 1) * pageSize + loop.index + 1}</td>
         <td>${route.routeID}</td>
         <td>${route.departureStation.stationName}</td>
         <td>${route.arrivalStation.stationName}</td>

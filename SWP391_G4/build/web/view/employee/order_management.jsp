@@ -201,7 +201,7 @@
                             <tr>
                                 <c:if test="${loop.first}">
                                     <%-- Only display booking-level details on the first row --%>
-                                    <td rowspan="${fn:length(booking.tickets)}"><a href="order?action=view&id=${booking.bookingID}">${booking.bookingID}</a></td>
+                                    <td rowspan="${fn:length(booking.tickets)}">${booking.bookingID}</a></td>
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.customerName}</td>
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.customerPhone}</td>
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.customerEmail}</td>
