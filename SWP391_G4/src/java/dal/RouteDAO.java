@@ -1,13 +1,18 @@
 package dal;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import model.Route;
 import model.Station;
 
-public class RouteDAO extends DBContext {
+public class RouteDAO extends DBContext { // No generic type needed here
 
-    public boolean addRoute(int departureStationID, int arrivalStationID, double distance, double basePrice) {
+    // Existing methods (add, update, delete, getRouteById, isRouteExists - KEEP THESE)
+    // ... (Your existing methods from your provided code) ...
+      public boolean addRoute(int departureStationID, int arrivalStationID, double distance, double basePrice) {
         String sql = "INSERT INTO Route (DepartureStationID, ArrivalStationID, Distance, BasePrice) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -20,8 +25,8 @@ public class RouteDAO extends DBContext {
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     public List<Station> getAllStations() {
@@ -70,8 +75,8 @@ public class RouteDAO extends DBContext {
 
 // Lấy thông tin một tuyến tàu theo ID
     public Route getRouteById(int routeID) {
-        String sql = "SELECT r.RouteID, s.StationID AS DepartureID, s.StationName AS DepartureName, "
-                + "s2.StationID AS ArrivalID, s2.StationName AS ArrivalName, r.Distance, r.BasePrice "
+        String sql = "SELECT r.RouteID, s.StationID AS DepartureID, s.StationName AS DepartureName, s.Address as DepartureAddress, "
+                + "s2.StationID AS ArrivalID, s2.StationName AS ArrivalName, s2.Address as ArrivalAddress, r.Distance, r.BasePrice "
                 + "FROM Route r "
                 + "JOIN Station s ON r.DepartureStationID = s.StationID "
                 + "JOIN Station s2 ON r.ArrivalStationID = s2.StationID "
@@ -81,8 +86,8 @@ public class RouteDAO extends DBContext {
             ps.setInt(1, routeID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                Station departure = new Station(rs.getInt("DepartureID"), rs.getString("DepartureName"), "");
-                Station arrival = new Station(rs.getInt("ArrivalID"), rs.getString("ArrivalName"), "");
+                Station departure = new Station(rs.getInt("DepartureID"), rs.getString("DepartureName"), rs.getString("DepartureAddress"));
+                Station arrival = new Station(rs.getInt("ArrivalID"), rs.getString("ArrivalName"), rs.getString("ArrivalAddress"));
                 return new Route(rs.getInt("RouteID"), departure, arrival, rs.getDouble("Distance"), rs.getDouble("BasePrice"));
             }
         } catch (SQLException e) {
@@ -90,8 +95,7 @@ public class RouteDAO extends DBContext {
         }
         return null;
     }
-
-    public boolean isRouteExists(int departureStationID, int arrivalStationID) {
+      public boolean isRouteExists(int departureStationID, int arrivalStationID) {
         String sql = "SELECT COUNT(*) FROM Route WHERE DepartureStationID = ? AND ArrivalStationID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, departureStationID);
@@ -126,23 +130,61 @@ public class RouteDAO extends DBContext {
         }
         return basePrice;
     }
+    // New: Get paginated list of routes
+    public List<Route> getRoutes(int page, int pageSize) {
+        List<Route> routes = new ArrayList<>();
+        String sql = "SELECT * FROM (SELECT r.RouteID, s.StationID as DepartureId,s.StationName as DepartureName,s.Address as DepartureAddress\n" +
+",s2.StationID as ArrivalId,s2.StationName as ArrivalName,s2.Address as ArrivalAddress ,r.Distance, r.BasePrice, " +
+                "ROW_NUMBER() OVER (ORDER BY r.RouteID) as row_num " +
+                "FROM Route r " +
+                "JOIN Station s ON r.DepartureStationID = s.StationID " +
+                "JOIN Station s2 ON r.ArrivalStationID = s2.StationID) as x " +
+                "WHERE row_num BETWEEN ? AND ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, (page - 1) * pageSize + 1); // Correct start row
+            ps.setInt(2, page * pageSize);           // Correct end row
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                     Station departure = new Station(rs.getInt("DepartureId"),
+                                rs.getNString("DepartureName"),
+                                rs.getNString("DepartureAddress"));
 
-    @Override
-    public void insert(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                        Station arrival = new Station(rs.getInt("ArrivalId"),
+                                rs.getNString("ArrivalName"),
+                                rs.getNString("ArrivalAddress"));
+
+                        Route route = new Route(
+                                rs.getInt("RouteID"),
+                                departure,
+                                arrival,
+                                rs.getDouble("Distance"),
+                                rs.getDouble("BasePrice")
+                        );
+                        routes.add(route);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return routes;
     }
 
-    @Override
-    public void update(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    // New: Get total number of routes
+    public int getTotalRoutesCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS total FROM Route";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt("total"); // Use alias for clarity
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or use a logger
+        }
+        return count;
     }
-
-    @Override
-    public void delete(Object model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
+     // Keep your existing list() method, but mark it as deprecated
+    @Deprecated
     public ArrayList<Route> list() {
         ArrayList<Route> routes = new ArrayList<>();
         String sql = "SELECT r.RouteID,s.StationID as DepartureId,s.StationName as DepartureName,s.Address as DepartureAddress\n"
@@ -172,6 +214,21 @@ public class RouteDAO extends DBContext {
             e.printStackTrace();
         }
         return routes;
+    }
+
+    @Override
+    public void insert(Object model) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void update(Object model) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void delete(Object model) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override

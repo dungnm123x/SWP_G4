@@ -2,34 +2,55 @@ package controller;
 
 import dal.RouteDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 import model.Route;
 import model.Station;
-import model.User;
+import model.User; // Assuming you have a User model
 
 public class RouteController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RouteDAO routeDAO = new RouteDAO();
-        List<Route> routes = routeDAO.list();
-        List<Station> stations = routeDAO.getAllStations();
+
+        // --- Pagination Logic ---
+        int page = 1; // Default to page 1
+        int pageSize = 10; // Set your desired page size (you can make this configurable)
+
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                // Handle invalid page number (log it, default to 1, or redirect to an error page)
+                page = 1; // Or set an error message and forward
+            }
+        }
+
+        List<Route> routes = routeDAO.getRoutes(page, pageSize); // Get paginated routes
+        int totalRoutes = routeDAO.getTotalRoutesCount(); // Get total count
+        int totalPages = (int) Math.ceil((double) totalRoutes / pageSize); // Calculate total pages
+
+
+        List<Station> stations = routeDAO.getAllStations(); // Keep this for the dropdown
 
         request.setAttribute("routes", routes);
         request.setAttribute("stations", stations);
+        request.setAttribute("currentPage", page);    // Pass current page to JSP
+        request.setAttribute("totalPages", totalPages);  // Pass total pages to JSP
+        request.setAttribute("pageSize", pageSize); //Pass page size to JSP
+
+
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
-            response.sendRedirect("login");
-            return;
+             response.sendRedirect("login");
+             return;
         }
 
-        // Kiểm tra nếu có ID cần chỉnh sửa
+        // Check for edit ID
         String editId = request.getParameter("editId");
         if (editId != null) {
             Route route = routeDAO.getRouteById(Integer.parseInt(editId));
@@ -74,6 +95,6 @@ public class RouteController extends HttpServlet {
             request.setAttribute("message", success ? "Xóa tuyến tàu thành công!" : "Xóa thất bại(tuyến đang trong sử dụng).");
         }
 
-        doGet(request, response); // Load lại danh sách tuyến tàu
+        doGet(request, response); // Reload the route list
     }
 }
