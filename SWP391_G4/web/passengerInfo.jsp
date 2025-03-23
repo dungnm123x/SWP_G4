@@ -15,7 +15,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <script>
-            
+
             // Mức giảm giá TẠM TÍNH ở client
             const discountRates = {
                 "Người lớn": 0,
@@ -246,7 +246,7 @@
                                            placeholder="Số CMND/Hộ chiếu" required />
                                     <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
                                     <!-- Mỗi ghế: ô input "Họ tên hành khách" và "CCCD hành khách" -->
-                                    
+
                                     <input type="hidden" name="passengerCCCD${status.index}" />
 
                                 </td>
@@ -411,7 +411,7 @@
                         type="text" 
                         class="form-control" 
                         name="bookingName" 
-                        value="${sessionScope.bookingName}" 
+                        value="${requestScope.bookingName != null ? requestScope.bookingName : sessionScope.bookingName}" 
                         required 
                         />
                 </div>
@@ -435,7 +435,7 @@
                         type="email" 
                         class="form-control" 
                         name="bookingEmail" 
-                        value="${sessionScope.bookingEmail}" 
+                        value="${requestScope.bookingEmail != null ? requestScope.bookingEmail : sessionScope.bookingEmail}" 
                         required 
                         />
                 </div>
@@ -446,10 +446,9 @@
                         type="text" 
                         class="form-control" 
                         name="bookingPhone" 
-                        value="${sessionScope.bookingPhone}" 
+                        value="${requestScope.bookingPhone != null ? requestScope.bookingPhone : sessionScope.bookingPhone}" 
                         required 
-                        />
-                </div>
+                        />                </div>
             </div>
 
             <div class="d-flex justify-content-between mt-4">
