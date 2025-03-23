@@ -420,17 +420,78 @@ public class BookingDAO extends DBContext {
         }
     }
 
-    public boolean cancelBooking(int bookingID) {
-        String sql = "UPDATE Booking SET BookingStatus = 'Cancelled' WHERE BookingID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, bookingID);
-            int affectedRows = ps.executeUpdate();
-            return affectedRows > 0;
+    public boolean cancelBooking(int bookingID) throws SQLException {
+    // Use a transaction to ensure atomicity
+    connection.setAutoCommit(false);
+    PreparedStatement updateBooking = null;
+    PreparedStatement updateTicket = null;
+    PreparedStatement updateSeat = null;
+
+    try {
+        // 1. Update the Booking status
+        String updateBookingSql = "UPDATE Booking SET BookingStatus = 'Cancelled' WHERE BookingID = ?";
+        updateBooking = connection.prepareStatement(updateBookingSql);
+        updateBooking.setInt(1, bookingID);
+        int bookingRowsAffected = updateBooking.executeUpdate();
+
+        // Check if booking exists
+        if (bookingRowsAffected == 0) {
+            connection.rollback(); // Rollback if no booking found
+            return false; // Indicate failure
+        }
+        // 2. Update the Ticket status for all tickets associated with the booking
+        String updateTicketSql = "UPDATE Ticket SET TicketStatus = 'Cancelled' WHERE BookingID = ?";
+        updateTicket = connection.prepareStatement(updateTicketSql);
+        updateTicket.setInt(1, bookingID);
+        updateTicket.executeUpdate(); // We don't check rowsAffected here; it's OK if there are no tickets
+
+        // 3. Update the Seat status for all seats associated with the cancelled tickets
+        // Join with Ticket table on bookingId
+        String updateSeatSql = "UPDATE Seat SET Status = 'Available' " +
+                               "WHERE CarriageID IN (SELECT c.CarriageID FROM Carriage c JOIN Seat s ON c.CarriageID = s.CarriageID "
+                + "JOIN Ticket t ON s.SeatID = t.SeatID WHERE t.BookingID= ?)";
+        updateSeat = connection.prepareStatement(updateSeatSql);
+        updateSeat.setInt(1, bookingID);
+        updateSeat.executeUpdate();
+        connection.commit(); // Commit the transaction
+        return true;        // Success
+
+    } catch (SQLException e) {
+        connection.rollback(); // Rollback on any error
+        e.printStackTrace();
+        throw e;            // Re-throw the exception after rollback (important!)
+
+    } finally {
+        // Close resources (in reverse order of creation)
+        if (updateSeat != null) {
+            try {
+                updateSeat.close();
+            } catch (SQLException e) {
+                 e.printStackTrace();
+            }
+        }
+         if (updateTicket != null) {
+            try {
+                updateTicket.close();
+            } catch (SQLException e) {
+                 e.printStackTrace();
+            }
+        }
+         if (updateBooking != null) {
+            try {
+                updateBooking.close();
+            } catch (SQLException e) {
+                 e.printStackTrace();
+            }
+        }
+
+        try {
+            connection.setAutoCommit(true); // Restore auto-commit
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
     }
+}
 
     public boolean deleteBooking(int bookingID) {
         String sql = "DELETE FROM Booking WHERE BookingID = ?";

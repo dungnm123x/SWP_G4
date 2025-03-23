@@ -136,7 +136,7 @@
                     <label for="email">Email:</label>
                     <input type="text" id="email" name="email" value="${param.email}">
 
-                    <label for="status">Tình trạng</label>
+                    <%--<label for="status">Tình trạng</label>
                     <select id="status" name="status">
                         <option value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
                         <option value="Pending" ${param.status == 'Pending' ? 'selected' : ''}>Chờ</option>
@@ -145,7 +145,7 @@
                         <option value="Cancelled" ${param.status == 'Cancelled' ? 'selected' : ''}>Hủy</option>
                         <option value="Refunded" ${param.status == 'Refunded' ? 'selected' : ''}>Hoàn vé</option>
 
-                    </select>
+                    </select>--%>
                     </br>
                     <label for="startDate">Mua từ ngày:</label>
                     <input type="date" id="startDate" name="startDate" value="${param.startDate}">
@@ -166,13 +166,13 @@
 
                 </form>
                 <a href="order"><button>Xóa lọc</button></a>
-                <div style="margin-bottom: 20px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <%--<div style="margin-bottom: 20px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                     <strong style="font-size: 18px; color: #333; display: block; margin-bottom: 10px;">Thống kê</strong>
                     <span style="font-weight: bold;">Tổng: ${totalOrders}</span> |
                     <span style="font-weight: bold;">Đã Thanh Toán: ${paidOrders}</span> |
                     <span style="font-weight: bold;">Chờ giải quyết: ${pendingOrders}</span> |
                     <span style="font-weight: bold;">Hủy: ${cancelledOrders}</span>
-                </div>
+                </div>--%>
             </div>
 
             <%-- Order List Table --%>
@@ -190,7 +190,7 @@
                             <%-- <th>Mã vé</th>--%>
                             <%--<th>Số ghế</th>--%>
                         <th>Tổng tiền</th>
-                        <th>Tình trạng</th>
+                        <%--<th>Tình trạng</th>--%>
                         <th>Ngày mua</th>
                         <th>Hành động</th>
                     </tr>
@@ -217,7 +217,7 @@
                                 <c:if test="${loop.first}">
                                     <%--Only display booking-level details on the first row--%>
                                     <td rowspan="${fn:length(booking.tickets)}"><fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" /></td>
-                                    <td rowspan="${fn:length(booking.tickets)}">${booking.paymentStatus}</td>
+                                    <%--<td rowspan="${fn:length(booking.tickets)}">${booking.paymentStatus}</td>--%>
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.formattedBookingDate}</td>
                                     <td rowspan="${fn:length(booking.tickets)}">
                                         <a href="order?action=view&id=${booking.bookingID}">Xem</a>

@@ -17,12 +17,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.User;
 
 public class OrderController extends HttpServlet {
@@ -71,8 +74,15 @@ public class OrderController extends HttpServlet {
                 showEditForm(request, response);
                 break;
             case "cancel":
-                cancelOrder(request, response);
+            {
+                try {
+                    cancelOrder(request, response);
+                } catch (SQLException ex) {
+                    Logger.getLogger(OrderController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
                 break;
+
             case "getTrips":
                 getTripsByTrain(request, response); // AJAX handler
                 break;
@@ -283,16 +293,23 @@ public class OrderController extends HttpServlet {
     }
 
     private void cancelOrder(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException, SQLException {
+
         int bookingID = Integer.parseInt(request.getParameter("id"));
-        // Ideally, check if the order can be cancelled (e.g., based on time, status, etc.)
-        boolean cancelled = bookingDAO.cancelBooking(bookingID);
-        if (cancelled) {
-            request.setAttribute("message", "Order cancelled successfully.");
-        } else {
-            request.setAttribute("error", "Failed to cancel order.");
+
+        try {
+            boolean cancelled = bookingDAO.cancelBooking(bookingID); // Call the DAO method
+            if (cancelled) {
+                request.setAttribute("message", "Order cancelled successfully.");
+            } else {
+                request.setAttribute("error", "Failed to cancel order.");
+            }
+        } catch (SQLException e) {
+             request.setAttribute("error", "Database error: " + e.getMessage());
+            e.printStackTrace(); // Log the exception
         }
-        response.sendRedirect("order"); // Redirect to order list
+
+         response.sendRedirect("order"); // Redirect to order list
     }
 
     private void addOrder(HttpServletRequest request, HttpServletResponse response)
