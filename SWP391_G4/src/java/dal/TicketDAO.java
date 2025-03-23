@@ -220,6 +220,7 @@ public class TicketDAO extends DBContext {
                             rs.getInt("BookingID"),
                             rs.getInt("SeatID"),
                             rs.getInt("TripID"),
+                            rs.getInt("RefundID"),
                             rs.getDouble("TicketPrice"),
                             rs.getString("TicketStatus")
                     ));

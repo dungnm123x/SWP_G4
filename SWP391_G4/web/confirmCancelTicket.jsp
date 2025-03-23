@@ -92,9 +92,27 @@
                     <p class="text-end fw-bold">Tổng số vé: <span class="text-primary">${ticketCount}</span></p>
                     <p class="text-end fw-bold">Tổng tiền hoàn: <span class="text-success">${totalRefund} VND</span></p>
                 </div>
-
                 <div class="mt-4">
                     <h5>Phương thức xác nhận:</h5>
+                    <label for="bankName">Ngân hàng:</label>
+                      <select id="bankName" name="bankName" class="form-select d-inline w-25" required>
+                        <option value="" disabled selected>-- Chọn ngân hàng --</option>
+                        <option value="Vietcombank">Vietcombank</option>
+                        <option value="Techcombank">Techcombank</option>
+                        <option value="BIDV">BIDV</option>
+                        <option value="VietinBank">VietinBank</option>
+                        <option value="MB Bank">MB Bank</option>
+                        <option value="TPBank">TPBank</option>
+                        <option value="Sacombank">Sacombank</option>
+                        <option value="Agribank">Agribank</option>
+                        <option value="ACB">ACB</option>
+                        <option value="VPBank">VPBank</option>
+                        <option value="NCB">NCB</option>
+                        <option value="MOMO">MOMO</option>
+                        <option value="VNPAY">VNPAY</option>
+                    </select>
+                    <label for="bankAccount">Số tài khoản:</label>
+                    <input type="text" id="bankAccount" name="bankAccount" required>
                     <p>Email: <strong>${sessionScope.user.email}</strong></p>
                     <label for="otpInput">Mã xác nhận (6 số):</label>
                     <input type="text" id="otpInput" name="otp" class="form-control d-inline w-25" maxlength="6">

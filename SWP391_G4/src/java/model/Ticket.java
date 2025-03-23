@@ -9,21 +9,22 @@ package model;
  * @author dung9
  */
 public class Ticket {
+
     private int ticketID; // auto
     private String passengerName;
     private String cccd;  // CMND/Hộ chiếu
     private int bookingID;
     private int seatID;
     private int tripID;
+    private int refundID;
     private double ticketPrice;
     private String ticketStatus;
 
     // Constructor
-
     public Ticket() {
     }
 
-    public Ticket(int ticketID, String passengerName, String cccd, int bookingID, int seatID, int tripID, double ticketPrice, String ticketStatus) {
+    public Ticket(int ticketID, String passengerName, String cccd, int bookingID, int seatID, int tripID, int refundID, double ticketPrice, String ticketStatus) {
         this.ticketID = ticketID;
         this.passengerName = passengerName;
         this.cccd = cccd;
@@ -82,6 +83,14 @@ public class Ticket {
         this.tripID = tripID;
     }
 
+    public int getRefundID() {
+        return refundID;
+    }
+
+    public void setRefundID(int refundID) {
+        this.refundID = refundID;
+    }
+
     public double getTicketPrice() {
         return ticketPrice;
     }
@@ -98,6 +107,4 @@ public class Ticket {
         this.ticketStatus = ticketStatus;
     }
 
-    
-    
 }
