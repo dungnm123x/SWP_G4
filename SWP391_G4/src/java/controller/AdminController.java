@@ -50,6 +50,8 @@ public class AdminController extends HttpServlet {
                 double revenueThisWeek = dashBoardDAO.getRevenueThisWeek();
                 double revenueThisMonth = dashBoardDAO.getRevenueThisMonth();
                 double revenueThisYear = dashBoardDAO.getRevenueThisYear();
+                int[] starDistribution = dashBoardDAO.getStarDistribution();
+                request.setAttribute("starDistribution", starDistribution);
 
                 request.setAttribute("revenueToday", revenueToday);
                 request.setAttribute("revenueThisWeek", revenueThisWeek);

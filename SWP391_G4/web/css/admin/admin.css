@@ -614,3 +614,7 @@ form {
     margin: 0 5px;
     color: #777;
 }
+#map {
+    height: 400px; /* Hoặc chiều cao bạn muốn */
+    width: 100%;
+}

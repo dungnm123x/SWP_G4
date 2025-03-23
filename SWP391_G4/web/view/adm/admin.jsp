@@ -8,9 +8,17 @@
         <link rel="stylesheet" href="./css/admin/admin.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-s
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
+        <!-- Leaflet JavaScript -->
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <!-- FullCalendar CSS -->
+        <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+
+        <!-- FullCalendar JavaScript -->
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
         <script>
             function submitRoleForm(userId) {
                 document.getElementById('roleForm' + userId).submit();
@@ -30,7 +38,6 @@ s
                         <c:if test="${sessionScope.user.userId == 1}">
                         <li><a href="admin?view=userauthorization">Phân quyền</a></li>
                         </c:if>
-
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
                 </ul>
@@ -163,11 +170,149 @@ s
                                                 <p class="no-feedback">Không có phản hồi nào.</p>
                                             </c:otherwise>
                                         </c:choose>
-                                    </div>  
-                                </div>
-                            </div>
-                                                        
 
+                                    </div>  
+                                    <div class="dashboard-item" >
+                                        <h3>Phân Bố Phản Hồi Sao</h3>
+                                        <canvas id="starDistributionChart" width="250" height="250"></canvas>
+                                    </div>
+                                    <div class="dashboard-item" style="position: relative; height: 400px;"> <!-- Adjust height as needed -->
+                                        <h3>Bản đồ Ga Tàu Việt Nam</h3>
+                                        <div id="map" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="dashboard-row">
+                                    <h3>Quản Lý Lịch</h3>
+                                    <div id='calendar'></div>
+                                </div>
+
+                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const calendarEl = document.getElementById('calendar');
+
+                                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                                        initialView: 'dayGridMonth',
+                                        headerToolbar: {
+                                            left: 'prev,next today',
+                                            center: 'title',
+                                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                        },
+                                        editable: true,
+                                        selectable: true,
+                                        events: [], // Có thể thêm sự kiện vào đây
+
+// Khi người dùng chọn một khoảng thời gian
+                                        dateClick: function (info) {
+                                            const title = prompt('Nhập tiêu đề sự kiện:');
+                                            if (title) {
+                                                calendar.addEvent({
+                                                    title: title,
+                                                    start: info.dateStr,
+                                                    allDay: true
+                                                });
+                                            }
+                                        },
+
+// Khi người dùng thay đổi sự kiện
+                                        eventClick: function (info) {
+                                            const newTitle = prompt('Nhập tiêu đề mới cho sự kiện:', info.event.title);
+                                            if (newTitle) {
+                                                info.event.setProp('title', newTitle);
+                                            }
+                                        }
+                                    });
+
+                                    calendar.render();
+                                });
+                            </script>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    // Khởi tạo bản đồ
+                                    const map = L.map('map').setView([14.0583, 108.2772], 6); // Tọa độ trung tâm Việt Nam
+
+                                    // Thêm bản đồ nền từ OpenStreetMap
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        maxZoom: 19,
+                                        attribution: '© OpenStreetMap'
+                                    }).addTo(map);
+
+                                    // Dữ liệu ga tàu (bạn có thể điều chỉnh các tọa độ tương ứng với các ga)
+                                    const stations = [
+                                        {name: 'Ga Hà Nội', coords: [21.0285, 105.8542], detail: 'Ga chính của miền Bắc, điểm khởi đầu cho các đoàn tàu.'},
+                                        {name: 'Ga Sài Gòn', coords: [10.7769, 106.6959], detail: 'Ga lớn nhất miền Nam, nằm ở trung tâm thành phố Hồ Chí Minh.'},
+                                        {name: 'Ga Đà Nẵng', coords: [16.0544, 108.2022], detail: 'Ga nằm ở thành phố biển Đà Nẵng, gần các địa điểm du lịch lớn.'},
+                                        {name: 'Ga Huế', coords: [16.4633, 107.5909], detail: 'Ga chính của thành phố Huế, gần các di tích lịch sử.'},
+                                        {name: 'Ga Nha Trang', coords: [12.2406, 109.1967], detail: 'Ga nằm ở bãi biển Nha Trang, là điểm đến du lịch nổi tiếng.'},
+                                        {name: 'Ga Vinh', coords: [18.5802, 105.6728], detail: 'Ga chính của tỉnh Nghệ An, có nhiều tuyến tàu Bắc - Nam.'},
+                                        {name: 'Ga Hải Phòng', coords: [20.8591, 106.6859], detail: 'Ga lớn của thành phố Hải Phòng, gần cảng Hải Phòng.'},
+                                        {name: 'Ga Bắc Giang', coords: [21.2693, 106.1896], detail: 'Ga nằm ở tỉnh Bắc Giang, phục vụ các chuyến tàu địa phương.'},
+                                                // Thêm các ga khác nếu cần
+                                    ];
+
+                                    // Thêm ghim cho mỗi ga
+                                    stations.forEach(station => {
+                                        const marker = L.marker(station.coords).addTo(map);
+
+                                        // Hiển thị thông tin chi tiết khi đưa chuột vào biểu tượng ghim
+                                        marker.on('mouseover', function () {
+                                            const popupContent = `<strong>${station.name}</strong><br>${station.detail}`;
+                                            marker.bindPopup(popupContent).openPopup();
+                                        });
+
+                                        // Đóng thông tin khi chuột ra khỏi ghim
+                                        marker.on('mouseout', function () {
+                                            marker.closePopup();
+                                        });
+                                    });
+                                });
+                            </script>
+                                                        
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const starDistribution = [${starDistribution[0]}, ${starDistribution[1]}, ${starDistribution[2]}, ${starDistribution[3]}, ${starDistribution[4]}];
+
+                                    const ctx = document.getElementById('starDistributionChart').getContext('2d');
+                                    const starDistributionChart = new Chart(ctx, {
+                                        type: 'pie', // Hoặc 'doughnut' nếu bạn muốn
+                                        data: {
+                                            labels: ['1 Sao', '2 Sao', '3 Sao', '4 Sao', '5 Sao'],
+                                            datasets: [{
+                                                    data: starDistribution,
+                                                    backgroundColor: [
+                                                        'rgba(255, 99, 132, 0.2)',
+                                                        'rgba(54, 162, 235, 0.2)',
+                                                        'rgba(255, 206, 86, 0.2)',
+                                                        'rgba(75, 192, 192, 0.2)',
+                                                        'rgba(153, 102, 255, 0.2)'
+                                                    ],
+                                                    borderColor: [
+                                                        'rgba(255, 99, 132, 1)',
+                                                        'rgba(54, 162, 235, 1)',
+                                                        'rgba(255, 206, 86, 1)',
+                                                        'rgba(75, 192, 192, 1)',
+                                                        'rgba(153, 102, 255, 1)'
+                                                    ],
+                                                    borderWidth: 1
+                                                }]
+                                        },
+                                        options: {
+                                            responsive: true,
+
+                                            plugins: {
+                                                legend: {
+                                                    display: true,
+                                                    position: 'top',
+                                                },
+                                                title: {
+                                                    display: true,
+                                                    text: 'Phân Bố Sao Từ Phản Hồi Khách Hàng'
+                                                }
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
                             <script>
 
 
@@ -312,6 +457,7 @@ s
                                 });
                             </script>
                         </c:when>
+
                         <c:when test="${type == 'userauthorization'}">
                             <div class="search-container">
                                 <form method="get" action="admin">

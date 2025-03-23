@@ -162,6 +162,19 @@ public class DashBoardDAO extends DBContext<Object> {
         return feedbacks;
     }
 
+    public int[] getStarDistribution() throws SQLException {
+        int[] distribution = new int[5]; // Mảng để đếm số lượng sao từ 1 đến 5
+        String sql = "SELECT Rating, COUNT(*) AS Count FROM Feedback GROUP BY Rating";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                int rating = rs.getInt("Rating");
+                int count = rs.getInt("Count");
+                distribution[rating - 1] = count; // điều chỉnh chỉ số mảng cho phù hợp với rating từ 1 đến 5
+            }
+        }
+        return distribution;
+    }
+
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");
     }
