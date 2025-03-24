@@ -1,5 +1,6 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!-- Bắt đầu snippet giỏ vé -->
 <div class="card shadow-sm">
@@ -20,7 +21,10 @@
         <!-- Nếu có vé -->
         <c:if test="${not empty cartItems}">
             <div class="list-group mb-3">
+                <c:set var="totalPrice" value="0" scope="page"/>
                 <c:forEach var="item" items="${cartItems}">
+                    <c:set var="totalPrice" value="${totalPrice + item.price}" scope="page" />
+
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <!-- Thông tin vé bên trái -->
                         <div>
@@ -68,6 +72,11 @@
                         </div>
                     </div>
                 </c:forEach>
+                <div class="mt-3 text-end">
+                    Tổng tiền: 
+                    <strong>${totalPrice}</strong> VND
+                </div>
+
             </div>
 
             <!-- Nút "Mua vé" (checkout) -->
@@ -83,6 +92,6 @@
     </div>
 </div>
 <script>
-    
+
 </script>
 <!-- Kết thúc snippet giỏ vé -->
