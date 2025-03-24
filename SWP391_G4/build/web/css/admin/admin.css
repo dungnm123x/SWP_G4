@@ -425,39 +425,39 @@ form {
 }
 
 .dashboard-item.trains::before {
-    content: "\\F81A"; /* bi-train-front-fill */
+    content: "\F81A"; /* bi-train-front-fill */
 }
 
 .dashboard-item.bookings::before {
-    content: "\\F28E"; /* bi-ticket-perforated */
+    content: "\F190"; /* bi-ticket-perforated */
 }
 
 .dashboard-item.trips::before {
-    content: "\\F78C"; /* bi-map */
+    content: "\F78C"; /* bi-map */
 }
 
 .dashboard-item.rules::before {
-    content: "\\F266"; /* bi-file-earmark-text */
+    content: "\F3B3"; /* bi-file-earmark-text */
 }
 
 .dashboard-item.stations::before {
-    content: "\\F6E1"; /* bi-signpost-2-fill */
+    content: "\F81D"; /* bi-signpost-2-fill */
 }
 
 .dashboard-item.routes::before {
-    content: "\\F631"; /* bi-directions */
+    content: "\F882"; /* bi-directions */
 }
 
 .dashboard-item.category-blogs::before {
-    content: "\\F28A"; /* bi-bookmarks-fill */
+    content: "\F28A"; /* bi-bookmarks-fill */
 }
 
 .dashboard-item.blogs::before {
-    content: "\\F28C"; /* bi-book-fill */
+    content: "\F28C"; /* bi-book-fill */
 }
 
 .dashboard-item.category-rules::before {
-    content: "\\F26A"; /* bi-file-earmark-ruled-fill */
+    content: "\F26A"; /* bi-file-earmark-ruled-fill */
 }
 
 .dashboard-item h3 {
