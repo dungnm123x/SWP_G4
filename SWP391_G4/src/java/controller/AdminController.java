@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import model.CalendarEvent;
 import model.Feedback;
 import model.User;
 import model.Train;
@@ -80,6 +83,13 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("feedbackList", feedbackList);
 
                 request.setAttribute("type", "dashboard");
+                request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
+                return;
+            } else if ("calendar".equals(view)) {
+                // Handle the calendar view
+                List<CalendarEvent> events = dao.getCalendarEventsByUser(user.getUserId());
+                request.setAttribute("calendarEvents", events);
+                request.setAttribute("type", "calendar");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                 return;
             } else if ("employees".equals(view)) {
@@ -202,8 +212,96 @@ public class AdminController extends HttpServlet {
             throws ServletException, IOException {
         DAOAdmin dao = new DAOAdmin();
         String action = request.getParameter("action");
+        User user = (User) request.getSession().getAttribute("user");
 
-        if ("addEmployee".equals(action)) {
+        if ("addCalendarEvent".equals(action)) {
+            try {
+                String title = request.getParameter("title");
+                String startDateStr = request.getParameter("startDate");
+                String endDateStr = request.getParameter("endDate");
+                boolean allDay = "on".equals(request.getParameter("allDay"));
+                String description = request.getParameter("description");
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                Date startDate = dateFormat.parse(startDateStr);
+                Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? dateFormat.parse(endDateStr) : null;
+
+                CalendarEvent event = new CalendarEvent();
+                event.setUserID(user.getUserId());
+                event.setTitle(title);
+                event.setStartDate(startDate);
+                event.setEndDate(endDate);
+                event.setAllDay(allDay);
+                event.setDescription(description);
+
+                boolean success = dao.addCalendarEvent(event);
+                if (success) {
+                    request.getSession().setAttribute("message2", "✅ Thêm sự kiện thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Thêm sự kiện thất bại!");
+                }
+                response.sendRedirect("admin?view=calendar");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                response.sendRedirect("admin?view=calendar");
+                return;
+            }
+        } else if ("updateCalendarEvent".equals(action)) {
+            try {
+                int eventId = Integer.parseInt(request.getParameter("eventId"));
+                String title = request.getParameter("title");
+                String startDateStr = request.getParameter("startDate");
+                String endDateStr = request.getParameter("endDate");
+                boolean allDay = "on".equals(request.getParameter("allDay"));
+                String description = request.getParameter("description");
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                Date startDate = dateFormat.parse(startDateStr);
+                Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? dateFormat.parse(endDateStr) : null;
+
+                CalendarEvent event = new CalendarEvent();
+                event.setEventID(eventId);
+                event.setUserID(user.getUserId());
+                event.setTitle(title);
+                event.setStartDate(startDate);
+                event.setEndDate(endDate);
+                event.setAllDay(allDay);
+                event.setDescription(description);
+
+                boolean success = dao.updateCalendarEvent(event);
+                if (success) {
+                    request.getSession().setAttribute("message2", "✅ Cập nhật sự kiện thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Cập nhật sự kiện thất bại!");
+                }
+                response.sendRedirect("admin?view=calendar");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                response.sendRedirect("admin?view=calendar");
+                return;
+            }
+        } else if ("deleteCalendarEvent".equals(action)) {
+            try {
+                int eventId = Integer.parseInt(request.getParameter("eventId"));
+                boolean success = dao.deleteCalendarEvent(eventId, user.getUserId());
+                if (success) {
+                    request.getSession().setAttribute("message2", "✅ Xóa sự kiện thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ Xóa sự kiện thất bại!");
+                }
+                response.sendRedirect("admin?view=calendar");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                response.sendRedirect("admin?view=calendar");
+                return;
+            }
+        } else if ("addEmployee".equals(action)) {
             try {
                 String username = request.getParameter("username");
                 String password = request.getParameter("password"); // Cần hash mật khẩu

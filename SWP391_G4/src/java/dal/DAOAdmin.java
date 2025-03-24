@@ -5,6 +5,7 @@ import model.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.CalendarEvent;
 import model.Feedback;
 
 public class DAOAdmin extends DBContext {
@@ -595,7 +596,77 @@ public class DAOAdmin extends DBContext {
         }
         return 0;
     }
+    // Method to add a new calendar event
+    public boolean addCalendarEvent(CalendarEvent event) throws SQLException {
+        String query = "INSERT INTO CalendarEvent (UserID, Title, StartDate, EndDate, AllDay, Description) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, event.getUserID());
+            ps.setString(2, event.getTitle());
+            ps.setTimestamp(3, new Timestamp(event.getStartDate().getTime()));
+            if (event.getEndDate() != null) {
+                ps.setTimestamp(4, new Timestamp(event.getEndDate().getTime()));
+            } else {
+                ps.setNull(4, Types.TIMESTAMP);
+            }
+            ps.setBoolean(5, event.isAllDay());
+            ps.setString(6, event.getDescription());
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 
+    // Method to retrieve all calendar events for a user
+    public List<CalendarEvent> getCalendarEventsByUser(int userId) throws SQLException {
+        List<CalendarEvent> events = new ArrayList<>();
+        String query = "SELECT * FROM CalendarEvent WHERE UserID = ? AND Status = 1";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    CalendarEvent event = new CalendarEvent();
+                    event.setEventID(rs.getInt("EventID"));
+                    event.setUserID(rs.getInt("UserID"));
+                    event.setTitle(rs.getString("Title"));
+                    event.setStartDate(rs.getTimestamp("StartDate"));
+                    event.setEndDate(rs.getTimestamp("EndDate"));
+                    event.setAllDay(rs.getBoolean("AllDay"));
+                    event.setDescription(rs.getString("Description"));
+                    event.setStatus(rs.getBoolean("Status"));
+                    events.add(event);
+                }
+            }
+        }
+        return events;
+    }
+
+    // Method to update an existing calendar event
+    public boolean updateCalendarEvent(CalendarEvent event) throws SQLException {
+        String query = "UPDATE CalendarEvent SET Title = ?, StartDate = ?, EndDate = ?, AllDay = ?, Description = ? WHERE EventID = ? AND UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, event.getTitle());
+            ps.setTimestamp(2, new Timestamp(event.getStartDate().getTime()));
+            if (event.getEndDate() != null) {
+                ps.setTimestamp(3, new Timestamp(event.getEndDate().getTime()));
+            } else {
+                ps.setNull(3, Types.TIMESTAMP);
+            }
+            ps.setBoolean(4, event.isAllDay());
+            ps.setString(5, event.getDescription());
+            ps.setInt(6, event.getEventID());
+            ps.setInt(7, event.getUserID());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // Method to delete a calendar event (soft delete)
+    public boolean deleteCalendarEvent(int eventId, int userId) throws SQLException {
+        String query = "UPDATE CalendarEvent SET Status = 0 WHERE EventID = ? AND UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, eventId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        }
+    }
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet.");
