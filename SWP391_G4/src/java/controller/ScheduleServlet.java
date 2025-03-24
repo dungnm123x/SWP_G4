@@ -160,13 +160,6 @@ public class ScheduleServlet extends HttpServlet {
             // Lấy tên ga đi/đến để hiển thị
             String departureStationName = stationDAO.getStationNameById(departureStationID);
             String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
-
-            // Set attribute cho JSP hiển thị
-//            request.setAttribute("departureStation", departureStationName);
-//            request.setAttribute("arrivalStation", arrivalStationName);
-//            request.setAttribute("departureDate", dDay);
-//            request.setAttribute("selectedTicketType", tType);
-//            request.setAttribute("returnDate", rDate);
             
             session.setAttribute("departureStation", departureStationName);
             session.setAttribute("arrivalStation", arrivalStationName);
@@ -174,13 +167,6 @@ public class ScheduleServlet extends HttpServlet {
             session.setAttribute("selectedTicketType", tType);
             session.setAttribute("returnDate", rDate);
 
-            // Để searchtickets.jsp hiển thị “selected”
-//            request.setAttribute("selectedDeparture", departureStationID);
-//            request.setAttribute("selectedArrival", arrivalStationID);
-//            request.setAttribute("selectedDate", dDay);
-//            request.setAttribute("selectedTicketType", tType);
-//            request.setAttribute("returnDate", rDate);
-           
             session.setAttribute("selectedDeparture", departureStationID);
             session.setAttribute("selectedArrival", arrivalStationID);
             session.setAttribute("selectedDate", dDay);

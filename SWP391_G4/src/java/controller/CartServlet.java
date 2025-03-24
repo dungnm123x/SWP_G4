@@ -230,9 +230,7 @@ public class CartServlet extends HttpServlet {
                 + " -> " + newItem.getArrivalStationName() + " | Return: " + newItem.isReturnTrip());
 
 //        cartItems.add(newItem);
-        session.setAttribute("cartItems", cartItems);
-
-        
+        // session.setAttribute("cartItems", cartItems);
         // Kiểm tra vé này đã tồn tại chưa
         boolean exists = false;
         for (CartItem item : cartItems) {
@@ -249,16 +247,17 @@ public class CartServlet extends HttpServlet {
         session.setAttribute("cartItems", cartItems);
         session.setAttribute("isReturnTrip", returnTrip);
         System.out.println("Session returnTrip value: " + session.getAttribute("isReturnTrip"));
-
+        request.setAttribute("cartItems", cartItems);
+        request.getRequestDispatcher("/cart.jsp").forward(request, response);
 //         Redirect về schedule kèm param
-        String redirectURL = "schedule"
-                + "?departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
-                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")
-                + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
-                + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
-                + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
-
-        response.sendRedirect(redirectURL);
+//        String redirectURL = "schedule"
+//                + "?departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
+//                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")
+//                + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
+//                + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
+//                + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
+//
+//        response.sendRedirect(redirectURL);
     }
 
     @Override
