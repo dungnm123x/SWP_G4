@@ -351,22 +351,28 @@ form {
 /* ... (your existing CSS) ... */
 
 /* Dashboard Statistics Enhancements */
+/* Adjust the dashboard-row to ensure proper spacing */
 .dashboard-row {
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
+    flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
+    gap: 20px; /* Add spacing between items */
 }
 
+/* Adjust the dashboard-item to ensure proper sizing */
 .dashboard-item {
     background: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     flex: 1;
-    margin: 0 10px;
+    margin: 0;
     position: relative;
     overflow: hidden;
+    min-width: 250px; /* Ensure a minimum width for each item */
+    max-width: 100%; /* Prevent items from exceeding their container */
 }
 
 .dashboard-item:first-child {
@@ -467,26 +473,27 @@ form {
 /* ... (rest of your CSS) ... */
 
 /* CSS cho Feedback */
+/* Feedback Container */
 .feedback-container {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
     background-color: #f9f9f9;
+    flex: 1; /* Ensure it takes up available space in the row */
+    max-width: 40%; /* Limit the maximum width to prevent overflow */
+    min-width: 300px; /* Ensure a minimum width for readability */
+    overflow: hidden; /* Prevent content from overflowing */
 }
 
-.feedback-container h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.5em;
-    color: #333;
-}
-
+/* Feedback List */
 .feedback-list {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
+/* Feedback Item */
 .feedback-item {
     background-color: #fff;
     border: 1px solid #eee;
@@ -494,14 +501,25 @@ form {
     margin-bottom: 10px;
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Ensure it takes the full width of the container */
+    box-sizing: border-box; /* Include padding and border in the width */
+    overflow-wrap: break-word; /* Ensure long words break to the next line */
+    word-wrap: break-word; /* Fallback for older browsers */
+    word-break: break-word; /* Break long words if necessary */
 }
 
+/* Feedback Content */
 .feedback-content {
     display: block;
     margin-bottom: 5px;
     color: #007bff;
+    overflow-wrap: break-word; /* Ensure long text wraps to the next line */
+    word-wrap: break-word; /* Fallback for older browsers */
+    word-break: break-word; /* Break long words if necessary */
+    white-space: normal; /* Allow text to wrap naturally */
 }
 
+/* Feedback Rating, Date, and Email */
 .feedback-rating,
 .feedback-date,
 .feedback-email {
@@ -509,21 +527,53 @@ form {
     margin-bottom: 3px;
     font-size: 0.9em;
     color: #666;
+    overflow-wrap: break-word; /* Ensure long text wraps */
+    word-wrap: break-word; /* Fallback for older browsers */
+    word-break: break-word; /* Break long words if necessary */
 }
 
+/* Ensure the last feedback item has no margin at the bottom */
 .feedback-item:last-child {
     margin-bottom: 0;
 }
 
+/* No Feedback Message */
 .no-feedback {
     color: #888;
     font-style: italic;
 }
+
+/* Star Rating Colors */
 .feedback-rating .bi-star-fill.text-warning {
-    color: gold; /* Màu vàng giống feedbackForm */
+    color: gold; /* Match the star color with feedbackForm */
 }
+
 .feedback-rating .bi-star.text-warning {
-    color: gold; /* Màu vàng giống feedbackForm */
+    color: gold; /* Match the star color with feedbackForm */
+}
+
+/* Adjust the dashboard-row to ensure proper spacing */
+.dashboard-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
+    gap: 20px; /* Add spacing between items */
+}
+
+/* Adjust the dashboard-item to ensure proper sizing */
+.dashboard-item {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    min-width: 250px; /* Ensure a minimum width for each item */
+    max-width: 100%; /* Prevent items from exceeding their container */
 }
 .form-select {
     border: 1px solid #ced4da; /* Viền */
@@ -629,4 +679,143 @@ form {
 .chart-controls .btn.active {
     background-color: #007bff;
     color: white;
+}
+/* Container for the calendar view */
+.calendar-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+/* Form section (left side) */
+.calendar-form {
+    flex: 1;
+    min-width: 300px;
+    max-width: 30%;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar display section (right side) */
+.calendar-display {
+    flex: 2;
+    min-width: 500px;
+    max-width: 70%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Input group styling */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-field {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.textarea-field {
+    resize: vertical;
+}
+
+/* Button styling */
+.btn-custom {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary-custom {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary-custom:hover {
+    background-color: #0056b3;
+}
+
+.btn-danger-custom {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger-custom:hover {
+    background-color: #c82333;
+}
+
+/* Calendar styling */
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Custom Modal Styling */
+.modal-custom {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content-custom {
+    background-color: #fff;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.modal-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-header-custom h5 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-custom {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+.close-custom:hover {
+    color: #000;
+}
+
+.modal-body-custom {
+    padding: 20px;
 }

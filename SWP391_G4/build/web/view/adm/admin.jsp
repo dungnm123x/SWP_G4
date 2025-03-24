@@ -179,52 +179,11 @@
                                         <div id="map" style="width: 100%; height: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="dashboard-row">
-                                    <h3>Quản Lý Lịch</h3>
-                                    <div id='calendar'></div>
-                                </div>
+                                
 
                             </div>
 
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const calendarEl = document.getElementById('calendar');
-
-                                    const calendar = new FullCalendar.Calendar(calendarEl, {
-                                        initialView: 'dayGridMonth',
-                                        headerToolbar: {
-                                            left: 'prev,next today',
-                                            center: 'title',
-                                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                                        },
-                                        editable: true,
-                                        selectable: true,
-                                        events: [], // Có thể thêm sự kiện vào đây
-
-// Khi người dùng chọn một khoảng thời gian
-                                        dateClick: function (info) {
-                                            const title = prompt('Nhập tiêu đề sự kiện:');
-                                            if (title) {
-                                                calendar.addEvent({
-                                                    title: title,
-                                                    start: info.dateStr,
-                                                    allDay: true
-                                                });
-                                            }
-                                        },
-
-// Khi người dùng thay đổi sự kiện
-                                        eventClick: function (info) {
-                                            const newTitle = prompt('Nhập tiêu đề mới cho sự kiện:', info.event.title);
-                                            if (newTitle) {
-                                                info.event.setProp('title', newTitle);
-                                            }
-                                        }
-                                    });
-
-                                    calendar.render();
-                                });
-                            </script>
+                            
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
                                     // Khởi tạo bản đồ
@@ -476,156 +435,163 @@
                         </c:when>
                         <c:when test="${type == 'calendar'}">
                             <h2>Quản Lý Lịch</h2>
-                            <div class="dashboard">
-                                <div class="dashboard-row">
-                                    <!-- Form to add a new event -->
-                                    <div class="dashboard-item" style="width: 30%;">
-                                        <h3>Thêm Sự Kiện Mới</h3>
-                                        <form action="admin" method="post">
-                                            <input type="hidden" name="action" value="addCalendarEvent">
-                                            <div class="form-group">
-                                                <label for="title">Tiêu đề:</label>
-                                                <input type="text" id="title" name="title" class="form-control" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="startDate">Ngày bắt đầu:</label>
-                                                <input type="datetime-local" id="startDate" name="startDate" class="form-control" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="endDate">Ngày kết thúc (tùy chọn):</label>
-                                                <input type="datetime-local" id="endDate" name="endDate" class="form-control">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="allDay">Cả ngày:</label>
-                                                <input type="checkbox" id="allDay" name="allDay">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="description">Mô tả:</label>
-                                                <textarea id="description" name="description" class="form-control" rows="3"></textarea>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Thêm Sự Kiện</button>
-                                        </form>
-                                    </div>
-                                    <!-- Calendar display -->
-                                    <div class="dashboard-item" style="width: 70%;">
-                                        <h3>Lịch Sự Kiện</h3>
-                                        <div id="calendar"></div>
-                                    </div>
+                            <div class="calendar-container">
+                                <!-- Form to add a new event -->
+                                <div class="calendar-form">
+                                    <h3>Thêm Sự Kiện Mới</h3>
+                                    <form action="admin" method="post">
+                                        <input type="hidden" name="action" value="addCalendarEvent">
+                                        <div class="input-group">
+                                            <label for="title">Tiêu đề:</label>
+                                            <input type="text" id="title" name="title" class="input-field" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="startDate">Ngày bắt đầu:</label>
+                                            <input type="datetime-local" id="startDate" name="startDate" class="input-field" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="endDate">Ngày kết thúc (tùy chọn):</label>
+                                            <input type="datetime-local" id="endDate" name="endDate" class="input-field">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="allDay">Cả ngày:</label>
+                                            <input type="checkbox" id="allDay" name="allDay">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="description">Mô tả:</label>
+                                            <textarea id="description" name="description" class="input-field textarea-field" rows="3"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn-custom btn-primary-custom">Thêm Sự Kiện</button>
+                                    </form>
+                                </div>
+                                <!-- Calendar display -->
+                                <div class="calendar-display">
+                                    <h3>Lịch Sự Kiện</h3>
+                                    <div id="calendar"></div>
                                 </div>
                             </div>
 
-                            <!-- Modal for editing events -->
-                            <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editEventModalLabel">Chỉnh Sửa Sự Kiện</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form id="editEventForm" action="admin" method="post">
-                                                <input type="hidden" name="action" value="updateCalendarEvent">
-                                                <input type="hidden" id="editEventId" name="eventId">
-                                                <div class="form-group">
-                                                    <label for="editTitle">Tiêu đề:</label>
-                                                    <input type="text" id="editTitle" name="title" class="form-control" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="editStartDate">Ngày bắt đầu:</label>
-                                                    <input type="datetime-local" id="editStartDate" name="startDate" class="form-control" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="editEndDate">Ngày kết thúc (tùy chọn):</label>
-                                                    <input type="datetime-local" id="editEndDate" name="endDate" class="form-control">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="editAllDay">Cả ngày:</label>
-                                                    <input type="checkbox" id="editAllDay" name="allDay">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="editDescription">Mô tả:</label>
-                                                    <textarea id="editDescription" name="description" class="form-control" rows="3"></textarea>
-                                                </div>
-                                                <button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
-                                                <button type="button" class="btn btn-danger" id="deleteEventBtn">Xóa Sự Kiện</button>
-                                            </form>
-                                        </div>
+                            <!-- Custom Modal for editing events -->
+                            <div class="modal-custom" id="editEventModal">
+                                <div class="modal-content-custom">
+                                    <div class="modal-header-custom">
+                                        <h5>Chỉnh Sửa Sự Kiện</h5>
+                                        <button type="button" class="close-custom" onclick="closeModal('editEventModal')">&times;</button>
+                                    </div>
+                                    <div class="modal-body-custom">
+                                        <form id="editEventForm" action="admin" method="post">
+                                            <input type="hidden" name="action" value="updateCalendarEvent">
+                                            <input type="hidden" id="editEventId" name="eventId">
+                                            <div class="input-group">
+                                                <label for="editTitle">Tiêu đề:</label>
+                                                <input type="text" id="editTitle" name="title" class="input-field" required>
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="editStartDate">Ngày bắt đầu:</label>
+                                                <input type="datetime-local" id="editStartDate" name="startDate" class="input-field" required>
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="editEndDate">Ngày kết thúc (tùy chọn):</label>
+                                                <input type="datetime-local" id="editEndDate" name="endDate" class="input-field">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="editAllDay">Cả ngày:</label>
+                                                <input type="checkbox" id="editAllDay" name="allDay">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="editDescription">Mô tả:</label>
+                                                <textarea id="editDescription" name="description" class="input-field textarea-field" rows="3"></textarea>
+                                            </div>
+                                            <button type="submit" class="btn-custom btn-primary-custom">Lưu Thay Đổi</button>
+                                            <button type="button" class="btn-custom btn-danger-custom" id="deleteEventBtn">Xóa Sự Kiện</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
 
                             <script>
+                                // Function to open the modal
+                                function openModal(modalId) {
+                                    document.getElementById(modalId).style.display = 'block';
+                                }
+
+                                // Function to close the modal
+                                function closeModal(modalId) {
+                                    document.getElementById(modalId).style.display = 'none';
+                                }
+
                                 document.addEventListener('DOMContentLoaded', function () {
-                                const calendarEl = document.getElementById('calendar');
-                                        const calendar = new FullCalendar.Calendar(calendarEl, {
-                                        initialView: 'dayGridMonth',
-                                                headerToolbar: {
-                                                left: 'prev,next today',
-                                                        center: 'title',
-                                                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                                                },
-                                                editable: true,
-                                                selectable: true,
-                                                events: [
+                                    const calendarEl = document.getElementById('calendar');
+                                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                                    initialView: 'dayGridMonth',
+                                            headerToolbar: {
+                                            left: 'prev,next today',
+                                                    center: 'title',
+                                                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                            },
+                                            editable: true,
+                                            selectable: true,
+                                            events: [
                                 <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
-                                                {
-                                                id: '${event.eventID}',
-                                                        title: '${event.title}',
-                                                        start: '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>',
-                                                        end: <c:choose>
+                                            {
+                                            id: '${event.eventID}',
+                                                    title: '${event.title}',
+                                                    start: '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>',
+                                                    end: <c:choose>
                                         <c:when test="${not empty event.endDate}">
-                                                '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                            '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
                                         </c:when>
                                         <c:otherwise>
-                                                null
+                                            null
                                         </c:otherwise>
                                     </c:choose>,
-                                                        allDay: ${event.allDay},
-                                                        description: '${event.description != null ? event.description : ""}'
-                                                }<c:if test="${!loop.last}">,</c:if>
+                                                    allDay: ${event.allDay},
+                                                    description: '${event.description != null ? event.description : ""}'
+                                            }<c:if test="${!loop.last}">,</c:if>
                                 </c:forEach>
-                                                ],
-                                                dateClick: function (info) {
-                                                // Optional: Allow adding events by clicking on a date
-                                                document.getElementById('startDate').value = info.dateStr + 'T00:00';
-                                                        document.getElementById('endDate').value = info.dateStr + 'T23:59';
-                                                        document.getElementById('allDay').checked = true;
-                                                }
-                                        ,
-                                                eventClick: function (info) {
-                                                // Populate the edit modal with event details
-                                                document.getElementById('editEventId').value = info.event.id;
-                                                        document.getElementById('editTitle').value = info.event.title;
-                                                        document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
-                                                        if (info.event.end) {
-                                                document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
-                                                } else {
-                                                document.getElementById('editEndDate').value = '';
-                                                }
-                                                document.getElementById('editAllDay').checked = info.event.allDay;
-                                                        document.getElementById('editDescription').value = info.event.extendedProps.description || '';
-                                                        // Show the modal
-                                                        $('#editEventModal').modal('show');
-                                                        // Handle delete button click
-                                                        document.getElementById('deleteEventBtn').onclick = function () {
-                                                if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
+                                            ],
+                                    dateClick: function (info) {
+                                        // Optional: Allow adding events by clicking on a date
+                                        document.getElementById('startDate').value = info.dateStr + 'T00:00';
+                                        document.getElementById('endDate').value = info.dateStr + 'T23:59';
+                                        document.getElementById('allDay').checked = true;
+                                    }
+                                    ,
+                                    eventClick: function (info) {
+                                        // Populate the edit modal with event details
+                                        document.getElementById('editEventId').value = info.event.id;
+                                        document.getElementById('editTitle').value = info.event.title;
+                                        document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
+                                        if (info.event.end) {
+                                            document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
+                                        } else {
+                                            document.getElementById('editEndDate').value = '';
+                                        }
+                                        document.getElementById('editAllDay').checked = info.event.allDay;
+                                        document.getElementById('editDescription').value = info.event.extendedProps.description || '';
+
+                                        // Show the modal
+                                        openModal('editEventModal');
+
+                                        // Handle delete button click
+                                        document.getElementById('deleteEventBtn').onclick = function () {
+                                            if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
                                                 const form = document.createElement('form');
-                                                        form.method = 'post';
-                                                        form.action = 'admin';
-                                                        form.innerHTML = `
+                                                form.method = 'post';
+                                                form.action = 'admin';
+                                                form.innerHTML = `
                                                         <input type="hidden" name="action" value="deleteCalendarEvent">
                                                         <input type="hidden" name="eventId" value="${info.event.id}">
                                                     `;
-                                                        document.body.appendChild(form);
-                                                        form.submit();
-                                                }
-                                                };
-                                                }
+                                                document.body.appendChild(form);
+                                                form.submit();
+                                            }
+                                        };
                                         }
-                                        );
-                                        calendar.render();
+                                    }
+                                    );
+
+                                    calendar.render();
                                 });
                             </script>
                         </c:when>
