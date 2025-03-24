@@ -17,7 +17,6 @@ public class EmployeeCalendarController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Check if the user is logged in and has the employee role (RoleID = 3)
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || (user.getRoleID() != 2 && user.getRoleID() != 1)) { // Allow RoleID 1 (admin) for testing
             response.sendRedirect("login");

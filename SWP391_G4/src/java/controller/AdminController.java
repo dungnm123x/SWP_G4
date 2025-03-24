@@ -216,16 +216,79 @@ public class AdminController extends HttpServlet {
 
         if ("addCalendarEvent".equals(action)) {
             try {
+                // Retrieve form data
                 String title = request.getParameter("title");
                 String startDateStr = request.getParameter("startDate");
                 String endDateStr = request.getParameter("endDate");
                 boolean allDay = "on".equals(request.getParameter("allDay"));
                 String description = request.getParameter("description");
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                Date startDate = dateFormat.parse(startDateStr);
-                Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? dateFormat.parse(endDateStr) : null;
+                // Validation 1: Check if title is empty or too long
+                if (title == null || title.trim().isEmpty()) {
+                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được để trống!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+                if (title.length() > 100) {
+                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được dài quá 100 ký tự!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
 
+                // Validation 2: Check if description is too long
+                if (description != null && description.length() > 500) {
+                    request.getSession().setAttribute("message2", "❌ Mô tả không được dài quá 500 ký tự!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // Validation 3: Parse and validate dates
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                dateFormat.setLenient(false); // Ensure strict date parsing
+                Date startDate;
+                Date endDate = null;
+
+                // Parse start date
+                if (startDateStr == null || startDateStr.isEmpty()) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được để trống!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+                try {
+                    startDate = dateFormat.parse(startDateStr);
+                } catch (Exception e) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không hợp lệ!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // Parse end date (if provided)
+                if (endDateStr != null && !endDateStr.isEmpty()) {
+                    try {
+                        endDate = dateFormat.parse(endDateStr);
+                    } catch (Exception e) {
+                        request.getSession().setAttribute("message2", "❌ Ngày kết thúc không hợp lệ!");
+                        response.sendRedirect("admin?view=calendar");
+                        return;
+                    }
+                }
+
+                // Validation 4: Start date must be before end date (if end date is provided)
+                if (endDate != null && startDate.after(endDate)) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu phải trước ngày kết thúc!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // Validation 5: Start date should not be in the past (optional)
+                Date currentDate = new Date();
+                if (startDate.before(currentDate)) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được là ngày trong quá khứ!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // If all validations pass, create the event
                 CalendarEvent event = new CalendarEvent();
                 event.setUserID(user.getUserId());
                 event.setTitle(title);
@@ -257,10 +320,72 @@ public class AdminController extends HttpServlet {
                 boolean allDay = "on".equals(request.getParameter("allDay"));
                 String description = request.getParameter("description");
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                Date startDate = dateFormat.parse(startDateStr);
-                Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? dateFormat.parse(endDateStr) : null;
+                // Validation 1: Check if title is empty or too long
+                if (title == null || title.trim().isEmpty()) {
+                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được để trống!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+                if (title.length() > 100) {
+                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được dài quá 100 ký tự!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
 
+                // Validation 2: Check if description is too long
+                if (description != null && description.length() > 500) {
+                    request.getSession().setAttribute("message2", "❌ Mô tả không được dài quá 500 ký tự!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // Validation 3: Parse and validate dates
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                dateFormat.setLenient(false); // Ensure strict date parsing
+                Date startDate;
+                Date endDate = null;
+
+                // Parse start date
+                if (startDateStr == null || startDateStr.isEmpty()) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được để trống!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+                try {
+                    startDate = dateFormat.parse(startDateStr);
+                } catch (Exception e) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không hợp lệ!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // Parse end date (if provided)
+                if (endDateStr != null && !endDateStr.isEmpty()) {
+                    try {
+                        endDate = dateFormat.parse(endDateStr);
+                    } catch (Exception e) {
+                        request.getSession().setAttribute("message2", "❌ Ngày kết thúc không hợp lệ!");
+                        response.sendRedirect("admin?view=calendar");
+                        return;
+                    }
+                }
+
+                // Validation 4: Start date must be before end date (if end date is provided)
+                if (endDate != null && startDate.after(endDate)) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu phải trước ngày kết thúc!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // Validation 5: Start date should not be in the past (optional)
+                Date currentDate = new Date();
+                if (startDate.before(currentDate)) {
+                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được là ngày trong quá khứ!");
+                    response.sendRedirect("admin?view=calendar");
+                    return;
+                }
+
+                // If all validations pass, update the event
                 CalendarEvent event = new CalendarEvent();
                 event.setEventID(eventId);
                 event.setUserID(user.getUserId());

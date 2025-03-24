@@ -22,6 +22,92 @@
             function submitRoleForm(userId) {
                 document.getElementById('roleForm' + userId).submit();
             }
+
+            // Client-side validation for the Add Event form
+            function validateAddEventForm() {
+                const title = document.getElementById('title').value.trim();
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const description = document.getElementById('description').value.trim();
+                const currentDate = new Date().toISOString().slice(0, 16);
+
+                // Validate title
+                if (!title) {
+                    alert('Tiêu đề không được để trống!');
+                    return false;
+                }
+                if (title.length > 100) {
+                    alert('Tiêu đề không được dài quá 100 ký tự!');
+                    return false;
+                }
+
+                // Validate description
+                if (description.length > 500) {
+                    alert('Mô tả không được dài quá 500 ký tự!');
+                    return false;
+                }
+
+                // Validate start date
+                if (!startDate) {
+                    alert('Ngày bắt đầu không được để trống!');
+                    return false;
+                }
+                if (startDate < currentDate) {
+                    alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+                    return false;
+                }
+
+                // Validate end date (if provided)
+                if (endDate && startDate >= endDate) {
+                    alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Client-side validation for the Edit Event form
+            function validateEditEventForm() {
+                const title = document.getElementById('editTitle').value.trim();
+                const startDate = document.getElementById('editStartDate').value;
+                const endDate = document.getElementById('editEndDate').value;
+                const description = document.getElementById('editDescription').value.trim();
+                const currentDate = new Date().toISOString().slice(0, 16);
+
+                // Validate title
+                if (!title) {
+                    alert('Tiêu đề không được để trống!');
+                    return false;
+                }
+                if (title.length > 100) {
+                    alert('Tiêu đề không được dài quá 100 ký tự!');
+                    return false;
+                }
+
+                // Validate description
+                if (description.length > 500) {
+                    alert('Mô tả không được dài quá 500 ký tự!');
+                    return false;
+                }
+
+                // Validate start date
+                if (!startDate) {
+                    alert('Ngày bắt đầu không được để trống!');
+                    return false;
+                }
+                if (startDate < currentDate) {
+                    alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+                    return false;
+                }
+
+                // Validate end date (if provided)
+                if (endDate && startDate >= endDate) {
+                    alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                    return false;
+                }
+
+                return true;
+            }
         </script>
     </head>
     <body>
@@ -34,12 +120,11 @@
                     <li><a href="admin?view=dashboard">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                        <c:if test="${sessionScope.user.userId == 1}">
+                    <c:if test="${sessionScope.user.userId == 1}">
                         <li><a href="admin?view=userauthorization">Phân quyền</a></li>
-                        </c:if>
+                    </c:if>
                     <li><a href="admin?view=calendar">Lịch</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
-
                 </ul>
                 <form action="logout" method="GET">
                     <button type="submit" class="logout-button">Logout</button>
@@ -85,10 +170,9 @@
                                             <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
-
                                 </div>
                                 <div class="dashboard-row">
-                                    <div class="dashboard-item stations"   style="background-color: #E0BBE4">
+                                    <div class="dashboard-item stations" style="background-color: #E0BBE4">
                                         <h3>Thống kê Ga</h3>
                                         <p>Tổng số ga: ${totalStations}</p>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #E6C2F5;">
@@ -157,9 +241,7 @@
                                                                 </c:forEach>
                                                             </strong>
                                                             <br>
-
                                                             <span class="feedback-content" style="color: black">${feedback.content}</span>
-
                                                         </li>
                                                     </c:forEach>
                                                 </ul>
@@ -168,34 +250,27 @@
                                                 <p class="no-feedback">Không có phản hồi nào.</p>
                                             </c:otherwise>
                                         </c:choose>
-
                                     </div>  
                                     <div class="dashboard-item" >
                                         <h3>Phân Bố Phản Hồi Sao</h3>
                                         <canvas id="starDistributionChart" width="250" height="250"></canvas>
                                     </div>
-                                    <div class="dashboard-item" style="position: relative; height: 400px;"> <!-- Adjust height as needed -->
+                                    <div class="dashboard-item" style="position: relative; height: 400px;">
                                         <h3>Bản đồ Ga Tàu Việt Nam</h3>
                                         <div id="map" style="width: 100%; height: 100%;"></div>
                                     </div>
                                 </div>
-                                
-
                             </div>
 
-                            
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    // Khởi tạo bản đồ
-                                    const map = L.map('map').setView([14.0583, 108.2772], 6); // Tọa độ trung tâm Việt Nam
+                                    const map = L.map('map').setView([14.0583, 108.2772], 6);
 
-                                    // Thêm bản đồ nền từ OpenStreetMap
                                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                                         maxZoom: 19,
                                         attribution: '© OpenStreetMap'
                                     }).addTo(map);
 
-                                    // Dữ liệu ga tàu (bạn có thể điều chỉnh các tọa độ tương ứng với các ga)
                                     const stations = [
                                         {name: 'Ga Hà Nội', coords: [21.0285, 105.8542], detail: 'Ga chính của miền Bắc, điểm khởi đầu cho các đoàn tàu.'},
                                         {name: 'Ga Sài Gòn', coords: [10.7769, 106.6959], detail: 'Ga lớn nhất miền Nam, nằm ở trung tâm thành phố Hồ Chí Minh.'},
@@ -205,58 +280,51 @@
                                         {name: 'Ga Vinh', coords: [18.5802, 105.6728], detail: 'Ga chính của tỉnh Nghệ An, có nhiều tuyến tàu Bắc - Nam.'},
                                         {name: 'Ga Hải Phòng', coords: [20.8591, 106.6859], detail: 'Ga lớn của thành phố Hải Phòng, gần cảng Hải Phòng.'},
                                         {name: 'Ga Bắc Giang', coords: [21.2693, 106.1896], detail: 'Ga nằm ở tỉnh Bắc Giang, phục vụ các chuyến tàu địa phương.'},
-                                                // Thêm các ga khác nếu cần
                                     ];
 
-                                    // Thêm ghim cho mỗi ga
                                     stations.forEach(station => {
                                         const marker = L.marker(station.coords).addTo(map);
-
-                                        // Hiển thị thông tin chi tiết khi đưa chuột vào biểu tượng ghim
                                         marker.on('mouseover', function () {
                                             const popupContent = `<strong>${station.name}</strong><br>${station.detail}`;
                                             marker.bindPopup(popupContent).openPopup();
                                         });
-
-                                        // Đóng thông tin khi chuột ra khỏi ghim
                                         marker.on('mouseout', function () {
                                             marker.closePopup();
                                         });
                                     });
                                 });
                             </script>
-                                                        
+                            
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const starDistribution = [${starDistribution[0]}, ${starDistribution[1]}, ${starDistribution[2]}, ${starDistribution[3]}, ${starDistribution[4]}];
 
                                     const ctx = document.getElementById('starDistributionChart').getContext('2d');
                                     const starDistributionChart = new Chart(ctx, {
-                                        type: 'pie', // Hoặc 'doughnut' nếu bạn muốn
+                                        type: 'pie',
                                         data: {
                                             labels: ['1 Sao', '2 Sao', '3 Sao', '4 Sao', '5 Sao'],
                                             datasets: [{
-                                                    data: starDistribution,
-                                                    backgroundColor: [
-                                                        'rgba(255, 99, 132, 0.2)',
-                                                        'rgba(54, 162, 235, 0.2)',
-                                                        'rgba(255, 206, 86, 0.2)',
-                                                        'rgba(75, 192, 192, 0.2)',
-                                                        'rgba(153, 102, 255, 0.2)'
-                                                    ],
-                                                    borderColor: [
-                                                        'rgba(255, 99, 132, 1)',
-                                                        'rgba(54, 162, 235, 1)',
-                                                        'rgba(255, 206, 86, 1)',
-                                                        'rgba(75, 192, 192, 1)',
-                                                        'rgba(153, 102, 255, 1)'
-                                                    ],
-                                                    borderWidth: 1
-                                                }]
+                                                data: starDistribution,
+                                                backgroundColor: [
+                                                    'rgba(255, 99, 132, 0.2)',
+                                                    'rgba(54, 162, 235, 0.2)',
+                                                    'rgba(255, 206, 86, 0.2)',
+                                                    'rgba(75, 192, 192, 0.2)',
+                                                    'rgba(153, 102, 255, 0.2)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(255, 99, 132, 1)',
+                                                    'rgba(54, 162, 235, 1)',
+                                                    'rgba(255, 206, 86, 1)',
+                                                    'rgba(75, 192, 192, 1)',
+                                                    'rgba(153, 102, 255, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            }]
                                         },
                                         options: {
                                             responsive: true,
-
                                             plugins: {
                                                 legend: {
                                                     display: true,
@@ -273,66 +341,63 @@
                             </script>
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    // Prepare data for the revenue chart
                                     const period = '${period}';
                                     let labels = [];
                                     let unusedData = [];
                                     let usedData1 = [];
                                     let usedData2 = [];
 
-                                    // Populate labels and data based on the period
-                                <c:choose>
-                                    <c:when test="${period == 'weekly'}">
-                                    labels = Array.from({length: 52}, (_, i) => i + 1); // Weeks 1 to 52
-                                    unusedData = new Array(52).fill(0);
-                                    usedData1 = new Array(52).fill(0);
-                                    usedData2 = new Array(52).fill(0);
+                                    <c:choose>
+                                        <c:when test="${period == 'weekly'}">
+                                            labels = Array.from({length: 52}, (_, i) => i + 1);
+                                            unusedData = new Array(52).fill(0);
+                                            usedData1 = new Array(52).fill(0);
+                                            usedData2 = new Array(52).fill(0);
 
-                                        <c:forEach var="data" items="${unusedRevenue}">
-                                    unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                        <c:forEach var="data" items="${usedRevenue1}">
-                                    usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                        <c:forEach var="data" items="${usedRevenue2}">
-                                    usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:when test="${period == 'monthly'}">
-                                    labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-                                    unusedData = new Array(12).fill(0);
-                                    usedData1 = new Array(12).fill(0);
-                                    usedData2 = new Array(12).fill(0);
+                                            <c:forEach var="data" items="${unusedRevenue}">
+                                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                            <c:forEach var="data" items="${usedRevenue1}">
+                                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                            <c:forEach var="data" items="${usedRevenue2}">
+                                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:when test="${period == 'monthly'}">
+                                            labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                                            unusedData = new Array(12).fill(0);
+                                            usedData1 = new Array(12).fill(0);
+                                            usedData2 = new Array(12).fill(0);
 
-                                        <c:forEach var="data" items="${unusedRevenue}">
-                                    unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                        <c:forEach var="data" items="${usedRevenue1}">
-                                    usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                        <c:forEach var="data" items="${usedRevenue2}">
-                                    usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:when test="${period == 'yearly'}">
-                                    labels = Array.from({length: 5}, (_, i) => 2021 + i); // Example: 2021 to 2025
-                                    unusedData = new Array(5).fill(0);
-                                    usedData1 = new Array(5).fill(0);
-                                    usedData2 = new Array(5).fill(0);
+                                            <c:forEach var="data" items="${unusedRevenue}">
+                                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                            <c:forEach var="data" items="${usedRevenue1}">
+                                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                            <c:forEach var="data" items="${usedRevenue2}">
+                                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:when test="${period == 'yearly'}">
+                                            labels = Array.from({length: 5}, (_, i) => 2021 + i);
+                                            unusedData = new Array(5).fill(0);
+                                            usedData1 = new Array(5).fill(0);
+                                            usedData2 = new Array(5).fill(0);
 
-                                        <c:forEach var="data" items="${unusedRevenue}">
-                                    unusedData[${data.timePeriod - 2021}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                        <c:forEach var="data" items="${usedRevenue1}">
-                                    usedData1[${data.timePeriod - 2021}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                        <c:forEach var="data" items="${usedRevenue2}">
-                                    usedData2[${data.timePeriod - 2021}] = ${data.totalRevenue};
-                                        </c:forEach>
-                                    </c:when>
-                                </c:choose>
+                                            <c:forEach var="data" items="${unusedRevenue}">
+                                                unusedData[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                            <c:forEach var="data" items="${usedRevenue1}">
+                                                usedData1[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                            <c:forEach var="data" items="${usedRevenue2}">
+                                                usedData2[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                            </c:forEach>
+                                        </c:when>
+                                    </c:choose>
 
-                                    // Create the revenue chart
                                     const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
                                     const revenueChart = new Chart(ctxRevenue, {
                                         type: 'line',
@@ -397,31 +462,26 @@
                                 });
                             </script>
                             <script>
-
-
-
-
-                                // Biểu đồ thống kê người dùng
                                 var ctxUser = document.getElementById('userChart').getContext('2d');
                                 var userChart = new Chart(ctxUser, {
                                     type: 'bar',
                                     data: {
                                         labels: ['Người dùng', 'Nhân viên', 'Khách hàng'],
                                         datasets: [{
-                                                label: 'Số lượng',
-                                                data: [${totalUsers}, ${totalEmployees}, ${totalCustomers}],
-                                                backgroundColor: [
-                                                    'rgba(255, 99, 132, 0.2)',
-                                                    'rgba(54, 162, 235, 0.2)',
-                                                    'rgba(255, 206, 86, 0.2)'
-                                                ],
-                                                borderColor: [
-                                                    'rgba(255, 99, 132, 1)',
-                                                    'rgba(54, 162, 235, 1)',
-                                                    'rgba(255, 206, 86, 1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
+                                            label: 'Số lượng',
+                                            data: [${totalUsers}, ${totalEmployees}, ${totalCustomers}],
+                                            backgroundColor: [
+                                                'rgba(255, 99, 132, 0.2)',
+                                                'rgba(54, 162, 235, 0.2)',
+                                                'rgba(255, 206, 86, 0.2)'
+                                            ],
+                                            borderColor: [
+                                                'rgba(255, 99, 132, 1)',
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(255, 206, 86, 1)'
+                                            ],
+                                            borderWidth: 1
+                                        }]
                                     },
                                     options: {
                                         scales: {
@@ -439,7 +499,7 @@
                                 <!-- Form to add a new event -->
                                 <div class="calendar-form">
                                     <h3>Thêm Sự Kiện Mới</h3>
-                                    <form action="admin" method="post">
+                                    <form action="admin" method="post" onsubmit="return validateAddEventForm()">
                                         <input type="hidden" name="action" value="addCalendarEvent">
                                         <div class="input-group">
                                             <label for="title">Tiêu đề:</label>
@@ -476,10 +536,10 @@
                                 <div class="modal-content-custom">
                                     <div class="modal-header-custom">
                                         <h5>Chỉnh Sửa Sự Kiện</h5>
-                                        <button type="button" class="close-custom" onclick="closeModal('editEventModal')">&times;</button>
+                                        <button type="button" class="close-custom" onclick="closeModal('editEventModal')">×</button>
                                     </div>
                                     <div class="modal-body-custom">
-                                        <form id="editEventForm" action="admin" method="post">
+                                        <form id="editEventForm" action="admin" method="post" onsubmit="return validateEditEventForm()">
                                             <input type="hidden" name="action" value="updateCalendarEvent">
                                             <input type="hidden" id="editEventId" name="eventId">
                                             <div class="input-group">
@@ -510,12 +570,10 @@
                             </div>
 
                             <script>
-                                // Function to open the modal
                                 function openModal(modalId) {
                                     document.getElementById(modalId).style.display = 'block';
                                 }
 
-                                // Function to close the modal
                                 function closeModal(modalId) {
                                     document.getElementById(modalId).style.display = 'none';
                                 }
@@ -523,73 +581,81 @@
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const calendarEl = document.getElementById('calendar');
                                     const calendar = new FullCalendar.Calendar(calendarEl, {
-                                    initialView: 'dayGridMonth',
-                                            headerToolbar: {
+                                        initialView: 'dayGridMonth',
+                                        headerToolbar: {
                                             left: 'prev,next today',
-                                                    center: 'title',
-                                                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                                            },
-                                            editable: true,
-                                            selectable: true,
-                                            events: [
-                                <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
-                                            {
-                                            id: '${event.eventID}',
+                                            center: 'title',
+                                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                        },
+                                        editable: true,
+                                        selectable: true,
+                                        events: [
+                                            <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
+                                                {
+                                                    id: '${event.eventID}',
                                                     title: '${event.title}',
-                                                    start: '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>',
+                                                    start: <c:choose>
+                                                        <c:when test="${event.allDay}">
+                                                            '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                                        </c:otherwise>
+                                                    </c:choose>,
                                                     end: <c:choose>
-                                        <c:when test="${not empty event.endDate}">
-                                            '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
-                                        </c:when>
-                                        <c:otherwise>
-                                            null
-                                        </c:otherwise>
-                                    </c:choose>,
+                                                        <c:when test="${not empty event.endDate}">
+                                                            <c:choose>
+                                                                <c:when test="${event.allDay}">
+                                                                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            null
+                                                        </c:otherwise>
+                                                    </c:choose>,
                                                     allDay: ${event.allDay},
                                                     description: '${event.description != null ? event.description : ""}'
-                                            }<c:if test="${!loop.last}">,</c:if>
-                                </c:forEach>
-                                            ],
-                                    dateClick: function (info) {
-                                        // Optional: Allow adding events by clicking on a date
-                                        document.getElementById('startDate').value = info.dateStr + 'T00:00';
-                                        document.getElementById('endDate').value = info.dateStr + 'T23:59';
-                                        document.getElementById('allDay').checked = true;
-                                    }
-                                    ,
-                                    eventClick: function (info) {
-                                        // Populate the edit modal with event details
-                                        document.getElementById('editEventId').value = info.event.id;
-                                        document.getElementById('editTitle').value = info.event.title;
-                                        document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
-                                        if (info.event.end) {
-                                            document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
-                                        } else {
-                                            document.getElementById('editEndDate').value = '';
-                                        }
-                                        document.getElementById('editAllDay').checked = info.event.allDay;
-                                        document.getElementById('editDescription').value = info.event.extendedProps.description || '';
+                                                }<c:if test="${!loop.last}">,</c:if>
+                                            </c:forEach>
+                                        ],
+                                        dateClick: function (info) {
+                                            document.getElementById('startDate').value = info.dateStr + 'T00:00';
+                                            document.getElementById('endDate').value = info.dateStr + 'T23:59';
+                                            document.getElementById('allDay').checked = true;
+                                        },
+                                        eventClick: function (info) {
+                                            document.getElementById('editEventId').value = info.event.id;
+                                            document.getElementById('editTitle').value = info.event.title;
+                                            document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
+                                            if (info.event.end) {
+                                                document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
+                                            } else {
+                                                document.getElementById('editEndDate').value = '';
+                                            }
+                                            document.getElementById('editAllDay').checked = info.event.allDay;
+                                            document.getElementById('editDescription').value = info.event.extendedProps.description || '';
 
-                                        // Show the modal
-                                        openModal('editEventModal');
+                                            openModal('editEventModal');
 
-                                        // Handle delete button click
-                                        document.getElementById('deleteEventBtn').onclick = function () {
-                                            if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
-                                                const form = document.createElement('form');
-                                                form.method = 'post';
-                                                form.action = 'admin';
-                                                form.innerHTML = `
+                                            document.getElementById('deleteEventBtn').onclick = function () {
+                                                if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
+                                                    const form = document.createElement('form');
+                                                    form.method = 'post';
+                                                    form.action = 'admin';
+                                                    form.innerHTML = `
                                                         <input type="hidden" name="action" value="deleteCalendarEvent">
                                                         <input type="hidden" name="eventId" value="${info.event.id}">
                                                     `;
-                                                document.body.appendChild(form);
-                                                form.submit();
-                                            }
-                                        };
+                                                    document.body.appendChild(form);
+                                                    form.submit();
+                                                }
+                                            };
                                         }
-                                    }
-                                    );
+                                    });
 
                                     calendar.render();
                                 });
@@ -610,7 +676,7 @@
                                     <tr>
                                         <th></th>
                                         <th>Tên người dùng</th>
-                                        <th>Họ và tân</th>
+                                        <th>Họ và tên</th>
                                         <th>Email</th>
                                         <th>Vai trò</th>
                                         <th>Hành động</th>
@@ -666,103 +732,99 @@
                             </div>
                         </c:when>
                         <c:when test="${not empty list}">
-                            <c:if test="${not empty list}">
-                                <div class="search-container">
-                                    <form method="get" action="admin">
-                                        <input type="hidden" name="view" value="${type}">
-                                        <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
-                                        <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
-                                        <a href="admin?view=${type}" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
-                                    </form>
-                                </div>
-                                <c:choose>
-                                    <c:when test="${type == 'employees'}">
-                                        <h2>Danh sách nhân viên</h2>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <h2>Danh sách khách hàng</h2>
-                                    </c:otherwise>
-                                </c:choose>
-                                <table border="1">
-                                    <thead>
+                            <div class="search-container">
+                                <form method="get" action="admin">
+                                    <input type="hidden" name="view" value="${type}">
+                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
+                                    <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
+                                    <a href="admin?view=${type}" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
+                                </form>
+                            </div>
+                            <c:choose>
+                                <c:when test="${type == 'employees'}">
+                                    <h2>Danh sách nhân viên</h2>
+                                </c:when>
+                                <c:otherwise>
+                                    <h2>Danh sách khách hàng</h2>
+                                </c:otherwise>
+                            </c:choose>
+                            <table border="1">
+                                <thead>
+                                    <tr>
+                                        <c:choose>
+                                            <c:when test="${type == 'employees' || type == 'customers'}">
+                                                <th></th>
+                                                <th>Tên người dung</th>
+                                                <th>Họ và tên</th>
+                                                <th>Email</th>
+                                                <th>SDT</th>
+                                                <th>Hành động</th>
+                                            </c:when>
+                                        </c:choose>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="item" items="${list}" varStatus="status">
                                         <tr>
                                             <c:choose>
                                                 <c:when test="${type == 'employees' || type == 'customers'}">
-                                                    <th></th>
-                                                    <th>Tên người dung</th>
-                                                    <th>Họ và tên</th>
-                                                    <th>Email</th>
-                                                    <th>SDT</th>
-                                                    <th>Hành động</th>
-                                                    </c:when>
-                                                </c:choose>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach var="item" items="${list}" varStatus="status">
-                                            <tr>
+                                                    <td>${status.index + 1}</td>
+                                                    <td>${item.username}</td>
+                                                    <td>${item.fullName}</td>
+                                                    <td>${item.email}</td>
+                                                    <td>${item.phoneNumber}</td>
+                                                </c:when>
+                                            </c:choose>
+                                            <td>
+                                                <button class="btn btn-outline-primary btn-sm"
+                                                        onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
+                                                    <i class="bi bi-eye"></i> Chi Tiết
+                                                </button>
                                                 <c:choose>
-                                                    <c:when test="${type == 'employees' || type == 'customers'}">
-                                                        <td>${status.index + 1}</td>
-                                                        <td>${item.username}</td>
-                                                        <td>${item.fullName}</td>
-                                                        <td>${item.email}</td>
-                                                        <td>${item.phoneNumber}</td>
+                                                    <c:when test="${item.status}">
+                                                        <button class="btn btn-outline-danger btn-sm" style="color: green; border-color: green;"
+                                                                onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
+                                                            <i class="bi bi-check-circle"></i> Đang hoạt động
+                                                        </button>
                                                     </c:when>
+                                                    <c:otherwise>
+                                                        <button class="btn btn-outline-success btn-sm" style="color: red; border-color: red;"
+                                                                onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
+                                                            <i class="bi bi-x-circle"></i> Đã tắt hoạt động
+                                                        </button>
+                                                    </c:otherwise>
                                                 </c:choose>
-                                                <td>
-                                                    <button class="btn btn-outline-primary btn-sm"
-                                                            onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
-                                                        <i class="bi bi-eye"></i> Chi Tiết
-                                                    </button>
-
-                                                    <c:choose>
-                                                        <c:when test="${item.status}">
-                                                            <button class="btn btn-outline-danger btn-sm" style="color: green; border-color: green;"
-                                                                    onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
-                                                                <i class="bi bi-check-circle"></i> Đang hoạt động
-                                                            </button>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <button class="btn btn-outline-success btn-sm" style="color: red; border-color: red;"
-                                                                    onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
-                                                                <i class="bi bi-x-circle"></i> Đã tắt hoạt động
-                                                            </button>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                                <div class="pagination">
-                                    <c:if test="${currentPage > 1}">
-                                        <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage - 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Previous</a>
-                                    </c:if>
-                                    <c:forEach var="i" begin="1" end="${totalPages}">
-                                        <c:choose>
-                                            <c:when test="${i eq currentPage}">
-                                                <span>${i}</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${i}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">${i}</a>
-                                            </c:otherwise>
-                                        </c:choose>
+                                            </td>
+                                        </tr>
                                     </c:forEach>
-                                    <c:if test="${currentPage < totalPages}">
-                                        <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage + 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Next</a>
-                                    </c:if>
-                                </div>
-
-                                <c:if test="${type eq 'employees'}">
-                                    <div class="add-button-container">
-                                        <a href="admin?view=addEmployee" class="btn-add">
-                                            <i class="bi bi-plus-circle"></i> Thêm Nhân Viên
-                                        </a>
-                                    </div>
+                                </tbody>
+                            </table>
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage - 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Previous</a>
                                 </c:if>
-                            </c:if>
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <c:choose>
+                                        <c:when test="${i eq currentPage}">
+                                            <span>${i}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${i}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="<c:url value="admin"><c:param name="view" value="${type}" /><c:param name="page" value="${currentPage + 1}" /><c:if test="${not empty param.search}"><c:param name="search" value="${param.search}" /></c:if></c:url>">Next</a>
+                                </c:if>
+                            </div>
 
+                            <c:if test="${type eq 'employees'}">
+                                <div class="add-button-container">
+                                    <a href="admin?view=addEmployee" class="btn-add">
+                                        <i class="bi bi-plus-circle"></i> Thêm Nhân Viên
+                                    </a>
+                                </div>
+                            </c:if>
                         </c:when>
                         <c:otherwise>
                             <p>Chọn chức năng từ menu bên trái để bắt đầu quản lý hệ thống.</p>

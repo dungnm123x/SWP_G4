@@ -135,47 +135,56 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const calendarEl = document.getElementById('calendar');
-                const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                        headerToolbar: {
-                        left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        },
-                        editable: false, // Disable editing for employees
-                        selectable: false, // Disable selecting for employees
-                        events: [
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+                    headerToolbar: {
+                    left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    editable: true,
+                    selectable: true,
+                    events: [
             <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
-                        {
-                        id: '${event.eventID}',
-                                title: '${event.title}',
-                                start: '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>',
-                                end: <c:choose>
-                    <c:when test="${not empty event.endDate}">
-                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                    {
+                    id: '${event.eventID}',
+                            title: '${event.title}',
+                            start: <c:choose>
+                    <c:when test="${event.allDay}">
+                    '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
                     </c:when>
                     <c:otherwise>
-                        null
+                    '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
                     </c:otherwise>
                 </c:choose>,
-                                allDay: ${event.allDay},
-                                description: '${event.description != null ? event.description : ""}'
-                        }<c:if test="${!loop.last}">,</c:if>
+                            end: <c:choose>
+                    <c:when test="${not empty event.endDate}">
+                        <c:choose>
+                            <c:when test="${event.allDay}">
+                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
+                            </c:when>
+                            <c:otherwise>
+                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                    null
+                    </c:otherwise>
+                </c:choose>,
+                            allDay: ${event.allDay},
+                            description: '${event.description != null ? event.description : ""}'
+                    }<c:if test="${!loop.last}">,</c:if>
             </c:forEach>
-                        ],
-                dateClick: function (info) {
-                    // Optional: Allow adding events by clicking on a date
+                    ],
+                    dateClick: function (info) {
                     document.getElementById('startDate').value = info.dateStr + 'T00:00';
                     document.getElementById('endDate').value = info.dateStr + 'T23:59';
                     document.getElementById('allDay').checked = true;
-                    }
-                    ,
-                }
-                ,
-                );
-
-                calendar.render();
+                    },
+            });
+            calendar.render();
             });
         </script>
     </body>
