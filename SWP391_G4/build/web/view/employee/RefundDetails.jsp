@@ -8,6 +8,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<link rel="stylesheet" href="css/employee.css">
 <!DOCTYPE html>
 <html>
     <head>
@@ -175,22 +176,20 @@
 
             /* Định dạng nút quay lại */
             .back-link {
-                display: inline-block;
-                padding: 12px 24px;
+                display: inline-block !important; /* Đảm bảo nút không bị kéo dài */
+                width: auto !important; /* Không cho phép kéo dài */
+                padding: 10px 16px;
                 background-color: #6c757d;
                 color: #fff;
                 text-decoration: none;
-                border-radius: 8px;
-                font-size: 16px;
+                border-radius: 6px;
+                font-size: 14px;
                 font-weight: 500;
                 transition: background-color 0.3s ease, transform 0.2s ease;
+                white-space: nowrap; /* Ngăn chữ bị xuống dòng */
                 text-align: center;
             }
 
-            .back-link:hover {
-                background-color: #5a6268;
-                transform: translateY(-2px);
-            }
 
             /* Responsive cho màn hình nhỏ */
             @media (max-width: 768px) {
@@ -257,10 +256,84 @@
                     font-size: 10px;
                 }
             }
+            .button-group {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                flex-wrap: wrap;
+                align-items: center; /* Căn giữa nút */
+            }
+            .confirm-btn {
+                background-color: #28a745; /* Màu xanh lá */
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+            .confirm-btn:hover {
+                background-color: #218838;
+                transform: translateY(-2px);
+            }
+            .admin-back-button:hover {
+                background-color: #00509E;
+            }
+            .admin-back-button i {
+                margin-right: 8px;
+            }
         </style>
     </head>
     <body>
-        <div class="refund-details-container">
+        <div class="container">
+            <c:if test="${sessionScope.user.roleID == 2}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="avatar">
+                    </div>
+                    <ul>
+                        <li><a href="train">Quản lý tàu</a></li>
+                        <li><a href="trip">Quản lý chuyến</a></li>
+                        <li><a href="route">Quản lý tuyến tàu</a></li>
+                        <li><a href="station">Quản lý ga</a></li>
+                        <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="refund">Quản lý đơn hoàn tiền</a></li>
+                        <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
+                        <li><a href="posts-list">Quản lý Blog</a></li>
+                        <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
+                        <li><a href="manager-rule-list">Quản lý quy định</a></li>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+            </c:if>
+            <c:if test="${sessionScope.user.roleID == 1}">
+                <div class="sidebar">
+                    <div class="logo">
+                        <img src="./img/logo.jpg" alt="trainpicture">
+                    </div>
+                    <ul class="menu">
+                        <li><a href="admin?view=dashboard">Dashboard</a></li>
+                        <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
+                        <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
+                            <c:if test="${sessionScope.user.userId == 1}">
+                            <li><a href="admin?view=userauthorization">Phân quyền</a></li>
+                            </c:if>
+                        <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
+
+                    </ul>
+                    <form action="logout" method="GET">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+                <a href="admin?view=dashboard" class="admin-back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại trang Admin
+                </a>
+            </c:if>
             <h1>Chi tiết hóa đơn</h1>
 
             <c:if test="${not empty error}">
@@ -327,16 +400,18 @@
                     <p class="no-tickets">Không có vé đã hủy.</p>
                 </c:otherwise>
             </c:choose>
-            <div style="text-align: center;">
+            <div class="button-group">
                 <a href="refund" class="back-link">Trở về</a>
+
+                <c:if test="${refund.refundStatus eq 'Wait'}">
+                    <form action="confirmRefund" method="post">
+                        <input type="hidden" name="refundID" value="${refund.refundID}" />
+                        <input type="hidden" name="customerEmail" value="${refund.customerEmail}" />
+                        <button type="submit" class="confirm-btn">Xác nhận hoàn tiền</button>
+                    </form>
+                </c:if>
             </div>
-            <c:if test="${refund.refundStatus eq 'Wait'}">
-                <form action="confirmRefund" method="post">
-                    <input type="hidden" name="refundID" value="${refund.refundID}" />
-                    <input type="hidden" name="customerEmail" value="${refund.customerEmail}" />
-                    <button type="submit" class="confirm-btn">Xác nhận hoàn tiền</button>
-                </form>
-            </c:if>
+
         </div>
     </body>
 </html>

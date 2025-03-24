@@ -121,47 +121,37 @@
 
             <h1>Danh sách hoàn tiền</h1>
 
-            <c:if test="${not empty message}">
-                <p style="color: green;">${message}</p>
-            </c:if>
-            <c:if test="${not empty error}">
-                <p style = "color: red;">${error}</p>
-            </c:if>
 
-            <%-- Quick Stats (Optional - Requires additional controller logic) --%>
-            <%--
-            <div class="quick-stats">
-                <div>Total Orders: ${totalOrders}</div>
-                <div>Paid Orders: ${paidOrders}</div>
-                <div>Pending Orders: ${pendingOrders}</div>
-            </div>
-            --%>
 
             <%-- Filter Form --%>
             <div class="filter-section">
-                <form action="refund" method="GET"> <%-- Submit to the RefundController --%>
-                    <input type="hidden" name="action" value="list">
-                    <label for="customerName">Tên:</label>
-                    <input type="text" id="customerName" name="customerName" value="${param.customerName}">
+                <form action="refund" method="get"> 
+                    <label>Tên khách hàng:</label>
+                    <input type="text" name="customerName" value="${param.customerName}" />
 
-                    <label for="phone">SĐT</label>
-                    <input type="text" id="phone" name="phone" value="${param.phone}">
+                    <label>Số điện thoại:</label>
+                    <input type="text" name="phoneNumber" value="${param.phoneNumber}" />
 
-                    <label for="email">Email:</label>
-                    <input type="text" id="email" name="email" value="${param.email}">
+                    <label>Email:</label>
+                    <input type="text" name="customerEmail" value="${param.customerEmail}" />
+                    <br><label>Số tài khoản:</label>
+                    <input type="text" name="bankAccountID" value="${param.bankAccountID}" />
 
-                    <label for="status">Tình trạng</label>
-                    <select id="status" name="status">
-                        <option value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
-                        <option value="Pending" ${param.status == 'Pending' ? 'selected' : ''}>Chờ</option>
+                    <label>Ngày hoàn:</label>
+                    <input type="date" name="refundDate" value="${param.refundDate}" />
 
-                        <option value="Paid" ${param.status == 'Paid' ? 'selected' : ''}>Thanh toán</option>
-                        <option value="Cancelled" ${param.status == 'Cancelled' ? 'selected' : ''}>Hủy</option>
-                        <option value="Refunded" ${param.status == 'Refunded' ? 'selected' : ''}>Hoàn vé</option>
+                    <label>Trạng thái:</label>
+                    <select name="refundStatus">
+                        <option value="">Tất cả</option>
+                        <option value="Pending" ${param.refundStatus == 'Pending' ? 'selected' : ''}>Đang chờ</option>
+                        <option value="Complete" ${param.refundStatus == 'Complete' ? 'selected' : ''}>Hoàn tất</option>
                     </select>
-                    <button type="submit">Lọc</button>
 
+                   
+
+                    <button type="submit">Lọc</button>
                 </form>
+
                 <a href="refund"><button>Xóa lọc</button></a>
             </div>
             <!-- Hiển thị thông báo lỗi nếu có -->

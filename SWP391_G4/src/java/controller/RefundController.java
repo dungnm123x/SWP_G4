@@ -11,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.User;
 
 @WebServlet(name = "RefundController", urlPatterns = {"/refund", "/refundDetails", "/confirmRefund"})
 public class RefundController extends HttpServlet {
@@ -25,6 +26,11 @@ public class RefundController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getServletPath();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || user.getRoleID() != 1 && user.getRoleID() != 2) {
+            response.sendRedirect("login");
+            return;
+        }
         if (action.equals("/refundDetails")) {
             showRefundDetails(request, response);
         } else {
@@ -45,7 +51,23 @@ public class RefundController extends HttpServlet {
     private void listRefunds(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            List<RefundDTO> refunds = refundDAO.getAllRefundDetails();
+            // Lấy dữ liệu từ form lọc
+            String bankAccountID = request.getParameter("bankAccountID");
+            String refundDate = request.getParameter("refundDate");
+            String refundStatus = request.getParameter("refundStatus");
+            String customerName = request.getParameter("customerName");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String customerEmail = request.getParameter("customerEmail");
+
+            // Gọi DAO với các điều kiện lọc
+            List<RefundDTO> refunds = refundDAO.getAllRefundDetails(bankAccountID, refundDate, refundStatus,
+                    customerName, phoneNumber, customerEmail);
+
+            // Nếu không có kết quả, hiển thị thông báo
+            if (refunds.isEmpty()) {
+                request.setAttribute("message", "Không tìm thấy dữ liệu phù hợp.");
+            }
+
             request.setAttribute("refunds", refunds);
             request.getRequestDispatcher("view/employee/RefundManager.jsp").forward(request, response);
         } catch (SQLException e) {

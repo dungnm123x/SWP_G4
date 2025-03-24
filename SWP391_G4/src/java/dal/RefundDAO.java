@@ -108,7 +108,8 @@ public class RefundDAO extends DBContext {
         return refunds;
     }
 
-    public List<RefundDTO> getAllRefundDetails() throws SQLException {
+    public List<RefundDTO> getAllRefundDetails(String bankAccountID, String refundDate, String refundStatus,
+            String customerName, String phoneNumber, String customerEmail) throws SQLException {
         List<RefundDTO> refundList = new ArrayList<>();
         String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate, r.RefundStatus, r.TotalRefund, "
                 + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
@@ -125,11 +126,54 @@ public class RefundDAO extends DBContext {
                 + "JOIN Train tr ON tp.TrainID = tr.TrainID "
                 + "JOIN Route rt ON tp.RouteID = rt.RouteID "
                 + "JOIN Station sd ON rt.DepartureStationID = sd.StationID "
-                + "JOIN Station sa ON rt.ArrivalStationID = sa.StationID";
+                + "JOIN Station sa ON rt.ArrivalStationID = sa.StationID "
+                + "WHERE 1=1";  // Điều kiện mặc định
 
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        List<Object> parameters = new ArrayList<>();
+
+        // Lọc theo số tài khoản ngân hàng
+        if (bankAccountID != null && !bankAccountID.trim().isEmpty()) {
+            sql += " AND r.BankAccountID = ?";
+            parameters.add(bankAccountID);
+        }
+
+        // Lọc theo ngày hoàn tiền
+        if (refundDate != null && !refundDate.trim().isEmpty()) {
+            sql += " AND CONVERT(DATE, r.RefundDate) = ?";
+            parameters.add(refundDate);
+        }
+
+        // Lọc theo trạng thái hoàn tiền
+        if (refundStatus != null && !refundStatus.trim().isEmpty()) {
+            sql += " AND r.RefundStatus = ?";
+            parameters.add(refundStatus);
+        }
+
+        // Lọc theo tên khách hàng
+        if (customerName != null && !customerName.trim().isEmpty()) {
+            sql += " AND u.FullName LIKE ?";
+            parameters.add("%" + customerName + "%");
+        }
+
+        // Lọc theo số điện thoại
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+            sql += " AND u.PhoneNumber LIKE ?";
+            parameters.add("%" + phoneNumber + "%");
+        }
+
+        // Lọc theo email
+        if (customerEmail != null && !customerEmail.trim().isEmpty()) {
+            sql += " AND u.Email LIKE ?";
+            parameters.add("%" + customerEmail + "%");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                // Tạo tuyến đường từ ga khởi hành đến ga đến
                 String route = rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation");
 
                 refundList.add(new RefundDTO(
@@ -146,7 +190,7 @@ public class RefundDAO extends DBContext {
                         rs.getInt("TicketID"),
                         rs.getString("CCCD"),
                         rs.getString("TrainName"),
-                        route, // ✅ Tuyến đường kết hợp từ DepartureStation & ArrivalStation
+                        route, // ✅ Tuyến đường
                         rs.getTimestamp("DepartureTime"),
                         rs.getInt("CarriageNumber"),
                         rs.getInt("SeatNumber"),
