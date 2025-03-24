@@ -18,134 +18,125 @@
 
             // Mức giảm giá TẠM TÍNH ở client
             const discountRates = {
-                "Người lớn": 0,
-                "Trẻ em": 50,
-                "Sinh viên": 20,
-                "Người cao tuổi": 30,
-                "VIP": 10
+            "Người lớn": 0,
+                    "Trẻ em": 50,
+                    "Sinh viên": 20,
+                    "Người cao tuổi": 30,
+                    "VIP": 10
             };
-
             // Khi chọn loại hành khách
             function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId) {
-                let selectedOption = selectElement.value;
-                let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+            let selectedOption = selectElement.value;
+            let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+            // Nếu chọn Trẻ em / Người cao tuổi => hiện popup nhập ngày sinh
+            if (selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") {
+            document.getElementById(ageModalId).style.display = 'flex';
+            return;
+            }
+            // Nếu chọn VIP => hiện popup nhập thẻ VIP
+            if (selectedOption === "VIP") {
+            document.getElementById(vipModalId).style.display = 'flex';
+            return;
+            }
 
-                // Nếu chọn Trẻ em / Người cao tuổi => hiện popup nhập ngày sinh
-                if (selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") {
-                    document.getElementById(ageModalId).style.display = 'flex';
-                    return;
-                }
-                // Nếu chọn VIP => hiện popup nhập thẻ VIP
-                if (selectedOption === "VIP") {
-                    document.getElementById(vipModalId).style.display = 'flex';
-                    return;
-                }
-
-                // Các loại khác (Người lớn, Sinh viên) => tính luôn
-                let rate = discountRates[selectedOption] || 0;
-                let discountAmount = basePrice * rate / 100;
-                let finalPrice = basePrice - discountAmount + 1;
-                document.getElementById(discountId).innerText = '-' + rate + '%';
-                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-                updateTotalAmount();
+            // Các loại khác (Người lớn, Sinh viên) => tính luôn
+            let rate = discountRates[selectedOption] || 0;
+            let discountAmount = basePrice * rate / 100;
+            let finalPrice = basePrice - discountAmount + 1;
+            document.getElementById(discountId).innerText = '-' + rate + '%';
+            document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+            updateTotalAmount();
             }
 
             // Tính tổng tiền tạm (client)
             function updateTotalAmount() {
-                let sum = 0;
-                document.querySelectorAll('[id^="displayTotal"]').forEach(function (elem) {
-                    let val = parseFloat(elem.innerText.replace(/[^\d\.]/g, ''));
-                    if (!isNaN(val)) {
-                        sum += val;
-                    }
-                });
-                document.getElementById('totalAmount').innerText = sum.toLocaleString();
+            let sum = 0;
+            document.querySelectorAll('[id^="displayTotal"]').forEach(function (elem) {
+            let val = parseFloat(elem.innerText.replace(/[^\d\.]/g, ''));
+            if (!isNaN(val)) {
+            sum += val;
+            }
+            });
+            document.getElementById('totalAmount').innerText = sum.toLocaleString();
             }
 
             // Đóng modal
             function closeModal(id) {
-                document.getElementById(id).style.display = 'none';
+            document.getElementById(id).style.display = 'none';
             }
 
             // Tính tuổi ở client
             function getAge(day, month, year) {
-                // month - 1 vì trong JS, tháng tính từ 0..11
-                let birthDate = new Date(year, month - 1, day);
-                let now = new Date();
-                let age = now.getFullYear() - birthDate.getFullYear();
-                let m = now.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return age;
+            // month - 1 vì trong JS, tháng tính từ 0..11
+            let birthDate = new Date(year, month - 1, day);
+            let now = new Date();
+            let age = now.getFullYear() - birthDate.getFullYear();
+            let m = now.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) {
+            age--;
+            }
+            return age;
             }
 
             // Xác nhận tuổi (Trẻ em / Người cao tuổi) phía client
             function confirmAge(modalId, selectId, priceId, discountId, totalId, dayId, monthId, yearId) {
-                closeModal(modalId);
+            closeModal(modalId);
+            let day = document.getElementById(dayId).value;
+            let month = document.getElementById(monthId).value;
+            let year = document.getElementById(yearId).value;
+            let age = getAge(day, month, year);
+            let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+            let selectedOption = document.getElementById(selectId).value;
+            let rate = 0;
+            if (selectedOption === "Trẻ em") {
+            // 6..10 => 50%. <6 => không cần vé, >10 => không hợp lệ
+            if (age < 6) {
+            alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
+            rate = 0;
+            } else if (age > 10) {
+            alert("Không đúng độ tuổi Trẻ em (6-10)!");
+            rate = 0;
+            } else {
+            rate = 50;
+            }
+            } else {
+            // Người cao tuổi => >=60 => 30%
+            if (age < 60) {
+            alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
+            rate = 0;
+            } else {
+            rate = 30;
+            }
+            }
 
-                let day = document.getElementById(dayId).value;
-                let month = document.getElementById(monthId).value;
-                let year = document.getElementById(yearId).value;
-
-                let age = getAge(day, month, year);
-
-                let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-                let selectedOption = document.getElementById(selectId).value;
-
-                let rate = 0;
-                if (selectedOption === "Trẻ em") {
-                    // 6..10 => 50%. <6 => không cần vé, >10 => không hợp lệ
-                    if (age < 6) {
-                        alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
-                        rate = 0;
-                    } else if (age > 10) {
-                        alert("Không đúng độ tuổi Trẻ em (6-10)!");
-                        rate = 0;
-                    } else {
-                        rate = 50;
-                    }
-                } else {
-                    // Người cao tuổi => >=60 => 30%
-                    if (age < 60) {
-                        alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
-                        rate = 0;
-                    } else {
-                        rate = 30;
-                    }
-                }
-
-                let discountAmount = basePrice * rate / 100;
-                let finalPrice = basePrice - discountAmount + 1;
-
-                document.getElementById(discountId).innerText = '-' + rate + '%';
-                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-                updateTotalAmount();
+            let discountAmount = basePrice * rate / 100;
+            let finalPrice = basePrice - discountAmount + 1;
+            document.getElementById(discountId).innerText = '-' + rate + '%';
+            document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+            updateTotalAmount();
             }
 
             // Xác nhận VIP (client)
             function confirmVIP(modalId, selectId, priceId, discountId, totalId) {
-                let vipInputId = 'vipCard' + selectId.replace('passengerType', '');
-                let vipCard = document.getElementById(vipInputId).value.trim();
-                if (vipCard === "") {
-                    alert("Vui lòng nhập thông tin thẻ VIP!");
-                    return;
-                }
-                closeModal(modalId);
-
-                let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-                let rate = 10; // Tạm cứng 10% (client)
-                let discountAmount = basePrice * rate / 100;
-                let finalPrice = basePrice - discountAmount + 1;
-
-                document.getElementById(discountId).innerText = '-10%';
-                document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-                updateTotalAmount();
+            let vipInputId = 'vipCard' + selectId.replace('passengerType', '');
+            let vipCard = document.getElementById(vipInputId).value.trim();
+            if (vipCard === "") {
+            alert("Vui lòng nhập thông tin thẻ VIP!");
+            return;
+            }
+            closeModal(modalId);
+            let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+            let rate = 10; // Tạm cứng 10% (client)
+            let discountAmount = basePrice * rate / 100;
+            let finalPrice = basePrice - discountAmount + 1;
+            document.getElementById(discountId).innerText = '-10%';
+            document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+            updateTotalAmount();
             }
 
             // Khi load trang => tính tổng tạm
             window.onload = function () {
-                updateTotalAmount();
+            updateTotalAmount();
             };
         </script>
 
@@ -217,12 +208,12 @@
                                             name="passengerType${status.index}"
                                             required
                                             onchange="updateDiscount(
-                                                            this,
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}',
-                                                            'ageModal${status.index}',
-                                                            'vipModal${status.index}')">
+                                                        this,
+                                                        'price${status.index}',
+                                                        'discount${status.index}',
+                                                        'displayTotal${status.index}',
+                                                        'ageModal${status.index}',
+                                                        'vipModal${status.index}')">
                                         <option value="Người lớn" <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
                                                 selected
                                             </c:if>>Người lớn</option>
@@ -346,15 +337,15 @@
                                             class="btn btn-secondary">Hủy</button>
                                     <button type="button"
                                             onclick="confirmAge(
-                                                            'ageModal${status.index}',
-                                                            'passengerType${status.index}',
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}',
-                                                            'birthDay${status.index}',
-                                                            'birthMonth${status.index}',
-                                                            'birthYear${status.index}'
-                                                            )"
+                                                        'ageModal${status.index}',
+                                                        'passengerType${status.index}',
+                                                        'price${status.index}',
+                                                        'discount${status.index}',
+                                                        'displayTotal${status.index}',
+                                                        'birthDay${status.index}',
+                                                        'birthMonth${status.index}',
+                                                        'birthYear${status.index}'
+                                                        )"
                                             class="btn btn-primary">
                                         Xác nhận
                                     </button>
@@ -378,12 +369,12 @@
                                             class="btn btn-secondary">Hủy</button>
                                     <button type="button"
                                             onclick="confirmVIP(
-                                                            'vipModal${status.index}',
-                                                            'passengerType${status.index}',
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}'
-                                                            )"
+                                                        'vipModal${status.index}',
+                                                        'passengerType${status.index}',
+                                                        'price${status.index}',
+                                                        'discount${status.index}',
+                                                        'displayTotal${status.index}'
+                                                        )"
                                             class="btn btn-primary">
                                         Xác nhận
                                     </button>
@@ -416,6 +407,66 @@
                         />
                 </div>
 
+<!--                <div class="col-xs-4 col-sm-3 et-col-md-2 et-train-block ng-scope" ng-repeat="tau in onScreenGoingTrains" ng-click="doiChuyen(tau, false)" analytics-on="click" analytics-event="SelectTrain">
+                    <div class="et-train-head et-train-head-selected" ng-class="{'et-train-head-selected': tau.MacTau == searchData.tauDi.MacTau, 'et-train-head-auto': tau.MacTau != searchData.tauDi.MacTau & amp; & amp; tau.IsChonChoTuDong}">
+                        <div class="row center-block" style="width: 40%; margin-bottom: 3px"><div class="et-train-lamp text-center ng-binding" ng-style="{color: tau.HasCheapTicket?'#bf8c01':'#555555'}" style="color: rgb(85, 85, 85);">SE3</div>
+                            
+                        </div>
+                        <div class="et-train-head-info">
+                            <div class="row et-no-margin">
+                                <span class="pull-left et-bold ng-binding">TG đi</span> 
+                                <span class="pull-right ng-binding">23/03 19:20</span>
+                            </div>
+                            <div class="row et-no-margin">
+                                <span class="pull-left et-bold ng-binding">TG đến</span>
+                                <span class="pull-right"></span> 
+                                <span class="pull-right ng-binding">25/03 05:45</span>
+                            </div>
+                            <div class="row et-no-margin">
+                                <div class="et-col-50">
+                                    <div class="et-text-sm ng-binding">SL chỗ đặt</div>
+                                    <div class="et-text-large et-bold pull-left ng-binding" style="margin-left: 5px">0
+                                    </div>
+                                        
+                                </div>
+                                <div class="et-col-50 text-center">
+                                    <div class="et-text-sm ng-binding">SL chỗ trống
+                                    </div>
+                                    <div class="et-text-large et-bold pull-right ng-binding" style="margin-right: 5px">0
+                                    </div>
+                                        
+                                </div>
+                                    
+                            </div>
+                                
+                        </div>
+                        <div class="row et-no-margin">
+                            <div class="et-col-50">
+                                <span class="et-train-lamp-bellow-left">
+                                    
+                                </span>
+                            </div>
+                            <div class="et-col-50">
+                                <span class="et-train-lamp-bellow-right">
+                                    
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="et-train-base"></div><div class="et-train-base-2">
+                        
+                    </div>
+                    <div class="et-train-base-3">
+                        
+                    </div>
+                    <div class="et-train-base-4">
+                        
+                    </div>
+                    <div class="et-train-base-5">
+                        
+                    </div>
+                        
+                </div>-->
                 <div class="col-md-4">
 
 
@@ -467,17 +518,15 @@
         </form>
         <script>
             function setSeatID(seatID) {
-                document.getElementById("seatIDHidden").value = seatID;
+            document.getElementById("seatIDHidden").value = seatID;
             }
         </script>
 
         <script>
             function goBack() {
-                let urlParams = new URLSearchParams(window.location.search);
-
-                let previousURL = '<%= session.getAttribute("previousURL") != null ? session.getAttribute("previousURL") : "schedule" %>';
-                window.location.href = previousURL;
-
+            let urlParams = new URLSearchParams(window.location.search);
+            let previousURL = '<%= session.getAttribute("previousURL") != null ? session.getAttribute("previousURL") : "schedule" %>';
+            window.location.href = previousURL;
             }
         </script>
 
