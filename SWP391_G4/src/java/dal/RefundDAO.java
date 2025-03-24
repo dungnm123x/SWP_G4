@@ -108,14 +108,14 @@ public class RefundDAO extends DBContext {
         return refunds;
     }
 
-     public List<RefundDTO> getAllRefundDetails() throws SQLException {
+    public List<RefundDTO> getAllRefundDetails() throws SQLException {
         List<RefundDTO> refundList = new ArrayList<>();
         String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate, r.RefundStatus, r.TotalRefund, "
-                + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, u.Address, "
+                + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
                 + "t.TicketID, t.CCCD, "
+                + "tr.TrainName AS TrainName, "
                 + "sd.StationName AS DepartureStation, sa.StationName AS ArrivalStation, "
-                + "tr.Name AS TrainName, tp.DepartureTime, "
-                + "c.CarriageNumber, s.SeatNumber, t.TicketPrice, t.TicketStatus, tp.TripType "
+                + "tp.DepartureTime, c.CarriageNumber, s.SeatNumber, tp.TripType "
                 + "FROM Refund r "
                 + "JOIN [User] u ON r.UserID = u.UserID "
                 + "JOIN Ticket t ON t.RefundID = r.RefundID "
@@ -127,38 +127,118 @@ public class RefundDAO extends DBContext {
                 + "JOIN Station sd ON rt.DepartureStationID = sd.StationID "
                 + "JOIN Station sa ON rt.ArrivalStationID = sa.StationID";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
+                // Tạo tuyến đường từ ga khởi hành đến ga đến
+                String route = rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation");
+
                 refundList.add(new RefundDTO(
-                    rs.getInt("RefundID"),
-                    rs.getString("BankAccountID"),
-                    rs.getString("BankName"),
-                    rs.getTimestamp("RefundDate"),
-                    rs.getString("RefundStatus"),
-                    rs.getBigDecimal("TotalRefund"),
-                    rs.getInt("UserID"),
-                    rs.getString("customerName"),
-                    rs.getString("customerEmail"),
-                    rs.getString("PhoneNumber"),
-                    rs.getString("Address"),
-                    rs.getInt("TicketID"),
-                    rs.getString("CCCD"),
-                    rs.getString("DepartureStation"),
-                    rs.getString("ArrivalStation"),
-                    rs.getString("TrainName"),
-                    rs.getTimestamp("DepartureTime"),
-                    rs.getInt("CarriageNumber"),
-                    rs.getInt("SeatNumber"),
-                    rs.getDouble("TicketPrice"),
-                    rs.getString("TicketStatus"),
-                    rs.getString("TripType")
+                        rs.getInt("RefundID"),
+                        rs.getString("BankAccountID"),
+                        rs.getString("BankName"),
+                        rs.getTimestamp("RefundDate"),
+                        rs.getString("RefundStatus"),
+                        rs.getBigDecimal("TotalRefund"),
+                        rs.getInt("UserID"),
+                        rs.getString("customerName"),
+                        rs.getString("customerEmail"),
+                        rs.getString("PhoneNumber"),
+                        rs.getInt("TicketID"),
+                        rs.getString("CCCD"),
+                        rs.getString("TrainName"),
+                        route, // ✅ Tuyến đường kết hợp từ DepartureStation & ArrivalStation
+                        rs.getTimestamp("DepartureTime"),
+                        rs.getInt("CarriageNumber"),
+                        rs.getInt("SeatNumber"),
+                        rs.getString("TripType")
                 ));
             }
         }
         return refundList;
     }
 
+    public RefundDTO getRefundDetailsByID(int refundID) throws SQLException {
+        String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate, r.RefundStatus, r.TotalRefund, "
+                + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
+                + "t.TicketID, t.CCCD, tr.TrainName, sd.StationName AS DepartureStation, "
+                + "sa.StationName AS ArrivalStation, tp.DepartureTime, c.CarriageNumber, "
+                + "s.SeatNumber, tp.TripType, t.TicketPrice "
+                + "FROM Refund r "
+                + "JOIN [User] u ON r.UserID = u.UserID "
+                + "JOIN Ticket t ON t.RefundID = r.RefundID "
+                + "JOIN Seat s ON t.SeatID = s.SeatID "
+                + "JOIN Carriage c ON s.CarriageID = c.CarriageID "
+                + "JOIN Trip tp ON t.TripID = tp.TripID "
+                + "JOIN Train tr ON tp.TrainID = tr.TrainID "
+                + "JOIN Route rt ON tp.RouteID = rt.RouteID "
+                + "JOIN Station sd ON rt.DepartureStationID = sd.StationID "
+                + "JOIN Station sa ON rt.ArrivalStationID = sa.StationID "
+                + "WHERE r.RefundID = ?";
+
+        RefundDTO refund = null;
+        List<TicketDTO> tickets = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, refundID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    if (refund == null) {
+                        refund = new RefundDTO(
+                                rs.getInt("RefundID"),
+                                rs.getString("BankAccountID"),
+                                rs.getString("BankName"),
+                                rs.getTimestamp("RefundDate"),
+                                rs.getString("RefundStatus"),
+                                rs.getBigDecimal("TotalRefund"),
+                                rs.getInt("UserID"),
+                                rs.getString("customerName"),
+                                rs.getString("customerEmail"),
+                                rs.getString("PhoneNumber"),
+                                0, "", "", "", null, 0, 0, "" // Giá trị mặc định cho vé
+                        );
+                    }
+
+                    TicketDTO ticket = new TicketDTO(
+                            rs.getInt("TicketID"),
+                            rs.getString("customerName"),
+                            rs.getString("CCCD"),
+                            0, 0, 0,
+                            rs.getDouble("TicketPrice"),
+                            "Refunded",
+                            rs.getString("SeatNumber"),
+                            rs.getString("CarriageNumber"),
+                            "Standard",
+                            rs.getString("TrainName"),
+                            rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation"),
+                            rs.getTimestamp("DepartureTime").toLocalDateTime(),
+                            null
+                    );
+
+                    tickets.add(ticket);
+                }
+            }
+        }
+
+        if (refund != null) {
+            refund.setTickets(tickets);
+        }
+        return refund;
+    }
+
+    public boolean updateRefundStatus(int refundID, String newStatus) {
+        String sql = "UPDATE Refund SET RefundStatus = ? WHERE RefundID = ? AND RefundStatus = 'Wait'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, refundID);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     @Override
     public void insert(Object model) {

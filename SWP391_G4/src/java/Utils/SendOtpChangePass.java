@@ -79,7 +79,7 @@ public class SendOtpChangePass extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-                UserDAO userDAO = new UserDAO();
+        UserDAO userDAO = new UserDAO();
         String email = request.getParameter("email");
         RequestDispatcher dispatcher = null;
         int otpvalue = 0;
@@ -119,19 +119,19 @@ public class SendOtpChangePass extends HttpServlet {
                 MimeMessage message = new MimeMessage(session);
                 message.setFrom(new InternetAddress("dungnmhe173094@fpt.edu.vn"));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-                message.setSubject("TrainTicketBooking: OTP Code to verify account");
+                message.setSubject("OnlineBookingTicketTrain: OTP Code to verify account");
                 String htmlContent = "<!DOCTYPE html>"
                         + "<html>"
                         + "<body style=\"font-family: Arial, sans-serif; background-color: #ffffff;\">"
                         + "<div style=\"max-width: 600px; margin: auto; padding: 20px; border: 1px solid #cccccc; background-color: #ffffff;\">"
-                        + "<h2 style=\"color: #007bff;\">TrainTicketBooking</h2>"
+                        + "<h2 style=\"color: #007bff;\">OnlineBookingTicketTrain</h2>"
                         + "<p style=\"font-size: 16px; color: #333333;\">Hello,</p>"
                         + "<p style=\"font-size: 16px; color: #333333;\">Your OTP code to verify your account is:</p>"
                         + "<h1 style=\"font-size: 24px; color: #007bff; text-align: center;\">" + otpvalue + "</h1>"
                         + "<p style=\"font-size: 16px; color: #333333;\">Please use this code to complete your verification process.</p>"
                         + "<p style=\"font-size: 16px; color: #333333;\">If you did not request this code, please ignore this email.</p>"
                         + "<br>"
-                        + "<p style=\"font-size: 16px; color: #333333;\">Thank you,<br>TrainTicketBooking </p>"
+                        + "<p style=\"font-size: 16px; color: #333333;\">Thank you,<br>OnlineBookingTicketTrain </p>"
                         + "</div>"
                         + "</body>"
                         + "</html>";

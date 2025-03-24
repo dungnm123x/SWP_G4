@@ -34,6 +34,9 @@
             </div>
         </div>
     </div>
+    <!---Start TaggoAI--->
+    <script async data-taggo-botid="67d2c8af0cf62d81f8f97d44" src="https://widget.taggo.chat/v2.js"></script>
+    <!---End TaggoAI--->
 </nav>
 
 <script>

@@ -132,21 +132,21 @@ public class SendOtpCancelTicket extends HttpServlet {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_SENDER));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("TrainTicketBooking: OTP Code for Ticket Cancellation");
+            message.setSubject("OnlineBookingTicketTrain: OTP Code for Ticket Cancellation");
 
             // Nội dung email có định dạng HTML
             String htmlContent = "<!DOCTYPE html>"
                     + "<html>"
                     + "<body style=\"font-family: Arial, sans-serif; background-color: #ffffff;\">"
                     + "<div style=\"max-width: 600px; margin: auto; padding: 20px; border: 1px solid #cccccc; background-color: #ffffff;\">"
-                    + "<h2 style=\"color: #007bff;\">TrainTicketBooking</h2>"
+                    + "<h2 style=\"color: #007bff;\">OnlineBookingTicketTrain</h2>"
                     + "<p style=\"font-size: 16px; color: #333333;\">Xin chào,</p>"
                     + "<p style=\"font-size: 16px; color: #333333;\">Mã OTP xác nhận hủy vé của bạn là:</p>"
                     + "<h1 style=\"font-size: 24px; color: #007bff; text-align: center;\">" + otp + "</h1>"
                     + "<p style=\"font-size: 16px; color: #333333;\">Mã có hiệu lực trong 120 giây.</p>"
                     + "<p style=\"font-size: 16px; color: #333333;\">Nếu bạn không yêu cầu hủy vé, vui lòng bỏ qua email này.</p>"
                     + "<br>"
-                    + "<p style=\"font-size: 16px; color: #333333;\">Trân trọng,<br>TrainTicketBooking</p>"
+                    + "<p style=\"font-size: 16px; color: #333333;\">Trân trọng,<br>OnlineBookingTicketTrain</p>"
                     + "</div>"
                     + "</body>"
                     + "</html>";
