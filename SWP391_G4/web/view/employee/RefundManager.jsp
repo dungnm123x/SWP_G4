@@ -9,6 +9,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%-- For date formatting --%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <html>
     <head>
         <title>Quản lí hóa đơn</title>
@@ -61,6 +65,9 @@
             .admin-back-button i {
                 margin-right: 8px;
             }
+            .btn-sm i {
+                font-size: 16px; /* Điều chỉnh kích thước icon */
+            }
         </style>
     </head>
     <body>
@@ -111,54 +118,106 @@
                     <i class="fas fa-arrow-left"></i> Quay lại trang Admin
                 </a>
             </c:if>
-            <h1>Danh sách cần hoàn tiền</h1>
 
-            <c:if test="${not empty message}">
-                <p style="color: green;">${message}</p>
-            </c:if>
+            <h1>Danh sách hoàn tiền</h1>
+
+
+
+            <%-- Filter Form --%>
+            <div class="filter-section">
+                <form action="refund" method="get"> 
+                    <label>Tên khách hàng:</label>
+                    <input type="text" name="customerName" value="${param.customerName}" />
+
+                    <label>Số điện thoại:</label>
+                    <input type="text" name="phoneNumber" value="${param.phoneNumber}" />
+
+                    <label>Email:</label>
+                    <input type="text" name="customerEmail" value="${param.customerEmail}" />
+                    <br><label>Số tài khoản:</label>
+                    <input type="text" name="bankAccountID" value="${param.bankAccountID}" />
+
+                    <label>Ngày hoàn:</label>
+                    <input type="date" name="refundDate" value="${param.refundDate}" />
+
+                    <label>Trạng thái:</label>
+                    <select name="refundStatus">
+                        <option value="">Tất cả</option>
+                        <option value="Pending" ${param.refundStatus == 'Pending' ? 'selected' : ''}>Đang chờ</option>
+                        <option value="Complete" ${param.refundStatus == 'Complete' ? 'selected' : ''}>Hoàn tất</option>
+                    </select>
+
+                   
+
+                    <button type="submit">Lọc</button>
+                </form>
+
+                <a href="refund"><button>Xóa lọc</button></a>
+            </div>
+            <!-- Hiển thị thông báo lỗi nếu có -->
             <c:if test="${not empty error}">
-                <p style = "color: red;">${error}</p>
+                <p style="color: red;">${error}</p>
             </c:if>
 
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tên khách hàng</th>
-                        <th>Email</th>
-                        <th>SĐT</th>
-                        <th>Địa chỉ</th>
-                        <th>Số tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày yêu cầu</th>
-                        <th>Mã vé</th>
-                        <th>Ga đi</th>
-                        <th>Ga đến</th>
-                        <th>Tàu</th>
-                        <th>Ngày khởi hành</th>
-                        <th>Chỗ ngồi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${refunds}" var="refund">
-                        <tr>
-                            <td>${refund.refundID}</td>
-                            <td>${refund.customerName}</td>
-                            <td>${refund.customerEmail}</td>
-                            <td>${refund.phoneNumber}</td>
-                            <td>${refund.address}</td>
-                            <td><fmt:formatNumber value="${refund.totalRefund}" type="currency" currencySymbol="VND" /></td>
-                            <td>${refund.refundStatus}</td>
-                            <td><fmt:formatDate value="${refund.refundDate}" pattern="yyyy-MM-dd HH:mm" /></td>
-                            <td>${refund.ticketID}</td>
-                            <td>${refund.departureStation}</td>
-                            <td>${refund.arrivalStation}</td>
-                            <td>${refund.trainCode}</td>
-                            <td><fmt:formatDate value="${refund.departureTime}" pattern="yyyy-MM-dd HH:mm" /></td>
-                            <td>${refund.departureStation} → ${refund.arrivalStation}</td>
-                            <td>${refund.trainName}</td>
+            <c:choose>
+                <c:when test="${empty refunds}">
+                    <p>Không có yêu cầu hoàn tiền nào.</p>
+                </c:when>
+                <c:otherwise>
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên khách hàng</th>
+                                <th>Email</th>
+                                <th>SĐT</th>
+                                <th>Ngân hàng</th>
+                                <th>Số tài khoản</th>
+                                <th>Vé</th>
+                                <th>Số tiền hoàn</th>
+                                <th>Trạng thái</th>
+                                <th>Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:set var="prevRefundID" value="-1" />
+                            <c:forEach items="${refunds}" var="refund" varStatus="loop">
+                                <c:if test="${refund.refundID ne prevRefundID}">
+                                    <c:set var="rowCount" value="0" />
+                                    <c:forEach items="${refunds}" var="innerRefund">
+                                        <c:if test="${innerRefund.refundID eq refund.refundID}">
+                                            <c:set var="rowCount" value="${rowCount + 1}" />
+                                        </c:if>
+                                    </c:forEach>
 
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
+                                    <tr>
+                                        <td rowspan="${rowCount}">${refund.refundID}</td>
+                                        <td rowspan="${rowCount}">${refund.customerName}</td>
+                                        <td rowspan="${rowCount}">${refund.customerEmail}</td>
+                                        <td rowspan="${rowCount}">${refund.phoneNumber}</td>
+                                        <td rowspan="${rowCount}">${refund.bankName}</td>
+                                        <td rowspan="${rowCount}">${refund.bankAccountID}</td>
+                                        <td>${refund.ticketID}</td>
+                                        <td rowspan="${rowCount}"><fmt:formatNumber value="${refund.totalRefund}" type="currency" currencySymbol="VND" /></td>
+                                        <td rowspan="${rowCount}">${refund.refundStatus}</td>
+                                        <td rowspan="${rowCount}">
+                                            <a href="refundDetails?refundID=${refund.refundID}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:if>
+                                <c:if test="${refund.refundID eq prevRefundID}">
+                                    <tr>
+                                        <td>${refund.ticketID}</td>
+                                    </tr>
+                                </c:if>
+                                <c:set var="prevRefundID" value="${refund.refundID}" />
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:otherwise>
+            </c:choose>
+
+    </body>
+</html>
