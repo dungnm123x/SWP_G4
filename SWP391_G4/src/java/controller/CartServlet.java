@@ -102,27 +102,13 @@ public class CartServlet extends HttpServlet {
             cartItems = new ArrayList<>();
             session.setAttribute("cartItems", cartItems);
         }
-
-        // 1) Nếu param removeSeatID != null => XÓA 1 vé
         String removeSeatID = request.getParameter("removeSeatID");
         if (removeSeatID != null && !removeSeatID.trim().isEmpty()) {
             removeItemFromCart(removeSeatID, request);
 
-            // Đọc lại param (nếu bạn đang dùng) để redirect
-            String departureStationID = request.getParameter("departureStationID");
-            String arrivalStationID = request.getParameter("arrivalStationID");
-            String day = request.getParameter("departureDay");
-            String tripType = request.getParameter("tripType");
-            String returnDate = request.getParameter("returnDate");
-
-            String redirectURL = "schedule"
-                    + "?departureStationID=" + URLEncoder.encode(departureStationID == null ? "" : departureStationID, "UTF-8")
-                    + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID == null ? "" : arrivalStationID, "UTF-8")
-                    + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
-                    + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
-                    + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
-
-            response.sendRedirect(redirectURL);
+            // Sau khi xóa xong, forward về cart.jsp để lấy HTML cập nhật
+            request.setAttribute("cartItems", session.getAttribute("cartItems"));
+            request.getRequestDispatcher("cart.jsp").forward(request, response);
             return;
         }
 
@@ -230,9 +216,7 @@ public class CartServlet extends HttpServlet {
                 + " -> " + newItem.getArrivalStationName() + " | Return: " + newItem.isReturnTrip());
 
 //        cartItems.add(newItem);
-        session.setAttribute("cartItems", cartItems);
-
-        
+        // session.setAttribute("cartItems", cartItems);
         // Kiểm tra vé này đã tồn tại chưa
         boolean exists = false;
         for (CartItem item : cartItems) {
@@ -249,16 +233,17 @@ public class CartServlet extends HttpServlet {
         session.setAttribute("cartItems", cartItems);
         session.setAttribute("isReturnTrip", returnTrip);
         System.out.println("Session returnTrip value: " + session.getAttribute("isReturnTrip"));
-
+        request.setAttribute("cartItems", cartItems);
+        request.getRequestDispatcher("/cart.jsp").forward(request, response);
 //         Redirect về schedule kèm param
-        String redirectURL = "schedule"
-                + "?departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
-                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")
-                + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
-                + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
-                + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
-
-        response.sendRedirect(redirectURL);
+//        String redirectURL = "schedule"
+//                + "?departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
+//                + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")
+//                + "&departureDay=" + URLEncoder.encode(day == null ? "" : day, "UTF-8")
+//                + "&tripType=" + URLEncoder.encode(tripType == null ? "" : tripType, "UTF-8")
+//                + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
+//
+//        response.sendRedirect(redirectURL);
     }
 
     @Override

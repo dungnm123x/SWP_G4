@@ -237,23 +237,67 @@
 
         </script>
         <script>
-            document.querySelectorAll(".seat").forEach(seat => {
-                seat.addEventListener("click", function (event) {
+
+            document.body.addEventListener("click", function (event) {
+                const target = event.target;
+                if (target.classList.contains("seat")) {
                     event.preventDefault();
-                    let form = this.closest("form");
-                    let formData = new FormData(form);
-                    fetch("cartitem", {
-                        method: "POST",
-                        body: formData
-                    }).then(response => response.text())
-                            .then(data => {
-                                document.querySelector(".cart-container").innerHTML = data; // Cập nhật giỏ vé mà không reload
-                            }).catch(error => console.error("Lỗi:", error));
+
+                    const form = target.closest("form");
+                    if (form) {
+                        // Tạo FormData
+                        const fd = new FormData(form);
+
+                        // Chuyển thành URLSearchParams để servlet parse được
+                        const params = new URLSearchParams(fd);
+
+                        fetch("cartitem", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: params.toString() // "ticketID=xxx&seatID=yyy&price=zzz..."
+                        })
+                                .then(response => response.text())
+                                .then(data => {
+                                    document.querySelector(".cart-container").innerHTML = data;
+                                })
+                                .catch(error => console.error("Lỗi:", error));
+                    }
+                }
+            });
+
+
+        
+            document.addEventListener("DOMContentLoaded", function () {
+                document.body.addEventListener("click", function (event) {
+                    const target = event.target;
+                    // Nếu là nút xóa
+                    if (target.classList.contains("btn-remove")) {
+                        event.preventDefault(); // Chặn submit form mặc định
+                        const form = target.closest("form");
+                        if (form) {
+                            const fd = new FormData(form);
+                            const params = new URLSearchParams(fd);
+
+                            fetch("cartitem", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: params.toString() // ticketID=xxx&removeSeatID=yyy&...
+                            })
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        document.querySelector(".cart-container").innerHTML = html;
+                                    })
+                                    .catch(error => console.error("Lỗi:", error));
+                        }
+                    }
                 });
             });
 
         </script>
-
         <style>
             .tooltip {
                 position: absolute;
