@@ -46,17 +46,27 @@ public class AdminController extends HttpServlet {
                 int totalBlogs = dashBoardDAO.getTotalBlogs();
                 int totalRules = dashBoardDAO.getTotalRules();
                 int totalStations = dashBoardDAO.getTotalStations();
-                double revenueToday = dashBoardDAO.getRevenueToday();
-                double revenueThisWeek = dashBoardDAO.getRevenueThisWeek();
-                double revenueThisMonth = dashBoardDAO.getRevenueThisMonth();
-                double revenueThisYear = dashBoardDAO.getRevenueThisYear();
+
                 int[] starDistribution = dashBoardDAO.getStarDistribution();
                 request.setAttribute("starDistribution", starDistribution);
 
-                request.setAttribute("revenueToday", revenueToday);
-                request.setAttribute("revenueThisWeek", revenueThisWeek);
-                request.setAttribute("revenueThisMonth", revenueThisMonth);
-                request.setAttribute("revenueThisYear", revenueThisYear);
+// Get the selected period (default to "monthly")
+                String period = request.getParameter("period");
+                if (period == null || period.isEmpty()) {
+                    period = "monthly";
+                }
+
+// Fetch revenue data for each ticket status
+                List<DashBoardDAO.RevenueData> unusedRevenue = dashBoardDAO.getRevenueData(period, "Unused");
+                List<DashBoardDAO.RevenueData> usedRevenue1 = dashBoardDAO.getRevenueData(period, "Used");
+                List<DashBoardDAO.RevenueData> usedRevenue2 = dashBoardDAO.getRevenueData(period, "Used");
+
+// Pass the data to the JSP
+                request.setAttribute("unusedRevenue", unusedRevenue);
+                request.setAttribute("usedRevenue1", usedRevenue1);
+                request.setAttribute("usedRevenue2", usedRevenue2);
+                request.setAttribute("period", period);
+
                 request.setAttribute("totalUsers", totalUsers);
                 request.setAttribute("totalEmployees", totalEmployees);
                 request.setAttribute("totalCustomers", totalCustomers);

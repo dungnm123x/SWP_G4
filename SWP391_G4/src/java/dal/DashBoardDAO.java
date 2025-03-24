@@ -32,41 +32,7 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0.0;
     }
 
-    public double getRevenueForDate(Date date) throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE CAST(BookingDate AS DATE) = ?";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql)) {
-            stm.setDate(1, new java.sql.Date(date.getTime()));
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
-        }
-        return 0.0;
-    }
-
-    public double getRevenueForMonth(int month) throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE MONTH(BookingDate) = ?";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql)) {
-            stm.setInt(1, month);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
-        }
-        return 0.0;
-    }
-
-    public double getRevenueForYear(int year) throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE YEAR(BookingDate) = ?";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql)) {
-            stm.setInt(1, year);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
-        }
-        return 0.0;
-    }
+    
 
     public int getTotalOrders() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Orders";
@@ -88,47 +54,78 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0;
     }
 
-    public double getRevenueToday() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE BookingDate >= CAST(GETDATE() AS DATE)";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                double revenue = rs.getDouble(1);
-                System.out.println("Revenue today: " + revenue); // Thêm dòng này
-                return revenue;
+    // Method to get revenue data grouped by time period (week, month, or year)
+    public List<RevenueData> getRevenueData(String period, String ticketStatus) throws SQLException {
+        List<RevenueData> revenueDataList = new ArrayList<>();
+        String sql = "";
+
+        // Determine the SQL query based on the period (week, month, or year)
+        switch (period.toLowerCase()) {
+            case "weekly":
+                sql = "SELECT DATEPART(WEEK, t.DepartureTime) AS TimePeriod, " +
+                      "SUM(ti.TicketPrice) AS TotalRevenue " +
+                      "FROM Ticket ti " +
+                      "JOIN Trip t ON ti.TripID = t.TripID " +
+                      "WHERE ti.TicketStatus = ? " +
+                      "GROUP BY DATEPART(WEEK, t.DepartureTime) " +
+                      "ORDER BY DATEPART(WEEK, t.DepartureTime)";
+                break;
+            case "monthly":
+                sql = "SELECT DATEPART(MONTH, t.DepartureTime) AS TimePeriod, " +
+                      "SUM(ti.TicketPrice) AS TotalRevenue " +
+                      "FROM Ticket ti " +
+                      "JOIN Trip t ON ti.TripID = t.TripID " +
+                      "WHERE ti.TicketStatus = ? " +
+                      "GROUP BY DATEPART(MONTH, t.DepartureTime) " +
+                      "ORDER BY DATEPART(MONTH, t.DepartureTime)";
+                break;
+            case "yearly":
+                sql = "SELECT DATEPART(YEAR, t.DepartureTime) AS TimePeriod, " +
+                      "SUM(ti.TicketPrice) AS TotalRevenue " +
+                      "FROM Ticket ti " +
+                      "JOIN Trip t ON ti.TripID = t.TripID " +
+                      "WHERE ti.TicketStatus = ? " +
+                      "GROUP BY DATEPART(YEAR, t.DepartureTime) " +
+                      "ORDER BY DATEPART(YEAR, t.DepartureTime)";
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid period: " + period);
+        }
+
+        try (PreparedStatement stm = getConnection().prepareStatement(sql)) {
+            stm.setString(1, ticketStatus);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    RevenueData data = new RevenueData();
+                    data.setTimePeriod(rs.getInt("TimePeriod"));
+                    data.setTotalRevenue(rs.getDouble("TotalRevenue"));
+                    revenueDataList.add(data);
+                }
             }
         }
-        System.out.println("Revenue today: 0"); // Thêm dòng này
-        return 0;
+        return revenueDataList;
     }
 
-    public double getRevenueThisWeek() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE BookingDate >= DATEADD(wk,DATEDIFF(wk,7,GETDATE()),0)";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
-        }
-        return 0;
-    }
+    // Helper class to store revenue data
+    public static class RevenueData {
+        private int timePeriod;
+        private double totalRevenue;
 
-    public double getRevenueThisMonth() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE MONTH(BookingDate) = MONTH(GETDATE()) AND YEAR(BookingDate) = YEAR(GETDATE())";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
+        public int getTimePeriod() {
+            return timePeriod;
         }
-        return 0;
-    }
 
-    public double getRevenueThisYear() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE YEAR(BookingDate) = YEAR(GETDATE())";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
+        public void setTimePeriod(int timePeriod) {
+            this.timePeriod = timePeriod;
         }
-        return 0;
+
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
     }
 
     private int getCount(String sql) throws SQLException {

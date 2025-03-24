@@ -127,14 +127,12 @@
                                 <div class="dashboard-row">
                                     <div class="dashboard-item" style="width: 60%;">
                                         <h3>Thống kê doanh thu</h3>
-                                        <div class="revenue-chart-container">
-                                            <div class="revenue-options">
-                                                <button class="revenue-option active" data-type="month">Monthly</button>
-                                                <button class="revenue-option" data-type="week">Weekly</button>
-                                                <button class="revenue-option" data-type="year">Yearly</button>
-                                            </div>
-                                            <canvas id="revenueChart" width="600" height="300"></canvas>
+                                        <div class="chart-controls">
+                                            <a href="admin?view=dashboard&period=monthly" class="btn btn-outline-primary ${period == 'monthly' ? 'active' : ''}">Monthly</a>
+                                            <a href="admin?view=dashboard&period=weekly" class="btn btn-outline-primary ${period == 'weekly' ? 'active' : ''}">Weekly</a>
+                                            <a href="admin?view=dashboard&period=yearly" class="btn btn-outline-primary ${period == 'yearly' ? 'active' : ''}">Yearly</a>
                                         </div>
+                                        <canvas id="revenueChart" width="600" height="300"></canvas>
                                     </div>
                                     <div class="dashboard-item" style="width: 40%;">
                                         <h3>Thống kê người dùng</h3>
@@ -187,6 +185,7 @@
                                 </div>
 
                             </div>
+
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const calendarEl = document.getElementById('calendar');
@@ -314,116 +313,134 @@
                                 });
                             </script>
                             <script>
-
-
-                                const revenueData = {
-                                    week: ${revenueThisWeek},
-                                    month: ${revenueThisMonth},
-                                    year: ${revenueThisYear}
-                                };
-
-                                const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-                                let revenueChart;
-
-
-
-                                function renderRevenueChart(selectedType) {
-                                    if (revenueChart) {
-                                        revenueChart.destroy();
-                                    }
-
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    // Prepare data for the revenue chart
+                                    const period = '${period}';
                                     let labels = [];
-                                    let data = [];
+                                    let unusedData = [];
+                                    let usedData1 = [];
+                                    let usedData2 = [];
 
-                                    if (selectedType === 'year') {
-                                        const currentYear = new Date().getFullYear();
-                                        for (let i = 4; i >= 0; i--) {
-                                            const year = currentYear - i;
-                                            labels.push(year.toString());
-                                            data.push(getRevenueForYear(year));
-                                        }
-                                    } else if (selectedType === 'week') {
-                                        const today = new Date();
-                                        for (let i = 6; i >= 0; i--) {
-                                            const date = new Date(today);
-                                            date.setDate(today.getDate() - i);
-                                            labels.push(date.toLocaleDateString('vi-VN', {weekday: 'short'}));
-                                            data.push(getRevenueForDate(date));
-                                        }
-                                    } else if (selectedType === 'month') {
-                                        for (let i = 0; i < 12; i++) {
-                                            labels.push('Tháng ' + (i + 1));
-                                            data.push(getRevenueForMonth(i + 1));
-                                        }
-                                    }
+                                    // Populate labels and data based on the period
+                                <c:choose>
+                                    <c:when test="${period == 'weekly'}">
+                                    labels = Array.from({length: 52}, (_, i) => i + 1); // Weeks 1 to 52
+                                    unusedData = new Array(52).fill(0);
+                                    usedData1 = new Array(52).fill(0);
+                                    usedData2 = new Array(52).fill(0);
 
-                                    revenueChart = new Chart(ctxRevenue, {
+                                        <c:forEach var="data" items="${unusedRevenue}">
+                                    unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue1}">
+                                    usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue2}">
+                                    usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:when test="${period == 'monthly'}">
+                                    labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                                    unusedData = new Array(12).fill(0);
+                                    usedData1 = new Array(12).fill(0);
+                                    usedData2 = new Array(12).fill(0);
+
+                                        <c:forEach var="data" items="${unusedRevenue}">
+                                    unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue1}">
+                                    usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue2}">
+                                    usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:when test="${period == 'yearly'}">
+                                    labels = Array.from({length: 5}, (_, i) => 2021 + i); // Example: 2021 to 2025
+                                    unusedData = new Array(5).fill(0);
+                                    usedData1 = new Array(5).fill(0);
+                                    usedData2 = new Array(5).fill(0);
+
+                                        <c:forEach var="data" items="${unusedRevenue}">
+                                    unusedData[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue1}">
+                                    usedData1[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue2}">
+                                    usedData2[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                    </c:when>
+                                </c:choose>
+
+                                    // Create the revenue chart
+                                    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+                                    const revenueChart = new Chart(ctxRevenue, {
                                         type: 'line',
                                         data: {
                                             labels: labels,
-                                            datasets: [{
-                                                    label: 'Doanh thu',
-                                                    data: data,
+                                            datasets: [
+                                                {
+                                                    label: 'Doanh thu (Unused)',
+                                                    data: unusedData,
+                                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                    fill: true,
+                                                    tension: 0.1
+                                                },
+                                                {
+                                                    label: 'Doanh thu (Used - 1)',
+                                                    data: usedData1,
+                                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                                    fill: true,
+                                                    tension: 0.1
+                                                },
+                                                {
+                                                    label: 'Doanh thu (Used - 2)',
+                                                    data: usedData2,
                                                     borderColor: 'rgba(75, 192, 192, 1)',
                                                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                    borderWidth: 1,
                                                     fill: true,
-                                                }]
+                                                    tension: 0.1
+                                                }
+                                            ]
                                         },
                                         options: {
+                                            responsive: true,
                                             scales: {
                                                 y: {
                                                     beginAtZero: true,
                                                     title: {
                                                         display: true,
-                                                        text: 'Doanh thu (VNĐ)'
+                                                        text: 'Doanh thu (VND)'
                                                     }
                                                 },
                                                 x: {
                                                     title: {
                                                         display: true,
-                                                        text: selectedType === 'year' ? 'Năm' : 'Thời gian'
+                                                        text: 'Thời gian'
                                                     }
+                                                }
+                                            },
+                                            plugins: {
+                                                legend: {
+                                                    display: true,
+                                                    position: 'top'
+                                                },
+                                                title: {
+                                                    display: true,
+                                                    text: 'Thống Kê Doanh Thu'
                                                 }
                                             }
                                         }
                                     });
-                                }
-
-                                // Hàm giả định để lấy doanh thu theo ngày
-                                function getRevenueForDate(date) {
-                                    // Thay thế bằng logic thực tế để lấy doanh thu từ server
-                                    return Math.floor(Math.random() * 1000000);
-                                }
-
-                                // Hàm giả định để lấy doanh thu theo tháng
-                                function getRevenueForMonth(month) {
-                                    // Thay thế bằng logic thực tế để lấy doanh thu từ server
-                                    return Math.floor(Math.random() * 5000000);
-                                }
-
-                                // Hàm giả định để lấy doanh thu theo năm
-                                function getRevenueForYear(year) {
-                                    // Thay thế bằng logic thực tế để lấy doanh thu từ server
-                                    const baseRevenue = 10000000;
-                                    const randomFactor = Math.random() * 5000000;
-                                    return baseRevenue + year * 100000 + randomFactor;
-                                }
-
-                                // Các tùy chọn "Monthly", "Weekly", "Yearly"
-                                const revenueOptions = document.querySelectorAll('.revenue-option');
-
-                                revenueOptions.forEach(option => {
-                                    option.addEventListener('click', () => {
-                                        revenueOptions.forEach(opt => opt.classList.remove('active'));
-                                        option.classList.add('active');
-                                        const dataType = option.getAttribute('data-type');
-                                        renderRevenueChart(dataType);
-                                    });
                                 });
+                            </script>
+                            <script>
 
-                                // Khởi tạo biểu đồ với giá trị mặc định là 'year'
-                                renderRevenueChart('year');
+
+
 
                                 // Biểu đồ thống kê người dùng
                                 var ctxUser = document.getElementById('userChart').getContext('2d');

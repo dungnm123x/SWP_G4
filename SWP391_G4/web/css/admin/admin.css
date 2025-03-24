@@ -618,3 +618,15 @@ form {
     height: 400px; /* Hoặc chiều cao bạn muốn */
     width: 100%;
 }
+.chart-controls {
+    margin-bottom: 15px;
+}
+
+.chart-controls .btn {
+    margin-right: 10px;
+}
+
+.chart-controls .btn.active {
+    background-color: #007bff;
+    color: white;
+}
