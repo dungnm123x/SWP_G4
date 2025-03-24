@@ -82,4 +82,7 @@
         </c:if>
     </div>
 </div>
+<script>
+    
+</script>
 <!-- Kết thúc snippet giỏ vé -->

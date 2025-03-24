@@ -267,8 +267,37 @@
                 }
             });
 
-        </script>
 
+        
+            document.addEventListener("DOMContentLoaded", function () {
+                document.body.addEventListener("click", function (event) {
+                    const target = event.target;
+                    // Nếu là nút xóa
+                    if (target.classList.contains("btn-remove")) {
+                        event.preventDefault(); // Chặn submit form mặc định
+                        const form = target.closest("form");
+                        if (form) {
+                            const fd = new FormData(form);
+                            const params = new URLSearchParams(fd);
+
+                            fetch("cartitem", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: params.toString() // ticketID=xxx&removeSeatID=yyy&...
+                            })
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        document.querySelector(".cart-container").innerHTML = html;
+                                    })
+                                    .catch(error => console.error("Lỗi:", error));
+                        }
+                    }
+                });
+            });
+
+        </script>
         <style>
             .tooltip {
                 position: absolute;
