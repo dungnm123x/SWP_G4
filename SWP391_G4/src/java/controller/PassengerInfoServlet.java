@@ -80,6 +80,16 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
+        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
+        if (cartItems != null) {
+            boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
+            if (confirmedDOB == null || confirmedDOB.length < cartItems.size()) {
+                confirmedDOB = new boolean[cartItems.size()];
+                // Mặc định toàn bộ false
+                session.setAttribute("confirmedDOB", confirmedDOB);
+            }
+        }
+
         // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
         session.setAttribute("bookingName", user.getFullName());
         session.setAttribute("bookingEmail", user.getEmail());
@@ -240,27 +250,23 @@ public class PassengerInfoServlet extends HttpServlet {
 //            return;
 //        }
         if ("confirmDOB".equals(action)) {
-            // 1) Lấy index, dobString
             String indexStr = request.getParameter("index");
             String dob = request.getParameter("dob");
             int idx = Integer.parseInt(indexStr);
 
-            // 2) Lưu "dob" + cờ "confirmedDOB" vào session
-           
-            // Giả sử bạn có sẵn: sessionScope.idNumberList, sessionScope.confirmedDOB
+            // Lấy session
             List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
             boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
-            // Hoặc dùng ArrayList<Boolean>, v.v.
 
-            // 3) Cập nhật
-            idNumberList.set(idx, dob);
+            // Tùy logic: 
+            //   - Nếu CHỈ Trẻ em => idNumberList.set(idx, dob), confirmedDOB[idx] = true
+            //   - Nếu Người cao tuổi => CHỈ store cờ confirmedDOB, KHÔNG ghi đè idNumber
+            idNumberList.set(idx, dob);        // or check if isChild => set
             confirmedDOB[idx] = true;
 
-            // 4) Lưu lại
             session.setAttribute("idNumberList", idNumberList);
             session.setAttribute("confirmedDOB", confirmedDOB);
 
-            // 5) In ra 1 kết quả (JSON hoặc text) => AJAX
             response.setContentType("text/plain");
             response.getWriter().write("OK");
             return;
@@ -279,7 +285,7 @@ public class PassengerInfoServlet extends HttpServlet {
         List<String> fullNameList = new ArrayList<>();
         List<String> idNumberList = new ArrayList<>();
         List<String> typeList = new ArrayList<>();
-
+        List<Double> finalPriceList = new ArrayList<>();
         Set<String> cccdSet = new HashSet<>();
         Set<String> cccdSetGo = new HashSet<>();
         Set<String> cccdSetReturn = new HashSet<>();
@@ -444,15 +450,16 @@ public class PassengerInfoServlet extends HttpServlet {
 
             // Tính finalPrice
             double discountAmount = basePrice * discountRate / 100.0;
-            double finalPrice = basePrice - discountAmount + 1;
+            double finalPrice = basePrice - discountAmount + 1000;
             totalAmount += finalPrice;
+            finalPriceList.add(finalPrice);
 
             // Lưu
             fullNameList.add(fullName);
             idNumberList.add(idNumber);
             typeList.add(passengerType);
         }
-
+        session.setAttribute("finalPriceList", finalPriceList);
         // Lấy thông tin người đặt vé
         String bookingName = request.getParameter("bookingName");
         String bookingEmail = request.getParameter("bookingEmail");

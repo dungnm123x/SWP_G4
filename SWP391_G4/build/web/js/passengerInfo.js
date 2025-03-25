@@ -107,84 +107,76 @@ function getAge(day, month, year) {
 //  updateTotalAmount();
 //}
 function confirmAge(modalId, selectId, priceId, discountId, totalId,
-        dayId, monthId, yearId, idNumberInputId) {
-    // 1) Đóng popup
-    closeModal(modalId);
+                    dayId, monthId, yearId, idNumberInputId) {
+  closeModal(modalId);
 
-    // 2) Lấy giá trị ngày-tháng-năm
-    let day = document.getElementById(dayId).value;
-    let month = document.getElementById(monthId).value;
-    let year = document.getElementById(yearId).value;
+  let day = document.getElementById(dayId).value;
+  let month = document.getElementById(monthId).value;
+  let year = document.getElementById(yearId).value;
+  let age = getAge(day, month, year);
 
-    // 3) Tính tuổi (client)
-    let age = getAge(day, month, year);
+  let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+  let selectedOption = document.getElementById(selectId).value;
+  let rate = 0;
 
-    // 4) Lấy giá vé gốc và loại hành khách
-    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-    let selectedOption = document.getElementById(selectId).value;
+  // Tính discount
+  if (selectedOption === "Trẻ em") {
+    if (age < 6) {
+      alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
+      rate = 0;
+    } else if (age > 10) {
+      alert("Không đúng độ tuổi Trẻ em (6-10)!");
+      rate = 0;
+    } else {
+      rate = 50; // 6..10
+    }
+  } else if (selectedOption === "Người cao tuổi") {
+    if (age < 60) {
+      alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
+      rate = 0;
+    } else {
+      rate = 30; // 60+
+    }
+  }
+  // (Người lớn / Sinh viên / VIP => rate = 0, logic ở chỗ khác)
 
-    // 5) Xác định discount rate
-    let rate = 0;
+  // Nếu rate > 0 => hợp lệ => ghép DOB
+  if (rate > 0) {
+    let dobString = day.padStart(2, '0') + "/" + month.padStart(2, '0') + "/" + year;
+
+    // *** Chỉ set readOnly nếu là Trẻ em ***
     if (selectedOption === "Trẻ em") {
-        if (age < 6) {
-            alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
-            rate = 0;
-        } else if (age > 10) {
-            alert("Không đúng độ tuổi Trẻ em (6-10)!");
-            rate = 0;
-        } else {
-            // Tuổi 6..10 => discount 50%
-            rate = 50;
-        }
-    } else if (selectedOption === "Người cao tuổi") {
-        if (age < 60) {
-            alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
-            rate = 0;
-        } else {
-            // 60+ => discount 30%
-            rate = 30;
-        }
-    }
-    // (Người lớn, Sinh viên, VIP: logic discount ở chỗ khác)
+      document.getElementById(idNumberInputId).value = dobString;
+      document.getElementById(idNumberInputId).readOnly = true;
+    } 
 
-    // 6) Nếu rate > 0, nghĩa là DOB hợp lệ => set readOnly và gửi Ajax lưu DOB
-    if (rate > 0) {
-        // Ghép DOB thành chuỗi dd/MM/yyyy
-        let dobString = day.padStart(2, '0') + "/" + month.padStart(2, '0') + "/" + year;
-        // Gán vào input
-        document.getElementById(idNumberInputId).value = dobString;
-        document.getElementById(idNumberInputId).readOnly = true;
+    // Gửi Ajax confirmDOB => server
+    let idx = selectId.replace('passengerType', '');
+    let params = new URLSearchParams();
+    params.append("action", "confirmDOB");
+    params.append("index", idx);
+    params.append("dob", dobString);
 
-        // Gửi Ajax lưu DOB lên server (action=confirmDOB)
-        let idx = selectId.replace('passengerType', ''); // "passengerType2" -> "2"
-        let params = new URLSearchParams();
-        params.append("action", "confirmDOB");
-        params.append("index", idx);
-        params.append("dob", dobString);
+    fetch("passengerinfo", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString()
+    })
+    .then(resp => resp.text())
+    .then(result => {
+      console.log("DOB confirmed on server:", result);
+    })
+    .catch(err => console.error(err));
+  }
 
-        fetch("passengerinfo", {
-            method: "POST",
-            headers: {"Content-Type": "application/x-www-form-urlencoded"},
-            body: params.toString()
-        })
-                .then(resp => resp.text())
-                .then(result => {
-                    console.log("DOB confirmed on server:", result);
-                    // Ở đây server có thể trả về "OK" hoặc JSON,
-                    // bạn tùy ý xử lý (hiển thị thông báo, v.v.)
-                })
-                .catch(err => console.error(err));
-    }
-
-    // 7) Tính discount + cập nhật giao diện
-    let discountAmount = basePrice * rate / 100;
-    let finalPrice = basePrice - discountAmount + 1;
-    document.getElementById(discountId).innerText = '-' + rate + '%';
-    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-
-    // 8) Cập nhật tổng tiền
-    updateTotalAmount();
+  // Tính finalPrice
+  let discountAmount = basePrice * rate / 100;
+  let finalPrice = basePrice - discountAmount + 1;
+  document.getElementById(discountId).innerText = '-' + rate + '%';
+  document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+  updateTotalAmount();
 }
+
 
 // Xác nhận VIP
 function confirmVIP(modalId, selectId, priceId, discountId, totalId) {

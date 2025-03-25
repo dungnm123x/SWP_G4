@@ -123,10 +123,8 @@
                                         <strong>Đối tượng:</strong> ${sessionScope.typeList[status.index]}
                                     </td>
                                     <td>${item.price}</td>
-                                    <td>
-                                        <!-- Tạm = item.price, hoặc discount, vv -->
-                                        ${item.price}
-                                    </td>
+                                    <td>${sessionScope.finalPriceList[status.index]}</td>
+
                                 </tr>
                             </c:forEach>
 
