@@ -80,6 +80,10 @@
         <servlet-name>OrderController</servlet-name>
         <servlet-class>controller.OrderController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EmployeeCalendarController</servlet-name>
+        <servlet-class>controller.employee.EmployeeCalendarController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>listTrainController</servlet-name>
         <url-pattern>/trip</url-pattern>
@@ -207,5 +211,9 @@
     <servlet-mapping>
         <servlet-name>OrderController</servlet-name>
         <url-pattern>/order</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EmployeeCalendarController</servlet-name>
+        <url-pattern>/employeeCalendar</url-pattern>
     </servlet-mapping>
 </web-app>

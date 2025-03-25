@@ -66,6 +66,7 @@
                         <img src="./img/logo.jpg" alt="avatar">
                     </div>
                     <ul>
+                        <li><a href="employeeCalendar">Lịch làm việc</a></li>
                         <li><a href="train">Quản lý tàu</a></li>
                         <li><a href="trip">Quản lý chuyến</a></li>
                         <li><a href="route">Quản lý tuyến tàu</a></li>
@@ -95,6 +96,7 @@
                             <c:if test="${sessionScope.user.userId == 1}">
                             <li><a href="admin?view=userauthorization">Phân quyền</a></li>
                             </c:if>
+                        <li><a href="admin?view=calendar">Lịch</a></li>
                         <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
 
                     </ul>
