@@ -47,7 +47,10 @@ function updateDiscount(
     let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
 
     // Nếu là "Trẻ em" / "Người cao tuổi" mà *chưa* confirmed => mở popup
-    if ((selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") && !alreadyConfirmed) {
+//    let alreadyConfirmed = (rowEl.getAttribute('data-confirmedDOB') === 'true');
+    const isChildOrOld = (selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi");
+    if (isChildOrOld && !alreadyConfirmed) {
+        // mở popup
         document.getElementById(ageModalId).style.display = 'flex';
         return; // chờ user nhập DOB
     }
@@ -216,7 +219,7 @@ function confirmVIP(modalId, selectId, priceId, discountId, totalId) {
     let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
     let rate = 10;
     let discountAmount = basePrice * rate / 100;
-    let finalPrice = basePrice - discountAmount + 1;
+    let finalPrice = basePrice - discountAmount + 1000;
     document.getElementById(discountId).innerText = '-10%';
     document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
     updateTotalAmount();
