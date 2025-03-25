@@ -87,7 +87,7 @@ public class AdminController extends HttpServlet {
                 return;
             } else if ("calendar".equals(view)) {
                 // Handle the calendar view
-                List<CalendarEvent> events = dao.getCalendarEventsByUser(user.getUserId());
+                List<CalendarEvent> events = dao.getAllCalendarEvents();
                 request.setAttribute("calendarEvents", events);
                 request.setAttribute("type", "calendar");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);

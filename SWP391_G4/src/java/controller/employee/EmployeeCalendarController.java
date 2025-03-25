@@ -26,7 +26,7 @@ public class EmployeeCalendarController extends HttpServlet {
         // Fetch calendar events for the logged-in employee
         DAOAdmin dao = new DAOAdmin();
         try {
-            List<CalendarEvent> events = dao.getCalendarEventsByUser(user.getUserId());
+            List<CalendarEvent> events = dao.getAllCalendarEvents();
             request.setAttribute("calendarEvents", events);
             request.getRequestDispatcher("view/employee/employeeCalendar.jsp").forward(request, response);
         } catch (SQLException e) {
