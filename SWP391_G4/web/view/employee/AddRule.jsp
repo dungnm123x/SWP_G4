@@ -133,6 +133,7 @@ Author     : dung9
                         <li><a href="route">Quản lý tuyến tàu</a></li>
                         <li><a href="station">Quản lý ga</a></li>
                         <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="refund">Quản lý đơn hoàn tiền</a></li>
                         <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                         <li><a href="posts-list">Quản lý Blog</a></li>
                         <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>

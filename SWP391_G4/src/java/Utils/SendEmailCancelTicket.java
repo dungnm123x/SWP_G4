@@ -8,6 +8,7 @@ package Utils;
  *
  * @author dung9
  */
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -26,7 +27,7 @@ public class SendEmailCancelTicket {
      * @param htmlContent Nội dung email (có thể là HTML)
      * @return true nếu gửi thành công, false nếu thất bại
      */
-    public static boolean sendEmail(String recipientEmail, String subject, String htmlContent) {
+    public static boolean sendEmail(String recipientEmail, String subject, String htmlContent) throws UnsupportedEncodingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -44,7 +45,7 @@ public class SendEmailCancelTicket {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_SENDER));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject(subject);
+            message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
