@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller;
-
+import java.time.LocalDate;
 import dal.StationDAO;
 import dal.TrainDAO;
 import dal.TripDAO;
@@ -64,10 +63,14 @@ public class SearchTicketServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-   @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            String minDate = java.time.LocalDate.now().toString();
+            // Truyền sang JSP
+            request.setAttribute("minDate", minDate);
+
             StationDAO stationDAO = new StationDAO();
             List<Station> gaList = stationDAO.getAllStations();
             request.setAttribute("gaList", gaList);

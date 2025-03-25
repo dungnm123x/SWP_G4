@@ -6,6 +6,8 @@
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="f" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page import="java.time.LocalDate" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -54,8 +56,13 @@
                 </select>
 
                 <!-- Ngày đi -->
+                <!-- Ngày đi -->
                 <input type="date" name="departureDay" id="departureDay"
-                       value="${selectedDate}" required />
+                       value="${selectedDate}"
+                       min="${minDate}" 
+                       required />
+
+
 
                 <!-- Loại vé -->
                 <select name="tripType" id="tripType" required onchange="toggleReturnDate()">
@@ -66,7 +73,8 @@
                 <!-- Ngày về (ẩn nếu chọn "Một chiều") -->
                 <div id="returnDateContainer" style="display: ${selectedTicketType == '2' ? 'block' : 'none'};">
                     <input type="date" name="returnDate" id="returnDate"
-                           value="${returnDate}" />
+                           value="${returnDate}"   min="${minDate}" 
+                            />
                 </div>
 
                 <button type="submit">Tìm Kiếm</button>
