@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controller;
+
 import java.time.LocalDate;
 import dal.StationDAO;
 import dal.TrainDAO;
@@ -91,6 +92,54 @@ public class SearchTicketServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String departureDayStr = request.getParameter("departureDay");
+        LocalDate departureDay = LocalDate.parse(departureDayStr);
+        LocalDate today = LocalDate.now();
+
+        // Kiểm tra nếu ngày đi là quá khứ
+        if (departureDay.isBefore(today)) {
+            request.setAttribute("errorMessage", "Ngày đi không được là quá khứ. Vui lòng chọn ngày hợp lệ.");
+            // Truyền lại danh sách ga
+            try {
+                String minDate = today.toString();
+                request.setAttribute("minDate", minDate);
+
+                StationDAO stationDAO = new StationDAO();
+                List<Station> gaList = stationDAO.getAllStations();
+                request.setAttribute("gaList", gaList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            request.getRequestDispatcher("searchtickets.jsp").forward(request, response);
+            return;
+        }
+
+        // Nếu là vé khứ hồi, có thể kiểm tra ngày về cũng không được quá khứ và không nhỏ hơn ngày đi
+        String tripType = request.getParameter("tripType");
+        if ("2".equals(tripType)) {
+            String returnDateStr = request.getParameter("returnDate");
+            if (returnDateStr != null && !returnDateStr.isEmpty()) {
+                LocalDate returnDate = LocalDate.parse(returnDateStr);
+                if (returnDate.isBefore(today) || returnDate.isBefore(departureDay)) {
+                    request.setAttribute("errorMessage", "Ngày về phải không thuộc quá khứ và không nhỏ hơn ngày đi.");
+                    // Truyền lại danh sách ga
+                    try {
+                        String minDate = today.toString();
+                        request.setAttribute("minDate", minDate);
+
+                        StationDAO stationDAO = new StationDAO();
+                        List<Station> gaList = stationDAO.getAllStations();
+                        request.setAttribute("gaList", gaList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    request.getRequestDispatcher("searchtickets.jsp").forward(request, response);
+                    return;
+                }
+            }
+        }
+
+        // Nếu hợp lệ, bạn có thể gọi phương thức processRequest hoặc thực hiện logic tìm kiếm
         processRequest(request, response);
     }
 

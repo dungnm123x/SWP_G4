@@ -406,67 +406,6 @@
                         required 
                         />
                 </div>
-
-<!--                <div class="col-xs-4 col-sm-3 et-col-md-2 et-train-block ng-scope" ng-repeat="tau in onScreenGoingTrains" ng-click="doiChuyen(tau, false)" analytics-on="click" analytics-event="SelectTrain">
-                    <div class="et-train-head et-train-head-selected" ng-class="{'et-train-head-selected': tau.MacTau == searchData.tauDi.MacTau, 'et-train-head-auto': tau.MacTau != searchData.tauDi.MacTau & amp; & amp; tau.IsChonChoTuDong}">
-                        <div class="row center-block" style="width: 40%; margin-bottom: 3px"><div class="et-train-lamp text-center ng-binding" ng-style="{color: tau.HasCheapTicket?'#bf8c01':'#555555'}" style="color: rgb(85, 85, 85);">SE3</div>
-                            
-                        </div>
-                        <div class="et-train-head-info">
-                            <div class="row et-no-margin">
-                                <span class="pull-left et-bold ng-binding">TG đi</span> 
-                                <span class="pull-right ng-binding">23/03 19:20</span>
-                            </div>
-                            <div class="row et-no-margin">
-                                <span class="pull-left et-bold ng-binding">TG đến</span>
-                                <span class="pull-right"></span> 
-                                <span class="pull-right ng-binding">25/03 05:45</span>
-                            </div>
-                            <div class="row et-no-margin">
-                                <div class="et-col-50">
-                                    <div class="et-text-sm ng-binding">SL chỗ đặt</div>
-                                    <div class="et-text-large et-bold pull-left ng-binding" style="margin-left: 5px">0
-                                    </div>
-                                        
-                                </div>
-                                <div class="et-col-50 text-center">
-                                    <div class="et-text-sm ng-binding">SL chỗ trống
-                                    </div>
-                                    <div class="et-text-large et-bold pull-right ng-binding" style="margin-right: 5px">0
-                                    </div>
-                                        
-                                </div>
-                                    
-                            </div>
-                                
-                        </div>
-                        <div class="row et-no-margin">
-                            <div class="et-col-50">
-                                <span class="et-train-lamp-bellow-left">
-                                    
-                                </span>
-                            </div>
-                            <div class="et-col-50">
-                                <span class="et-train-lamp-bellow-right">
-                                    
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="et-train-base"></div><div class="et-train-base-2">
-                        
-                    </div>
-                    <div class="et-train-base-3">
-                        
-                    </div>
-                    <div class="et-train-base-4">
-                        
-                    </div>
-                    <div class="et-train-base-5">
-                        
-                    </div>
-                        
-                </div>-->
                 <div class="col-md-4">
 
 
@@ -505,11 +444,6 @@
             <div class="d-flex justify-content-between mt-4">
                 <!-- Nút "Quay lại" đến 1 trang cụ thể -->
                 <button type="button" onclick="goBack()" class="btn btn-secondary">Quay lại</button>
-
-
-
-
-
                 <button type="submit" class="btn btn-primary">
                     Tiếp tục
                 </button>

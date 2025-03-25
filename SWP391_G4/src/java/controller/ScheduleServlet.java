@@ -115,6 +115,8 @@ public class ScheduleServlet extends HttpServlet {
         String tType = request.getParameter("tripType");            // 1 hoặc 2
         String rDate = request.getParameter("returnDate");          // Ngày về (có thể rỗng)
 
+        String minDate = java.time.LocalDate.now().toString();
+        request.setAttribute("minDate", minDate);
         // Lấy danh sách ga
         StationDAO stationDAO = new StationDAO();
         List<Station> gaList = stationDAO.getAllStations();
@@ -142,148 +144,106 @@ public class ScheduleServlet extends HttpServlet {
             int departureStationID = Integer.parseInt(depID);
             int arrivalStationID = Integer.parseInt(arrID);
 
-            // Gọi DAO lấy danh sách chuyến
-            TripDAO tripDAO = new TripDAO();
-            List<Trip> tripList = tripDAO.getTripsByRoute(departureStationID, arrivalStationID, dDay);
+            java.time.LocalDate departureDay = java.time.LocalDate.parse(dDay);
+            java.time.LocalDate today = java.time.LocalDate.now();
 
-            // Nếu tripType=2 => lấy thêm chuyến về
-            List<Trip> returnTripList = null;
-            if ("2".equals(tType) && rDate != null && !rDate.trim().isEmpty()) {
-                returnTripList = tripDAO.getTripsByRoute(arrivalStationID, departureStationID, rDate);
+            if (departureDay.isBefore(today)) {
+                request.setAttribute("errorMessage", "Ngày đi không được là quá khứ!");
+                request.getRequestDispatcher("searchtickets.jsp").forward(request, response);
+                return;
             }
 
-            // Lưu tripList vào session (hoặc request)
-            HttpSession session = request.getSession();
-            session.setAttribute("scheduleList", tripList);
-            session.setAttribute("returnScheduleList", returnTripList);
+            // Nếu là khứ hồi => kiểm tra ngày về
+            if ("2".equals(tType) && rDate != null && !rDate.trim().isEmpty()) {
+                java.time.LocalDate returnDay = java.time.LocalDate.parse(rDate);
+                if (returnDay.isBefore(today) || returnDay.isBefore(departureDay)) {
+                    request.setAttribute("errorMessage", "Ngày về phải >= ngày đi và không thuộc quá khứ!");
+                    request.getRequestDispatcher("searchtickets.jsp").forward(request, response);
+                    return;
+                }
+            }
+                // Gọi DAO lấy danh sách chuyến
+                TripDAO tripDAO = new TripDAO();
+                List<Trip> tripList = tripDAO.getTripsByRoute(departureStationID, arrivalStationID, dDay);
 
-            // Lấy tên ga đi/đến để hiển thị
-            String departureStationName = stationDAO.getStationNameById(departureStationID);
-            String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
-            
-            session.setAttribute("departureStation", departureStationName);
-            session.setAttribute("arrivalStation", arrivalStationName);
-            session.setAttribute("departureDate", dDay);
-            session.setAttribute("selectedTicketType", tType);
-            session.setAttribute("returnDate", rDate);
+                // Nếu tripType=2 => lấy thêm chuyến về
+                List<Trip> returnTripList = null;
+                if ("2".equals(tType) && rDate != null && !rDate.trim().isEmpty()) {
+                    returnTripList = tripDAO.getTripsByRoute(arrivalStationID, departureStationID, rDate);
+                }
 
-            session.setAttribute("selectedDeparture", departureStationID);
-            session.setAttribute("selectedArrival", arrivalStationID);
-            session.setAttribute("selectedDate", dDay);
-            session.setAttribute("selectedTicketType", tType);
-            session.setAttribute("returnDate", rDate);
+                // Lưu tripList vào session (hoặc request)
+                HttpSession session = request.getSession();
+                session.setAttribute("scheduleList", tripList);
+                session.setAttribute("returnScheduleList", returnTripList);
 
-            // Forward sang schedule.jsp
-            request.getRequestDispatcher("schedule.jsp").forward(request, response);
+                // Lấy tên ga đi/đến để hiển thị
+                String departureStationName = stationDAO.getStationNameById(departureStationID);
+                String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
 
-        } catch (NumberFormatException e) {
+                session.setAttribute("departureStation", departureStationName);
+                session.setAttribute("arrivalStation", arrivalStationName);
+                session.setAttribute("departureDate", dDay);
+                session.setAttribute("selectedTicketType", tType);
+                session.setAttribute("returnDate", rDate);
+
+                session.setAttribute("selectedDeparture", departureStationID);
+                session.setAttribute("selectedArrival", arrivalStationID);
+                session.setAttribute("selectedDate", dDay);
+                session.setAttribute("selectedTicketType", tType);
+                session.setAttribute("returnDate", rDate);
+
+                // Forward sang schedule.jsp
+                request.getRequestDispatcher("schedule.jsp").forward(request, response);
+
+            }catch (NumberFormatException e) {
             e.printStackTrace();
             // Nếu parseInt lỗi => có thể redirect sang trang lỗi
             response.sendRedirect("error.jsp");
         }
-    }
+        }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-//    @Override
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        try {
-//            int departureStationID = Integer.parseInt(request.getParameter("diemdi"));
-//            int arrivalStationID = Integer.parseInt(request.getParameter("diemden"));
-//            String departureDate = request.getParameter("ngaydi");
-//            String ticketType = request.getParameter("loaive");
-//            String returnDate = request.getParameter("ngayve");
-//
-//            // Lấy thông tin ga đi và ga đến
-//            StationDAO stationDAO = new StationDAO();
-//            String departureStationName = stationDAO.getStationNameById(departureStationID);
-//            String arrivalStationName = stationDAO.getStationNameById(arrivalStationID);
-//
-//            // Lấy danh sách ga
-//            List<Station> gaList = stationDAO.getAllStations();
-//            request.setAttribute("gaList", gaList);
-//
-//            // Lấy danh sách chuyến đi
-//            TripDAO tripDAO = new TripDAO();
-//            List<Trip> tripList = tripDAO.getTripsByRoute(departureStationID, arrivalStationID, departureDate);
-//
-//            // Nếu là vé khứ hồi, lấy danh sách chuyến về
-//            List<Trip> returnTripList = null;
-//            if ("2".equals(ticketType) && returnDate != null && !returnDate.isEmpty()) {
-//                returnTripList = tripDAO.getTripsByRoute(arrivalStationID, departureStationID, returnDate);
-//            }
-//
-//            // Lấy danh sách tên tàu
-//            TrainDAO trainDAO = new TrainDAO();
-//            Map<Integer, Train> trainMap = new HashMap<>();
-//            for (Trip trip : tripList) {
-//                Train train = trainDAO.getTrainById(trip.getTrain().getTrainID());
-//                trainMap.put(trip.getTripID(), train);
-//            }
-//
-//            // Giữ lại dữ liệu khi tìm kiếm
-//            HttpSession session = request.getSession();
-//            session.setAttribute("selectedDeparture", departureStationID);
-//            session.setAttribute("selectedArrival", arrivalStationID);
-//            session.setAttribute("selectedDate", departureDate);
-//            session.setAttribute("selectedTicketType", ticketType);
-//            session.setAttribute("returnDate", returnDate);
-//
-//            request.setAttribute("departureStation", departureStationName);
-//            request.setAttribute("arrivalStation", arrivalStationName);
-//            request.setAttribute("departureDate", departureDate);
-//            request.setAttribute("selectedTicketType", ticketType);
-//            request.setAttribute("returnDate", returnDate);
-//            
-//           
-//            session.setAttribute("scheduleList", tripList);
-//
-//            session.setAttribute("returnScheduleList", returnTripList);
-//            request.setAttribute("trainMap", trainMap);
-//
-//            request.getRequestDispatcher("schedule.jsp").forward(request, response);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            response.sendRedirect("error.jsp");
-//        }
-//    }
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        /**
+         * Handles the HTTP <code>POST</code> method.
+         *
+         * @param request servlet request
+         * @param response servlet response
+         * @throws ServletException if a servlet-specific error occurs
+         * @throws IOException if an I/O error occurs
+         */
+        @Override
+        protected void doPost
+        (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Đọc param từ form searchtickets.jsp
-        String depID = request.getParameter("departureStationID");
-        String arrID = request.getParameter("arrivalStationID");
-        String dDay = request.getParameter("departureDay");
-        String tType = request.getParameter("tripType");
-        String rDate = request.getParameter("returnDate");
+            // Đọc param từ form searchtickets.jsp
+            String depID = request.getParameter("departureStationID");
+            String arrID = request.getParameter("arrivalStationID");
+            String dDay = request.getParameter("departureDay");
+            String tType = request.getParameter("tripType");
+            String rDate = request.getParameter("returnDate");
 
-        // Redirect sang doGet, kèm param
-        String redirectURL = "schedule"
-                + "?departureStationID=" + URLEncoder.encode(depID == null ? "" : depID, "UTF-8")
-                + "&arrivalStationID=" + URLEncoder.encode(arrID == null ? "" : arrID, "UTF-8")
-                + "&departureDay=" + URLEncoder.encode(dDay == null ? "" : dDay, "UTF-8")
-                + "&tripType=" + URLEncoder.encode(tType == null ? "" : tType, "UTF-8")
-                + "&returnDate=" + URLEncoder.encode(rDate == null ? "" : rDate, "UTF-8");
+            // Redirect sang doGet, kèm param
+            String redirectURL = "schedule"
+                    + "?departureStationID=" + URLEncoder.encode(depID == null ? "" : depID, "UTF-8")
+                    + "&arrivalStationID=" + URLEncoder.encode(arrID == null ? "" : arrID, "UTF-8")
+                    + "&departureDay=" + URLEncoder.encode(dDay == null ? "" : dDay, "UTF-8")
+                    + "&tripType=" + URLEncoder.encode(tType == null ? "" : tType, "UTF-8")
+                    + "&returnDate=" + URLEncoder.encode(rDate == null ? "" : rDate, "UTF-8");
 
-        response.sendRedirect(redirectURL);
-    }
+            response.sendRedirect(redirectURL);
+        }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
+        /**
+         * Returns a short description of the servlet.
+         *
+         * @return a String containing servlet description
+         */
+        @Override
+        public String getServletInfo
+        
+            () {
         return "Short description";
-    }// </editor-fold>
+        }// </editor-fold>
 
-}
+    }
