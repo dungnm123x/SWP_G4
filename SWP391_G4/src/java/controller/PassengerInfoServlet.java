@@ -120,6 +120,7 @@ public class PassengerInfoServlet extends HttpServlet {
 
         // Lấy action
         String action = request.getParameter("action");
+        String renderPartial = request.getParameter("renderPartial");
         // Lấy param
         String departureStationID = request.getParameter("departureStationID");
         String arrivalStationID = request.getParameter("arrivalStationID");
@@ -177,28 +178,55 @@ public class PassengerInfoServlet extends HttpServlet {
         // 2) Nếu action = "removeOne" => Xóa 1 vé nhưng vẫn giữ lại URL tìm kiếm
         if ("removeOne".equals(action)) {
             String seatID = request.getParameter("seatID");
-            System.out.println("Request seatID to remove: " + seatID);
-
-            if (seatID != null && !seatID.isEmpty()) {
-                boolean removed = cartItems.removeIf(item
-                        -> (item.getTrainName() + "_" + item.getDepartureDate() + "_" + item.getCarriageNumber() + "_" + item.getSeatNumber()).equals(seatID)
+            if (seatID != null) {
+                cartItems.removeIf(item
+                        -> (item.getTrainName() + "_" + item.getDepartureDate()
+                                + "_" + item.getCarriageNumber() + "_" + item.getSeatNumber())
+                                .equals(seatID)
                 );
-
-                if (removed) {
-                    System.out.println("Successfully removed seat: " + seatID);
-                } else {
-                    System.out.println("No matching seat found for: " + seatID);
-                }
             }
 
-            // Nếu giỏ hàng vẫn còn vé, quay lại passengerInfo.jsp
-            if (!cartItems.isEmpty()) {
-//                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+            // Xóa xong => if renderPartial => chỉ trả về HTML của phần table
+            if ("true".equals(renderPartial)) {
+                // request scope => set cartItems
+                request.setAttribute("cartItems", cartItems);
+
+                // Forward sang 1 JSP snippet, hoặc forward sang passengerInfo.jsp
+                // kèm cờ "partial" => c:if
+                request.setAttribute("partialMode", true);
+                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                return;
             } else {
-                response.sendRedirect(redirectURL);
+                // Trường hợp user bấm submit form => reload page cũ
+                // ...
+                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                return;
             }
-            return;
         }
+//        if ("removeOne".equals(action)) {
+//            String seatID = request.getParameter("seatID");
+//            System.out.println("Request seatID to remove: " + seatID);
+//
+//            if (seatID != null && !seatID.isEmpty()) {
+//                boolean removed = cartItems.removeIf(item
+//                        -> (item.getTrainName() + "_" + item.getDepartureDate() + "_" + item.getCarriageNumber() + "_" + item.getSeatNumber()).equals(seatID)
+//                );
+//
+//                if (removed) {
+//                    System.out.println("Successfully removed seat: " + seatID);
+//                } else {
+//                    System.out.println("No matching seat found for: " + seatID);
+//                }
+//            }
+//
+//            // Nếu giỏ hàng vẫn còn vé, quay lại passengerInfo.jsp
+//            if (!cartItems.isEmpty()) {
+////                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+//            } else {
+//                response.sendRedirect(redirectURL);
+//            }
+//            return;
+//        }
 
         // 3) Người dùng bấm "Tiếp tục"
         int passengerCount = 0;
