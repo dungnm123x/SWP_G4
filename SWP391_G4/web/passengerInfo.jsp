@@ -434,7 +434,9 @@
                     <input 
                         type="text" 
                         class="form-control" 
-                        name="bookingCCCD"   
+                        name="bookingCCCD"
+                        pattern="\d{9}|\d{12}"
+                        title="CCCD/Hộ chiếu phải gồm 9 hoặc 12 chữ số"
                         value="${sessionScope.bookingCCCD}"  
                         required 
                         />

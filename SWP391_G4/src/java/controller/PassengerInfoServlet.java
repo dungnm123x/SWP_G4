@@ -81,13 +81,11 @@ public class PassengerInfoServlet extends HttpServlet {
         }
 
         // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
-        
         session.setAttribute("bookingName", user.getFullName());
         session.setAttribute("bookingEmail", user.getEmail());
         session.setAttribute("bookingPhone", user.getPhoneNumber());
-        
-        // (Hoặc .getIdentityNumber() tùy bạn đặt tên cột)
 
+        // (Hoặc .getIdentityNumber() tùy bạn đặt tên cột)
         // ... (phần code tạo previousURL)
         String depID = request.getParameter("departureStationID");
         String arrID = request.getParameter("arrivalStationID");
@@ -267,6 +265,14 @@ public class PassengerInfoServlet extends HttpServlet {
             }
             if (normalizedCCCD.isEmpty()) {
                 request.setAttribute("errorMessage", "CMND/Hộ chiếu không hợp lệ, vui lòng nhập lại.");
+                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                return;
+            }
+            // Ví dụ: chấp nhận 9 hoặc 12 chữ số
+            String cccdRegex = "^(\\d{9}|\\d{12})$";
+
+            if (!normalizedCCCD.matches(cccdRegex)) {
+                request.setAttribute("errorMessage", "CCCD/Hộ chiếu phải là 9 hoặc 12 chữ số!");
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             }
