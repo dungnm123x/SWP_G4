@@ -193,7 +193,7 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                     // Nút submit
                     out.println("<button type='submit' class='seat " + seatClass + "' "
                             + "data-tooltip='Ghế " + seat.getSeatNumber() + " - " + seatStatus
-                            + " - Giá: " + df.format(seatPrice) + " $'>"
+                            + " - Giá: " + df.format(seatPrice) + " VND'>"
                             + seat.getSeatNumber()
                             + "</button>");
 

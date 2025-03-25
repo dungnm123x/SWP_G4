@@ -108,9 +108,25 @@ public class StationController extends HttpServlet {
             stationDAO.updateStation(station);
             response.sendRedirect("station");
         } else {
-            Station station = new Station(0, name, address);
-            stationDAO.addStation(station);
+            //add
+            if (name == null || name.trim().isEmpty() || address == null || address.trim().isEmpty()) {
+            request.setAttribute("error", "Station name and address cannot be empty.");
+              // Repopulate the station list for display
+            request.setAttribute("stations", stationDAO.getAllStations());
             response.sendRedirect("station");
+            return; // Stop processing
+        }
+        // Check for duplicate station names
+        if (stationDAO.isStationNameExist(name)) {
+            request.setAttribute("error", "Ga đã tồn tại.");
+              // Repopulate the station list for display
+            request.setAttribute("stations", stationDAO.getAllStations());
+            response.sendRedirect("station");
+            return; // Stop processing
+        }
+         Station station = new Station(0, name, address); // Assuming ID is auto-incrementing
+        stationDAO.addStation(station);
+        response.sendRedirect("station");
         }
 
     }

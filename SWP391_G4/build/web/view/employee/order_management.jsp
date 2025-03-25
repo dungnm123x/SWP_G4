@@ -72,6 +72,7 @@
                         <li><a href="route">Quản lý tuyến tàu</a></li>
                         <li><a href="station">Quản lý ga</a></li>
                         <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="refund">Quản lý đơn hoàn tiền</a></li>
                         <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                         <li><a href="posts-list">Quản lý Blog</a></li>
                         <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
@@ -222,10 +223,10 @@
                                     <%--<td rowspan="${fn:length(booking.tickets)}">${booking.paymentStatus}</td>--%>
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.formattedBookingDate}</td>
                                     <td rowspan="${fn:length(booking.tickets)}">
-                                        <a href="order?action=view&id=${booking.bookingID}">Xem</a>
-                                        <c:if test="${booking.bookingStatus != 'Cancelled'}">
+                                        <a href="order?action=view&id=${booking.bookingID}"><button>Xem</button></a>
+                                        <%--<c:if test="${booking.bookingStatus != 'Cancelled'}">
                                             <a href="order?action=cancel&id=${booking.bookingID}" onclick="return confirm('Are you sure you want to cancel this order?');">Hủy</a>
-                                        </c:if>
+                                        </c:if>--%>
                                     </td>
                                 </c:if>
 

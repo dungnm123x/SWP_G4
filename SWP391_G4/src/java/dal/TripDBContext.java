@@ -292,6 +292,87 @@ public class TripDBContext extends DBContext<TripDTO> {
         }
     }
 
+    public List<TripDTO> getTripsByTrainId(int trainId) {
+        List<TripDTO> trips = new ArrayList<>();
+        String sql = "SELECT tr.TripID, tr.TrainID, t.TrainName, tr.RouteID, "
+                + "CONCAT(st1.StationName, ' - ', st2.StationName) AS RouteName, "
+                + "tr.DepartureTime, tr.ArrivalTime, tr.TripStatus "
+                + "FROM Trip tr "
+                + "JOIN Train t ON tr.TrainID = t.TrainID "
+                + "JOIN Route r ON tr.RouteID = r.RouteID "
+                + "JOIN Station st1 ON r.DepartureStationID = st1.StationID "
+                + "JOIN Station st2 ON r.ArrivalStationID = st2.StationID "
+                + "WHERE tr.TrainID = ?"; // Filter by TrainID
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trainId); // Set the TrainID parameter
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TripDTO trip = new TripDTO();
+                    trip.setTripID(rs.getInt("TripID"));
+                    trip.setTrainID(rs.getInt("TrainID"));
+                    trip.setTrainName(rs.getString("TrainName"));
+                    trip.setRouteID(rs.getInt("RouteID"));
+                    trip.setRouteName(rs.getString("RouteName"));
+
+                    Timestamp departureTimestamp = rs.getTimestamp("DepartureTime");
+                    if (departureTimestamp != null) {
+                        trip.setDepartureTime(departureTimestamp.toLocalDateTime());
+                    }
+
+                    Timestamp arrivalTimestamp = rs.getTimestamp("ArrivalTime");
+                    if (arrivalTimestamp != null) {
+                        trip.setArrivalTime(arrivalTimestamp.toLocalDateTime());
+                    }
+                    trip.setTripStatus(rs.getString("TripStatus"));
+                    trips.add(trip);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+        }
+        return trips;
+    }
+
+    public boolean isTripOverlapping(int trainID, LocalDateTime newDeparture, LocalDateTime newArrival, Integer excludeTripId) {
+        String sql = "SELECT COUNT(*) FROM Trip "
+                + "WHERE TrainID = ? "
+                + "AND ((DepartureTime < ? AND ArrivalTime > ?) "
+                + // Case 1: New trip starts before existing trip ends, and ends after existing trip starts
+                "  OR (DepartureTime < ? AND ArrivalTime > ?))";   // Case 2: New trip starts during existing trip
+
+        // Add exclusion for updates
+        if (excludeTripId != null) {
+            sql += " AND TripID <> ?"; // Exclude the current trip being updated
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trainID);
+            ps.setTimestamp(2, Timestamp.valueOf(newArrival)); // End of *new* trip
+            ps.setTimestamp(3, Timestamp.valueOf(newDeparture)); // Start of *new* trip
+            ps.setTimestamp(4, Timestamp.valueOf(newDeparture)); // Start of *new* trip
+            ps.setTimestamp(5, Timestamp.valueOf(newArrival)); // End of new trip.
+            if (excludeTripId != null) {
+                ps.setInt(6, excludeTripId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Return true if count > 0 (overlap exists)
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log and handle the exception
+            return true; // Assume overlap on error, to be safe
+        }
+        return false; // No overlap found
+    }
+
+// Overload for add, excludeTripId will be null.
+    public boolean isTripOverlapping(int trainID, LocalDateTime newDeparture, LocalDateTime newArrival) {
+        return isTripOverlapping(trainID, newDeparture, newArrival, null);
+    }
+
     // ... (Other methods, including get/list/insert/update/delete for DBContext interface)
     @Override
     public TripDTO get(int id) {

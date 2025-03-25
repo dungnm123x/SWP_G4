@@ -44,6 +44,7 @@
                         <li><a href="route">Quản lý tuyến tàu</a></li>
                         <li><a href="station">Quản lý ga</a></li>
                         <li><a href="order">Quản lý hóa đơn</a></li>
+                        <li><a href="refund">Quản lý đơn hoàn tiền</a></li>
                         <li><a href="category-blog">Quản lý tiêu đề Blog</a></li>
                         <li><a href="posts-list">Quản lý Blog</a></li>
                         <li><a href="category-rule">Quản lý tiêu đề quy định</a></li>
@@ -111,11 +112,8 @@
                     <input type="datetime-local" id="arrivalTime" name="arrivalTime" required><br>
 
                     <label for="tripStatus">Tình trạng:</label>
-                    <select id="tripStatus" name="tripStatus" required>
-                        <option value="Scheduled">Scheduled</option>
-                        <option value="Departed">Departed</option>
-                        <option value="Arrived">Arrived</option>
-                        <option value="Cancelled">Cancelled</option>
+                    <select id="tripStatus" name="tripStatus" required disabled>
+                        <option value="Scheduled" selected>Scheduled</option>
                     </select><br>
 
                     <button type="submit">Thêm</button>
