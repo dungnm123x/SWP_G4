@@ -239,6 +239,33 @@ public class PassengerInfoServlet extends HttpServlet {
 //            }
 //            return;
 //        }
+        if ("confirmDOB".equals(action)) {
+            // 1) Lấy index, dobString
+            String indexStr = request.getParameter("index");
+            String dob = request.getParameter("dob");
+            int idx = Integer.parseInt(indexStr);
+
+            // 2) Lưu "dob" + cờ "confirmedDOB" vào session
+           
+            // Giả sử bạn có sẵn: sessionScope.idNumberList, sessionScope.confirmedDOB
+            List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
+            boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
+            // Hoặc dùng ArrayList<Boolean>, v.v.
+
+            // 3) Cập nhật
+            idNumberList.set(idx, dob);
+            confirmedDOB[idx] = true;
+
+            // 4) Lưu lại
+            session.setAttribute("idNumberList", idNumberList);
+            session.setAttribute("confirmedDOB", confirmedDOB);
+
+            // 5) In ra 1 kết quả (JSON hoặc text) => AJAX
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
+            return;
+        }
+
         // 3) Người dùng bấm "Tiếp tục"
         int passengerCount = 0;
         try {

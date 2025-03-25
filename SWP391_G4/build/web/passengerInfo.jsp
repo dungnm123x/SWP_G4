@@ -1,20 +1,14 @@
-<%-- 
-    Document   : passengerInfo
-    Created on : Mar 3, 2025, 10:30:51 PM
-    Author     : Admin
---%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
-boolean partialMode = (request.getAttribute("partialMode") != null);
+    boolean partialMode = (request.getAttribute("partialMode") != null);
 %>
+
 <c:choose>
+
     <c:when test="${partialMode}">
-        <!-- =========================
-             CHỈ IN ĐOẠN <TABLE> 
-             ========================= -->
 
         <table class="table table-bordered text-center">
             <thead class="table-primary">
@@ -54,34 +48,46 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                                     'idNumber${status.index}'
                                                     )">
                                 <option value="Người lớn"
-                                        <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">selected</c:if>>
-                                            Người lớn
-                                        </option>
-                                        <option value="Trẻ em"
-                                        <c:if test="${sessionScope.typeList[status.index] == 'Trẻ em'}">selected</c:if>>
-                                            Trẻ em
-                                        </option>
-                                        <option value="Sinh viên"
-                                        <c:if test="${sessionScope.typeList[status.index] == 'Sinh viên'}">selected</c:if>>
-                                            Sinh viên
-                                        </option>
-                                        <option value="Người cao tuổi"
-                                        <c:if test="${sessionScope.typeList[status.index] == 'Người cao tuổi'}">selected</c:if>>
-                                            Người cao tuổi
-                                        </option>
-                                        <option value="VIP"
-                                        <c:if test="${sessionScope.typeList[status.index] == 'VIP'}">selected</c:if>>
-                                            Hội viên VIP
-                                        </option>
-                                </select>
+                                        <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
+                                            selected
+                                        </c:if>>
+                                    Người lớn
+                                </option>
+                                <option value="Trẻ em"
+                                        <c:if test="${sessionScope.typeList[status.index] == 'Trẻ em'}">
+                                            selected
+                                        </c:if>>
+                                    Trẻ em
+                                </option>
+                                <option value="Sinh viên"
+                                        <c:if test="${sessionScope.typeList[status.index] == 'Sinh viên'}">
+                                            selected
+                                        </c:if>>
+                                    Sinh viên
+                                </option>
+                                <option value="Người cao tuổi"
+                                        <c:if test="${sessionScope.typeList[status.index] == 'Người cao tuổi'}">
+                                            selected
+                                        </c:if>>
+                                    Người cao tuổi
+                                </option>
+                                <option value="VIP"
+                                        <c:if test="${sessionScope.typeList[status.index] == 'VIP'}">
+                                            selected
+                                        </c:if>>
+                                    Hội viên VIP
+                                </option>
+                            </select>
 
-                                <input type="text" class="form-control"
-                                       id="idNumber${status.index}"
-                                name="idNumber${status.index}"
-                                value="${sessionScope.idNumberList[status.index]}"
-                                placeholder="Số CMND/Hộ chiếu" required />
+                            <input type="text" class="form-control"
+                                   id="idNumber${status.index}"
+                                   name="idNumber${status.index}"
+                                   value="${sessionScope.idNumberList[status.index]}"
+                                   placeholder="Số CMND/Hộ chiếu"
+                                   <c:if test="${sessionScope.confirmedDOB[status.index]}">readonly="readonly"</c:if>
+                                       required />
 
-                            <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
+                                   <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
                             <input type="hidden" name="passengerCCCD${status.index}" />
                         </td>
 
@@ -163,16 +169,16 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                     class="btn btn-secondary">Hủy</button>
                             <button type="button"
                                     onclick="confirmAge(
-                                                        'ageModal${status.index}',
-                                                        'passengerType${status.index}',
-                                                        'price${status.index}',
-                                                        'discount${status.index}',
-                                                        'displayTotal${status.index}',
-                                                        'birthDay${status.index}',
-                                                        'birthMonth${status.index}',
-                                                        'birthYear${status.index}',
-                                                        'idNumber${status.index}'
-                                                        )"
+                                                    'ageModal${status.index}',
+                                                    'passengerType${status.index}',
+                                                    'price${status.index}',
+                                                    'discount${status.index}',
+                                                    'displayTotal${status.index}',
+                                                    'birthDay${status.index}',
+                                                    'birthMonth${status.index}',
+                                                    'birthYear${status.index}',
+                                                    'idNumber${status.index}'
+                                                    )"
                                     class="btn btn-primary">
                                 Xác nhận
                             </button>
@@ -195,12 +201,12 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                     class="btn btn-secondary">Hủy</button>
                             <button type="button"
                                     onclick="confirmVIP(
-                                                        'vipModal${status.index}',
-                                                        'passengerType${status.index}',
-                                                        'price${status.index}',
-                                                        'discount${status.index}',
-                                                        'displayTotal${status.index}'
-                                                        )"
+                                                    'vipModal${status.index}',
+                                                    'passengerType${status.index}',
+                                                    'price${status.index}',
+                                                    'discount${status.index}',
+                                                    'displayTotal${status.index}'
+                                                    )"
                                     class="btn btn-primary">
                                 Xác nhận
                             </button>
@@ -211,7 +217,16 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
         </tbody>
     </table>
 
+    <script>
+
+        rebindRemoveButtons();
+        reapplyDiscount();
+        updateTotalAmount();
+
+    </script>
 </c:when>
+
+
 <c:otherwise>
     <!DOCTYPE html>
     <html>
@@ -220,143 +235,8 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
             <title>Nhập thông tin hành khách</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-            <script>
-
-                // Mức giảm giá TẠM TÍNH ở client
-                const discountRates = {
-                    "Người lớn": 0,
-                    "Trẻ em": 50,
-                    "Sinh viên": 20,
-                    "Người cao tuổi": 30,
-                    "VIP": 10
-                };
-                // Khi chọn loại hành khách
-                function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId, idNumberInputId) {
-                    document.getElementById(idNumberInputId).readOnly = false;
-                    let selectedOption = selectElement.value;
-                    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-                    // Nếu chọn Trẻ em / Người cao tuổi => hiện popup nhập ngày sinh
-                    if (selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") {
-                        document.getElementById(ageModalId).style.display = 'flex';
-                        return;
-                    }
-                    // Nếu chọn VIP => hiện popup nhập thẻ VIP
-                    if (selectedOption === "VIP") {
-                        document.getElementById(vipModalId).style.display = 'flex';
-                        return;
-                    }
-
-                    // Các loại khác (Người lớn, Sinh viên) => tính luôn
-                    let rate = discountRates[selectedOption] || 0;
-                    let discountAmount = basePrice * rate / 100;
-                    let finalPrice = basePrice - discountAmount + 1;
-                    document.getElementById(discountId).innerText = '-' + rate + '%';
-                    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-                    updateTotalAmount();
-                }
-
-                // Tính tổng tiền tạm (client)
-                function updateTotalAmount() {
-                    let sum = 0;
-                    document.querySelectorAll('[id^="displayTotal"]').forEach(function (elem) {
-                        let val = parseFloat(elem.innerText.replace(/[^\d\.]/g, ''));
-                        if (!isNaN(val)) {
-                            sum += val;
-                        }
-                    });
-                    document.getElementById('totalAmount').innerText = sum.toLocaleString();
-                }
-
-                // Đóng modal
-                function closeModal(id) {
-                    document.getElementById(id).style.display = 'none';
-                }
-
-                // Tính tuổi ở client
-                function getAge(day, month, year) {
-                    // month - 1 vì trong JS, tháng tính từ 0..11
-                    let birthDate = new Date(year, month - 1, day);
-                    let now = new Date();
-                    let age = now.getFullYear() - birthDate.getFullYear();
-                    let m = now.getMonth() - birthDate.getMonth();
-                    if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) {
-                        age--;
-                    }
-                    return age;
-                }
-
-                // Xác nhận tuổi (Trẻ em / Người cao tuổi) phía client
-                function confirmAge(modalId, selectId, priceId, discountId, totalId,
-                        dayId, monthId, yearId, idNumberInputId) {
-                    closeModal(modalId);
-
-                    let day = document.getElementById(dayId).value;
-                    let month = document.getElementById(monthId).value;
-                    let year = document.getElementById(yearId).value;
-                    let age = getAge(day, month, year);
-
-                    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-                    let selectedOption = document.getElementById(selectId).value;
-                    let rate = 0;
-
-                    if (selectedOption === "Trẻ em") {
-                        if (age < 6) {
-                            alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
-                            rate = 0;
-                        } else if (age > 10) {
-                            alert("Không đúng độ tuổi Trẻ em (6-10)!");
-                            rate = 0;
-                        } else {
-                            // Tuổi 6..10 => hợp lệ => set discount=50
-                            rate = 50;
-                            // Tự động gán DOB vào input CCCD
-                            let dobString = day.padStart(2, '0') + "/"
-                                    + month.padStart(2, '0') + "/"
-                                    + year;
-                            document.getElementById(idNumberInputId).value = dobString;
-                            document.getElementById(idNumberInputId).readOnly = true;
-                        }
-                    } else {
-                        // Người cao tuổi
-                        if (age < 60) {
-                            alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
-                            rate = 0;
-                        } else {
-                            rate = 30;
-                        }
-                    }
-
-                    let discountAmount = basePrice * rate / 100;
-                    let finalPrice = basePrice - discountAmount + 1;
-                    document.getElementById(discountId).innerText = '-' + rate + '%';
-                    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-                    updateTotalAmount();
-                }
-
-
-                // Xác nhận VIP (client)
-                function confirmVIP(modalId, selectId, priceId, discountId, totalId) {
-                    let vipInputId = 'vipCard' + selectId.replace('passengerType', '');
-                    let vipCard = document.getElementById(vipInputId).value.trim();
-                    if (vipCard === "") {
-                        alert("Vui lòng nhập thông tin thẻ VIP!");
-                        return;
-                    }
-                    closeModal(modalId);
-                    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-                    let rate = 10; // Tạm cứng 10% (client)
-                    let discountAmount = basePrice * rate / 100;
-                    let finalPrice = basePrice - discountAmount + 1;
-                    document.getElementById(discountId).innerText = '-10%';
-                    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-                    updateTotalAmount();
-                }
-
-                // Khi load trang => tính tổng tạm
-                window.onload = function () {
-                    updateTotalAmount();
-                };
-            </script>
+            <!-- Import file JS duy nhất -->
+            <script src="js/passengerInfo.js" type="text/javascript"></script>
 
             <style>
                 .modal {
@@ -378,8 +258,8 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                     width: 350px;
                     text-align: center;
                 }
-
             </style>
+
             <jsp:include page="/navbar.jsp"/>
         </head>
         <body class="container py-4 mt-5">
@@ -430,79 +310,80 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                                 name="passengerType${status.index}"
                                                 required
                                                 onchange="updateDiscount(
-                                                            this,
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}',
-                                                            'ageModal${status.index}',
-                                                            'vipModal${status.index}',
-                                                            'idNumber${status.index}'  /* Thêm ID input CCCD */
-                                                            )">
-                                            <option value="Người lớn" <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
-                                                    selected
-                                                </c:if>>Người lớn</option>
-                                            <option value="Trẻ em"<c:if test="${sessionScope.typeList[status.index] == 'Trẻ em'}">
-                                                    selected
-                                                </c:if>>Trẻ em</option>
-                                            <option value="Sinh viên"<c:if test="${sessionScope.typeList[status.index] == 'Sinh viên'}">
-                                                    selected
-                                                </c:if>>Sinh viên</option>
-                                            <option value="Người cao tuổi"<c:if test="${sessionScope.typeList[status.index] == 'Người cao tuổi'}">
-                                                    selected
-                                                </c:if>>Người cao tuổi</option>
-                                            <option value="VIP"<c:if test="${sessionScope.typeList[status.index] == 'VIP'}">
-                                                    selected
-                                                </c:if>>Hội viên VIP</option>
+                    this,
+                    'price${status.index}',
+                    'discount${status.index}',
+                    'displayTotal${status.index}',
+                    'ageModal${status.index}',
+                    'vipModal${status.index}',
+                    'idNumber${status.index}'
+                    )">
+                                            <option value="Người lớn"
+                                                    <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
+                                                        selected
+                                                    </c:if>>
+                                                Người lớn
+                                            </option>
+                                            <option value="Trẻ em"
+                                                    <c:if test="${sessionScope.typeList[status.index] == 'Trẻ em'}">
+                                                        selected
+                                                    </c:if>>
+                                                Trẻ em
+                                            </option>
+                                            <option value="Sinh viên"
+                                                    <c:if test="${sessionScope.typeList[status.index] == 'Sinh viên'}">
+                                                        selected
+                                                    </c:if>>
+                                                Sinh viên
+                                            </option>
+                                            <option value="Người cao tuổi"
+                                                    <c:if test="${sessionScope.typeList[status.index] == 'Người cao tuổi'}">
+                                                        selected
+                                                    </c:if>>
+                                                Người cao tuổi
+                                            </option>
+                                            <option value="VIP"
+                                                    <c:if test="${sessionScope.typeList[status.index] == 'VIP'}">
+                                                        selected
+                                                    </c:if>>
+                                                Hội viên VIP
+                                            </option>
                                         </select>
 
                                         <input type="text" class="form-control"
                                                id="idNumber${status.index}"
                                                name="idNumber${status.index}"
                                                value="${sessionScope.idNumberList[status.index]}"
-                                               placeholder="Số CMND/Hộ chiếu" required />
+                                               placeholder="Số CMND/Hộ chiếu"
+                                               <c:if test="${sessionScope.confirmedDOB[status.index]}">readonly="readonly"</c:if>
+                                                   required />
 
-                                        <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
-                                        <!-- Mỗi ghế: ô input "Họ tên hành khách" và "CCCD hành khách" -->
 
+                                               <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
                                         <input type="hidden" name="passengerCCCD${status.index}" />
-
                                     </td>
 
                                     <!-- Cột thông tin chỗ -->
-                                    <!-- Cột thông tin chỗ -->
                                     <td>
-                                        <!-- Phân biệt chuyến đi / chuyến về -->
                                         <c:choose>
                                             <c:when test="${item.returnTrip}">
-                                                <!-- Chuyến về: hiển thị ngược -->
-                                                <strong class="text-danger">Chuyến về:</strong>
-                                                <br/>
-                                                <small>
-                                                    ${item.arrivalStationName} &rarr; ${item.departureStationName}
-                                                </small>
+                                                <strong class="text-danger">Chuyến về:</strong><br/>
+                                                <small>${item.arrivalStationName} &rarr; ${item.departureStationName}</small>
                                             </c:when>
                                             <c:otherwise>
-                                                <!-- Chuyến đi: hiển thị xuôi -->
-                                                <strong class="text-success">Chuyến đi:</strong>
-                                                <br/>
-                                                <small>
-                                                    ${item.departureStationName} &rarr; ${item.arrivalStationName}
-                                                </small>
+                                                <strong class="text-success">Chuyến đi:</strong><br/>
+                                                <small>${item.departureStationName} &rarr; ${item.arrivalStationName}</small>
                                             </c:otherwise>
                                         </c:choose>
-
-                                        <!-- Dòng hiển thị tàu và chỗ -->
                                         <br/>
                                         <span>Tàu: <strong>${item.trainName}</strong> - ${item.departureDate}</span>
                                         <br/>
                                         <span>Toa: <strong>${item.carriageNumber}</strong>, Chỗ <strong>${item.seatNumber}</strong></span>
                                     </td>
 
-
                                     <!-- Cột giá vé gốc -->
                                     <td>
                                         ${item.price} VND
-                                        <!-- Input hidden để Servlet đọc -->
                                         <input type="hidden" id="price${status.index}"
                                                name="price${status.index}"
                                                value="${item.price}" />
@@ -511,7 +392,7 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                     <!-- Cột giảm giá (hiển thị tạm) -->
                                     <td id="discount${status.index}">-0%</td>
 
-                                    <!-- Khuyến mại cố định (nếu có) -->
+                                    <!-- Khuyến mại -->
                                     <td>Không có khuyến mại</td>
 
                                     <!-- Bảo hiểm -->
@@ -521,10 +402,10 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                     <td id="displayTotal${status.index}">
                                         <c:out value="${item.price + 1000}" /> VND
                                     </td>
+
                                     <!-- Nút xóa -->
                                     <td>
                                         <input type="hidden" id="seatIDHidden" name="seatID" />
-
                                         <button type="button"
                                                 class="btn btn-danger btn-remove"
                                                 data-seatid="${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}">
@@ -532,12 +413,12 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                         </button>
                                     </td>
                                 </tr>
+
                                 <!-- Modal xác nhận tuổi (Trẻ em / Người cao tuổi) -->
                             <div id="ageModal${status.index}" class="modal">
                                 <div class="modal-content">
                                     <h5>Nhập ngày tháng năm sinh</h5>
                                     <div class="mb-2">
-                                        <!-- Thêm id để JS lấy giá trị -->
                                         <select id="birthDay${status.index}" name="birthDay${status.index}">
                                             <c:forEach var="i" begin="1" end="31">
                                                 <option value="${i}">${i}</option>
@@ -560,16 +441,16 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                                 class="btn btn-secondary">Hủy</button>
                                         <button type="button"
                                                 onclick="confirmAge(
-                                                            'ageModal${status.index}',
-                                                            'passengerType${status.index}',
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}',
-                                                            'birthDay${status.index}',
-                                                            'birthMonth${status.index}',
-                                                            'birthYear${status.index}',
-                                                            'idNumber${status.index}'  // <--- Tham số ID input
-                                                            )"
+                                                                'ageModal${status.index}',
+                                                                'passengerType${status.index}',
+                                                                'price${status.index}',
+                                                                'discount${status.index}',
+                                                                'displayTotal${status.index}',
+                                                                'birthDay${status.index}',
+                                                                'birthMonth${status.index}',
+                                                                'birthYear${status.index}',
+                                                                'idNumber${status.index}'
+                                                                )"
                                                 class="btn btn-primary">
                                             Xác nhận
                                         </button>
@@ -593,12 +474,12 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                                                 class="btn btn-secondary">Hủy</button>
                                         <button type="button"
                                                 onclick="confirmVIP(
-                                                            'vipModal${status.index}',
-                                                            'passengerType${status.index}',
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}'
-                                                            )"
+                                                                'vipModal${status.index}',
+                                                                'passengerType${status.index}',
+                                                                'price${status.index}',
+                                                                'discount${status.index}',
+                                                                'displayTotal${status.index}'
+                                                                )"
                                                 class="btn btn-primary">
                                             Xác nhận
                                         </button>
@@ -609,6 +490,7 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                         </tbody>
                     </table>
                 </div>
+
                 <input type="hidden" name="passengerCount" value="${fn:length(cartItems)}" />
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <button type="submit" name="action" value="clearAll" 
@@ -616,8 +498,11 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                             formnovalidate>
                         🗑 Xóa tất cả vé
                     </button>
-                    <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0.0</span> VND</h5>
+                    <h5 class="text-primary">
+                        Tổng tiền: <span id="totalAmount">0.0</span> VND
+                    </h5>
                 </div>
+
                 <h4 class="text-primary mt-4">Thông tin người đặt vé</h4>
                 <div class="row g-3">
                     <div class="col-md-4">
@@ -631,8 +516,6 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                             />
                     </div>
                     <div class="col-md-4">
-
-
                         <label class="form-label">CCCD/Hộ chiếu (người đặt)</label>
                         <input 
                             type="text" 
@@ -644,7 +527,6 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                             required 
                             />
                     </div>
-
                     <div class="col-md-4">
                         <label class="form-label">Email</label>
                         <input 
@@ -655,7 +537,6 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                             readOnly 
                             />
                     </div>
-
                     <div class="col-md-4">
                         <label class="form-label">Số điện thoại</label>
                         <input 
@@ -669,84 +550,29 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <!-- Nút "Quay lại" đến 1 trang cụ thể -->
-
+                    <!-- Nút "Quay lại" -->
                     <button type="button"
                             onclick="window.location.href = '<%= session.getAttribute("previousURL") %>'"
                             class="btn btn-secondary">
                         Quay lại
                     </button>
 
-
-
                     <button type="submit" class="btn btn-primary">
                         Tiếp tục
                     </button>
                 </div>
-
             </form>
-            <script>
-                function setSeatID(seatID) {
-                    document.getElementById("seatIDHidden").value = seatID;
-                }
-            </script>
 
-            <script>
-                function goBack() {
-                    let urlParams = new URLSearchParams(window.location.search);
-                    let previousURL = '<%= session.getAttribute("previousURL") != null ? session.getAttribute("previousURL") : "schedule" %>';
-                    window.location.href = previousURL;
-                }
-
-            </script>
+            <!-- Cuối body => gọi hàm bind lần đầu -->
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
                     rebindRemoveButtons();
+                    reapplyDiscount();
+                    updateTotalAmount();
+
                 });
-
-                function rebindRemoveButtons() {
-                    // Gắn click cho các nút Xóa
-                    document.querySelectorAll(".btn-remove").forEach(btn => {
-                        btn.addEventListener("click", function (e) {
-                            e.preventDefault();
-                            let seatID = this.getAttribute("data-seatid");
-
-                            // Tạo params
-                            let params = new URLSearchParams();
-                            params.append("action", "removeOne");
-                            params.append("seatID", seatID);
-
-                            // fetch => renderPartial=true
-                            fetch("passengerinfo?renderPartial=true", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/x-www-form-urlencoded"
-                                },
-                                body: params.toString()
-                            })
-                                    .then(resp => resp.text())
-                                    .then(result => {
-                                        // Kiểm tra nếu server trả về "EMPTY" => giỏ trống => về schedule
-                                        if (result === "EMPTY") {
-                                            window.location.href = "<%= session.getAttribute("previousURL") %>";
-                                            return;
-                                        }
-
-                                        // Ngược lại => thay thế table cũ
-                                        document.querySelector(".table-responsive").innerHTML = result;
-                                        // rebind
-                                        rebindRemoveButtons();
-                                        // Gọi lại updateTotalAmount() để tính lại
-                                        updateTotalAmount();
-                                    })
-                                    .catch(err => console.error(err));
-                        });
-                    });
-                }
             </script>
         </body>
     </html>
 </c:otherwise>
 </c:choose>
-
-
