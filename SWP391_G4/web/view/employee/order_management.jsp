@@ -221,10 +221,10 @@
                                     <%--<td rowspan="${fn:length(booking.tickets)}">${booking.paymentStatus}</td>--%>
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.formattedBookingDate}</td>
                                     <td rowspan="${fn:length(booking.tickets)}">
-                                        <a href="order?action=view&id=${booking.bookingID}">Xem</a>
-                                        <c:if test="${booking.bookingStatus != 'Cancelled'}">
+                                        <a href="order?action=view&id=${booking.bookingID}"><button>Xem</button></a>
+                                        <%--<c:if test="${booking.bookingStatus != 'Cancelled'}">
                                             <a href="order?action=cancel&id=${booking.bookingID}" onclick="return confirm('Are you sure you want to cancel this order?');">Hủy</a>
-                                        </c:if>
+                                        </c:if>--%>
                                     </td>
                                 </c:if>
 

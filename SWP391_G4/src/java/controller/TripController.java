@@ -3,6 +3,7 @@ package controller;
 import dal.TrainDBContext;
 import dal.TripDBContext; // Use the dedicated TripDBContext
 import dal.RouteDBContext;
+import dal.TrainDAO;
 import dto.TrainDTO;
 import dto.TripDTO;
 import dto.RouteDTO; // Import RouteDTO
@@ -24,12 +25,14 @@ public class TripController extends HttpServlet {
     private TripDBContext tripDB;  // Use TripDBContext, *not* TrainDBContext
     private TrainDBContext trainDB; // For populating the Train dropdown
     private RouteDBContext routeDB; // For populating the Route dropdown
+    private TrainDAO trainDAO;
 
     @Override
     public void init() throws ServletException {
         tripDB = new TripDBContext(); // Initialize TripDBContext
         trainDB = new TrainDBContext(); // Initialize TrainDBContext
         routeDB = new RouteDBContext(); // Initialize RouteDBContext
+        trainDAO = new TrainDAO();
     }
 
     @Override
@@ -153,6 +156,11 @@ public class TripController extends HttpServlet {
             response.sendRedirect("trip"); // Redirect to list, or show an error page
             return;
         }
+        if (trip.getDepartureTime().isBefore(LocalDateTime.now())) {
+        request.setAttribute("error", "Không thể sửa chuyến quá khứ.");
+        listTrips(request, response); // Redirect back to the list, displaying the error
+        return; // IMPORTANT: Stop processing here!
+    }
         // Get trains and routes
         List<TrainDTO> trains = trainDB.getAllTrains();// Lấy danh sách TÀU (không có tham số)
         List<RouteDTO> routes = routeDB.getAllRoutes();
@@ -165,87 +173,276 @@ public class TripController extends HttpServlet {
 
     // Inside your TripController.java
 
-private void addTrip(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    try {
-        int trainID = Integer.parseInt(request.getParameter("trainID"));
-        int routeID = Integer.parseInt(request.getParameter("routeID"));
-        String departureTimeStr = request.getParameter("departureTime");
-        String arrivalTimeStr = request.getParameter("arrivalTime");
-        String tripStatus = request.getParameter("tripStatus");
+//private void addTrip(HttpServletRequest request, HttpServletResponse response)
+//        throws ServletException, IOException {
+//    try {
+//        int trainID = Integer.parseInt(request.getParameter("trainID"));
+//        int routeID = Integer.parseInt(request.getParameter("routeID"));
+//        String departureTimeStr = request.getParameter("departureTime");
+//        String arrivalTimeStr = request.getParameter("arrivalTime");
+//        String tripStatus = request.getParameter("tripStatus");
+//
+//        // Date/Time Parsing and Validation (CRUCIAL)
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+//        LocalDateTime departureTime = LocalDateTime.parse(departureTimeStr, formatter);
+//        LocalDateTime arrivalTime = LocalDateTime.parse(arrivalTimeStr, formatter);
+//
+//        // *** VALIDATION: Arrival Time must be AFTER Departure Time ***
+//        if (!arrivalTime.isAfter(departureTime)) {
+//            // Validation failed!
+//            request.setAttribute("error", "Arrival time must be after departure time.");
+//            // Re-populate the form data (so the user doesn't lose their input)
+//            List<TrainDTO> trains = trainDB.getAllTrains();
+//            List<RouteDTO> routes = routeDB.getAllRoutes();
+//            request.setAttribute("trains", trains);
+//            request.setAttribute("routes", routes);
+//
+//             // Create a TripDTO object and set value into it.
+//            TripDTO prefilledTrip = new TripDTO();
+//            prefilledTrip.setTrainID(trainID);
+//            prefilledTrip.setRouteID(routeID);
+//            prefilledTrip.setDepartureTime(departureTime);
+//            prefilledTrip.setArrivalTime(arrivalTime);
+//            prefilledTrip.setTripStatus(tripStatus);
+//
+//            request.setAttribute("trip", prefilledTrip); // Use "trip" attribute
+//            // Forward back to the add form (trip_add.jsp)
+//            request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+//            return; // IMPORTANT: Stop processing here!
+//        }
+//
+//        // Create TripDTO object (if validation passed)
+//        TripDTO newTrip = new TripDTO();
+//        newTrip.setTrainID(trainID);
+//        newTrip.setRouteID(routeID);
+//        newTrip.setDepartureTime(departureTime);
+//        newTrip.setArrivalTime(arrivalTime);
+//        newTrip.setTripStatus(tripStatus);
+//        // Add the trip
+//        boolean added = tripDB.addTrip(newTrip);
+//
+//        if (added) {
+//            request.setAttribute("message", "Trip added successfully!");
+//        } else {
+//            request.setAttribute("error", "Failed to add trip.");
+//        }
+//       response.sendRedirect("trip"); // Redirect to the trip list
+//
+//    } catch (NumberFormatException e) {
+//        request.setAttribute("error", "Invalid number format.");
+//         List<TrainDTO> trains = trainDB.getAllTrains();
+//         List<RouteDTO> routes = routeDB.getAllRoutes();
+//         request.setAttribute("trains", trains);
+//         request.setAttribute("routes", routes);
+//        request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+//    } catch (DateTimeParseException e) {
+//        request.setAttribute("error", "Invalid date/time format.  Use yyyy-MM-ddTHH:mm");
+//         List<TrainDTO> trains = trainDB.getAllTrains();
+//        List<RouteDTO> routes = routeDB.getAllRoutes();
+//        request.setAttribute("trains", trains);
+//         request.setAttribute("routes", routes);
+//        request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+//    } catch (Exception e) {
+//        request.setAttribute("error", "An error occurred: " + e.getMessage());
+//          List<TrainDTO> trains = trainDB.getAllTrains();
+//         List<RouteDTO> routes = routeDB.getAllRoutes();
+//        request.setAttribute("trains", trains);
+//         request.setAttribute("routes", routes);
+//        request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+//    }
+//}
+//
+////Similar changes in update method
+// private void updateTrip(HttpServletRequest request, HttpServletResponse response)
+//        throws ServletException, IOException {
+//          try {
+//                int tripID = Integer.parseInt(request.getParameter("tripID"));
+//                int trainID = Integer.parseInt(request.getParameter("trainID"));
+//                int routeID = Integer.parseInt(request.getParameter("routeID"));
+//                String departureTimeStr = request.getParameter("departureTime");
+//                String arrivalTimeStr = request.getParameter("arrivalTime");
+//                String tripStatus = request.getParameter("tripStatus");
+//                // Convert date/time strings to LocalDateTime
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+//                LocalDateTime departureTime = LocalDateTime.parse(departureTimeStr, formatter);
+//                LocalDateTime arrivalTime = LocalDateTime.parse(arrivalTimeStr, formatter);
+//
+//                 // *** VALIDATION: Arrival Time must be AFTER Departure Time ***
+//                if (!arrivalTime.isAfter(departureTime)) {
+//                    // Validation failed!
+//                    request.setAttribute("error", "Arrival time must be after departure time.");
+//
+//                    // Re-populate form data
+//                    List<TrainDTO> trains = trainDB.getAllTrains();
+//                    List<RouteDTO> routes = routeDB.getAllRoutes();
+//                    request.setAttribute("trains", trains);
+//                    request.setAttribute("routes", routes);
+//
+//                    // Set the *existing* trip data back into the request (for editing)
+//                    TripDTO trip = new TripDTO();
+//                    trip.setTripID(tripID);  // Don't forget the ID!
+//                    trip.setTrainID(trainID);
+//                    trip.setRouteID(routeID);
+//                    trip.setDepartureTime(departureTime);
+//                    trip.setArrivalTime(arrivalTime);
+//                    trip.setTripStatus(tripStatus);
+//
+//                    request.setAttribute("trip", trip);  // VERY important
+//
+//                    request.getRequestDispatcher("view/employee/trip_edit.jsp").forward(request, response);
+//                    return; // Stop processing here!
+//                }
+//
+//                // Create TripDTO object
+//                TripDTO updatedTrip = new TripDTO();
+//                updatedTrip.setTripID(tripID);
+//                updatedTrip.setTrainID(trainID);
+//                updatedTrip.setRouteID(routeID);
+//                updatedTrip.setDepartureTime(departureTime);
+//                updatedTrip.setArrivalTime(arrivalTime);
+//                updatedTrip.setTripStatus(tripStatus);
+//                // Update the trip
+//                boolean updated = tripDB.updateTrip(updatedTrip);
+//                if (updated) {
+//                    request.setAttribute("message", "Trip updated successfully!");
+//                } else {
+//                    request.setAttribute("error", "Failed to update trip.");
+//                }
+//                response.sendRedirect("trip"); // Redirect to trip list
+//
+//            } catch (NumberFormatException e) {
+//                request.setAttribute("error", "Invalid number format.");
+//                showEditForm(request, response);
+//            } catch (DateTimeParseException e) {
+//                request.setAttribute("error", "Invalid date/time format. Use yyyy-MM-ddTHH:mm");
+//                showEditForm(request, response);
+//            }  catch (Exception e) {
+//                request.setAttribute("error", "An error occurred: " + e.getMessage());
+//                showEditForm(request, response);
+//            }
+//    }
+    
+    private void addTrip(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+         // Similar try-catch structure as before, but adapted for your new requirements:
+         try {
+                int trainID = Integer.parseInt(request.getParameter("trainID"));
+                int routeID = Integer.parseInt(request.getParameter("routeID"));
+                String departureTimeStr = request.getParameter("departureTime");
+                String arrivalTimeStr = request.getParameter("arrivalTime");
+                String tripStatus = request.getParameter("tripStatus");
+                // Convert date/time strings to LocalDateTime
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+                LocalDateTime departureTime = LocalDateTime.parse(departureTimeStr, formatter);
+                LocalDateTime arrivalTime = LocalDateTime.parse(arrivalTimeStr, formatter);
 
-        // Date/Time Parsing and Validation (CRUCIAL)
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        LocalDateTime departureTime = LocalDateTime.parse(departureTimeStr, formatter);
-        LocalDateTime arrivalTime = LocalDateTime.parse(arrivalTimeStr, formatter);
+                 // *** VALIDATION: Arrival Time must be AFTER Departure Time ***
+                if (!arrivalTime.isAfter(departureTime)) {
+                    // Validation failed!
+                    request.setAttribute("error", "Thời gian đến không thể để ở quá khứ.");
+                    // Re-populate the form data (so the user doesn't lose their input)
+                    List<TrainDTO> trains = trainDAO.getAllTrains();
+                    List<RouteDTO> routes = routeDB.getAllRoutes();
+                    request.setAttribute("trains", trains);
+                    request.setAttribute("routes", routes);
 
-        // *** VALIDATION: Arrival Time must be AFTER Departure Time ***
-        if (!arrivalTime.isAfter(departureTime)) {
-            // Validation failed!
-            request.setAttribute("error", "Arrival time must be after departure time.");
-            // Re-populate the form data (so the user doesn't lose their input)
-            List<TrainDTO> trains = trainDB.getAllTrains();
-            List<RouteDTO> routes = routeDB.getAllRoutes();
-            request.setAttribute("trains", trains);
-            request.setAttribute("routes", routes);
+                     // Create a TripDTO object and set value into it.
+                    TripDTO prefilledTrip = new TripDTO();
+                    prefilledTrip.setTrainID(trainID);
+                    prefilledTrip.setRouteID(routeID);
+                    prefilledTrip.setDepartureTime(departureTime);
+                    prefilledTrip.setArrivalTime(arrivalTime);
+                    prefilledTrip.setTripStatus(tripStatus);
 
-             // Create a TripDTO object and set value into it.
-            TripDTO prefilledTrip = new TripDTO();
-            prefilledTrip.setTrainID(trainID);
-            prefilledTrip.setRouteID(routeID);
-            prefilledTrip.setDepartureTime(departureTime);
-            prefilledTrip.setArrivalTime(arrivalTime);
-            prefilledTrip.setTripStatus(tripStatus);
+                    request.setAttribute("trip", prefilledTrip); // Use "trip" attribute
+                    // Forward back to the add form (trip_add.jsp)
+                    request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+                    return; // IMPORTANT: Stop processing here!
+                }
 
-            request.setAttribute("trip", prefilledTrip); // Use "trip" attribute
-            // Forward back to the add form (trip_add.jsp)
-            request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
-            return; // IMPORTANT: Stop processing here!
-        }
+                // *** VALIDATION: Check for overlapping trips ***
+               if (tripDB.isTripOverlapping(trainID, departureTime, arrivalTime)) {
+                    request.setAttribute("error", "Tàu đã trùng lịch.");
+                   //Re populate form data
+                    List<TrainDTO> trains = trainDAO.getAllTrains();
+                    List<RouteDTO> routes = routeDB.getAllRoutes();
+                    request.setAttribute("trains", trains);
+                    request.setAttribute("routes", routes);
+                    // Create a TripDTO object and set value into it.
+                    TripDTO prefilledTrip = new TripDTO();
+                    prefilledTrip.setTrainID(trainID);
+                    prefilledTrip.setRouteID(routeID);
+                    prefilledTrip.setDepartureTime(departureTime);
+                    prefilledTrip.setArrivalTime(arrivalTime);
+                    prefilledTrip.setTripStatus(tripStatus);
 
-        // Create TripDTO object (if validation passed)
-        TripDTO newTrip = new TripDTO();
-        newTrip.setTrainID(trainID);
-        newTrip.setRouteID(routeID);
-        newTrip.setDepartureTime(departureTime);
-        newTrip.setArrivalTime(arrivalTime);
-        newTrip.setTripStatus(tripStatus);
-        // Add the trip
-        boolean added = tripDB.addTrip(newTrip);
+                    request.setAttribute("trip", prefilledTrip); // Use "trip" attribute
+                    request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+                    return; // Stop processing!
+                }
 
-        if (added) {
-            request.setAttribute("message", "Trip added successfully!");
-        } else {
-            request.setAttribute("error", "Failed to add trip.");
-        }
-       response.sendRedirect("trip"); // Redirect to the trip list
+                // *** VALIDATION: Check for past departure time ***
+                if (departureTime.isBefore(LocalDateTime.now())) {
+                    request.setAttribute("error", "Không thể cài thời gian khởi hành trong quá khứ.");
+                    // Re-populate form data
+                    List<TrainDTO> trains = trainDAO.getAllTrains();
+                    List<RouteDTO> routes = routeDB.getAllRoutes();
+                    request.setAttribute("trains", trains);
+                    request.setAttribute("routes", routes);
+                     // Create a TripDTO object and set value into it.
+                    TripDTO prefilledTrip = new TripDTO();
+                    prefilledTrip.setTrainID(trainID);
+                    prefilledTrip.setRouteID(routeID);
+                    prefilledTrip.setDepartureTime(departureTime);
+                    prefilledTrip.setArrivalTime(arrivalTime);
+                    prefilledTrip.setTripStatus(tripStatus);
 
-    } catch (NumberFormatException e) {
-        request.setAttribute("error", "Invalid number format.");
-         List<TrainDTO> trains = trainDB.getAllTrains();
-         List<RouteDTO> routes = routeDB.getAllRoutes();
-         request.setAttribute("trains", trains);
-         request.setAttribute("routes", routes);
-        request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
-    } catch (DateTimeParseException e) {
-        request.setAttribute("error", "Invalid date/time format.  Use yyyy-MM-ddTHH:mm");
-         List<TrainDTO> trains = trainDB.getAllTrains();
-        List<RouteDTO> routes = routeDB.getAllRoutes();
-        request.setAttribute("trains", trains);
-         request.setAttribute("routes", routes);
-        request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
-    } catch (Exception e) {
-        request.setAttribute("error", "An error occurred: " + e.getMessage());
-          List<TrainDTO> trains = trainDB.getAllTrains();
-         List<RouteDTO> routes = routeDB.getAllRoutes();
-        request.setAttribute("trains", trains);
-         request.setAttribute("routes", routes);
-        request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+                    request.setAttribute("trip", prefilledTrip); // Use "trip" attribute
+                    request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+                    return; // Stop processing!
+                }
+
+                // Create TripDTO object (if validation passed)
+                TripDTO newTrip = new TripDTO();
+                newTrip.setTrainID(trainID);
+                newTrip.setRouteID(routeID);
+                newTrip.setDepartureTime(departureTime);
+                newTrip.setArrivalTime(arrivalTime);
+                newTrip.setTripStatus(tripStatus);
+                // Add the trip
+                boolean added = tripDB.addTrip(newTrip);
+
+                if (added) {
+                    request.setAttribute("message", "Thêm thành công!");
+                } else {
+                    request.setAttribute("error", "Thêm thất bại.");
+                }
+                response.sendRedirect("trip"); // Redirect to trip list
+
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Invalid number format.");
+                 List<TrainDTO> trains = trainDAO.getAllTrains();
+                List<RouteDTO> routes = routeDB.getAllRoutes();
+                request.setAttribute("trains", trains);
+                request.setAttribute("routes", routes);
+                request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+            } catch (DateTimeParseException e) {
+                request.setAttribute("error", "Invalid date/time format.  Use yyyy-MM-ddTHH:mm");
+                 List<TrainDTO> trains = trainDAO.getAllTrains();
+                List<RouteDTO> routes = routeDB.getAllRoutes();
+                request.setAttribute("trains", trains);
+                request.setAttribute("routes", routes);
+                request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+            } catch (Exception e) {
+                request.setAttribute("error", "An error occurred: " + e.getMessage());
+                 List<TrainDTO> trains = trainDAO.getAllTrains();
+                List<RouteDTO> routes = routeDB.getAllRoutes();
+                request.setAttribute("trains", trains);
+                request.setAttribute("routes", routes);
+                request.getRequestDispatcher("view/employee/trip_add.jsp").forward(request, response);
+            }
     }
-}
-
-//Similar changes in update method
- private void updateTrip(HttpServletRequest request, HttpServletResponse response)
+    private void updateTrip(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
           try {
                 int tripID = Integer.parseInt(request.getParameter("tripID"));
@@ -262,13 +459,15 @@ private void addTrip(HttpServletRequest request, HttpServletResponse response)
                  // *** VALIDATION: Arrival Time must be AFTER Departure Time ***
                 if (!arrivalTime.isAfter(departureTime)) {
                     // Validation failed!
-                    request.setAttribute("error", "Arrival time must be after departure time.");
+                    request.setAttribute("error", "Thời gian đến cần sau thời gian khởi hành.");
 
                     // Re-populate form data
-                    List<TrainDTO> trains = trainDB.getAllTrains();
+                    List<TrainDTO> trains = trainDAO.getAllTrains();
                     List<RouteDTO> routes = routeDB.getAllRoutes();
+                     List<TripDTO> trips = tripDB.getTripsByTrainId(trainID);
                     request.setAttribute("trains", trains);
                     request.setAttribute("routes", routes);
+                      request.setAttribute("trips", trips); //for the select in edit form
 
                     // Set the *existing* trip data back into the request (for editing)
                     TripDTO trip = new TripDTO();
@@ -284,6 +483,54 @@ private void addTrip(HttpServletRequest request, HttpServletResponse response)
                     request.getRequestDispatcher("view/employee/trip_edit.jsp").forward(request, response);
                     return; // Stop processing here!
                 }
+                // *** VALIDATION: Check for overlapping trips ***
+               if (tripDB.isTripOverlapping(trainID, departureTime, arrivalTime,tripID)) {
+                    request.setAttribute("error", "Tàu bị trùng lịch.");
+                      // Re-populate form data
+                    List<TrainDTO> trains = trainDAO.getAllTrains();
+                    List<RouteDTO> routes = routeDB.getAllRoutes();
+                      List<TripDTO> trips = tripDB.getTripsByTrainId(trainID);
+                    request.setAttribute("trains", trains);
+                    request.setAttribute("routes", routes);
+                     request.setAttribute("trips", trips);
+
+                    // Set the *existing* trip data back into the request (for editing)
+                    TripDTO trip = new TripDTO();
+                    trip.setTripID(tripID);  // Don't forget the ID!
+                    trip.setTrainID(trainID);
+                    trip.setRouteID(routeID);
+                    trip.setDepartureTime(departureTime);
+                    trip.setArrivalTime(arrivalTime);
+                    trip.setTripStatus(tripStatus);
+
+                    request.setAttribute("trip", trip);
+                    request.getRequestDispatcher("view/employee/trip_edit.jsp").forward(request, response);
+                    return; // Stop processing!
+                }
+                // *** VALIDATION: Check for past departure time ***
+                 if (departureTime.isBefore(LocalDateTime.now())) {
+                    request.setAttribute("error", "Thời gian khởi hành không thể ở quá khứ.");
+                   // Re-populate form data
+                    List<TrainDTO> trains = trainDAO.getAllTrains();
+                    List<RouteDTO> routes = routeDB.getAllRoutes();
+                      List<TripDTO> trips = tripDB.getTripsByTrainId(trainID);
+                    request.setAttribute("trains", trains);
+                    request.setAttribute("routes", routes);
+                    request.setAttribute("trips", trips);
+
+                    // Set the *existing* trip data back into the request (for editing)
+                    TripDTO trip = new TripDTO();
+                    trip.setTripID(tripID);  // Don't forget the ID!
+                    trip.setTrainID(trainID);
+                    trip.setRouteID(routeID);
+                    trip.setDepartureTime(departureTime);
+                    trip.setArrivalTime(arrivalTime);
+                    trip.setTripStatus(tripStatus);
+
+                    request.setAttribute("trip", trip);
+                    request.getRequestDispatcher("view/employee/trip_edit.jsp").forward(request, response);
+                    return; // Stop processing!
+                }
 
                 // Create TripDTO object
                 TripDTO updatedTrip = new TripDTO();
@@ -296,9 +543,9 @@ private void addTrip(HttpServletRequest request, HttpServletResponse response)
                 // Update the trip
                 boolean updated = tripDB.updateTrip(updatedTrip);
                 if (updated) {
-                    request.setAttribute("message", "Trip updated successfully!");
+                    request.setAttribute("message", "Sửa thành công!");
                 } else {
-                    request.setAttribute("error", "Failed to update trip.");
+                    request.setAttribute("error", "Sửa thất bại.");
                 }
                 response.sendRedirect("trip"); // Redirect to trip list
 
@@ -319,9 +566,9 @@ private void addTrip(HttpServletRequest request, HttpServletResponse response)
         int tripID = Integer.parseInt(request.getParameter("id"));
         boolean deleted = tripDB.deleteTrip(tripID); // Call deleteTrip
         if (deleted) {
-            request.setAttribute("message", "Trip deleted successfully.");
+            request.setAttribute("message", "Xóa thành công.");
         } else {
-            request.setAttribute("error", "Failed to delete trip.");
+            request.setAttribute("error", "Xóa thất bại.");
         }
         response.sendRedirect("trip"); // Redirect to the trip list
     }
