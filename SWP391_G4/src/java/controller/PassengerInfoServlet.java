@@ -80,25 +80,29 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
-        // Lấy param tìm kiếm
+        // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
+        // Nếu user trong DB có cột phone, email, cccd,... bạn lấy tương ứng
+        session.setAttribute("bookingName", user.getFullName());
+        session.setAttribute("bookingEmail", user.getEmail());
+        session.setAttribute("bookingPhone", user.getPhoneNumber());
+        
+        // (Hoặc .getIdentityNumber() tùy bạn đặt tên cột)
+
+        // ... (phần code tạo previousURL)
         String depID = request.getParameter("departureStationID");
         String arrID = request.getParameter("arrivalStationID");
         String dDay = request.getParameter("departureDay");
         String tType = request.getParameter("tripType");
         String rDate = request.getParameter("returnDate");
 
-        // Sinh URL để quay lại schedule
         String previousURL = "schedule"
                 + "?departureStationID=" + URLEncoder.encode(depID == null ? "" : depID, "UTF-8")
                 + "&arrivalStationID=" + URLEncoder.encode(arrID == null ? "" : arrID, "UTF-8")
                 + "&departureDay=" + URLEncoder.encode(dDay == null ? "" : dDay, "UTF-8")
                 + "&tripType=" + URLEncoder.encode(tType == null ? "" : tType, "UTF-8")
                 + "&returnDate=" + URLEncoder.encode(rDate == null ? "" : rDate, "UTF-8");
-
-        // Lưu vào session
         session.setAttribute("previousURL", previousURL);
 
-        // Forward
         request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
     }
 

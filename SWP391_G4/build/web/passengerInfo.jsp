@@ -79,17 +79,20 @@
             }
 
             // Xác nhận tuổi (Trẻ em / Người cao tuổi) phía client
-            function confirmAge(modalId, selectId, priceId, discountId, totalId, dayId, monthId, yearId) {
+            function confirmAge(modalId, selectId, priceId, discountId, totalId,
+                    dayId, monthId, yearId, idNumberInputId) {
                 closeModal(modalId);
+
                 let day = document.getElementById(dayId).value;
                 let month = document.getElementById(monthId).value;
                 let year = document.getElementById(yearId).value;
                 let age = getAge(day, month, year);
+
                 let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
                 let selectedOption = document.getElementById(selectId).value;
                 let rate = 0;
+
                 if (selectedOption === "Trẻ em") {
-                    // 6..10 => 50%. <6 => không cần vé, >10 => không hợp lệ
                     if (age < 6) {
                         alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
                         rate = 0;
@@ -97,10 +100,17 @@
                         alert("Không đúng độ tuổi Trẻ em (6-10)!");
                         rate = 0;
                     } else {
+                        // Tuổi 6..10 => hợp lệ => set discount=50
                         rate = 50;
+                        // Tự động gán DOB vào input CCCD
+                        let dobString = day.padStart(2, '0') + "/"
+                                + month.padStart(2, '0') + "/"
+                                + year;
+                        document.getElementById(idNumberInputId).value = dobString;
+
                     }
                 } else {
-                    // Người cao tuổi => >=60 => 30%
+                    // Người cao tuổi
                     if (age < 60) {
                         alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
                         rate = 0;
@@ -115,6 +125,7 @@
                 document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
                 updateTotalAmount();
             }
+
 
             // Xác nhận VIP (client)
             function confirmVIP(modalId, selectId, priceId, discountId, totalId) {
@@ -235,10 +246,12 @@
                                             </c:if>>Hội viên VIP</option>
                                     </select>
 
-                                    <input type="text" class="form-control" 
+                                    <input type="text" class="form-control"
+                                           id="idNumber${status.index}"
                                            name="idNumber${status.index}"
                                            value="${sessionScope.idNumberList[status.index]}"
                                            placeholder="Số CMND/Hộ chiếu" required />
+
                                     <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
                                     <!-- Mỗi ghế: ô input "Họ tên hành khách" và "CCCD hành khách" -->
 
@@ -348,7 +361,8 @@
                                                             'displayTotal${status.index}',
                                                             'birthDay${status.index}',
                                                             'birthMonth${status.index}',
-                                                            'birthYear${status.index}'
+                                                            'birthYear${status.index}',
+                                                            'idNumber${status.index}'  // <--- Tham số ID input
                                                             )"
                                             class="btn btn-primary">
                                         Xác nhận
