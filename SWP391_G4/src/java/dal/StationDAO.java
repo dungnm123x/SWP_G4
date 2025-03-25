@@ -154,6 +154,26 @@ public class StationDAO extends DBContext<RailwayDTO> {
     return false; // Station not used, safe to delete
 }
 
+    public boolean isStationNameExist(String stationName, int stationId) {
+    String sql = "SELECT COUNT(*) FROM Station WHERE StationName = ? AND StationID <> ?"; // Exclude current station
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, stationName);
+        ps.setInt(2, stationId); // Exclude the station being edited
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Return true if count > 0 (name exists)
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Or use a logger
+    }
+    return false; // Assume no existence on error
+}
+
+public boolean isStationNameExist(String stationName) {
+    //For adding new station, stationId is not exist yet.
+    return isStationNameExist(stationName, 0); // Pass 0 for new station
+}
 
     @Override
     public void insert(RailwayDTO model) {

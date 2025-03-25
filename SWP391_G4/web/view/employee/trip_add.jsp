@@ -110,11 +110,8 @@
                     <input type="datetime-local" id="arrivalTime" name="arrivalTime" required><br>
 
                     <label for="tripStatus">Tình trạng:</label>
-                    <select id="tripStatus" name="tripStatus" required>
-                        <option value="Scheduled">Scheduled</option>
-                        <option value="Departed">Departed</option>
-                        <option value="Arrived">Arrived</option>
-                        <option value="Cancelled">Cancelled</option>
+                    <select id="tripStatus" name="tripStatus" required disabled>
+                        <option value="Scheduled" selected>Scheduled</option>
                     </select><br>
 
                     <button type="submit">Thêm</button>

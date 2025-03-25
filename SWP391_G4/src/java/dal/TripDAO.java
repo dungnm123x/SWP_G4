@@ -214,6 +214,45 @@ public class TripDAO extends DBContext<RailwayDTO> {
         return trip;
     }
 
+    public boolean isTripOverlapping(int trainID, LocalDateTime newDeparture, LocalDateTime newArrival, Integer excludeTripId) {
+        String sql = "SELECT COUNT(*) FROM Trip "
+                + "WHERE TrainID = ? "
+                + "AND ((DepartureTime < ? AND ArrivalTime > ?) "
+                + // Case 1: New trip starts before existing trip ends, and ends after existing trip starts
+                "  OR (DepartureTime < ? AND ArrivalTime > ?))";   // Case 2: New trip starts during existing trip
+
+        // Add exclusion for updates
+        if (excludeTripId != null) {
+            sql += " AND TripID <> ?"; // Exclude the current trip being updated
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trainID);
+            ps.setTimestamp(2, Timestamp.valueOf(newArrival)); // End of *new* trip
+            ps.setTimestamp(3, Timestamp.valueOf(newDeparture)); // Start of *new* trip
+            ps.setTimestamp(4, Timestamp.valueOf(newDeparture)); // Start of *new* trip
+            ps.setTimestamp(5, Timestamp.valueOf(newArrival)); // End of new trip.
+            if (excludeTripId != null) {
+                ps.setInt(6, excludeTripId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Return true if count > 0 (overlap exists)
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log and handle the exception
+            return true; // Assume overlap on error, to be safe
+        }
+        return false; // No overlap found
+    }
+
+// Overload for add, excludeTripId will be null.
+    public boolean isTripOverlapping(int trainID, LocalDateTime newDeparture, LocalDateTime newArrival) {
+        return isTripOverlapping(trainID, newDeparture, newArrival, null);
+    }
+
     @Override
     public void insert(RailwayDTO model) {
         throw new UnsupportedOperationException("Not supported yet.");
