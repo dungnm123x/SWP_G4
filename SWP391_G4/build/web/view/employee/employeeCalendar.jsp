@@ -15,7 +15,92 @@
         <style>
 
 
+            .modal-custom {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
 
+            .modal-content-custom {
+                background-color: #fff;
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                max-width: 500px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .modal-header-custom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 10px;
+            }
+
+            .modal-header-custom h5 {
+                margin: 0;
+            }
+
+            .close-custom {
+                font-size: 24px;
+                font-weight: bold;
+                color: #aaa;
+                border: none;
+                background: none;
+                cursor: pointer;
+            }
+
+            .close-custom:hover {
+                color: #000;
+            }
+
+            .modal-body-custom .input-group {
+                margin-bottom: 15px;
+            }
+
+            .modal-body-custom label {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .detail-field {
+                margin: 0;
+                padding: 5px;
+                background-color: #f9f9f9;
+                border-radius: 4px;
+            }
+
+            .modal-footer-custom {
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+                text-align: right;
+            }
+
+            .btn-custom {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            .btn-primary-custom {
+                background-color: #007bff;
+                color: white;
+            }
+
+            .btn-primary-custom:hover {
+                background-color: #0056b3;
+            }
 
             .calendar-display {
                 background-color: #fff;
@@ -120,66 +205,119 @@
             </div>
 
             <!-- Display success or error messages -->
-            
+
 
             <!-- Calendar display -->
             <div class="calendar-display">
                 <div id="calendar"></div>
             </div>
+            <!-- Modal để hiển thị chi tiết sự kiện -->
+            <div class="modal-custom" id="eventDetailModal">
+                <div class="modal-content-custom">
+                    <div class="modal-header-custom">
+                        <h5>Chi Tiết Sự Kiện</h5>
+                        <button type="button" class="close-custom" onclick="closeModal('eventDetailModal')">×</button>
+                    </div>
+                    <div class="modal-body-custom">
+                        <div class="input-group">
+                            <label>Tiêu đề:</label>
+                            <p id="detailTitle" class="detail-field"></p>
+                        </div>
+                        <div class="input-group">
+                            <label>Ngày bắt đầu:</label>
+                            <p id="detailStartDate" class="detail-field"></p>
+                        </div>
+                        <div class="input-group">
+                            <label>Ngày kết thúc:</label>
+                            <p id="detailEndDate" class="detail-field"></p>
+                        </div>
+                        <div class="input-group">
+                            <label>Cả ngày:</label>
+                            <p id="detailAllDay" class="detail-field"></p>
+                        </div>
+                        <div class="input-group">
+                            <label>Mô tả:</label>
+                            <p id="detailDescription" class="detail-field"></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer-custom">
+                        <button type="button" class="btn-custom btn-primary-custom" onclick="closeModal('eventDetailModal')">Đóng</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script>
+            function openModal(modalId) {
+                document.getElementById(modalId).style.display = 'block';
+            }
+
+            function closeModal(modalId) {
+                document.getElementById(modalId).style.display = 'none';
+            }
+
             document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-                    headerToolbar: {
-                    left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    },
-                    editable: true,
-                    selectable: true,
-                    events: [
+                const calendarEl = document.getElementById('calendar');
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                        headerToolbar: {
+                        left: 'prev,next today',
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        editable: false, // Nhân viên không thể chỉnh sửa lịch
+                        selectable: true,
+                        events: [
             <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
-                    {
-                    id: '${event.eventID}',
-                            title: '${event.title}',
-                            start: <c:choose>
+                        {
+                        id: '${event.eventID}',
+                                title: '${event.title}',
+                                start: <c:choose>
                     <c:when test="${event.allDay}">
-                    '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
+                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
                     </c:when>
                     <c:otherwise>
-                    '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
                     </c:otherwise>
                 </c:choose>,
-                            end: <c:choose>
+                                end: <c:choose>
                     <c:when test="${not empty event.endDate}">
                         <c:choose>
                             <c:when test="${event.allDay}">
-                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
+                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
                             </c:when>
                             <c:otherwise>
-                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
                             </c:otherwise>
                         </c:choose>
                     </c:when>
                     <c:otherwise>
-                    null
+                        null
                     </c:otherwise>
                 </c:choose>,
-                            allDay: ${event.allDay},
-                            description: '${event.description != null ? event.description : ""}'
-                    }<c:if test="${!loop.last}">,</c:if>
+                                allDay: ${event.allDay},
+                                description: '${event.description != null ? event.description : ""}'
+                        }<c:if test="${!loop.last}">,</c:if>
             </c:forEach>
-                    ],
-                    dateClick: function (info) {
-                    document.getElementById('startDate').value = info.dateStr + 'T00:00';
-                    document.getElementById('endDate').value = info.dateStr + 'T23:59';
-                    document.getElementById('allDay').checked = true;
-                    },
-            });
-            calendar.render();
+                        ],
+                dateClick: function (info) {
+                    // Không cần xử lý gì cho nhân viên khi nhấp vào ngày
+                }
+                ,
+                eventClick: function (info) {
+                    // Điền thông tin chi tiết vào modal
+                    document.getElementById('detailTitle').textContent = info.event.title;
+                    document.getElementById('detailStartDate').textContent = info.event.start.toLocaleString();
+                    document.getElementById('detailEndDate').textContent = info.event.end ? info.event.end.toLocaleString() : 'Không có';
+                    document.getElementById('detailAllDay').textContent = info.event.allDay ? 'Có' : 'Không';
+                    document.getElementById('detailDescription').textContent = info.event.extendedProps.description || 'Không có mô tả';
+
+                    // Hiển thị modal
+                    openModal('eventDetailModal');
+                    }
+                }
+                );
+                calendar.render();
             });
         </script>
     </body>
