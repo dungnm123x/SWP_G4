@@ -81,7 +81,7 @@ public class PassengerInfoServlet extends HttpServlet {
         }
 
         // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
-        // Nếu user trong DB có cột phone, email, cccd,... bạn lấy tương ứng
+        
         session.setAttribute("bookingName", user.getFullName());
         session.setAttribute("bookingEmail", user.getEmail());
         session.setAttribute("bookingPhone", user.getPhoneNumber());

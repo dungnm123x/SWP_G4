@@ -107,7 +107,7 @@
                                 + month.padStart(2, '0') + "/"
                                 + year;
                         document.getElementById(idNumberInputId).value = dobString;
-
+                        document.getElementById(idNumberInputId).readOnly = true;
                     }
                 } else {
                     // Người cao tuổi
@@ -456,6 +456,7 @@
                         name="bookingPhone" 
                         value="${requestScope.bookingPhone != null ? requestScope.bookingPhone : sessionScope.bookingPhone}" 
                         required 
+
                         />                </div>
             </div>
 
