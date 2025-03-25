@@ -25,7 +25,8 @@
                 "VIP": 10
             };
             // Khi chọn loại hành khách
-            function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId) {
+            function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId,idNumberInputId) {
+                document.getElementById(idNumberInputId).readOnly = false;
                 let selectedOption = selectElement.value;
                 let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
                 // Nếu chọn Trẻ em / Người cao tuổi => hiện popup nhập ngày sinh
@@ -223,12 +224,14 @@
                                             name="passengerType${status.index}"
                                             required
                                             onchange="updateDiscount(
-                                                            this,
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}',
-                                                            'ageModal${status.index}',
-                                                            'vipModal${status.index}')">
+                                                      this,
+                                                      'price${status.index}',
+                                                      'discount${status.index}',
+                                                      'displayTotal${status.index}',
+                                                      'ageModal${status.index}',
+                                                      'vipModal${status.index}',
+                                                      'idNumber${status.index}'  /* Thêm ID input CCCD */
+                                                                                )">
                                         <option value="Người lớn" <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
                                                 selected
                                             </c:if>>Người lớn</option>
@@ -421,7 +424,7 @@
                         class="form-control" 
                         name="bookingName" 
                         value="${requestScope.bookingName != null ? requestScope.bookingName : sessionScope.bookingName}" 
-                        required 
+                        readOnly 
                         />
                 </div>
                 <div class="col-md-4">
@@ -444,7 +447,7 @@
                         class="form-control" 
                         name="bookingEmail" 
                         value="${requestScope.bookingEmail != null ? requestScope.bookingEmail : sessionScope.bookingEmail}" 
-                        required 
+                        readOnly 
                         />
                 </div>
 
@@ -455,7 +458,7 @@
                         class="form-control" 
                         name="bookingPhone" 
                         value="${requestScope.bookingPhone != null ? requestScope.bookingPhone : sessionScope.bookingPhone}" 
-                        required 
+                        readOnly 
 
                         />                </div>
             </div>
