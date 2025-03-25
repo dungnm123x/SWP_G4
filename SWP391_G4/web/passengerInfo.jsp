@@ -664,8 +664,8 @@ boolean partialMode = (request.getAttribute("partialMode") != null);
                             name="bookingPhone" 
                             value="${requestScope.bookingPhone != null ? requestScope.bookingPhone : sessionScope.bookingPhone}" 
                             readOnly 
-
-                            />                </div>
+                            />                
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">

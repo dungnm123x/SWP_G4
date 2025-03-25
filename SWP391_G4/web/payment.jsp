@@ -16,7 +16,7 @@
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
             rel="stylesheet"
-        />
+            />
 
         <!-- Link file CSS riêng (nếu có) -->
         <link href="css/payment.css" rel="stylesheet" type="text/css" />
@@ -67,7 +67,7 @@
                             name="paymentMethod"
                             value="creditCard"
                             required
-                        />
+                            />
                         Thẻ tín dụng/ghi nợ
                     </label>
 
@@ -76,7 +76,7 @@
                             type="radio"
                             name="paymentMethod"
                             value="eWallet"
-                        />
+                            />
                         Ví điện tử (Momo, ZaloPay)
                     </label>
 
@@ -85,7 +85,7 @@
                             type="radio"
                             name="paymentMethod"
                             value="bankTransfer"
-                        />
+                            />
                         Chuyển khoản ngân hàng
                     </label>
 
@@ -95,7 +95,7 @@
                             type="radio"
                             name="paymentMethod"
                             value="vnpay"
-                        />
+                            />
                         Thanh toán qua VNPay
                     </label>
                 </div>
@@ -103,7 +103,17 @@
                 <button type="submit" class="btn btn-primary btn-space">
                     Xác nhận thanh toán
                 </button>
-                <a href="passengerinfo" class="btn btn-secondary">Quay lại</a>
+                <c:url var="reInputURL" value="passengerinfo">
+                    <c:param name="departureStationID" value="${sessionScope.selectedDeparture}" />
+                    <c:param name="arrivalStationID" value="${sessionScope.selectedArrival}" />
+                    <c:param name="departureDay" value="${sessionScope.selectedDate}" />
+                    <c:param name="tripType" value="${sessionScope.selectedTripType}" />
+                    <c:param name="returnDate" value="${sessionScope.returnDate}" />
+                </c:url>
+
+                <a href="${reInputURL}" class="btn btn-secondary">
+                    Nhập lại
+                </a>
             </form>
         </div>
 
