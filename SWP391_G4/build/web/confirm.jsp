@@ -154,9 +154,20 @@
                 </c:if>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="passengerinfo" class="btn btn-secondary btn-space">
+                    <c:url var="reInputURL" value="passengerinfo">
+                        <c:param name="departureStationID" value="${sessionScope.selectedDeparture}" />
+                        <c:param name="arrivalStationID" value="${sessionScope.selectedArrival}" />
+                        <c:param name="departureDay" value="${sessionScope.selectedDate}" />
+                        <c:param name="tripType" value="${sessionScope.selectedTripType}" />
+                        <c:param name="returnDate" value="${sessionScope.returnDate}" />
+                    </c:url>
+
+                    <a href="${reInputURL}" class="btn btn-secondary">
                         Nhập lại
                     </a>
+
+
+
                     <!-- confirm.jsp -->
                     <a href="payment" class="btn btn-primary">
                         Chọn phương thức thanh toán

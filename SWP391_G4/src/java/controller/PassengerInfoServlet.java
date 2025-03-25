@@ -193,7 +193,7 @@ public class PassengerInfoServlet extends HttpServlet {
 
             // Nếu giỏ hàng vẫn còn vé, quay lại passengerInfo.jsp
             if (!cartItems.isEmpty()) {
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+//                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
             } else {
                 response.sendRedirect(redirectURL);
             }

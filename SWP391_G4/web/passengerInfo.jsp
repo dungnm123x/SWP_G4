@@ -25,7 +25,7 @@
                 "VIP": 10
             };
             // Khi chọn loại hành khách
-            function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId,idNumberInputId) {
+            function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId, idNumberInputId) {
                 document.getElementById(idNumberInputId).readOnly = false;
                 let selectedOption = selectElement.value;
                 let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
@@ -224,14 +224,14 @@
                                             name="passengerType${status.index}"
                                             required
                                             onchange="updateDiscount(
-                                                      this,
-                                                      'price${status.index}',
-                                                      'discount${status.index}',
-                                                      'displayTotal${status.index}',
-                                                      'ageModal${status.index}',
-                                                      'vipModal${status.index}',
-                                                      'idNumber${status.index}'  /* Thêm ID input CCCD */
-                                                                                )">
+                                                            this,
+                                                            'price${status.index}',
+                                                            'discount${status.index}',
+                                                            'displayTotal${status.index}',
+                                                            'ageModal${status.index}',
+                                                            'vipModal${status.index}',
+                                                            'idNumber${status.index}'  /* Thêm ID input CCCD */
+                                                            )">
                                         <option value="Người lớn" <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
                                                 selected
                                             </c:if>>Người lớn</option>
@@ -319,179 +319,259 @@
                                 <!-- Nút xóa -->
                                 <td>
                                     <input type="hidden" id="seatIDHidden" name="seatID" />
-                                    <button type="submit" name="action" value="removeOne" class="btn btn-danger"
-                                            onclick="setSeatID('${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}')"
-                                            formnovalidate>
-                                        Xóa vé
-                                    </button>
+                                    
+                                        <button type="button"
+                                                class="btn btn-danger btn-remove"
+                                                data-seatid="${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}">
+                                            Xóa vé
+                                        </button>
 
-                                </td>
 
-                            </tr>
+                                    </td>
 
-                            <!-- Modal xác nhận tuổi (Trẻ em / Người cao tuổi) -->
-                        <div id="ageModal${status.index}" class="modal">
-                            <div class="modal-content">
-                                <h5>Nhập ngày tháng năm sinh</h5>
-                                <div class="mb-2">
-                                    <!-- Thêm id để JS lấy giá trị -->
-                                    <select id="birthDay${status.index}" name="birthDay${status.index}">
-                                        <c:forEach var="i" begin="1" end="31">
-                                            <option value="${i}">${i}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <select id="birthMonth${status.index}" name="birthMonth${status.index}">
-                                        <c:forEach var="i" begin="1" end="12">
-                                            <option value="${i}">${i}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <select id="birthYear${status.index}" name="birthYear${status.index}">
-                                        <c:forEach var="i" begin="1920" end="2025">
-                                            <option value="${i}">${i}</option>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                                <div>
-                                    <button type="button" 
-                                            onclick="closeModal('ageModal${status.index}')"
-                                            class="btn btn-secondary">Hủy</button>
-                                    <button type="button"
-                                            onclick="confirmAge(
-                                                            'ageModal${status.index}',
-                                                            'passengerType${status.index}',
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}',
-                                                            'birthDay${status.index}',
-                                                            'birthMonth${status.index}',
-                                                            'birthYear${status.index}',
-                                                            'idNumber${status.index}'  // <--- Tham số ID input
-                                                            )"
-                                            class="btn btn-primary">
-                                        Xác nhận
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                                </tr>
 
-                        <!-- Modal VIP -->
-                        <div id="vipModal${status.index}" class="modal">
-                            <div class="modal-content">
-                                <h5>Xác nhận thẻ VIP</h5>
-                                <div>
-                                    <input type="text"
-                                           id="vipCard${status.index}"
-                                           name="vipCard${status.index}"
-                                           placeholder="Số thẻ VIP / CMND/CCCD" />
-                                </div>
-                                <div class="mt-3">
-                                    <button type="button"
-                                            onclick="closeModal('vipModal${status.index}')"
-                                            class="btn btn-secondary">Hủy</button>
-                                    <button type="button"
-                                            onclick="confirmVIP(
-                                                            'vipModal${status.index}',
-                                                            'passengerType${status.index}',
-                                                            'price${status.index}',
-                                                            'discount${status.index}',
-                                                            'displayTotal${status.index}'
-                                                            )"
-                                            class="btn btn-primary">
-                                        Xác nhận
-                                    </button>
+                                <!-- Modal xác nhận tuổi (Trẻ em / Người cao tuổi) -->
+                            <div id="ageModal${status.index}" class="modal">
+                                <div class="modal-content">
+                                    <h5>Nhập ngày tháng năm sinh</h5>
+                                    <div class="mb-2">
+                                        <!-- Thêm id để JS lấy giá trị -->
+                                        <select id="birthDay${status.index}" name="birthDay${status.index}">
+                                            <c:forEach var="i" begin="1" end="31">
+                                                <option value="${i}">${i}</option>
+                                            </c:forEach>
+                                        </select>
+                                        <select id="birthMonth${status.index}" name="birthMonth${status.index}">
+                                            <c:forEach var="i" begin="1" end="12">
+                                                <option value="${i}">${i}</option>
+                                            </c:forEach>
+                                        </select>
+                                        <select id="birthYear${status.index}" name="birthYear${status.index}">
+                                            <c:forEach var="i" begin="1920" end="2025">
+                                                <option value="${i}">${i}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <button type="button" 
+                                                onclick="closeModal('ageModal${status.index}')"
+                                                class="btn btn-secondary">Hủy</button>
+                                        <button type="button"
+                                                onclick="confirmAge(
+                                                                'ageModal${status.index}',
+                                                                'passengerType${status.index}',
+                                                                'price${status.index}',
+                                                                'discount${status.index}',
+                                                                'displayTotal${status.index}',
+                                                                'birthDay${status.index}',
+                                                                'birthMonth${status.index}',
+                                                                'birthYear${status.index}',
+                                                                'idNumber${status.index}'  // <--- Tham số ID input
+                                                                )"
+                                                class="btn btn-primary">
+                                            Xác nhận
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-            <input type="hidden" name="passengerCount" value="${fn:length(cartItems)}" />
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <button type="submit" name="action" value="clearAll" 
-                        class="btn btn-danger"
-                        formnovalidate>
-                    🗑 Xóa tất cả vé
-                </button>
-                <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0.0</span> VND</h5>
-            </div>
-            <h4 class="text-primary mt-4">Thông tin người đặt vé</h4>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Họ và tên</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        name="bookingName" 
-                        value="${requestScope.bookingName != null ? requestScope.bookingName : sessionScope.bookingName}" 
-                        readOnly 
-                        />
+
+                            <!-- Modal VIP -->
+                            <div id="vipModal${status.index}" class="modal">
+                                <div class="modal-content">
+                                    <h5>Xác nhận thẻ VIP</h5>
+                                    <div>
+                                        <input type="text"
+                                               id="vipCard${status.index}"
+                                               name="vipCard${status.index}"
+                                               placeholder="Số thẻ VIP / CMND/CCCD" />
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="button"
+                                                onclick="closeModal('vipModal${status.index}')"
+                                                class="btn btn-secondary">Hủy</button>
+                                        <button type="button"
+                                                onclick="confirmVIP(
+                                                                'vipModal${status.index}',
+                                                                'passengerType${status.index}',
+                                                                'price${status.index}',
+                                                                'discount${status.index}',
+                                                                'displayTotal${status.index}'
+                                                                )"
+                                                class="btn btn-primary">
+                                            Xác nhận
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-md-4">
+                <input type="hidden" name="passengerCount" value="${fn:length(cartItems)}" />
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button type="submit" name="action" value="clearAll" 
+                            class="btn btn-danger"
+                            formnovalidate>
+                        🗑 Xóa tất cả vé
+                    </button>
+                    <h5 class="text-primary">Tổng tiền: <span id="totalAmount">0.0</span> VND</h5>
+                </div>
+                <h4 class="text-primary mt-4">Thông tin người đặt vé</h4>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Họ và tên</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            name="bookingName" 
+                            value="${requestScope.bookingName != null ? requestScope.bookingName : sessionScope.bookingName}" 
+                            readOnly 
+                            />
+                    </div>
+                    <div class="col-md-4">
 
 
-                    <label class="form-label">CCCD/Hộ chiếu (người đặt)</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        name="bookingCCCD"
-                        pattern="\d{9}|\d{12}"
-                        title="CCCD/Hộ chiếu phải gồm 9 hoặc 12 chữ số"
-                        value="${sessionScope.bookingCCCD}"  
-                        required 
-                        />
+                        <label class="form-label">CCCD/Hộ chiếu (người đặt)</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            name="bookingCCCD"
+                            pattern="\d{9}|\d{12}"
+                            title="CCCD/Hộ chiếu phải gồm 9 hoặc 12 chữ số"
+                            value="${sessionScope.bookingCCCD}"  
+                            required 
+                            />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            class="form-control" 
+                            name="bookingEmail" 
+                            value="${requestScope.bookingEmail != null ? requestScope.bookingEmail : sessionScope.bookingEmail}" 
+                            readOnly 
+                            />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Số điện thoại</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            name="bookingPhone" 
+                            value="${requestScope.bookingPhone != null ? requestScope.bookingPhone : sessionScope.bookingPhone}" 
+                            readOnly 
+
+                            />                </div>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Email</label>
-                    <input 
-                        type="email" 
-                        class="form-control" 
-                        name="bookingEmail" 
-                        value="${requestScope.bookingEmail != null ? requestScope.bookingEmail : sessionScope.bookingEmail}" 
-                        readOnly 
-                        />
+                <div class="d-flex justify-content-between mt-4">
+                    <!-- Nút "Quay lại" đến 1 trang cụ thể -->
+
+                    <button type="button"
+                            onclick="window.location.href = '<%= session.getAttribute("previousURL") %>'"
+                            class="btn btn-secondary">
+                        Quay lại
+                    </button>
+
+
+
+                    <button type="submit" class="btn btn-primary">
+                        Tiếp tục
+                    </button>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Số điện thoại</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        name="bookingPhone" 
-                        value="${requestScope.bookingPhone != null ? requestScope.bookingPhone : sessionScope.bookingPhone}" 
-                        readOnly 
+            </form>
+            <script>
+                function setSeatID(seatID) {
+                    document.getElementById("seatIDHidden").value = seatID;
+                }
+            </script>
 
-                        />                </div>
-            </div>
+            <script>
+                function goBack() {
+                    let urlParams = new URLSearchParams(window.location.search);
+                    let previousURL = '<%= session.getAttribute("previousURL") != null ? session.getAttribute("previousURL") : "schedule" %>';
+                    window.location.href = previousURL;
+                }
 
-            <div class="d-flex justify-content-between mt-4">
-                <!-- Nút "Quay lại" đến 1 trang cụ thể -->
+            </script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    // Lấy danh sách các nút "Xóa vé"
+                    document.querySelectorAll(".btn-remove").forEach(btn => {
+                        btn.addEventListener("click", function (e) {
+                            e.preventDefault(); // chặn hành vi mặc định (nếu là link)
 
-                <button type="button" onclick="window.history.back()"class="btn btn-secondary">Quay lại</button>
+                            let seatID = this.getAttribute("data-seatid");
 
-                <button type="submit" class="btn btn-primary">
-                    Tiếp tục
-                </button>
-            </div>
+                            // Tạo params
+                            let params = new URLSearchParams();
+                            params.append("action", "removeOne");
+                            params.append("seatID", seatID);
+                            // Ngoài ra, ta cần param hidden: departureStationID, arrivalStationID, ...
+                            // để servlet biết quay lại partial. Tuy nhiên, 
+                            // nếu servlet CHỈ cần xóa seatID, 
+                            // ta không nhất thiết gửi param kia. 
+                            // Tùy logic bạn.
 
-        </form>
-        <script>
-            function setSeatID(seatID) {
-                document.getElementById("seatIDHidden").value = seatID;
-            }
-        </script>
+                            fetch("passengerinfo", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: params.toString()
+                            })
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        // Server trả về 1 đoạn HTML table (hoặc tbody) mới
+                                        // Ta thay thế khu vực .table-responsive (hoặc <tbody>) 
+                                        // = HTML vừa trả về
+                                        document.querySelector(".table-responsive").innerHTML = html;
 
-        <script>
-            function goBack() {
-                let urlParams = new URLSearchParams(window.location.search);
-                let previousURL = '<%= session.getAttribute("previousURL") != null ? session.getAttribute("previousURL") : "schedule" %>';
-                window.location.href = previousURL;
-            }
-        </script>
+                                        // Sau khi thay HTML xong, 
+                                        // ta cần gắn lại event "click" cho các nút Xóa (vì DOM thay đổi)
+                                        rebindRemoveButtons();
+                                    })
+                                    .catch(err => console.error(err));
+                        });
+                    });
+                });
 
-    </body>
-</html>
+// Hàm gắn lại event "click" cho nút Xóa vé
+                function rebindRemoveButtons() {
+                    document.querySelectorAll(".btn-remove").forEach(btn => {
+                        btn.addEventListener("click", function (e) {
+                            e.preventDefault();
+                            let seatID = this.getAttribute("data-seatid");
+                            let params = new URLSearchParams();
+                            params.append("action", "removeOne");
+                            params.append("seatID", seatID);
+
+                            fetch("passengerinfo", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: params.toString()
+                            })
+                                    .then(resp => resp.text())
+                                    .then(html => {
+                                        document.querySelector(".table-responsive").innerHTML = html;
+                                        // Lại gọi rebindRemoveButtons
+                                        rebindRemoveButtons();
+                                    })
+                                    .catch(err => console.error(err));
+                        });
+                    });
+                }
+            </script>
+
+
+        </body>
+    </html>
 
 
 
