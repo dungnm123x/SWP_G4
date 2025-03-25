@@ -80,14 +80,21 @@
             </div>
 
             <!-- Nút "Mua vé" (checkout) -->
+            <!-- form checkout trong cart.jsp -->
             <form action="cartitem" method="post" class="checkout-form text-end">
                 <input type="hidden" name="action" value="checkout">
                 <input type="hidden" name="tripID" value="${cartItems[0].trip.tripID}" />
 
-                <button type="submit" class="btn btn-success">
-                    Mua vé
-                </button>
+                <!-- Giữ lại param tìm kiếm -->
+                <input type="hidden" name="departureStationID" value="${param.departureStationID}" />
+                <input type="hidden" name="arrivalStationID"   value="${param.arrivalStationID}" />
+                <input type="hidden" name="departureDay"       value="${param.departureDay}" />
+                <input type="hidden" name="tripType"           value="${param.tripType}" />
+                <input type="hidden" name="returnDate"         value="${param.returnDate}" />
+
+                <button type="submit" class="btn btn-success">Mua vé</button>
             </form>
+
         </c:if>
     </div>
 </div>

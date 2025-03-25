@@ -71,23 +71,34 @@ public class PassengerInfoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
-        // Kiểm tra đăng nhập
         if (user == null) {
-            // Chưa login => lưu link để quay lại
             session.setAttribute("redirectAfterLogin", "passengerinfo");
             response.sendRedirect("login.jsp");
             return;
         }
 
-        // Nếu đã login, ta có thể tự động điền thông tin người đặt vé:
-        request.setAttribute("bookingName", user.getFullName());
-        request.setAttribute("bookingEmail", user.getEmail());
-        request.setAttribute("bookingPhone", user.getPhoneNumber());
+        // Lấy param tìm kiếm
+        String depID = request.getParameter("departureStationID");
+        String arrID = request.getParameter("arrivalStationID");
+        String dDay = request.getParameter("departureDay");
+        String tType = request.getParameter("tripType");
+        String rDate = request.getParameter("returnDate");
 
-        // Forward sang passengerInfo.jsp
+        // Sinh URL để quay lại schedule
+        String previousURL = "schedule"
+                + "?departureStationID=" + URLEncoder.encode(depID == null ? "" : depID, "UTF-8")
+                + "&arrivalStationID=" + URLEncoder.encode(arrID == null ? "" : arrID, "UTF-8")
+                + "&departureDay=" + URLEncoder.encode(dDay == null ? "" : dDay, "UTF-8")
+                + "&tripType=" + URLEncoder.encode(tType == null ? "" : tType, "UTF-8")
+                + "&returnDate=" + URLEncoder.encode(rDate == null ? "" : rDate, "UTF-8");
+
+        // Lưu vào session
+        session.setAttribute("previousURL", previousURL);
+
+        // Forward
         request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
     }
 

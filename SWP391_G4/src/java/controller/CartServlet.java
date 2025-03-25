@@ -122,17 +122,29 @@ public class CartServlet extends HttpServlet {
         if ("checkout".equals(action)) {
             // Lấy tripID do form gửi lên
             String tripID = request.getParameter("tripID");
-
+            String departureStationID = request.getParameter("departureStationID");
+            String arrivalStationID = request.getParameter("arrivalStationID");
+            String departureDay = request.getParameter("departureDay");
+            String tripType = request.getParameter("tripType");
+            String returnDate = request.getParameter("returnDate");
             // Nếu tripID bị null/rỗng => xử lý lỗi hoặc redirect
             if (tripID == null || tripID.trim().isEmpty()) {
                 // ... Thông báo lỗi ...
             } else {
                 // Gắn vào URL
-                String redirectURL = "passengerinfo?tripID=" + URLEncoder.encode(tripID, "UTF-8");
+                String redirectURL = "passengerinfo"
+                        + "?tripID=" + URLEncoder.encode(tripID, "UTF-8")
+                        + "&departureStationID=" + URLEncoder.encode(departureStationID, "UTF-8")
+                        + "&arrivalStationID=" + URLEncoder.encode(arrivalStationID, "UTF-8")
+                        + "&departureDay=" + URLEncoder.encode(departureDay, "UTF-8")
+                        + "&tripType=" + URLEncoder.encode(tripType, "UTF-8")
+                        + "&returnDate=" + URLEncoder.encode(returnDate == null ? "" : returnDate, "UTF-8");
+
                 response.sendRedirect(redirectURL);
                 return;
             }
         }
+        
 
         // 3) Nếu không phải xóa, thì là THÊM vé vào giỏ
         // Lấy param
