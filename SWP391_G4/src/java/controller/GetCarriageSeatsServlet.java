@@ -65,7 +65,6 @@ public class GetCarriageSeatsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -117,7 +116,7 @@ public class GetCarriageSeatsServlet extends HttpServlet {
                 RouteDAO routeDAO = new RouteDAO();
                 basePrice = routeDAO.getBasePriceByTrainID(trainID);
             }
-            DecimalFormat df = new DecimalFormat("#,##0.00");
+            DecimalFormat df = new DecimalFormat("#,##0");
 
             // 6) In giao diện: lặp qua các toa => lặp ghế => in form
             SeatDAO seatDAO = new SeatDAO();

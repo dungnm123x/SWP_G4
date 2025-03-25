@@ -123,19 +123,25 @@
                                         <strong>Đối tượng:</strong> ${sessionScope.typeList[status.index]}
                                     </td>
                                     <td>${item.price}</td>
-                                    <td>${sessionScope.finalPriceList[status.index]}</td>
+                                    <td>
+                            <fmt:formatNumber value="${sessionScope.finalPriceList[status.index]}" pattern="#,##0"/>
+                            </td>
 
-                                </tr>
-                            </c:forEach>
+
+                            </tr>
+                        </c:forEach>
 
                         </tbody>
                         <tfoot>
                             <c:if test="${not empty totalAmount}">
                                 <tr>
                                     <td colspan="3" class="text-end">Tổng cộng:</td>
-                                    <td>${totalAmount}</td>
-                                </tr>
-                            </c:if>
+                                    <td>
+                            <fmt:formatNumber value="${totalAmount}" pattern="#,##0"/> VNĐ
+                            </td>
+
+                            </tr>
+                        </c:if>
                         </tfoot>
                     </table>
                 </div>

@@ -80,17 +80,16 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
-        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
-        if (cartItems != null) {
-            boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
-            if (confirmedDOB == null || confirmedDOB.length < cartItems.size()) {
-                confirmedDOB = new boolean[cartItems.size()];
-                // Mặc định toàn bộ false
-                session.setAttribute("confirmedDOB", confirmedDOB);
-            }
+        Map<String, Boolean> confirmedMap = (Map<String, Boolean>) session.getAttribute("confirmedDOBMap");
+        if (confirmedMap == null) {
+            confirmedMap = new HashMap<>();
+            session.setAttribute("confirmedDOBMap", confirmedMap);
         }
 
-        // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
+// Mỗi item => key = seatID (hoặc unique)
+// Mỗi lần confirmDOB => confirmedMap.put(seatID, true)
+// Lúc render => data-confirmedDOB="${confirmedMap[item.seatID]}"
+            // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
         session.setAttribute("bookingName", user.getFullName());
         session.setAttribute("bookingEmail", user.getEmail());
         session.setAttribute("bookingPhone", user.getPhoneNumber());

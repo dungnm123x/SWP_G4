@@ -64,7 +64,7 @@ function updateDiscount(
     // Còn lại (Người lớn, Sinh viên, hoặc "Trẻ em"/"NCT" đã confirmDOB) => tính discount ngay
     let rate = discountRates[selectedOption] || 0;
     let discountAmount = basePrice * rate / 100;
-    let finalPrice = basePrice - discountAmount + 1;
+    let finalPrice = basePrice - discountAmount + 1000;
     document.getElementById(discountId).innerText = '-' + rate + '%';
     document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
     updateTotalAmount();
@@ -199,7 +199,7 @@ function confirmAge(
 
     // Tính finalPrice
     let discountAmount = basePrice * rate / 100;
-    let finalPrice = basePrice - discountAmount + 1;
+    let finalPrice = basePrice - discountAmount + 1000;
     document.getElementById(discountId).innerText = '-' + rate + '%';
     document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
     updateTotalAmount();
