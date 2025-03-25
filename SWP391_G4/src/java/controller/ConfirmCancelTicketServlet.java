@@ -105,6 +105,11 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
             request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
             return;
         }
+        if (!bankAccountID.matches("\\d{1,50}")) {
+            request.setAttribute("errorMessage", "Số tài khoản ngân hàng chỉ được chứa các chữ số và tối đa 50 số!");
+            request.getRequestDispatcher("confirmCancelTicket.jsp").forward(request, response);
+            return;
+        }
         String enteredOtp = request.getParameter("otp");
         Object sessionOtpObj = request.getSession().getAttribute("otp");
         String sessionOtp = (sessionOtpObj != null) ? String.valueOf(sessionOtpObj) : null;
@@ -116,13 +121,13 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
             return;
         }
         double totalRefund = 0;
-        int toalTickets=0;
+        int toalTickets = 0;
         List<Integer> ticketIDs = new ArrayList<>();
         TicketDAO ticketDAO = new TicketDAO();
         for (RailwayDTO ticket : pendingTickets) {
             ticketDAO.cancelTicket(ticket.getTicketID(), ticket.getSeatNumber());
             totalRefund += ticket.getTicketPrice() * 0.8;
-            toalTickets ++;
+            toalTickets++;
             ticketIDs.add(ticket.getTicketID()); // Lưu danh sách TicketID
         }
         RefundDAO refundDAO = new RefundDAO();

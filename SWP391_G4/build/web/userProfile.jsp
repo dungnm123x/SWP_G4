@@ -73,12 +73,12 @@
                             </a>
                         </li>
                         <li class="mb-4">
-                            <a href="javascript:history.back()" class="flex items-center text-gray-700">
-                                <i class="fas fa-backward mr-2"></i>
-                                Trở về
+                            <a id="backButton" href="#" class="flex items-center text-gray-700">
+                                <i class="fas fa-backward mr-2"></i> Trở về
                             </a>
-
                         </li>
+
+
                     </ul>
                 </div>
 
@@ -128,6 +128,19 @@
             const dateInput = document.getElementById('dateInput');
             const today = new Date().toISOString().split('T')[0];
             dateInput.setAttribute('max', today);
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let userRole = "<%= session.getAttribute("role") %>"; // Lấy role từ session
+            let backButton = document.getElementById("backButton");
+
+            if (userRole === "1" || userRole === "2") { // 1 = admin, 2 = customer
+                backButton.setAttribute("href", "javascript:history.back()");
+            } else {
+                backButton.setAttribute("href", "home.jsp");
+                backButton.innerHTML = '<i class="fas fa-home mr-2"></i> Trang chủ';
+            }
         });
     </script>
 </html>

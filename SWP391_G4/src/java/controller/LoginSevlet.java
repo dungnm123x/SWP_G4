@@ -132,6 +132,7 @@ public class LoginSevlet extends HttpServlet {
 //        } else {
 //            response.sendRedirect("home");
 //        }
+        session.setAttribute("role", user.getRoleID());
         String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
         if (redirectUrl != null) {
             session.removeAttribute("redirectAfterLogin");
