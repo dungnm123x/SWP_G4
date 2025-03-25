@@ -152,17 +152,20 @@
                 </c:if>
 
                 <div class="d-flex justify-content-between mt-4">
+                    <!-- confirm.jsp -->
                     <c:url var="reInputURL" value="passengerinfo">
-                        <c:param name="departureStationID" value="${sessionScope.selectedDeparture}" />
-                        <c:param name="arrivalStationID" value="${sessionScope.selectedArrival}" />
-                        <c:param name="departureDay" value="${sessionScope.selectedDate}" />
-                        <c:param name="tripType" value="${sessionScope.selectedTripType}" />
-                        <c:param name="returnDate" value="${sessionScope.returnDate}" />
+                        <!-- Lấy param từ request, y hệt param mà passengerInfo.jsp cần -->
+                        <c:param name="departureStationID" value="${param.departureStationID}" />
+                        <c:param name="arrivalStationID" value="${param.arrivalStationID}" />
+                        <c:param name="departureDay" value="${param.departureDay}" />
+                        <c:param name="tripType" value="${param.tripType}" />
+                        <c:param name="returnDate" value="${param.returnDate}" />
                     </c:url>
 
                     <a href="${reInputURL}" class="btn btn-secondary">
                         Nhập lại
                     </a>
+
 
 
 

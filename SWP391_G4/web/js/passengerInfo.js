@@ -10,20 +10,55 @@ const discountRates = {
 };
 
 // Hàm updateDiscount
-function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId, idNumberInputId) {
+//function updateDiscount(selectElement, priceId, discountId, totalId, ageModalId, vipModalId, idNumberInputId) {
+//    document.getElementById(idNumberInputId).readOnly = false;
+//    let selectedOption = selectElement.value;
+//    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+//
+//    if (selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") {
+//        document.getElementById(ageModalId).style.display = 'flex';
+//        return;
+//    }
+//    if (selectedOption === "VIP") {
+//        document.getElementById(vipModalId).style.display = 'flex';
+//        return;
+//    }
+//
+//    let rate = discountRates[selectedOption] || 0;
+//    let discountAmount = basePrice * rate / 100;
+//    let finalPrice = basePrice - discountAmount + 1;
+//    document.getElementById(discountId).innerText = '-' + rate + '%';
+//    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+//    updateTotalAmount();
+//}
+function updateDiscount(
+        selectElement, priceId, discountId, totalId,
+        ageModalId, vipModalId, idNumberInputId
+        ) {
+    // Lấy row (hoặc cell) chứa cờ
+    let rowEl = selectElement.closest('tr');
+    // Đọc thuộc tính data-confirmedDOB (kiểu string "true" hoặc "false")
+    let alreadyConfirmed = (rowEl.getAttribute('data-confirmedDOB') === 'true');
+
+    // Mở khoá input
     document.getElementById(idNumberInputId).readOnly = false;
+
     let selectedOption = selectElement.value;
     let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
 
-    if (selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") {
+    // Nếu là "Trẻ em" / "Người cao tuổi" mà *chưa* confirmed => mở popup
+    if ((selectedOption === "Trẻ em" || selectedOption === "Người cao tuổi") && !alreadyConfirmed) {
         document.getElementById(ageModalId).style.display = 'flex';
-        return;
+        return; // chờ user nhập DOB
     }
+
+    // Nếu là VIP => popup VIP (nếu muốn)
     if (selectedOption === "VIP") {
         document.getElementById(vipModalId).style.display = 'flex';
         return;
     }
 
+    // Còn lại (Người lớn, Sinh viên, hoặc "Trẻ em"/"NCT" đã confirmDOB) => tính discount ngay
     let rate = discountRates[selectedOption] || 0;
     let discountAmount = basePrice * rate / 100;
     let finalPrice = basePrice - discountAmount + 1;
@@ -106,76 +141,67 @@ function getAge(day, month, year) {
 //  document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
 //  updateTotalAmount();
 //}
-function confirmAge(modalId, selectId, priceId, discountId, totalId,
-                    dayId, monthId, yearId, idNumberInputId) {
-  closeModal(modalId);
+function confirmAge(
+        modalId, selectId, priceId, discountId, totalId,
+        dayId, monthId, yearId, idNumberInputId
+        ) {
+    closeModal(modalId);
 
-  let day = document.getElementById(dayId).value;
-  let month = document.getElementById(monthId).value;
-  let year = document.getElementById(yearId).value;
-  let age = getAge(day, month, year);
+    // Tìm row
+    let rowEl = document.getElementById(selectId).closest('tr');
 
-  let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-  let selectedOption = document.getElementById(selectId).value;
-  let rate = 0;
+    let day = document.getElementById(dayId).value;
+    let month = document.getElementById(monthId).value;
+    let year = document.getElementById(yearId).value;
+    let age = getAge(day, month, year);
 
-  // Tính discount
-  if (selectedOption === "Trẻ em") {
-    if (age < 6) {
-      alert("Trẻ em dưới 6 tuổi không cần vé. Vui lòng xóa vé này nếu không cần.");
-      rate = 0;
-    } else if (age > 10) {
-      alert("Không đúng độ tuổi Trẻ em (6-10)!");
-      rate = 0;
-    } else {
-      rate = 50; // 6..10
-    }
-  } else if (selectedOption === "Người cao tuổi") {
-    if (age < 60) {
-      alert("Chưa đủ 60 tuổi để giảm giá Người cao tuổi!");
-      rate = 0;
-    } else {
-      rate = 30; // 60+
-    }
-  }
-  // (Người lớn / Sinh viên / VIP => rate = 0, logic ở chỗ khác)
+    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
+    let selectedOption = document.getElementById(selectId).value;
+    let rate = 0;
 
-  // Nếu rate > 0 => hợp lệ => ghép DOB
-  if (rate > 0) {
-    let dobString = day.padStart(2, '0') + "/" + month.padStart(2, '0') + "/" + year;
-
-    // *** Chỉ set readOnly nếu là Trẻ em ***
     if (selectedOption === "Trẻ em") {
-      document.getElementById(idNumberInputId).value = dobString;
-      document.getElementById(idNumberInputId).readOnly = true;
-    } 
+        // ... check age <6 => skip ...
+        rate = 50;
+        // set readOnly
+        document.getElementById(idNumberInputId).readOnly = true;
+    } else if (selectedOption === "Người cao tuổi") {
+        // ... check age <60 => skip ...
+        rate = 30;
+        // KHÔNG readOnly (tuỳ ý)
+    }
 
     // Gửi Ajax confirmDOB => server
-    let idx = selectId.replace('passengerType', '');
-    let params = new URLSearchParams();
-    params.append("action", "confirmDOB");
-    params.append("index", idx);
-    params.append("dob", dobString);
+    if (rate > 0) {
+        let dobString = day.padStart(2, '0') + "/" + month.padStart(2, '0') + "/" + year;
+        let idx = selectId.replace('passengerType', '');
+        let params = new URLSearchParams();
+        params.append("action", "confirmDOB");
+        params.append("index", idx);
+        params.append("dob", dobString);
 
-    fetch("passengerinfo", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString()
-    })
-    .then(resp => resp.text())
-    .then(result => {
-      console.log("DOB confirmed on server:", result);
-    })
-    .catch(err => console.error(err));
-  }
+        fetch("passengerinfo", {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: params.toString()
+        })
+                .then(resp => resp.text())
+                .then(result => {
+                    console.log("DOB confirmed on server:", result);
+                })
+                .catch(err => console.error(err));
 
-  // Tính finalPrice
-  let discountAmount = basePrice * rate / 100;
-  let finalPrice = basePrice - discountAmount + 1;
-  document.getElementById(discountId).innerText = '-' + rate + '%';
-  document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-  updateTotalAmount();
+        // *** cờ local => "true" => LẦN SAU KHÔNG HIỆN POPUP ***
+        rowEl.setAttribute('data-confirmedDOB', 'true');
+    }
+
+    // Tính finalPrice
+    let discountAmount = basePrice * rate / 100;
+    let finalPrice = basePrice - discountAmount + 1;
+    document.getElementById(discountId).innerText = '-' + rate + '%';
+    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
+    updateTotalAmount();
 }
+
 
 
 // Xác nhận VIP
@@ -248,7 +274,3 @@ function rebindRemoveButtons() {
         });
     });
 }
-
-
-
-

@@ -25,7 +25,8 @@
             </thead>
             <tbody>
                 <c:forEach var="item" items="${sessionScope.cartItems}" varStatus="status">
-                    <tr>
+                    <tr data-confirmedDOB="${sessionScope.confirmedDOB[status.index]}">
+
                         <!-- Cột nhập thông tin hành khách -->
                         <td class="p-2">
                             <input type="hidden" name="passengerName${status.index}" />
@@ -296,7 +297,8 @@
                         </thead>
                         <tbody>
                             <c:forEach var="item" items="${sessionScope.cartItems}" varStatus="status">
-                                <tr>
+                                <tr data-confirmedDOB="${sessionScope.confirmedDOB[status.index]}">
+
                                     <!-- Cột nhập thông tin hành khách -->
                                     <td class="p-2">
                                         <input type="hidden" name="passengerName${status.index}" />
