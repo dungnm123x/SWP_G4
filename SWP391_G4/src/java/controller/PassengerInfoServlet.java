@@ -179,30 +179,42 @@ public class PassengerInfoServlet extends HttpServlet {
         if ("removeOne".equals(action)) {
             String seatID = request.getParameter("seatID");
             if (seatID != null) {
+                // Xóa item
                 cartItems.removeIf(item
-                        -> (item.getTrainName() + "_" + item.getDepartureDate()
-                                + "_" + item.getCarriageNumber() + "_" + item.getSeatNumber())
-                                .equals(seatID)
+                        -> (item.getTrainName() + "_" + item.getDepartureDate() + "_"
+                                + item.getCarriageNumber() + "_" + item.getSeatNumber()).equals(seatID)
                 );
             }
 
-            // Xóa xong => if renderPartial => chỉ trả về HTML của phần table
-            if ("true".equals(renderPartial)) {
-                // request scope => set cartItems
-                request.setAttribute("cartItems", cartItems);
+            // Nếu giỏ đã rỗng => redirect
+            if (cartItems.isEmpty()) {
+                // Gửi phản hồi đặc biệt cho AJAX
+                if ("true".equals(request.getParameter("renderPartial"))) {
+                    // Chỉ cần in 1 đoạn JSON hay text “EMPTY” 
+                    // => client sẽ handle để window.location = ...
+                    response.setContentType("text/plain");
+                    response.getWriter().write("EMPTY");
+                    return;
+                } else {
+                    // Trường hợp user submit form thường
+                    response.sendRedirect(redirectURL);
+                    return;
+                }
+            }
 
-                // Forward sang 1 JSP snippet, hoặc forward sang passengerInfo.jsp
-                // kèm cờ "partial" => c:if
+            // Nếu vẫn còn vé
+            if ("true".equals(request.getParameter("renderPartial"))) {
+                // partialMode => forward sang JSP
                 request.setAttribute("partialMode", true);
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             } else {
-                // Trường hợp user bấm submit form => reload page cũ
-                // ...
+                // Forward full
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             }
         }
+
 //        if ("removeOne".equals(action)) {
 //            String seatID = request.getParameter("seatID");
 //            System.out.println("Request seatID to remove: " + seatID);
@@ -227,7 +239,6 @@ public class PassengerInfoServlet extends HttpServlet {
 //            }
 //            return;
 //        }
-
         // 3) Người dùng bấm "Tiếp tục"
         int passengerCount = 0;
         try {
@@ -277,6 +288,12 @@ public class PassengerInfoServlet extends HttpServlet {
             // Chuẩn hóa tên và CCCD trước khi kiểm tra
             String normalizedFullName = normalizeString(fullName);
             String normalizedCCCD = normalizeString(idNumber);
+            boolean needCCCDRegex = true;
+            if ("Trẻ em".equals(passengerType)) {
+                // Tùy ý => skip regex check
+                needCCCDRegex = false;
+            }
+
             TicketDAO ticketDAO = new TicketDAO();
             if (ticketDAO.ticketExistsByCCCDAndPaid(idNumber, tripID)) {
                 request.setAttribute("errorMessage",
@@ -291,18 +308,20 @@ public class PassengerInfoServlet extends HttpServlet {
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             }
-            if (normalizedCCCD.isEmpty()) {
+            if (normalizedCCCD.isEmpty() && needCCCDRegex) {
                 request.setAttribute("errorMessage", "CMND/Hộ chiếu không hợp lệ, vui lòng nhập lại.");
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             }
             // Ví dụ: chấp nhận 9 hoặc 12 chữ số
-            String cccdRegex = "^(\\d{9}|\\d{12})$";
 
-            if (!normalizedCCCD.matches(cccdRegex)) {
-                request.setAttribute("errorMessage", "CCCD/Hộ chiếu phải là 9 hoặc 12 chữ số!");
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
-                return;
+            if (needCCCDRegex) {
+                String cccdRegex = "^(\\d{9}|\\d{12})$";
+                if (!normalizedCCCD.matches(cccdRegex)) {
+                    request.setAttribute("errorMessage", "CCCD/Hộ chiếu phải là 9 hoặc 12 chữ số!");
+                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    return;
+                }
             }
 
             // Xác định vé khứ hồi
