@@ -32,6 +32,8 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0.0;
     }
 
+    
+
     public int getTotalOrders() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Orders";
         try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
@@ -52,47 +54,78 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0;
     }
 
-    public double getRevenueToday() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE BookingDate >= CAST(GETDATE() AS DATE)";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                double revenue = rs.getDouble(1);
-                System.out.println("Revenue today: " + revenue); // Thêm dòng này
-                return revenue;
+    // Method to get revenue data grouped by time period (week, month, or year)
+    public List<RevenueData> getRevenueData(String period, String ticketStatus) throws SQLException {
+        List<RevenueData> revenueDataList = new ArrayList<>();
+        String sql = "";
+
+        // Determine the SQL query based on the period (week, month, or year)
+        switch (period.toLowerCase()) {
+            case "weekly":
+                sql = "SELECT DATEPART(WEEK, t.DepartureTime) AS TimePeriod, " +
+                      "SUM(ti.TicketPrice) AS TotalRevenue " +
+                      "FROM Ticket ti " +
+                      "JOIN Trip t ON ti.TripID = t.TripID " +
+                      "WHERE ti.TicketStatus = ? " +
+                      "GROUP BY DATEPART(WEEK, t.DepartureTime) " +
+                      "ORDER BY DATEPART(WEEK, t.DepartureTime)";
+                break;
+            case "monthly":
+                sql = "SELECT DATEPART(MONTH, t.DepartureTime) AS TimePeriod, " +
+                      "SUM(ti.TicketPrice) AS TotalRevenue " +
+                      "FROM Ticket ti " +
+                      "JOIN Trip t ON ti.TripID = t.TripID " +
+                      "WHERE ti.TicketStatus = ? " +
+                      "GROUP BY DATEPART(MONTH, t.DepartureTime) " +
+                      "ORDER BY DATEPART(MONTH, t.DepartureTime)";
+                break;
+            case "yearly":
+                sql = "SELECT DATEPART(YEAR, t.DepartureTime) AS TimePeriod, " +
+                      "SUM(ti.TicketPrice) AS TotalRevenue " +
+                      "FROM Ticket ti " +
+                      "JOIN Trip t ON ti.TripID = t.TripID " +
+                      "WHERE ti.TicketStatus = ? " +
+                      "GROUP BY DATEPART(YEAR, t.DepartureTime) " +
+                      "ORDER BY DATEPART(YEAR, t.DepartureTime)";
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid period: " + period);
+        }
+
+        try (PreparedStatement stm = getConnection().prepareStatement(sql)) {
+            stm.setString(1, ticketStatus);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    RevenueData data = new RevenueData();
+                    data.setTimePeriod(rs.getInt("TimePeriod"));
+                    data.setTotalRevenue(rs.getDouble("TotalRevenue"));
+                    revenueDataList.add(data);
+                }
             }
         }
-        System.out.println("Revenue today: 0"); // Thêm dòng này
-        return 0;
+        return revenueDataList;
     }
 
-    public double getRevenueThisWeek() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE BookingDate >= DATEADD(wk,DATEDIFF(wk,7,GETDATE()),0)";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
-        }
-        return 0;
-    }
+    // Helper class to store revenue data
+    public static class RevenueData {
+        private int timePeriod;
+        private double totalRevenue;
 
-    public double getRevenueThisMonth() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE MONTH(BookingDate) = MONTH(GETDATE()) AND YEAR(BookingDate) = YEAR(GETDATE())";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
+        public int getTimePeriod() {
+            return timePeriod;
         }
-        return 0;
-    }
 
-    public double getRevenueThisYear() throws SQLException {
-        String sql = "SELECT SUM(TotalPrice) FROM Booking WHERE YEAR(BookingDate) = YEAR(GETDATE())";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
+        public void setTimePeriod(int timePeriod) {
+            this.timePeriod = timePeriod;
         }
-        return 0;
+
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
     }
 
     private int getCount(String sql) throws SQLException {
@@ -105,26 +138,39 @@ public class DashBoardDAO extends DBContext<Object> {
     }
 
     public List<Feedback> getLatestFeedbacks() throws SQLException {
-    List<Feedback> feedbacks = new ArrayList<>();
-    String sql = "SELECT TOP 3 f.*, u.Email FROM Feedback f JOIN [User] u ON f.UserID = u.UserID ORDER BY f.FeedbackDate DESC"; // Get top 5 latest feedback with user email
-    try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
-        while (rs.next()) {
-            Feedback feedback = new Feedback();
-            User user = new User();
-            user.setUserId(rs.getInt("UserID"));
-            user.setEmail(rs.getString("Email")); // Lấy email từ ResultSet
-            
-            feedback.setFeedbackId(rs.getInt("FeedbackID"));
-            feedback.setUser(user); // Set User object
-            feedback.setContent(rs.getString("Content"));
-            feedback.setRating(rs.getInt("Rating"));
-            feedback.setFeedbackDate(rs.getTimestamp("FeedbackDate"));
-            feedback.setStatus(rs.getBoolean("Status"));
-            feedbacks.add(feedback);
+        List<Feedback> feedbacks = new ArrayList<>();
+        String sql = "SELECT TOP 3 f.*, u.Email FROM Feedback f JOIN [User] u ON f.UserID = u.UserID ORDER BY f.FeedbackDate DESC"; // Get top 5 latest feedback with user email
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                Feedback feedback = new Feedback();
+                User user = new User();
+                user.setUserId(rs.getInt("UserID"));
+                user.setEmail(rs.getString("Email")); // Lấy email từ ResultSet
+
+                feedback.setFeedbackId(rs.getInt("FeedbackID"));
+                feedback.setUser(user); // Set User object
+                feedback.setContent(rs.getString("Content"));
+                feedback.setRating(rs.getInt("Rating"));
+                feedback.setFeedbackDate(rs.getTimestamp("FeedbackDate"));
+                feedback.setStatus(rs.getBoolean("Status"));
+                feedbacks.add(feedback);
+            }
         }
+        return feedbacks;
     }
-    return feedbacks;
-}
+
+    public int[] getStarDistribution() throws SQLException {
+        int[] distribution = new int[5]; // Mảng để đếm số lượng sao từ 1 đến 5
+        String sql = "SELECT Rating, COUNT(*) AS Count FROM Feedback GROUP BY Rating";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                int rating = rs.getInt("Rating");
+                int count = rs.getInt("Count");
+                distribution[rating - 1] = count; // điều chỉnh chỉ số mảng cho phù hợp với rating từ 1 đến 5
+            }
+        }
+        return distribution;
+    }
 
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");
@@ -136,6 +182,10 @@ public class DashBoardDAO extends DBContext<Object> {
 
     public int getTotalCustomers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User] WHERE RoleID = 3");
+    }
+
+    public int getTotalStations() throws SQLException {
+        return getCount("SELECT COUNT(*) FROM Station");
     }
 
     public int getTotalTrains() throws SQLException {
