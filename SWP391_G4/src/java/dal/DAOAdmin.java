@@ -638,6 +638,26 @@ public class DAOAdmin extends DBContext {
         }
         return events;
     }
+    public List<CalendarEvent> getAllCalendarEvents() throws SQLException {
+        List<CalendarEvent> events = new ArrayList<>();
+        String query = "SELECT * FROM CalendarEvent"; // Lấy tất cả các sự kiện từ bảng
+        try (PreparedStatement ps = connection.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                CalendarEvent event = new CalendarEvent();
+                event.setEventID(rs.getInt("EventID"));
+                event.setUserID(rs.getInt("UserID"));
+                event.setTitle(rs.getString("Title"));
+                event.setStartDate(rs.getTimestamp("StartDate"));
+                event.setEndDate(rs.getTimestamp("EndDate"));
+                event.setAllDay(rs.getBoolean("AllDay"));
+                event.setDescription(rs.getString("Description"));
+                event.setStatus(rs.getBoolean("Status"));
+                events.add(event);
+            }
+        }
+        return events;
+    }
 
     // Method to update an existing calendar event
     public boolean updateCalendarEvent(CalendarEvent event) throws SQLException {

@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Lịch Nhân Viên</title>
+        <title>Lịch</title>
         <!-- FullCalendar CSS and JS -->
         <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
@@ -115,17 +115,12 @@
                 </a>
             </c:if>
             <div class="header">
-                <h2>Lịch Sự Kiện Của Bạn</h2>
+                <h2>Lịch</h2>
 
             </div>
 
             <!-- Display success or error messages -->
-            <c:if test="${not empty sessionScope.message2}">
-                <div class="message ${sessionScope.message2.startsWith('✅') ? 'success' : 'error'}">
-                    ${sessionScope.message2}
-                    <c:remove var="message2" scope="session"/>
-                </div>
-            </c:if>
+            
 
             <!-- Calendar display -->
             <div class="calendar-display">
