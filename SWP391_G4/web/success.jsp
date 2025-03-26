@@ -86,7 +86,8 @@
                     <p><strong>Giá:</strong> ${item.price} $</p>
                     <p><strong>Hành khách:</strong> ${requestScope.fullNameList[status.index]}</p>
                     <p><strong>Số CMND/Hộ chiếu:</strong> ${requestScope.idNumberList[status.index]}</p>
-                    
+                    <p><strong>Đối tượng:</strong> ${requestScope.typeList[status.index]}</p>
+
                 </div>
             </c:forEach>
 

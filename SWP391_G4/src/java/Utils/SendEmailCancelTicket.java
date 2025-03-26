@@ -43,7 +43,7 @@ public class SendEmailCancelTicket {
 
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
+            message.setFrom(new InternetAddress(EMAIL_SENDER, "OnlineTicketTrainBooking"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
             message.setContent(htmlContent, "text/html; charset=utf-8");

@@ -117,7 +117,7 @@ public class SendOtpChangePass extends HttpServlet {
             // Tạo và gửi email OTP
             try {
                 MimeMessage message = new MimeMessage(session);
-                message.setFrom(new InternetAddress("dungnmhe173094@fpt.edu.vn"));
+                message.setFrom(new InternetAddress("OnlineTicketTrainBooking"));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
                 message.setSubject("OnlineBookingTicketTrain: OTP Code to verify account");
                 String htmlContent = "<!DOCTYPE html>"

@@ -19,8 +19,9 @@
                 <div class="signin-content">
                     <div class="signin-image">
                         <figure><img src="img/Login.jpg" alt="sign up image"></figure>
-                        <a href="register.jsp" class="signup-image-link">Create an account</a>
+                        <a href="register" class="signup-image-link">Create an account</a>
                         <a href="forgotPassword.jsp" class="signup-image-link">Forgot password</a>
+                        <a href="home" class="signup-image-link">Home</a>
                     </div>
                     <div class="signin-form">
                         <h2 class="form-title">Sign in</h2>

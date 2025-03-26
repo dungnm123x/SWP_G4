@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Properties;
 import java.util.Random;
@@ -115,7 +116,7 @@ public class SendOtpCancelTicket extends HttpServlet {
     }
 
     // Hàm gửi email chứa OTP với giao diện HTML
-    private boolean sendOtpEmail(String recipientEmail, int otp) {
+    private boolean sendOtpEmail(String recipientEmail, int otp) throws UnsupportedEncodingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -130,7 +131,7 @@ public class SendOtpCancelTicket extends HttpServlet {
 
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_SENDER));
+            message.setFrom(new InternetAddress(EMAIL_SENDER, "OnlineTicketTrainBooking"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("OnlineBookingTicketTrain: OTP Code for Ticket Cancellation");
 
