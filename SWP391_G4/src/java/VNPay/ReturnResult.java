@@ -4,6 +4,7 @@
  */
 package VNPay;
 
+import Utils.BookingEmailSender;
 import dal.BookingDAO;
 import dal.TicketDAO;
 import java.io.IOException;
@@ -92,6 +93,7 @@ public class ReturnResult extends HttpServlet {
         String vnp_BankCode = request.getParameter("vnp_BankCode");
         String vnp_PayDate_raw = request.getParameter("vnp_PayDate");
         String vnp_TransactionStatus = request.getParameter("vnp_TransactionStatus");
+        System.out.println("TransactionStatus: " + vnp_TransactionStatus);
 
         // (Tuỳ chọn) parse thời gian thanh toán
         String vnp_PayDate = "";
@@ -225,11 +227,26 @@ public class ReturnResult extends HttpServlet {
             request.setAttribute("bookingPhone", bookingPhone);
 
             request.getRequestDispatcher("success.jsp").forward(request, response);
+            try {
+                BookingEmailSender.sendBookingSuccessEmail(
+                        user.getEmail(),
+                        bookingName,
+                        cartItems,
+                        (List<String>) session.getAttribute("fullNameList"),
+                        (List<String>) session.getAttribute("idNumberList"),
+                        bookingPhone
+                );
+            } catch (Exception e) {
+                e.printStackTrace(); // Ghi log nếu gửi mail thất bại
+            }
 
+            System.out.println("Thanh toán thành công");
         } else {
             // Giao dịch không thành công => có thể về fail.jsp
+            System.out.println("Thanh toán KHÔNG thành công hoặc thiếu thông tin");
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
+
     }
 
     private static String formatNumber(double number) {

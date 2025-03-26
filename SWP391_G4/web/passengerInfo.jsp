@@ -20,7 +20,7 @@
                     <th>Giảm đối tượng</th>
                     <th>Khuyến mại</th>
                     <th>Bảo hiểm</th>
-                    <th>Thành tiền ($)</th>
+                    <th>Thành tiền (VND)</th>
                     <th></th>
                 </tr>
             </thead>
@@ -293,7 +293,7 @@
                                 <th>Giảm đối tượng</th>
                                 <th>Khuyến mại</th>
                                 <th>Bảo hiểm</th>
-                                <th>Thành tiền ($)</th>
+                                <th>Thành tiền (VND)</th>
                                 <th></th>
                             </tr>
                         </thead>

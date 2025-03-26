@@ -40,6 +40,7 @@
             <div class="table-responsive">
                 <form action="vnpay" id="frmCreateOrder" method="post">
 
+
                     <!-- 
                       2) Sửa hiển thị số tiền thành VNĐ thay vì $
                          Sử dụng fmt:formatNumber + pattern="#,##0"
@@ -100,7 +101,7 @@
 
         <!-- Sử dụng AJAX POST => trả về JSON => Mở popup VNPay (nếu cần) 
              Hoặc redirect sang VNPayServlet (như bạn đang làm) -->
-        <script type="text/javascript">
+<!--        <script type="text/javascript">
             $("#frmCreateOrder").submit(function (e) {
                 e.preventDefault();
                 var postData = $(this).serialize();
@@ -123,6 +124,6 @@
                     }
                 });
             });
-        </script>
+        </script>-->
     </body>
 </html>
