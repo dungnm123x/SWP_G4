@@ -125,7 +125,7 @@
                                     </td>
                                     <td>${item.price}</td>
                                     <td>
-                            <fmt:formatNumber value="${sessionScope.finalPriceList[status.index]}" pattern="#,##0"/>
+                            <fmt:formatNumber value="${sessionScope.finalPriceList[status.index]}" pattern="#,##0.##"/>
                             </td>
 
 
@@ -138,7 +138,7 @@
                                 <tr>
                                     <td colspan="3" class="text-end">Tổng cộng:</td>
                                     <td>
-                            <fmt:formatNumber value="${totalAmount}" pattern="#,##0"/> VNĐ
+                            <fmt:formatNumber value="${totalAmount}" pattern="#,##0.##" /> VNĐ
                             </td>
 
                             </tr>

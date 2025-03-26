@@ -1,7 +1,7 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<fmt:setLocale value="en_US"/>
 <!-- Bắt đầu snippet giỏ vé -->
 <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
@@ -46,7 +46,12 @@
 
                             <div>
                                 <small>Toa ${item.carriageNumber}, Ghế ${item.seatNumber}</small><br/>
-                                <small>Giá: <strong>${item.price} VND</strong></small>
+                                <small>
+                                    Giá: 
+                                    <strong>
+                                        <fmt:formatNumber value="${item.price}" pattern="###,##0.##"/> VND
+                                    </strong>
+                                </small>
                             </div>
                         </div>
 
@@ -74,7 +79,9 @@
                 </c:forEach>
                 <div class="mt-3 text-end">
                     Tổng tiền: 
-                    <strong>${totalPrice}</strong> VND
+                    <strong>
+                        <fmt:formatNumber value="${totalPrice}" pattern="###,##0.##"/>
+                    </strong> VND
                 </div>
 
             </div>

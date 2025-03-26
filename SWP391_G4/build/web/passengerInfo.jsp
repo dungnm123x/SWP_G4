@@ -2,10 +2,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%
     boolean partialMode = (request.getAttribute("partialMode") != null);
 %>
-
+<fmt:setLocale value="en_US"/>
 <c:choose>
 
     <c:when test="${partialMode}">
@@ -387,7 +388,7 @@
 
                                     <!-- Cột giá vé gốc -->
                                     <td>
-                                        ${item.price} VND
+                                        <fmt:formatNumber value="${item.price}" pattern="#,##0.##"  /> VND
                                         <input type="hidden" id="price${status.index}"
                                                name="price${status.index}"
                                                value="${item.price}" />

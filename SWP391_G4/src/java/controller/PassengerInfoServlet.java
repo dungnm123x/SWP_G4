@@ -248,7 +248,7 @@ public class PassengerInfoServlet extends HttpServlet {
 //            }
 //            return;
 //        }
-        if ("confirmDOB".equals(action)) {
+        if ("confirmedDOBMap".equals(action)) {
             String indexStr = request.getParameter("index");
             String dob = request.getParameter("dob");
             int idx = Integer.parseInt(indexStr);
