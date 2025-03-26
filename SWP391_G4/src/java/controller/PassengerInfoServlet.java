@@ -327,12 +327,13 @@ public class PassengerInfoServlet extends HttpServlet {
             }
 
             TicketDAO ticketDAO = new TicketDAO();
-            if (ticketDAO.ticketExistsByCCCDAndPaid(idNumber, tripID)) {
+            if (ticketDAO.isTicketActiveByCCCD(idNumber, tripID)) {
                 request.setAttribute("errorMessage",
                         "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             }
+            
 
 // Kiểm tra nếu tên hoặc CCCD chỉ chứa dấu cách hoặc rỗng
             if (normalizedFullName.isEmpty()) {

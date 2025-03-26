@@ -96,6 +96,22 @@ public class TicketDAO extends DBContext {
         }
     }
 
+    public boolean isCCCDRefundedInBooking(String cccd, int bookingID) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Ticket WHERE CCCD = ? AND BookingID = ? AND TicketStatus = 'Refunded'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, cccd);
+            ps.setInt(2, bookingID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Cập nhật trạng thái ghế (seat) (Available, Booked, ...)
      */
@@ -141,18 +157,20 @@ public class TicketDAO extends DBContext {
         }
     }
 
-    public boolean ticketExistsByCCCDAndPaid(String cccd, int tripID) {
+    public boolean isTicketActiveByCCCD(String cccd, int tripID) {
         String sql = "SELECT 1 "
                 + "FROM Ticket t "
                 + "JOIN Booking b ON t.BookingID = b.BookingID "
                 + "WHERE t.CCCD = ? "
                 + "  AND t.TripID = ? "
-                + "  AND b.PaymentStatus = 'Paid' ";
+                + "  AND b.PaymentStatus = 'Paid' "
+                + "  AND t.TicketStatus IN ('Used', 'Unused')"; // vé chưa refund
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, cccd);
             ps.setInt(2, tripID);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // nếu có row => true
+                return rs.next(); // Có vé hợp lệ => true
             }
         } catch (SQLException e) {
             e.printStackTrace();

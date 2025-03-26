@@ -247,7 +247,7 @@ public class ReturnResult extends HttpServlet {
         } else {
             // Giao dịch không thành công => có thể về fail.jsp
             System.out.println("Thanh toán KHÔNG thành công hoặc thiếu thông tin");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            request.getRequestDispatcher("failpaymet.jsp").forward(request, response);
         }
 
     }

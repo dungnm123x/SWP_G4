@@ -227,7 +227,7 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
             out.println("  title: 'Bạn đã hủy vé thành công!',");
             out.println("  text: 'Số tiền hoàn lại: " + totalRefund + " VND',");
             out.println("  confirmButtonText: 'OK'");
-            out.println("}).then(() => window.location.href='home.jsp');");
+            out.println("}).then(() => window.location.href='home');");
             out.println("</script>");
             out.println("</body></html>");
         }
