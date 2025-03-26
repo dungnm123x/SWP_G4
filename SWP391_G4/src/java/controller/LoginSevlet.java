@@ -107,7 +107,9 @@ public class LoginSevlet extends HttpServlet {
         System.out.println("DEBUG: Đăng nhập thành công với tài khoản " + username);
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
+        session.setAttribute("loggedInUserID", user.getUserId()); // Lưu UserID riêng
 
+        System.out.println("DEBUG: Đã lưu userID vào session: " + user.getUserId());
         boolean rememberMe = request.getParameter("remember") != null;
         if (rememberMe) {
             Cookie cuser = new Cookie("cuser", username);

@@ -97,7 +97,6 @@ public class BookingDAO extends DBContext {
         }
         return bookings;
     }
-
     public List<BookingDTO> getBookings(int page, int pageSize, String customerName, String phone, String email, String status, LocalDate startDate, LocalDate endDate, Integer routeId) {
         List<BookingDTO> bookings = new ArrayList<>();
         String sql = "SELECT DISTINCT b.*, u.FullName, u.PhoneNumber, u.Email "
