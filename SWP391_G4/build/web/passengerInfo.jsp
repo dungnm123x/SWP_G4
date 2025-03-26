@@ -127,7 +127,7 @@
                         <td>Không có khuyến mại</td>
 
                         <!-- Bảo hiểm -->
-                        <td>1000 VND</td>
+                        <td>1,000 VND</td>
 
                         <!-- Thành tiền tạm (client) -->
                         <td id="displayTotal${status.index}">
@@ -401,7 +401,7 @@
                                     <td>Không có khuyến mại</td>
 
                                     <!-- Bảo hiểm -->
-                                    <td>1000 VND</td>
+                                    <td>1,000 VND</td>
 
                                     <!-- Thành tiền tạm (client) -->
                                     <td id="displayTotal${status.index}">
