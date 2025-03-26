@@ -207,12 +207,12 @@ public class TrainController extends HttpServlet {
         return;  // Important: Stop processing here!
     }
     if (trainName == null || trainName.trim().isEmpty() ) {
-            request.setAttribute("error", "Tên tàu không thể để trống.");
-            List<TrainDTO> trains = trainDAO.getAllTrains(); // Get the train list again
-        request.setAttribute("trains", trains); // And put it back in the request
+        request.setAttribute("error", "Tên tàu không thể để trống.");
+        List<TrainDTO> trains = trainDAO.getAllTrains(); // Lấy lại danh sách tàu
+        request.setAttribute("trains", trains); // Gửi lại danh sách tàu
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
-        return;  // Important: Stop processing here!
-        }
+        return;  // DỪNG xử lý nếu tên không hợp lệ
+    }
 
     Train train = new Train(trainName);
     train = trainDAO.addTrain(train, totalCarriages, vipCarriages); // Use corrected addTrain
