@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Edit Trip</title>
+        <title>Sửa chuyến</title>
         <link rel="stylesheet" href="css/employee.css">  <%-- Include your CSS --%>
         <style>
             label {
@@ -81,7 +81,7 @@
                 </a>
             </c:if>
             <div class="form-container">
-                <h1>Edit Trip</h1>
+                <h1>Sửa chuyến</h1>
 
                 <c:if test="${not empty error}">
                     <p style="color: red;">${error}</p>

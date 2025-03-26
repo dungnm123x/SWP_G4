@@ -200,12 +200,19 @@ public class TrainController extends HttpServlet {
 
     // Check for duplicate train names *before* creating the Train object
     if (trainDAO.isTrainNameExist(trainName)) {
-        request.setAttribute("error", "Train name already exists.");
+        request.setAttribute("error", "Tên đã tồn tại.");
          List<TrainDTO> trains = trainDAO.getAllTrains(); // Get the train list again
         request.setAttribute("trains", trains); // And put it back in the request
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
         return;  // Important: Stop processing here!
     }
+    if (trainName == null || trainName.trim().isEmpty() ) {
+            request.setAttribute("error", "Tên tàu không thể để trống.");
+            List<TrainDTO> trains = trainDAO.getAllTrains(); // Get the train list again
+        request.setAttribute("trains", trains); // And put it back in the request
+        request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
+        return;  // Important: Stop processing here!
+        }
 
     Train train = new Train(trainName);
     train = trainDAO.addTrain(train, totalCarriages, vipCarriages); // Use corrected addTrain
@@ -215,7 +222,7 @@ public class TrainController extends HttpServlet {
         response.sendRedirect("train?message=Train added successfully!");
     } else {
         // Failure: Set an error and forward back to the form.
-        request.setAttribute("error", "Failed to add train.");
+        request.setAttribute("error", "Thêm tàu thất bại.");
           List<TrainDTO> trains = trainDAO.getAllTrains();
          request.setAttribute("trains", trains);
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
