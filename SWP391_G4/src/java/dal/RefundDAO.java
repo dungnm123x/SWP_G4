@@ -77,6 +77,7 @@ public class RefundDAO extends DBContext {
                         rs.getString("BankAccountID"),
                         rs.getString("BankName"),
                         rs.getTimestamp("RefundDate"),
+                        rs.getTimestamp("ConfirmRefundDate"),
                         rs.getString("RefundStatus"),
                         rs.getBigDecimal("TotalRefund")
                 ));
@@ -99,6 +100,7 @@ public class RefundDAO extends DBContext {
                             rs.getString("BankAccountID"),
                             rs.getString("BankName"),
                             rs.getTimestamp("RefundDate"),
+                            rs.getTimestamp("ConfirmRefundDate"),
                             rs.getString("RefundStatus"),
                             rs.getBigDecimal("TotalRefund")
                     ));
@@ -111,7 +113,7 @@ public class RefundDAO extends DBContext {
     public List<RefundDTO> getAllRefundDetails(String bankAccountID, String refundDate, String refundStatus,
             String customerName, String phoneNumber, String customerEmail) throws SQLException {
         List<RefundDTO> refundList = new ArrayList<>();
-        String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate, r.RefundStatus, r.TotalRefund, "
+        String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate,r.ConfirmRefundDate, r.RefundStatus, r.TotalRefund, "
                 + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
                 + "t.TicketID, t.CCCD, "
                 + "tr.TrainName AS TrainName, "
@@ -181,6 +183,7 @@ public class RefundDAO extends DBContext {
                         rs.getString("BankAccountID"),
                         rs.getString("BankName"),
                         rs.getTimestamp("RefundDate"),
+                        rs.getTimestamp("ConfirmRefundDate"),
                         rs.getString("RefundStatus"),
                         rs.getBigDecimal("TotalRefund"),
                         rs.getInt("UserID"),
@@ -202,7 +205,7 @@ public class RefundDAO extends DBContext {
     }
 
     public RefundDTO getRefundDetailsByID(int refundID) throws SQLException {
-        String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate, r.RefundStatus, r.TotalRefund, "
+        String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate,r.ConfirmRefundDate, r.RefundStatus, r.TotalRefund, "
                 + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
                 + "t.TicketID, t.CCCD, tr.TrainName, sd.StationName AS DepartureStation, "
                 + "sa.StationName AS ArrivalStation, tp.DepartureTime, c.CarriageNumber, "
@@ -232,6 +235,7 @@ public class RefundDAO extends DBContext {
                                 rs.getString("BankAccountID"),
                                 rs.getString("BankName"),
                                 rs.getTimestamp("RefundDate"),
+                                rs.getTimestamp("ConfirmRefundDate"),
                                 rs.getString("RefundStatus"),
                                 rs.getBigDecimal("TotalRefund"),
                                 rs.getInt("UserID"),
@@ -270,7 +274,7 @@ public class RefundDAO extends DBContext {
     }
 
     public boolean updateRefundStatus(int refundID, String newStatus) {
-        String sql = "UPDATE Refund SET RefundStatus = ? WHERE RefundID = ? AND RefundStatus = 'Wait'";
+        String sql = "UPDATE Refund SET RefundStatus = ?, ConfirmRefundDate = CURRENT_TIMESTAMP WHERE RefundID = ? AND RefundStatus = 'Wait'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newStatus);
@@ -283,7 +287,6 @@ public class RefundDAO extends DBContext {
             return false;
         }
     }
-
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

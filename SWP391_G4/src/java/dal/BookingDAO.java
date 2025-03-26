@@ -52,6 +52,7 @@ public class BookingDAO extends DBContext {
         }
         return -1;
     }
+
     /**
      * Cập nhật trạng thái booking (Active, Expired, ...)
      */
@@ -199,7 +200,82 @@ public class BookingDAO extends DBContext {
         }
         return bookings;
     }
-//Add getTotalBookingCount:
+
+    public List<BookingDTO> getBookingsByUser(int userID, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, Integer routeId) {
+        List<BookingDTO> bookings = new ArrayList<>();
+        String sql = "SELECT DISTINCT b.*, u.FullName, u.PhoneNumber, u.Email "
+                + "FROM Booking b "
+                + "JOIN [User] u ON b.UserID = u.UserID "
+                + "LEFT JOIN Ticket ti ON b.BookingID = ti.BookingID "
+                + "LEFT JOIN Trip tr ON ti.TripID = tr.TripID "
+                + "LEFT JOIN Route r ON tr.RouteID = r.RouteID "
+                + "WHERE b.UserID = ? "; // Chỉ lấy booking của user hiện tại
+
+        if (status != null && !status.isEmpty() && !status.equals("All")) {
+            sql += " AND b.PaymentStatus = ? ";
+        }
+        if (startDate != null) {
+            sql += " AND b.BookingDate >= ? ";
+        }
+        if (endDate != null) {
+            sql += " AND b.BookingDate <= ? ";
+        }
+        if (routeId != null) {
+            sql += " AND tr.RouteID = ? ";
+        }
+
+        sql += " ORDER BY b.BookingID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, userID);
+
+            if (status != null && !status.isEmpty() && !status.equals("All")) {
+                ps.setString(paramIndex++, status);
+            }
+            if (startDate != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.valueOf(startDate.atStartOfDay()));
+            }
+            if (endDate != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.valueOf(endDate.atTime(23, 59, 59)));
+            }
+            if (routeId != null) {
+                ps.setInt(paramIndex++, routeId);
+            }
+
+            ps.setInt(paramIndex++, (page - 1) * pageSize);
+            ps.setInt(paramIndex++, pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    BookingDTO booking = new BookingDTO();
+                    booking.setBookingID(rs.getInt("BookingID"));
+                    booking.setUserID(rs.getInt("UserID"));
+                    booking.setTripID(rs.getInt("TripID"));
+                    booking.setTotalPrice(rs.getDouble("TotalPrice"));
+                    booking.setPaymentStatus(rs.getString("PaymentStatus"));
+                    booking.setBookingStatus(rs.getString("BookingStatus"));
+                    Timestamp bookingTimestamp = rs.getTimestamp("BookingDate");
+                    if (bookingTimestamp != null) {
+                        booking.setBookingDate(bookingTimestamp.toLocalDateTime());
+                    }
+                    booking.setCustomerName(rs.getString("FullName"));
+                    booking.setCustomerPhone(rs.getString("PhoneNumber"));
+                    booking.setCustomerEmail(rs.getString("Email"));
+
+                    // Lấy danh sách vé của booking này
+                    TicketDAO ticketDAO = new TicketDAO();
+                    List<TicketDTO> tickets = ticketDAO.getTicketsByBookingId(booking.getBookingID());
+                    booking.setTickets(tickets);
+
+                    bookings.add(booking);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bookings;
+    }
 
     public int getTotalBookingCount(String customerName, String phone, String email, String status, LocalDate startDate, LocalDate endDate, Integer routeId) {
         int total = 0;
@@ -397,77 +473,77 @@ public class BookingDAO extends DBContext {
     }
 
     public boolean cancelBooking(int bookingID) throws SQLException {
-    // Use a transaction to ensure atomicity
-    connection.setAutoCommit(false);
-    PreparedStatement updateBooking = null;
-    PreparedStatement updateTicket = null;
-    PreparedStatement updateSeat = null;
-
-    try {
-        // 1. Update the Booking status
-        String updateBookingSql = "UPDATE Booking SET BookingStatus = 'Cancelled' WHERE BookingID = ?";
-        updateBooking = connection.prepareStatement(updateBookingSql);
-        updateBooking.setInt(1, bookingID);
-        int bookingRowsAffected = updateBooking.executeUpdate();
-
-        // Check if booking exists
-        if (bookingRowsAffected == 0) {
-            connection.rollback(); // Rollback if no booking found
-            return false; // Indicate failure
-        }
-        // 2. Update the Ticket status for all tickets associated with the booking
-        String updateTicketSql = "UPDATE Ticket SET TicketStatus = 'Cancelled' WHERE BookingID = ?";
-        updateTicket = connection.prepareStatement(updateTicketSql);
-        updateTicket.setInt(1, bookingID);
-        updateTicket.executeUpdate(); // We don't check rowsAffected here; it's OK if there are no tickets
-
-        // 3. Update the Seat status for all seats associated with the cancelled tickets
-        // Join with Ticket table on bookingId
-        String updateSeatSql = "UPDATE Seat SET Status = 'Available' " +
-                               "WHERE CarriageID IN (SELECT c.CarriageID FROM Carriage c JOIN Seat s ON c.CarriageID = s.CarriageID "
-                + "JOIN Ticket t ON s.SeatID = t.SeatID WHERE t.BookingID= ?)";
-        updateSeat = connection.prepareStatement(updateSeatSql);
-        updateSeat.setInt(1, bookingID);
-        updateSeat.executeUpdate();
-        connection.commit(); // Commit the transaction
-        return true;        // Success
-
-    } catch (SQLException e) {
-        connection.rollback(); // Rollback on any error
-        e.printStackTrace();
-        throw e;            // Re-throw the exception after rollback (important!)
-
-    } finally {
-        // Close resources (in reverse order of creation)
-        if (updateSeat != null) {
-            try {
-                updateSeat.close();
-            } catch (SQLException e) {
-                 e.printStackTrace();
-            }
-        }
-         if (updateTicket != null) {
-            try {
-                updateTicket.close();
-            } catch (SQLException e) {
-                 e.printStackTrace();
-            }
-        }
-         if (updateBooking != null) {
-            try {
-                updateBooking.close();
-            } catch (SQLException e) {
-                 e.printStackTrace();
-            }
-        }
+        // Use a transaction to ensure atomicity
+        connection.setAutoCommit(false);
+        PreparedStatement updateBooking = null;
+        PreparedStatement updateTicket = null;
+        PreparedStatement updateSeat = null;
 
         try {
-            connection.setAutoCommit(true); // Restore auto-commit
+            // 1. Update the Booking status
+            String updateBookingSql = "UPDATE Booking SET BookingStatus = 'Cancelled' WHERE BookingID = ?";
+            updateBooking = connection.prepareStatement(updateBookingSql);
+            updateBooking.setInt(1, bookingID);
+            int bookingRowsAffected = updateBooking.executeUpdate();
+
+            // Check if booking exists
+            if (bookingRowsAffected == 0) {
+                connection.rollback(); // Rollback if no booking found
+                return false; // Indicate failure
+            }
+            // 2. Update the Ticket status for all tickets associated with the booking
+            String updateTicketSql = "UPDATE Ticket SET TicketStatus = 'Cancelled' WHERE BookingID = ?";
+            updateTicket = connection.prepareStatement(updateTicketSql);
+            updateTicket.setInt(1, bookingID);
+            updateTicket.executeUpdate(); // We don't check rowsAffected here; it's OK if there are no tickets
+
+            // 3. Update the Seat status for all seats associated with the cancelled tickets
+            // Join with Ticket table on bookingId
+            String updateSeatSql = "UPDATE Seat SET Status = 'Available' "
+                    + "WHERE CarriageID IN (SELECT c.CarriageID FROM Carriage c JOIN Seat s ON c.CarriageID = s.CarriageID "
+                    + "JOIN Ticket t ON s.SeatID = t.SeatID WHERE t.BookingID= ?)";
+            updateSeat = connection.prepareStatement(updateSeatSql);
+            updateSeat.setInt(1, bookingID);
+            updateSeat.executeUpdate();
+            connection.commit(); // Commit the transaction
+            return true;        // Success
+
         } catch (SQLException e) {
+            connection.rollback(); // Rollback on any error
             e.printStackTrace();
+            throw e;            // Re-throw the exception after rollback (important!)
+
+        } finally {
+            // Close resources (in reverse order of creation)
+            if (updateSeat != null) {
+                try {
+                    updateSeat.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (updateTicket != null) {
+                try {
+                    updateTicket.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (updateBooking != null) {
+                try {
+                    updateBooking.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                connection.setAutoCommit(true); // Restore auto-commit
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
     public boolean deleteBooking(int bookingID) {
         String sql = "DELETE FROM Booking WHERE BookingID = ?";

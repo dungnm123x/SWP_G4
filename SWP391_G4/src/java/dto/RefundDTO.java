@@ -10,6 +10,7 @@ public class RefundDTO {
     private String bankAccountID;
     private String bankName;
     private Timestamp refundDate;
+    private Timestamp confirmRefundDate;
     private String refundStatus;
     private BigDecimal totalRefund;
 
@@ -29,7 +30,7 @@ public class RefundDTO {
     private int seatNumber;
     private String tripType;
 
-    public RefundDTO(int refundID, String bankAccountID, String bankName, Timestamp refundDate, String refundStatus,
+    public RefundDTO(int refundID, String bankAccountID, String bankName, Timestamp refundDate,Timestamp confirmRefundDate, String refundStatus,
             BigDecimal totalRefund, int userID, String customerName, String customerEmail, String phoneNumber,
             int ticketID, String cccd, String trainName, String routeName, Timestamp departureTime,
             int carriageNumber, int seatNumber, String tripType) {
@@ -37,6 +38,7 @@ public class RefundDTO {
         this.bankAccountID = bankAccountID;
         this.bankName = bankName;
         this.refundDate = refundDate;
+        this.confirmRefundDate=confirmRefundDate;
         this.refundStatus = refundStatus;
         this.totalRefund = totalRefund;
         this.userID = userID;
@@ -86,6 +88,13 @@ public class RefundDTO {
         this.refundDate = refundDate;
     }
 
+    public Timestamp getConfirmRefundDate() {
+        return confirmRefundDate;
+    }
+
+    public void setConfirmRefundDate(Timestamp confirmRefundDate) {
+        this.confirmRefundDate = confirmRefundDate;
+    }
     public String getRefundStatus() {
         return refundStatus;
     }
