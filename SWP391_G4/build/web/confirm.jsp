@@ -6,7 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -55,7 +55,7 @@
                     <h5>Thông tin người mua vé</h5>
                     <ul>
                         <li><strong>Họ và tên:</strong> ${param.bookingName}</li>
-                        <li><strong>Số CMND/Hộ chiếu:${param.bookingCCCD}</strong> <!-- Bạn có thể chèn thêm nếu cần --></li>
+                        <li><strong>Số CMND/Hộ chiếu:</strong> ${param.bookingCCCD}<!-- Bạn có thể chèn thêm nếu cần --></li>
                         <li><strong>Số điện thoại:</strong> ${param.bookingPhone}</li>
                         <li><strong>Email:</strong> ${param.bookingEmail}</li>
                     </ul>
