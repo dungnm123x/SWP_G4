@@ -48,6 +48,7 @@
                                                     'vipModal${status.index}',
                                                     'idNumber${status.index}'
                                                     )">
+
                                 <option value="Người lớn"
                                         <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
                                             selected
@@ -220,9 +221,9 @@
 
     <script>
 
-        rebindRemoveButtons();
-        reapplyDiscount();
+        reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
         updateTotalAmount();
+
 
     </script>
 </c:when>
@@ -320,6 +321,7 @@
                     'vipModal${status.index}',
                     'idNumber${status.index}'
                     )">
+
                                             <option value="Người lớn"
                                                     <c:if test="${sessionScope.typeList[status.index] == 'Người lớn'}">
                                                         selected
@@ -567,12 +569,12 @@
 
             <!-- Cuối body => gọi hàm bind lần đầu -->
             <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    rebindRemoveButtons();
-                    reapplyDiscount();
+                
+                    reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
                     updateTotalAmount();
 
-                });
+
+                
             </script>
         </body>
     </html>
