@@ -124,14 +124,17 @@
                                         <strong>Số CMND/Hộ chiếu:</strong> ${sessionScope.idNumberList[status.index]} <br>
                                         <strong>Đối tượng:</strong> ${sessionScope.typeList[status.index]}
                                     </td>
-                                    <td>${item.price}</td>
                                     <td>
-                            <fmt:formatNumber value="${sessionScope.finalPriceList[status.index]}" pattern="#,##0.##"/>
-                            </td>
+                                        <fmt:formatNumber value="${item.price}" pattern="#,##0.##" />
+                                    </td>
+
+                                    <td>
+                                        <fmt:formatNumber value="${sessionScope.finalPriceList[status.index]}" pattern="#,##0.##"/>
+                                    </td>
 
 
-                            </tr>
-                        </c:forEach>
+                                </tr>
+                            </c:forEach>
 
                         </tbody>
                         <tfoot>
@@ -139,11 +142,11 @@
                                 <tr>
                                     <td colspan="3" class="text-end">Tổng cộng:</td>
                                     <td>
-                            <fmt:formatNumber value="${totalAmount}" pattern="#,##0.##" /> VNĐ
-                            </td>
+                                        <fmt:formatNumber value="${totalAmount}" pattern="#,##0.##" /> VNĐ
+                                    </td>
 
-                            </tr>
-                        </c:if>
+                                </tr>
+                            </c:if>
                         </tfoot>
                     </table>
                 </div>
