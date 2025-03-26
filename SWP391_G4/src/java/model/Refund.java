@@ -17,6 +17,7 @@ public class Refund {
     private String bankAccountID;
     private String bankName;
     private Timestamp refundDate;
+    private Timestamp confirmRefundDate;
     private String refundStatus;
     private BigDecimal totalRefund;
 
@@ -24,12 +25,13 @@ public class Refund {
     public Refund() {
     }
 
-    public Refund(int refundID, int userID, String bankAccountID, String bankName, Timestamp refundDate, String refundStatus, BigDecimal totalRefund) {
+    public Refund(int refundID, int userID, String bankAccountID, String bankName, Timestamp refundDate,Timestamp confirmRefundDate, String refundStatus, BigDecimal totalRefund) {
         this.refundID = refundID;
         this.userID = userID;
         this.bankAccountID = bankAccountID;
         this.bankName = bankName;
         this.refundDate = refundDate;
+        this.confirmRefundDate=confirmRefundDate;
         this.refundStatus = refundStatus;
         this.totalRefund = totalRefund;
     }
@@ -73,6 +75,13 @@ public class Refund {
 
     public void setRefundDate(Timestamp refundDate) {
         this.refundDate = refundDate;
+    }
+    public Timestamp getConfirmRefundDate() {
+        return confirmRefundDate;
+    }
+
+    public void setConfirmRefundDate(Timestamp confirmRefundDate) {
+        this.confirmRefundDate = confirmRefundDate;
     }
 
     public String getRefundStatus() {

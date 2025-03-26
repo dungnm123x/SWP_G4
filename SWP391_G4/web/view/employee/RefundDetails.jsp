@@ -346,7 +346,8 @@
                 <div class="info-section">
                     <div class="section-title">Thông tin đặt vé:</div>
                     <p><strong>Id hóa đơn:</strong> ${refund.refundID}</p>
-                    <p><strong>Ngày đặt:</strong> ${refund.refundDate}</p>
+                    <p><strong>Ngày yêu cầu:</strong> ${refund.refundDate}</p>
+                    <p><strong>Ngày trả:</strong> ${refund.confirmRefundDate}</p>
                     <p><strong>Tình trạng:</strong> ${refund.refundStatus}</p>
                     <p><strong>Số vé:</strong> ${fn:length(refund.tickets)}</p>
                     <p><strong>Tổng giá:</strong> <fmt:formatNumber value="${refund.totalRefund}" type="currency" currencySymbol="VND" /></p>

@@ -85,14 +85,13 @@ public class RegisterServlet extends HttpServlet {
         boolean hasError = false;
 
         // Kiểm tra mật khẩu
-        if (!password.matches("^(?=.*[^A-Za-z0-9]).{6,}$")) {
-            request.setAttribute("passwordError", "Mật khẩu phải có ít nhất 1 ký tự đặc biệt và tối thiểu 6 ký tự!");
+        if (!password.matches("^(?=.*[^A-Za-z0-9])(?=\\S+$).{6,}$")) {
+            request.setAttribute("passwordError", "Mật khẩu phải có ít nhất 1 ký tự đặc biệt, tối thiểu 6 ký tự và không được chứa dấu cách!");
             hasError = true;
         } else if (!password.equals(repassword)) {
             request.setAttribute("repasswordError", "Mật khẩu nhập lại không khớp!");
             hasError = true;
         }
-
         // Kiểm tra email
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             request.setAttribute("emailError", "Email không hợp lệ!");
@@ -115,8 +114,13 @@ public class RegisterServlet extends HttpServlet {
         if (dao.checkAccountExist(username) != null) {
             request.setAttribute("usernameError", "Tên tài khoản đã tồn tại!");
             hasError = true;
+        } else if (username.contains(" ")) { // Kiểm tra xem có dấu cách không
+            request.setAttribute("usernameError", "Tên tài khoản không được chứa dấu cách!");
+            hasError = true;
+        } else if (!username.matches("^[a-zA-Z0-9_]+$")) { // Chỉ cho phép chữ, số, và dấu gạch dưới
+            request.setAttribute("usernameError", "Tên tài khoản chỉ được chứa chữ cái, số và dấu gạch dưới!");
+            hasError = true;
         }
-
         if (hasError) {
             // Giữ lại dữ liệu đã nhập nếu có lỗi
             request.setAttribute("fullname", fullname);

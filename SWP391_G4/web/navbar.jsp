@@ -50,7 +50,7 @@
         if (user) {
             userDropdown.innerHTML = "<strong>Hello, " + userName + "</strong>";
             userMenu.innerHTML = '<a class="dropdown-item" href="updateuser">Profile</a>'
-                    + '<a class="dropdown-item" href="ticket-list">Purchase order</a>' +
+                    + '<a class="dropdown-item" href="order-list">Purchase order</a>' +
                     '<a class="dropdown-item" href="logout">Logout</a>';
         }
 
