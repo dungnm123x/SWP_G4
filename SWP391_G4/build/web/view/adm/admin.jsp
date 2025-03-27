@@ -209,12 +209,24 @@
                                 <div class="dashboard-row">
                                     <div class="dashboard-item" style="width: 60%;">
                                         <h3>Thống kê doanh thu</h3>
-                                        <div class="chart-controls">
-                                            <a href="admin?view=dashboard&period=monthly" class="btn btn-outline-primary ${period == 'monthly' ? 'active' : ''}">Monthly</a>
-                                            <a href="admin?view=dashboard&period=weekly" class="btn btn-outline-primary ${period == 'weekly' ? 'active' : ''}">Weekly</a>
-                                            <a href="admin?view=dashboard&period=yearly" class="btn btn-outline-primary ${period == 'yearly' ? 'active' : ''}">Yearly</a>
+                                        <div class="revenue-filter">
+                                            <form method="get" action="admin">
+                                                <input type="hidden" name="view" value="dashboard">
+                                                <label for="period">Chọn khoảng thời gian:</label>
+                                                <select name="period" id="period" onchange="updateDateInput()">
+                                                    <option value="weekly" ${period == 'weekly' ? 'selected' : ''}>Hàng tuần</option>
+                                                    <option value="monthly" ${period == 'monthly' ? 'selected' : ''}>Hàng tháng</option>
+                                                    <option value="yearly" ${period == 'yearly' ? 'selected' : ''}>Hàng năm</option>
+                                                </select>
+
+                                                <label for="selectedDate">Chọn thời gian:</label>
+                                                <input type="date" id="selectedDate" name="selectedDate" value="${selectedDate}" required>
+
+                                                <button type="submit" class="btn-custom btn-primary-custom">Xem</button>
+                                            </form>
                                         </div>
-                                        <canvas id="revenueChart" width="600" height="300"></canvas>
+
+                                        <canvas id="revenueChart" width="400" height="200"></canvas>
                                     </div>
                                     <div class="dashboard-item" style="width: 40%;">
                                         <h3>Thống kê người dùng</h3>
@@ -332,33 +344,58 @@
                                 });
                             </script>
                             <script>
-                                document.addEventListener('DOMContentLoaded', function () {
+                                // Hàm cập nhật kiểu input ngày dựa trên period
+                                function updateDateInput() {
+                                const period = document.getElementById('period').value;
+                                const dateInput = document.getElementById('selectedDate');
+                                if (period === 'yearly') {
+                                dateInput.type = 'number';
+                                dateInput.min = new Date().getFullYear() - 4;
+                                dateInput.max = new Date().getFullYear();
+                                dateInput.value = dateInput.value || new Date().getFullYear();
+                                } else {
+                                dateInput.type = 'date';
+                                dateInput.value = dateInput.value || new Date().toISOString().split('T')[0];
+                                }
+                                }
+
+                                // Gọi hàm khi trang tải
+                                document.addEventListener('DOMContentLoaded', updateDateInput);
+                                // Dữ liệu cho biểu đồ
                                 const period = '${period}';
                                 let labels = [];
-                                let unusedData = [];
-                                let usedData1 = [];
-                                let usedData2 = [];
+                                const unusedData = [];
+                                const usedData1 = [];
+                                const usedData2 = [];
                                 <c:choose>
                                     <c:when test="${period == 'weekly'}">
-                                labels = Array.from({length: 52}, (_, i) => i + 1);
-                                unusedData = new Array(52).fill(0);
-                                usedData1 = new Array(52).fill(0);
-                                usedData2 = new Array(52).fill(0);
+                                // Tạo nhãn cho 7 ngày
+                                const selectedDate = new Date('${selectedDate}');
+                                for (let i = 6; i >= 0; i--) {
+                                const date = new Date(selectedDate);
+                                date.setDate(selectedDate.getDate() - i);
+                                labels.push(date.toISOString().split('T')[0]);
+                                }
+
+                                // Điền dữ liệu doanh thu
                                         <c:forEach var="data" items="${unusedRevenue}">
-                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                unusedData.push(${data.totalRevenue});
                                         </c:forEach>
                                         <c:forEach var="data" items="${usedRevenue1}">
-                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                usedData1.push(${data.totalRevenue});
                                         </c:forEach>
                                         <c:forEach var="data" items="${usedRevenue2}">
-                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                usedData2.push(${data.totalRevenue});
                                         </c:forEach>
                                     </c:when>
                                     <c:when test="${period == 'monthly'}">
-                                labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-                                unusedData = new Array(12).fill(0);
-                                usedData1 = new Array(12).fill(0);
-                                usedData2 = new Array(12).fill(0);
+                                // Tạo nhãn cho các ngày trong tháng
+                                const daysInMonth = new Date(new Date('${selectedDate}').getFullYear(), new Date('${selectedDate}').getMonth() + 1, 0).getDate();
+                                for (let i = 1; i <= daysInMonth; i++) {
+                                labels.push(i);
+                                }
+
+                                // Điền dữ liệu doanh thu
                                         <c:forEach var="data" items="${unusedRevenue}">
                                 unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
                                         </c:forEach>
@@ -370,22 +407,29 @@
                                         </c:forEach>
                                     </c:when>
                                     <c:when test="${period == 'yearly'}">
-                                labels = Array.from({length: 5}, (_, i) => 2021 + i);
-                                unusedData = new Array(5).fill(0);
-                                usedData1 = new Array(5).fill(0);
-                                usedData2 = new Array(5).fill(0);
+                                // Tạo nhãn cho 12 tháng
+                                labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                                // Điền dữ liệu doanh thu
                                         <c:forEach var="data" items="${unusedRevenue}">
-                                unusedData[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
                                         </c:forEach>
                                         <c:forEach var="data" items="${usedRevenue1}">
-                                usedData1[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
                                         </c:forEach>
                                         <c:forEach var="data" items="${usedRevenue2}">
-                                usedData2[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
                                         </c:forEach>
                                     </c:when>
                                 </c:choose>
 
+                                // Đảm bảo dữ liệu đầy đủ
+                                for (let i = 0; i < labels.length; i++) {
+                                unusedData[i] = unusedData[i] || 0;
+                                usedData1[i] = usedData1[i] || 0;
+                                usedData2[i] = usedData2[i] || 0;
+                                }
+
+                                // Vẽ biểu đồ đường
                                 const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
                                 const revenueChart = new Chart(ctxRevenue, {
                                 type: 'line',
@@ -393,60 +437,48 @@
                                         labels: labels,
                                                 datasets: [
                                                 {
-                                                label: 'Doanh thu (Unused)',
+                                                label: 'Doanh thu (Chưa dùng)',
                                                         data: unusedData,
                                                         borderColor: 'rgba(255, 99, 132, 1)',
                                                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                        fill: true,
+                                                        fill: false,
                                                         tension: 0.1
                                                 },
                                                 {
-                                                label: 'Doanh thu (Used - 1)',
+                                                label: 'Doanh thu (Dùng)',
                                                         data: usedData1,
                                                         borderColor: 'rgba(54, 162, 235, 1)',
                                                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                                        fill: true,
+                                                        fill: false,
                                                         tension: 0.1
                                                 },
                                                 {
-                                                label: 'Doanh thu (Used - 2)',
+                                                label: 'Doanh thu (Đã trả)',
                                                         data: usedData2,
                                                         borderColor: 'rgba(75, 192, 192, 1)',
                                                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                        fill: true,
+                                                        fill: false,
                                                         tension: 0.1
                                                 }
                                                 ]
                                         },
                                         options: {
-                                        responsive: true,
-                                                scales: {
-                                                y: {
-                                                beginAtZero: true,
-                                                        title: {
-                                                        display: true,
-                                                                text: 'Doanh thu (VND)'
-                                                        }
-                                                },
-                                                        x: {
-                                                        title: {
-                                                        display: true,
-                                                                text: 'Thời gian'
-                                                        }
-                                                        }
-                                                },
-                                                plugins: {
-                                                legend: {
+                                        scales: {
+                                        y: {
+                                        beginAtZero: true,
+                                                title: {
                                                 display: true,
-                                                        position: 'top'
-                                                },
-                                                        title: {
-                                                        display: true,
-                                                                text: 'Thống Kê Doanh Thu'
-                                                        }
+                                                        text: 'Doanh thu (VNĐ)'
+                                                }
+                                        },
+                                                x: {
+                                                title: {
+                                                display: true,
+                                                        text: 'Thời gian'
+                                                }
                                                 }
                                         }
-                                });
+                                        }
                                 });
                             </script>
                             <script>

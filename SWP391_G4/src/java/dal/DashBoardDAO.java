@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Feedback;
 import model.StationWithCoordinates;
 import model.User;
@@ -53,46 +55,66 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0;
     }
 
-    // Method to get revenue data grouped by time period (week, month, or year)
-    public List<RevenueData> getRevenueData(String period, String ticketStatus) throws SQLException {
+    public List<RevenueData> getRevenueData(String period, String ticketStatus, String selectedDate) throws SQLException {
         List<RevenueData> revenueDataList = new ArrayList<>();
         String sql = "";
+        PreparedStatement stm = null;
 
-        // Determine the SQL query based on the period (week, month, or year)
-        switch (period.toLowerCase()) {
-            case "weekly":
-                sql = "SELECT DATEPART(WEEK, t.DepartureTime) AS TimePeriod, "
-                        + "SUM(ti.TicketPrice) AS TotalRevenue "
-                        + "FROM Ticket ti "
-                        + "JOIN Trip t ON ti.TripID = t.TripID "
-                        + "WHERE ti.TicketStatus = ? "
-                        + "GROUP BY DATEPART(WEEK, t.DepartureTime) "
-                        + "ORDER BY DATEPART(WEEK, t.DepartureTime)";
-                break;
-            case "monthly":
-                sql = "SELECT DATEPART(MONTH, t.DepartureTime) AS TimePeriod, "
-                        + "SUM(ti.TicketPrice) AS TotalRevenue "
-                        + "FROM Ticket ti "
-                        + "JOIN Trip t ON ti.TripID = t.TripID "
-                        + "WHERE ti.TicketStatus = ? "
-                        + "GROUP BY DATEPART(MONTH, t.DepartureTime) "
-                        + "ORDER BY DATEPART(MONTH, t.DepartureTime)";
-                break;
-            case "yearly":
-                sql = "SELECT DATEPART(YEAR, t.DepartureTime) AS TimePeriod, "
-                        + "SUM(ti.TicketPrice) AS TotalRevenue "
-                        + "FROM Ticket ti "
-                        + "JOIN Trip t ON ti.TripID = t.TripID "
-                        + "WHERE ti.TicketStatus = ? "
-                        + "GROUP BY DATEPART(YEAR, t.DepartureTime) "
-                        + "ORDER BY DATEPART(YEAR, t.DepartureTime)";
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid period: " + period);
-        }
+        try {
+            switch (period.toLowerCase()) {
+                case "weekly":
+                    // Lấy doanh thu 7 ngày gần nhất từ ngày được chọn
+                    sql = "SELECT CAST(t.DepartureTime AS DATE) AS TimePeriod, "
+                            + "SUM(ti.TicketPrice) AS TotalRevenue "
+                            + "FROM Ticket ti "
+                            + "JOIN Trip t ON ti.TripID = t.TripID "
+                            + "WHERE ti.TicketStatus = ? "
+                            + "AND t.DepartureTime >= DATEADD(DAY, -6, CAST(? AS DATE)) "
+                            + "AND t.DepartureTime <= CAST(? AS DATE) "
+                            + "GROUP BY CAST(t.DepartureTime AS DATE) "
+                            + "ORDER BY CAST(t.DepartureTime AS DATE)";
+                    stm = getConnection().prepareStatement(sql);
+                    stm.setString(1, ticketStatus);
+                    stm.setString(2, selectedDate);
+                    stm.setString(3, selectedDate);
+                    break;
 
-        try (PreparedStatement stm = getConnection().prepareStatement(sql)) {
-            stm.setString(1, ticketStatus);
+                case "monthly":
+                    // Lấy doanh thu từng ngày trong tháng được chọn
+                    sql = "SELECT DAY(t.DepartureTime) AS TimePeriod, "
+                            + "SUM(ti.TicketPrice) AS TotalRevenue "
+                            + "FROM Ticket ti "
+                            + "JOIN Trip t ON ti.TripID = t.TripID "
+                            + "WHERE ti.TicketStatus = ? "
+                            + "AND YEAR(t.DepartureTime) = YEAR(CAST(? AS DATE)) "
+                            + "AND MONTH(t.DepartureTime) = MONTH(CAST(? AS DATE)) "
+                            + "GROUP BY DAY(t.DepartureTime) "
+                            + "ORDER BY DAY(t.DepartureTime)";
+                    stm = getConnection().prepareStatement(sql);
+                    stm.setString(1, ticketStatus);
+                    stm.setString(2, selectedDate);
+                    stm.setString(3, selectedDate);
+                    break;
+
+                case "yearly":
+                    // Lấy doanh thu 12 tháng trong năm được chọn
+                    sql = "SELECT MONTH(t.DepartureTime) AS TimePeriod, "
+                            + "SUM(ti.TicketPrice) AS TotalRevenue "
+                            + "FROM Ticket ti "
+                            + "JOIN Trip t ON ti.TripID = t.TripID "
+                            + "WHERE ti.TicketStatus = ? "
+                            + "AND YEAR(t.DepartureTime) = ? "
+                            + "GROUP BY MONTH(t.DepartureTime) "
+                            + "ORDER BY MONTH(t.DepartureTime)";
+                    stm = getConnection().prepareStatement(sql);
+                    stm.setString(1, ticketStatus);
+                    stm.setString(2, selectedDate);
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Invalid period: " + period);
+            }
+
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
                     RevenueData data = new RevenueData();
@@ -100,6 +122,10 @@ public class DashBoardDAO extends DBContext<Object> {
                     data.setTotalRevenue(rs.getDouble("TotalRevenue"));
                     revenueDataList.add(data);
                 }
+            }
+        } finally {
+            if (stm != null) {
+                stm.close();
             }
         }
         return revenueDataList;
