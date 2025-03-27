@@ -97,10 +97,11 @@ public class ChangePasswordServlet extends HttpServlet {
             hasError = true;
         }
 
-        if (!newPassword.matches("^(?=.*[^A-Za-z0-9]).{6,}$")) {
-            request.setAttribute("passwordError", "Mật khẩu mới phải có ít nhất 1 ký tự đặc biệt và tối thiểu 6 ký tự!");
+        // Kiểm tra mật khẩu
+        if (!newPassword.matches("^(?=.*[^A-Za-z0-9])(?=\\S+$).{6,}$")) {
+            request.setAttribute("passwordError", "Mật khẩu phải có ít nhất 1 ký tự đặc biệt, tối thiểu 6 ký tự và không được chứa dấu cách!");
             hasError = true;
-        } else if (!newPassword.equals(confirmPassword)) {
+        } else if (!confirmPassword.equals(newPassword)) {
             request.setAttribute("repasswordError", "Mật khẩu nhập lại không khớp!");
             hasError = true;
         }
