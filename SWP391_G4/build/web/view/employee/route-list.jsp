@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
     <head>
         <title>Quản lý Tuyến Tàu</title>
@@ -108,7 +109,7 @@
                 <input type="number" name="distance" step="1" min="0" value="${editRoute.distance}" required>
 
                 <label for="basePrice">Giá cơ bản:</label>
-                <input type="number" name="basePrice" step="1" min="0" value="${editRoute.basePrice}" required>
+                <input type="number" name="basePrice" step="1000" min="0" value="${editRoute.basePrice}" required>
 
                 <button type="submit"><c:if test="${not empty editRoute}">Cập Nhật</c:if><c:if test="${empty editRoute}">Thêm</c:if></button>
                 </form>
@@ -128,16 +129,17 @@
                         <td>${route.routeID}</td>
                         <td>${route.departureStation.stationName}</td>
                         <td>${route.arrivalStation.stationName}</td>
-                        <td>${route.distance}</td>
-                        <td>${route.basePrice}</td>
-                        <td>
-                            <a href="route?editId=${route.routeID}"><button>Chỉnh sửa</button></a> | 
-                            <form method="post" action="route" style="display:inline;">
-                                <input type="hidden" name="routeID" value="${route.routeID}">
-                                <input type="hidden" name="action" value="delete">
-                                <button type="submit" style="background-color: red; color: white;">Xóa</button>
-                            </form>
-                        </td>
+                        <td><fmt:formatNumber value="${route.distance}" pattern="#,##0" /> km</td>
+                    <td><fmt:formatNumber value="${route.basePrice}" type="currency" currencySymbol="VND" /></td>
+
+                    <td>
+                        <a href="route?editId=${route.routeID}"><button>Chỉnh sửa</button></a> | 
+                        <form method="post" action="route" style="display:inline;">
+                            <input type="hidden" name="routeID" value="${route.routeID}">
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" style="background-color: red; color: white;">Xóa</button>
+                        </form>
+                    </td>
                     </tr>
                 </c:forEach>
             </table>

@@ -242,6 +242,13 @@ private void updateTrain(HttpServletRequest request, HttpServletResponse respons
         request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response); // Forward!
         return;  // IMPORTANT: Stop processing here!
     }
+    if (trainName == null || trainName.trim().isEmpty() ) {
+        request.setAttribute("error", "Tên tàu không thể để trống.");
+        List<TrainDTO> trains = trainDAO.getAllTrains(); // Lấy lại danh sách tàu
+        request.setAttribute("trains", trains); // Gửi lại danh sách tàu
+        request.getRequestDispatcher("view/employee/train_management.jsp").forward(request, response);
+        return;  // DỪNG xử lý nếu tên không hợp lệ
+    }
 
         Train train = new Train(trainID, trainName); // Create Train object for update
         if(trainDAO.updateTrain(train)){
