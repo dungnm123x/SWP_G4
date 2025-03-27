@@ -194,6 +194,7 @@ public class PassengerInfoServlet extends HttpServlet {
                     break;
                 }
             }
+            // ... (phần cập nhật fullNameList, typeList, idNumberList và mảng confirmedDOB sau khi xóa vé)
             if (removeIndex != -1) {
                 cartItems.remove(removeIndex);
                 List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
@@ -224,6 +225,16 @@ public class PassengerInfoServlet extends HttpServlet {
                     }
                     session.setAttribute("confirmedDOB", newConfirmedDOB);
                 }
+
+                // <-- Chèn đoạn cập nhật readonly cho các vé "Trẻ em" ngay ở đây:
+                typeList = (List<String>) session.getAttribute("typeList");
+                confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
+                for (int i = 0; i < cartItems.size(); i++) {
+                    if ("Trẻ em".equals(typeList.get(i))) {
+                        confirmedDOB[i] = true;
+                    }
+                }
+                session.setAttribute("confirmedDOB", confirmedDOB);
             }
 
             // Nếu giỏ hàng trống, chuyển hướng về previousURL
