@@ -41,32 +41,22 @@ public class AdminController extends HttpServlet {
         try {
             if ("dashboard".equals(view)) {
                 DashBoardDAO dashBoardDAO = new DashBoardDAO();
-
-// Lấy tham số period và selectedDate từ request
                 String period = request.getParameter("period");
                 if (period == null || period.isEmpty()) {
-                    period = "monthly"; // Mặc định là monthly
+                    period = "monthly";
                 }
-
                 String selectedDate = request.getParameter("selectedDate");
                 if (selectedDate == null || selectedDate.isEmpty()) {
-                    // Mặc định là ngày hiện tại nếu không có giá trị
                     selectedDate = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
                 }
-
-// Lấy dữ liệu doanh thu theo period và selectedDate
                 List<DashBoardDAO.RevenueData> unusedRevenue = dashBoardDAO.getRevenueData(period, "Unused", selectedDate);
                 List<DashBoardDAO.RevenueData> usedRevenue1 = dashBoardDAO.getRevenueData(period, "Used", selectedDate);
                 List<DashBoardDAO.RevenueData> usedRevenue2 = dashBoardDAO.getRevenueData(period, "Used", selectedDate);
-
-// Truyền dữ liệu vào JSP
                 request.setAttribute("unusedRevenue", unusedRevenue);
                 request.setAttribute("usedRevenue1", usedRevenue1);
                 request.setAttribute("usedRevenue2", usedRevenue2);
                 request.setAttribute("period", period);
                 request.setAttribute("selectedDate", selectedDate);
-
-// Các thuộc tính khác
                 int totalUsers = dashBoardDAO.getTotalUsers();
                 int totalEmployees = dashBoardDAO.getTotalEmployees();
                 int totalCustomers = dashBoardDAO.getTotalCustomers();
@@ -76,7 +66,6 @@ public class AdminController extends HttpServlet {
                 int totalBlogs = dashBoardDAO.getTotalBlogs();
                 int totalRules = dashBoardDAO.getTotalRules();
                 int totalStations = dashBoardDAO.getTotalStations();
-
                 request.setAttribute("totalUsers", totalUsers);
                 request.setAttribute("totalEmployees", totalEmployees);
                 request.setAttribute("totalCustomers", totalCustomers);
@@ -86,10 +75,10 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalBlogs", totalBlogs);
                 request.setAttribute("totalRules", totalRules);
                 request.setAttribute("totalStations", totalStations);
-
                 List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
                 request.setAttribute("feedbackList", feedbackList);
-
+                int[] starDistribution = dashBoardDAO.getStarDistribution();
+                request.setAttribute("starDistribution", starDistribution);
                 List<StationWithCoordinates> stationsWithCoords = dashBoardDAO.getStationsWithCoordinates();
                 request.setAttribute("stationsWithCoords", stationsWithCoords);
 

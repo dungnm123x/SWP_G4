@@ -214,7 +214,7 @@
                                                 <input type="hidden" name="view" value="dashboard">
                                                 <label for="period">Chọn khoảng thời gian:</label>
                                                 <select name="period" id="period" onchange="updateDateInput()">
-                                                    <option value="weekly" ${period == 'weekly' ? 'selected' : ''}>Hàng tuần</option>
+                                                    
                                                     <option value="monthly" ${period == 'monthly' ? 'selected' : ''}>Hàng tháng</option>
                                                     <option value="yearly" ${period == 'yearly' ? 'selected' : ''}>Hàng năm</option>
                                                 </select>
