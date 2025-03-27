@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import model.CalendarEvent;
 import model.Feedback;
+import model.StationWithCoordinates;
 import model.User;
 import model.Train;
 
@@ -81,6 +82,9 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalStations", totalStations);
                 List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
                 request.setAttribute("feedbackList", feedbackList);
+                // Trong AdminController.java (Dashboard)
+                List<StationWithCoordinates> stationsWithCoords = dashBoardDAO.getStationsWithCoordinates();
+                request.setAttribute("stationsWithCoords", stationsWithCoords);
 
                 request.setAttribute("type", "dashboard");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);

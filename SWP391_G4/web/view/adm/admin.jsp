@@ -20,93 +20,91 @@
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
         <script>
             function submitRoleForm(userId) {
-                document.getElementById('roleForm' + userId).submit();
+            document.getElementById('roleForm' + userId).submit();
             }
 
             // Client-side validation for the Add Event form
             function validateAddEventForm() {
-                const title = document.getElementById('title').value.trim();
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                const description = document.getElementById('description').value.trim();
-                const currentDate = new Date().toISOString().slice(0, 16);
+            const title = document.getElementById('title').value.trim();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const description = document.getElementById('description').value.trim();
+            const currentDate = new Date().toISOString().slice(0, 16);
+            // Validate title
+            if (!title) {
+            alert('Tiêu đề không được để trống!');
+            return false;
+            }
+            if (title.length > 100) {
+            alert('Tiêu đề không được dài quá 100 ký tự!');
+            return false;
+            }
 
-                // Validate title
-                if (!title) {
-                    alert('Tiêu đề không được để trống!');
-                    return false;
-                }
-                if (title.length > 100) {
-                    alert('Tiêu đề không được dài quá 100 ký tự!');
-                    return false;
-                }
+            // Validate description
+            if (description.length > 500) {
+            alert('Mô tả không được dài quá 500 ký tự!');
+            return false;
+            }
 
-                // Validate description
-                if (description.length > 500) {
-                    alert('Mô tả không được dài quá 500 ký tự!');
-                    return false;
-                }
+            // Validate start date
+            if (!startDate) {
+            alert('Ngày bắt đầu không được để trống!');
+            return false;
+            }
+            if (startDate < currentDate) {
+            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+            return false;
+            }
 
-                // Validate start date
-                if (!startDate) {
-                    alert('Ngày bắt đầu không được để trống!');
-                    return false;
-                }
-                if (startDate < currentDate) {
-                    alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-                    return false;
-                }
+            // Validate end date (if provided)
+            if (endDate && startDate >= endDate) {
+            alert('Ngày bắt đầu phải trước ngày kết thúc!');
+            return false;
+            }
 
-                // Validate end date (if provided)
-                if (endDate && startDate >= endDate) {
-                    alert('Ngày bắt đầu phải trước ngày kết thúc!');
-                    return false;
-                }
-
-                return true;
+            return true;
             }
 
             // Client-side validation for the Edit Event form
             function validateEditEventForm() {
-                const title = document.getElementById('editTitle').value.trim();
-                const startDate = document.getElementById('editStartDate').value;
-                const endDate = document.getElementById('editEndDate').value;
-                const description = document.getElementById('editDescription').value.trim();
-                const currentDate = new Date().toISOString().slice(0, 16);
+            const title = document.getElementById('editTitle').value.trim();
+            const startDate = document.getElementById('editStartDate').value;
+            const endDate = document.getElementById('editEndDate').value;
+            const description = document.getElementById('editDescription').value.trim();
+            const currentDate = new Date().toISOString().slice(0, 16);
+            // Validate title
+            if (!title) {
+            alert('Tiêu đề không được để trống!');
+            return false;
+            }
+            if (title.length > 100) {
+            alert('Tiêu đề không được dài quá 100 ký tự!');
+            return false;
+            }
 
-                // Validate title
-                if (!title) {
-                    alert('Tiêu đề không được để trống!');
-                    return false;
-                }
-                if (title.length > 100) {
-                    alert('Tiêu đề không được dài quá 100 ký tự!');
-                    return false;
-                }
+            // Validate description
+            if (description.length > 500) {
+            alert('Mô tả không được dài quá 500 ký tự!');
+            return false;
+            }
 
-                // Validate description
-                if (description.length > 500) {
-                    alert('Mô tả không được dài quá 500 ký tự!');
-                    return false;
-                }
+            // Validate start date
+            if (!startDate) {
+            alert('Ngày bắt đầu không được để trống!');
+            return false;
+            }
+            if (startDate < currentDate) {
+            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+            return false;
+            }
 
-                // Validate start date
-                if (!startDate) {
-                    alert('Ngày bắt đầu không được để trống!');
-                    return false;
-                }
-                if (startDate < currentDate) {
-                    alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-                    return false;
-                }
+            // Validate end date (if provided)
+            if (endDate && startDate >= endDate) {
+            alert('Ngày bắt đầu phải trước ngày kết thúc!');
+            return false;
+            }
 
-                // Validate end date (if provided)
-                if (endDate && startDate >= endDate) {
-                    alert('Ngày bắt đầu phải trước ngày kết thúc!');
-                    return false;
-                }
-
-                return true;
+            return true;
             }
         </script>
     </head>
@@ -120,9 +118,9 @@
                     <li><a href="admin?view=dashboard">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                    <c:if test="${sessionScope.user.userId == 1}">
+                        <c:if test="${sessionScope.user.userId == 1}">
                         <li><a href="admin?view=userauthorization">Phân quyền</a></li>
-                    </c:if>
+                        </c:if>
                     <li><a href="admin?view=calendar">Lịch</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
@@ -264,232 +262,222 @@
 
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    const map = L.map('map').setView([14.0583, 108.2772], 6);
+                                var map = L.map('map').setView([16.0471, 108.2062], 6); // Center of Vietnam
 
-                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                        maxZoom: 19,
-                                        attribution: '© OpenStreetMap'
-                                    }).addTo(map);
-
-                                    const stations = [
-                                        {name: 'Ga Hà Nội', coords: [21.0285, 105.8542], detail: 'Ga chính của miền Bắc, điểm khởi đầu cho các đoàn tàu.'},
-                                        {name: 'Ga Sài Gòn', coords: [10.7769, 106.6959], detail: 'Ga lớn nhất miền Nam, nằm ở trung tâm thành phố Hồ Chí Minh.'},
-                                        {name: 'Ga Đà Nẵng', coords: [16.0544, 108.2022], detail: 'Ga nằm ở thành phố biển Đà Nẵng, gần các địa điểm du lịch lớn.'},
-                                        {name: 'Ga Huế', coords: [16.4633, 107.5909], detail: 'Ga chính của thành phố Huế, gần các di tích lịch sử.'},
-                                        {name: 'Ga Nha Trang', coords: [12.2406, 109.1967], detail: 'Ga nằm ở bãi biển Nha Trang, là điểm đến du lịch nổi tiếng.'},
-                                        {name: 'Ga Vinh', coords: [18.5802, 105.6728], detail: 'Ga chính của tỉnh Nghệ An, có nhiều tuyến tàu Bắc - Nam.'},
-                                        {name: 'Ga Hải Phòng', coords: [20.8591, 106.6859], detail: 'Ga lớn của thành phố Hải Phòng, gần cảng Hải Phòng.'},
-                                        {name: 'Ga Bắc Giang', coords: [21.2693, 106.1896], detail: 'Ga nằm ở tỉnh Bắc Giang, phục vụ các chuyến tàu địa phương.'},
-                                    ];
-
-                                    stations.forEach(station => {
-                                        const marker = L.marker(station.coords).addTo(map);
-                                        marker.on('mouseover', function () {
-                                            const popupContent = `<strong>${station.name}</strong><br>${station.detail}`;
-                                            marker.bindPopup(popupContent).openPopup();
-                                        });
-                                        marker.on('mouseout', function () {
-                                            marker.closePopup();
-                                        });
-                                    });
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                }).addTo(map);
+                                // Add station markers dynamically from database
+                                var stations = [
+                                <c:forEach var="station" items="${stationsWithCoords}" varStatus="loop">
+                                {
+                                name: '${station.stationName}',
+                                        lat: ${station.latitude},
+                                        lng: ${station.longitude},
+                                        address: '${station.address}'
+                                }<c:if test="${!loop.last}">,</c:if>
+                                </c:forEach>
+                                ];
+                                stations.forEach(function(station) {
+                                if (station.lat && station.lng) { // Check if coordinates exist
+                                L.marker([station.lat, station.lng])
+                                        .addTo(map)
+                                        .bindPopup('<b>' + station.name + '</b><br>' + station.address);
+                                }
+                                });
                                 });
                             </script>
-                            
+
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    const starDistribution = [${starDistribution[0]}, ${starDistribution[1]}, ${starDistribution[2]}, ${starDistribution[3]}, ${starDistribution[4]}];
-
-                                    const ctx = document.getElementById('starDistributionChart').getContext('2d');
-                                    const starDistributionChart = new Chart(ctx, {
-                                        type: 'pie',
+                                const starDistribution = [${starDistribution[0]}, ${starDistribution[1]}, ${starDistribution[2]}, ${starDistribution[3]}, ${starDistribution[4]}];
+                                const ctx = document.getElementById('starDistributionChart').getContext('2d');
+                                const starDistributionChart = new Chart(ctx, {
+                                type: 'pie',
                                         data: {
-                                            labels: ['1 Sao', '2 Sao', '3 Sao', '4 Sao', '5 Sao'],
-                                            datasets: [{
+                                        labels: ['1 Sao', '2 Sao', '3 Sao', '4 Sao', '5 Sao'],
+                                                datasets: [{
                                                 data: starDistribution,
-                                                backgroundColor: [
-                                                    'rgba(255, 99, 132, 0.2)',
-                                                    'rgba(54, 162, 235, 0.2)',
-                                                    'rgba(255, 206, 86, 0.2)',
-                                                    'rgba(75, 192, 192, 0.2)',
-                                                    'rgba(153, 102, 255, 0.2)'
-                                                ],
-                                                borderColor: [
-                                                    'rgba(255, 99, 132, 1)',
-                                                    'rgba(54, 162, 235, 1)',
-                                                    'rgba(255, 206, 86, 1)',
-                                                    'rgba(75, 192, 192, 1)',
-                                                    'rgba(153, 102, 255, 1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
+                                                        backgroundColor: [
+                                                                'rgba(255, 99, 132, 0.2)',
+                                                                'rgba(54, 162, 235, 0.2)',
+                                                                'rgba(255, 206, 86, 0.2)',
+                                                                'rgba(75, 192, 192, 0.2)',
+                                                                'rgba(153, 102, 255, 0.2)'
+                                                        ],
+                                                        borderColor: [
+                                                                'rgba(255, 99, 132, 1)',
+                                                                'rgba(54, 162, 235, 1)',
+                                                                'rgba(255, 206, 86, 1)',
+                                                                'rgba(75, 192, 192, 1)',
+                                                                'rgba(153, 102, 255, 1)'
+                                                        ],
+                                                        borderWidth: 1
+                                                }]
                                         },
                                         options: {
-                                            responsive: true,
-                                            plugins: {
+                                        responsive: true,
+                                                plugins: {
                                                 legend: {
-                                                    display: true,
-                                                    position: 'top',
+                                                display: true,
+                                                        position: 'top',
                                                 },
-                                                title: {
-                                                    display: true,
-                                                    text: 'Phân Bố Sao Từ Phản Hồi Khách Hàng'
+                                                        title: {
+                                                        display: true,
+                                                                text: 'Phân Bố Sao Từ Phản Hồi Khách Hàng'
+                                                        }
                                                 }
-                                            }
                                         }
-                                    });
+                                });
                                 });
                             </script>
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    const period = '${period}';
-                                    let labels = [];
-                                    let unusedData = [];
-                                    let usedData1 = [];
-                                    let usedData2 = [];
+                                const period = '${period}';
+                                let labels = [];
+                                let unusedData = [];
+                                let usedData1 = [];
+                                let usedData2 = [];
+                                <c:choose>
+                                    <c:when test="${period == 'weekly'}">
+                                labels = Array.from({length: 52}, (_, i) => i + 1);
+                                unusedData = new Array(52).fill(0);
+                                usedData1 = new Array(52).fill(0);
+                                usedData2 = new Array(52).fill(0);
+                                        <c:forEach var="data" items="${unusedRevenue}">
+                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue1}">
+                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue2}">
+                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:when test="${period == 'monthly'}">
+                                labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                                unusedData = new Array(12).fill(0);
+                                usedData1 = new Array(12).fill(0);
+                                usedData2 = new Array(12).fill(0);
+                                        <c:forEach var="data" items="${unusedRevenue}">
+                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue1}">
+                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue2}">
+                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:when test="${period == 'yearly'}">
+                                labels = Array.from({length: 5}, (_, i) => 2021 + i);
+                                unusedData = new Array(5).fill(0);
+                                usedData1 = new Array(5).fill(0);
+                                usedData2 = new Array(5).fill(0);
+                                        <c:forEach var="data" items="${unusedRevenue}">
+                                unusedData[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue1}">
+                                usedData1[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                        <c:forEach var="data" items="${usedRevenue2}">
+                                usedData2[${data.timePeriod - 2021}] = ${data.totalRevenue};
+                                        </c:forEach>
+                                    </c:when>
+                                </c:choose>
 
-                                    <c:choose>
-                                        <c:when test="${period == 'weekly'}">
-                                            labels = Array.from({length: 52}, (_, i) => i + 1);
-                                            unusedData = new Array(52).fill(0);
-                                            usedData1 = new Array(52).fill(0);
-                                            usedData2 = new Array(52).fill(0);
-
-                                            <c:forEach var="data" items="${unusedRevenue}">
-                                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                            <c:forEach var="data" items="${usedRevenue1}">
-                                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                            <c:forEach var="data" items="${usedRevenue2}">
-                                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:when test="${period == 'monthly'}">
-                                            labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-                                            unusedData = new Array(12).fill(0);
-                                            usedData1 = new Array(12).fill(0);
-                                            usedData2 = new Array(12).fill(0);
-
-                                            <c:forEach var="data" items="${unusedRevenue}">
-                                                unusedData[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                            <c:forEach var="data" items="${usedRevenue1}">
-                                                usedData1[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                            <c:forEach var="data" items="${usedRevenue2}">
-                                                usedData2[${data.timePeriod - 1}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:when test="${period == 'yearly'}">
-                                            labels = Array.from({length: 5}, (_, i) => 2021 + i);
-                                            unusedData = new Array(5).fill(0);
-                                            usedData1 = new Array(5).fill(0);
-                                            usedData2 = new Array(5).fill(0);
-
-                                            <c:forEach var="data" items="${unusedRevenue}">
-                                                unusedData[${data.timePeriod - 2021}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                            <c:forEach var="data" items="${usedRevenue1}">
-                                                usedData1[${data.timePeriod - 2021}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                            <c:forEach var="data" items="${usedRevenue2}">
-                                                usedData2[${data.timePeriod - 2021}] = ${data.totalRevenue};
-                                            </c:forEach>
-                                        </c:when>
-                                    </c:choose>
-
-                                    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-                                    const revenueChart = new Chart(ctxRevenue, {
-                                        type: 'line',
+                                const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+                                const revenueChart = new Chart(ctxRevenue, {
+                                type: 'line',
                                         data: {
-                                            labels: labels,
-                                            datasets: [
+                                        labels: labels,
+                                                datasets: [
                                                 {
-                                                    label: 'Doanh thu (Unused)',
-                                                    data: unusedData,
-                                                    borderColor: 'rgba(255, 99, 132, 1)',
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                    fill: true,
-                                                    tension: 0.1
+                                                label: 'Doanh thu (Unused)',
+                                                        data: unusedData,
+                                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                        fill: true,
+                                                        tension: 0.1
                                                 },
                                                 {
-                                                    label: 'Doanh thu (Used - 1)',
-                                                    data: usedData1,
-                                                    borderColor: 'rgba(54, 162, 235, 1)',
-                                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                                    fill: true,
-                                                    tension: 0.1
+                                                label: 'Doanh thu (Used - 1)',
+                                                        data: usedData1,
+                                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                                        fill: true,
+                                                        tension: 0.1
                                                 },
                                                 {
-                                                    label: 'Doanh thu (Used - 2)',
-                                                    data: usedData2,
-                                                    borderColor: 'rgba(75, 192, 192, 1)',
-                                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                    fill: true,
-                                                    tension: 0.1
+                                                label: 'Doanh thu (Used - 2)',
+                                                        data: usedData2,
+                                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                        fill: true,
+                                                        tension: 0.1
                                                 }
-                                            ]
+                                                ]
                                         },
                                         options: {
-                                            responsive: true,
-                                            scales: {
+                                        responsive: true,
+                                                scales: {
                                                 y: {
-                                                    beginAtZero: true,
-                                                    title: {
+                                                beginAtZero: true,
+                                                        title: {
                                                         display: true,
-                                                        text: 'Doanh thu (VND)'
-                                                    }
+                                                                text: 'Doanh thu (VND)'
+                                                        }
                                                 },
-                                                x: {
-                                                    title: {
+                                                        x: {
+                                                        title: {
                                                         display: true,
-                                                        text: 'Thời gian'
-                                                    }
-                                                }
-                                            },
-                                            plugins: {
+                                                                text: 'Thời gian'
+                                                        }
+                                                        }
+                                                },
+                                                plugins: {
                                                 legend: {
-                                                    display: true,
-                                                    position: 'top'
+                                                display: true,
+                                                        position: 'top'
                                                 },
-                                                title: {
-                                                    display: true,
-                                                    text: 'Thống Kê Doanh Thu'
+                                                        title: {
+                                                        display: true,
+                                                                text: 'Thống Kê Doanh Thu'
+                                                        }
                                                 }
-                                            }
                                         }
-                                    });
+                                });
                                 });
                             </script>
                             <script>
                                 var ctxUser = document.getElementById('userChart').getContext('2d');
                                 var userChart = new Chart(ctxUser, {
-                                    type: 'bar',
-                                    data: {
+                                type: 'bar',
+                                        data: {
                                         labels: ['Người dùng', 'Nhân viên', 'Khách hàng'],
-                                        datasets: [{
-                                            label: 'Số lượng',
-                                            data: [${totalUsers}, ${totalEmployees}, ${totalCustomers}],
-                                            backgroundColor: [
-                                                'rgba(255, 99, 132, 0.2)',
-                                                'rgba(54, 162, 235, 0.2)',
-                                                'rgba(255, 206, 86, 0.2)'
-                                            ],
-                                            borderColor: [
-                                                'rgba(255, 99, 132, 1)',
-                                                'rgba(54, 162, 235, 1)',
-                                                'rgba(255, 206, 86, 1)'
-                                            ],
-                                            borderWidth: 1
-                                        }]
-                                    },
-                                    options: {
+                                                datasets: [{
+                                                label: 'Số lượng',
+                                                        data: [${totalUsers}, ${totalEmployees}, ${totalCustomers}],
+                                                        backgroundColor: [
+                                                                'rgba(255, 99, 132, 0.2)',
+                                                                'rgba(54, 162, 235, 0.2)',
+                                                                'rgba(255, 206, 86, 0.2)'
+                                                        ],
+                                                        borderColor: [
+                                                                'rgba(255, 99, 132, 1)',
+                                                                'rgba(54, 162, 235, 1)',
+                                                                'rgba(255, 206, 86, 1)'
+                                                        ],
+                                                        borderWidth: 1
+                                                }]
+                                        },
+                                        options: {
                                         scales: {
-                                            y: {
-                                                beginAtZero: true
-                                            }
+                                        y: {
+                                        beginAtZero: true
                                         }
-                                    }
+                                        }
+                                        }
                                 });
                             </script>
                         </c:when>
@@ -571,93 +559,92 @@
 
                             <script>
                                 function openModal(modalId) {
-                                    document.getElementById(modalId).style.display = 'block';
+                                document.getElementById(modalId).style.display = 'block';
                                 }
 
                                 function closeModal(modalId) {
-                                    document.getElementById(modalId).style.display = 'none';
+                                document.getElementById(modalId).style.display = 'none';
                                 }
 
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    const calendarEl = document.getElementById('calendar');
-                                    const calendar = new FullCalendar.Calendar(calendarEl, {
-                                        initialView: 'dayGridMonth',
+                                const calendarEl = document.getElementById('calendar');
+                                const calendar = new FullCalendar.Calendar(calendarEl, {
+                                initialView: 'dayGridMonth',
                                         headerToolbar: {
-                                            left: 'prev,next today',
-                                            center: 'title',
-                                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                        left: 'prev,next today',
+                                                center: 'title',
+                                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
                                         },
                                         editable: true,
                                         selectable: true,
                                         events: [
-                                            <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
-                                                {
-                                                    id: '${event.eventID}',
-                                                    title: '${event.title}',
-                                                    start: <c:choose>
-                                                        <c:when test="${event.allDay}">
-                                                            '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
-                                                        </c:otherwise>
-                                                    </c:choose>,
-                                                    end: <c:choose>
-                                                        <c:when test="${not empty event.endDate}">
-                                                            <c:choose>
-                                                                <c:when test="${event.allDay}">
-                                                                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            null
-                                                        </c:otherwise>
-                                                    </c:choose>,
-                                                    allDay: ${event.allDay},
-                                                    description: '${event.description != null ? event.description : ""}'
-                                                }<c:if test="${!loop.last}">,</c:if>
-                                            </c:forEach>
+                                <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
+                                        {
+                                        id: '${event.eventID}',
+                                                title: '${event.title}',
+                                                start: <c:choose>
+                                        <c:when test="${event.allDay}">
+                                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
+                                        </c:when>
+                                        <c:otherwise>
+                                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                        </c:otherwise>
+                                    </c:choose>,
+                                                end: <c:choose>
+                                        <c:when test="${not empty event.endDate}">
+                                            <c:choose>
+                                                <c:when test="${event.allDay}">
+                                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
+                                                </c:when>
+                                                <c:otherwise>
+                                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:when>
+                                        <c:otherwise>
+                                        null
+                                        </c:otherwise>
+                                    </c:choose>,
+                                                allDay: ${event.allDay},
+                                                description: '${event.description != null ? event.description : ""}'
+                                        }<c:if test="${!loop.last}">,</c:if>
+                                </c:forEach>
                                         ],
                                         dateClick: function (info) {
-                                            document.getElementById('startDate').value = info.dateStr + 'T00:00';
-                                            document.getElementById('endDate').value = info.dateStr + 'T23:59';
-                                            document.getElementById('allDay').checked = true;
-                                        },
+                                        document.getElementById('startDate').value = info.dateStr + 'T00:00';
+                                        document.getElementById('endDate').value = info.dateStr + 'T23:59';
+                                        document.getElementById('allDay').checked = true;
+                                        }
+                                ,
                                         eventClick: function (info) {
-                                            document.getElementById('editEventId').value = info.event.id;
-                                            document.getElementById('editTitle').value = info.event.title;
-                                            document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
-                                            if (info.event.end) {
-                                                document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
-                                            } else {
-                                                document.getElementById('editEndDate').value = '';
-                                            }
-                                            document.getElementById('editAllDay').checked = info.event.allDay;
-                                            document.getElementById('editDescription').value = info.event.extendedProps.description || '';
-
-                                            openModal('editEventModal');
-
-                                            document.getElementById('deleteEventBtn').onclick = function () {
-                                                if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
-                                                    const form = document.createElement('form');
-                                                    form.method = 'post';
-                                                    form.action = 'admin';
-                                                    form.innerHTML = `
+                                        document.getElementById('editEventId').value = info.event.id;
+                                        document.getElementById('editTitle').value = info.event.title;
+                                        document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
+                                        if (info.event.end) {
+                                        document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
+                                        } else {
+                                        document.getElementById('editEndDate').value = '';
+                                        }
+                                        document.getElementById('editAllDay').checked = info.event.allDay;
+                                        document.getElementById('editDescription').value = info.event.extendedProps.description || '';
+                                        openModal('editEventModal');
+                                        document.getElementById('deleteEventBtn').onclick = function () {
+                                        if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
+                                        const form = document.createElement('form');
+                                        form.method = 'post';
+                                        form.action = 'admin';
+                                        form.innerHTML = `
                                                         <input type="hidden" name="action" value="deleteCalendarEvent">
                                                         <input type="hidden" name="eventId" value="${info.event.id}">
                                                     `;
-                                                    document.body.appendChild(form);
-                                                    form.submit();
-                                                }
-                                            };
+                                        document.body.appendChild(form);
+                                        form.submit();
                                         }
-                                    });
-
-                                    calendar.render();
+                                        };
+                                        }
+                                }
+                                );
+                                calendar.render();
                                 });
                             </script>
                         </c:when>
@@ -759,8 +746,8 @@
                                                 <th>Email</th>
                                                 <th>SDT</th>
                                                 <th>Hành động</th>
-                                            </c:when>
-                                        </c:choose>
+                                                </c:when>
+                                            </c:choose>
                                     </tr>
                                 </thead>
                                 <tbody>

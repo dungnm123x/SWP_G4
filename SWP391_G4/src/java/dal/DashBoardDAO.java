@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import model.Feedback;
+import model.StationWithCoordinates;
 import model.User;
 
 public class DashBoardDAO extends DBContext<Object> {
@@ -31,8 +32,6 @@ public class DashBoardDAO extends DBContext<Object> {
         }
         return 0.0;
     }
-
-    
 
     public int getTotalOrders() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Orders";
@@ -62,31 +61,31 @@ public class DashBoardDAO extends DBContext<Object> {
         // Determine the SQL query based on the period (week, month, or year)
         switch (period.toLowerCase()) {
             case "weekly":
-                sql = "SELECT DATEPART(WEEK, t.DepartureTime) AS TimePeriod, " +
-                      "SUM(ti.TicketPrice) AS TotalRevenue " +
-                      "FROM Ticket ti " +
-                      "JOIN Trip t ON ti.TripID = t.TripID " +
-                      "WHERE ti.TicketStatus = ? " +
-                      "GROUP BY DATEPART(WEEK, t.DepartureTime) " +
-                      "ORDER BY DATEPART(WEEK, t.DepartureTime)";
+                sql = "SELECT DATEPART(WEEK, t.DepartureTime) AS TimePeriod, "
+                        + "SUM(ti.TicketPrice) AS TotalRevenue "
+                        + "FROM Ticket ti "
+                        + "JOIN Trip t ON ti.TripID = t.TripID "
+                        + "WHERE ti.TicketStatus = ? "
+                        + "GROUP BY DATEPART(WEEK, t.DepartureTime) "
+                        + "ORDER BY DATEPART(WEEK, t.DepartureTime)";
                 break;
             case "monthly":
-                sql = "SELECT DATEPART(MONTH, t.DepartureTime) AS TimePeriod, " +
-                      "SUM(ti.TicketPrice) AS TotalRevenue " +
-                      "FROM Ticket ti " +
-                      "JOIN Trip t ON ti.TripID = t.TripID " +
-                      "WHERE ti.TicketStatus = ? " +
-                      "GROUP BY DATEPART(MONTH, t.DepartureTime) " +
-                      "ORDER BY DATEPART(MONTH, t.DepartureTime)";
+                sql = "SELECT DATEPART(MONTH, t.DepartureTime) AS TimePeriod, "
+                        + "SUM(ti.TicketPrice) AS TotalRevenue "
+                        + "FROM Ticket ti "
+                        + "JOIN Trip t ON ti.TripID = t.TripID "
+                        + "WHERE ti.TicketStatus = ? "
+                        + "GROUP BY DATEPART(MONTH, t.DepartureTime) "
+                        + "ORDER BY DATEPART(MONTH, t.DepartureTime)";
                 break;
             case "yearly":
-                sql = "SELECT DATEPART(YEAR, t.DepartureTime) AS TimePeriod, " +
-                      "SUM(ti.TicketPrice) AS TotalRevenue " +
-                      "FROM Ticket ti " +
-                      "JOIN Trip t ON ti.TripID = t.TripID " +
-                      "WHERE ti.TicketStatus = ? " +
-                      "GROUP BY DATEPART(YEAR, t.DepartureTime) " +
-                      "ORDER BY DATEPART(YEAR, t.DepartureTime)";
+                sql = "SELECT DATEPART(YEAR, t.DepartureTime) AS TimePeriod, "
+                        + "SUM(ti.TicketPrice) AS TotalRevenue "
+                        + "FROM Ticket ti "
+                        + "JOIN Trip t ON ti.TripID = t.TripID "
+                        + "WHERE ti.TicketStatus = ? "
+                        + "GROUP BY DATEPART(YEAR, t.DepartureTime) "
+                        + "ORDER BY DATEPART(YEAR, t.DepartureTime)";
                 break;
             default:
                 throw new IllegalArgumentException("Invalid period: " + period);
@@ -108,6 +107,7 @@ public class DashBoardDAO extends DBContext<Object> {
 
     // Helper class to store revenue data
     public static class RevenueData {
+
         private int timePeriod;
         private double totalRevenue;
 
@@ -170,6 +170,26 @@ public class DashBoardDAO extends DBContext<Object> {
             }
         }
         return distribution;
+    }
+
+    public List<StationWithCoordinates> getStationsWithCoordinates() throws SQLException {
+        List<StationWithCoordinates> stations = new ArrayList<>();
+        String sql = "SELECT s.StationID, s.StationName, s.Address, sc.Latitude, sc.Longitude "
+                + "FROM Station s "
+                + "JOIN StationCoordinates sc ON s.StationID = sc.StationID";
+
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                StationWithCoordinates station = new StationWithCoordinates();
+                station.setStationId(rs.getInt("StationID"));
+                station.setStationName(rs.getString("StationName"));
+                station.setAddress(rs.getString("Address"));
+                station.setLatitude(rs.getDouble("Latitude"));
+                station.setLongitude(rs.getDouble("Longitude"));
+                stations.add(station);
+            }
+        }
+        return stations;
     }
 
     public int getTotalUsers() throws SQLException {
