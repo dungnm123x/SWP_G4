@@ -1,5 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="en_US"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -83,7 +85,7 @@
 
                     <p><strong>Tàu:</strong> ${item.trainName} - ${item.departureDate}</p>
                     <p><strong>Toa:</strong> ${item.carriageNumber} - Chỗ ${item.seatNumber}</p>
-                    <p><strong>Giá:</strong> ${item.price} $</p>
+                    <p><strong>Giá:</strong> ${item.price} VND</p>
                     <p><strong>Hành khách:</strong> ${requestScope.fullNameList[status.index]}</p>
                     <p><strong>Số CMND/Hộ chiếu:</strong> ${requestScope.idNumberList[status.index]}</p>
                     <p><strong>Đối tượng:</strong> ${requestScope.typeList[status.index]}</p>
