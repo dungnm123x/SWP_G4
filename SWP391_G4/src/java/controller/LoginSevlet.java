@@ -76,7 +76,18 @@ public class LoginSevlet extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username").trim();
         String password = request.getParameter("password");
+        if (username == null || username.trim().isEmpty()) {
+            request.setAttribute("loginError", "Tên đăng nhập không được để trống!");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
 
+        if (username.contains(" ")) { // Kiểm tra nếu username chứa dấu cách
+            request.setAttribute("loginError", "Tên đăng nhập không được chứa dấu cách!");
+            request.setAttribute("username", username); // Giữ lại giá trị username nhập vào
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
         // Mã hóa mật khẩu nhập vào để so sánh với DB
         String encryptedPassword = Encryptor.encryptPassword(password);
 

@@ -198,7 +198,7 @@ public class OrderListServlet extends HttpServlet {
             bookingID = Integer.parseInt(request.getParameter("id"));
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid booking ID.");
-            request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
+            request.getRequestDispatcher("OrderDetails.jsp").forward(request, response);
             return;
         }
 
@@ -206,7 +206,7 @@ public class OrderListServlet extends HttpServlet {
 
         if (booking == null) {
             request.setAttribute("error", "Booking not found.");
-            request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
+            request.getRequestDispatcher("OrderDetails.jsp").forward(request, response);
             return;
         }
 
@@ -215,7 +215,7 @@ public class OrderListServlet extends HttpServlet {
 
         if (user == null) {
             request.setAttribute("error", "User not found.");
-            request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
+            request.getRequestDispatcher("OrderDetails.jsp").forward(request, response);
             return;
         }
 
@@ -227,7 +227,7 @@ public class OrderListServlet extends HttpServlet {
         request.setAttribute("user", user);
         // No longer need request.setAttribute("ticket", ...);  We have the full list.
 
-        request.getRequestDispatcher("view/employee/order_details.jsp").forward(request, response);
+        request.getRequestDispatcher("OrderDetails.jsp").forward(request, response);
     }
 
     // Method to get trips by train ID (for AJAX)

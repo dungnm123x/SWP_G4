@@ -138,7 +138,7 @@
             if (userRole === "1" || userRole === "2") { // 1 = admin, 2 = customer
                 backButton.setAttribute("href", "javascript:history.back()");
             } else {
-                backButton.setAttribute("href", "home.jsp");
+                backButton.setAttribute("href", "home");
                 backButton.innerHTML = '<i class="fas fa-home mr-2"></i> Trang chủ';
             }
         });
