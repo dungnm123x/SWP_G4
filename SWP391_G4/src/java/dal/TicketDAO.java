@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import model.Train;
 import model.Carriage;
+import model.CartItem;
 
 public class TicketDAO extends DBContext {
 
@@ -67,6 +68,63 @@ public class TicketDAO extends DBContext {
             e.printStackTrace(); // Or use a logger in a real application
         }
         return tickets;
+    }
+
+    public boolean checkAdultTicketValid(String adultTicketCode, CartItem childCartItem) {
+        // Câu SQL truy vấn TicketID, Booking -> PaymentStatus, BookingStatus
+        String sql = ""
+                + "SELECT t.TripID, b.PaymentStatus, b.BookingStatus "
+                + "FROM Ticket t "
+                + "JOIN Booking b ON t.BookingID = b.BookingID "
+                + "WHERE t.TicketID = ?";
+
+        try {
+            // Giả sử adultTicketCode là TicketID (kiểu số)
+            int adultTicketID = Integer.parseInt(adultTicketCode);
+
+            // Tạo PreparedStatement (dùng connection có sẵn từ DBContext)
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setInt(1, adultTicketID);
+
+                // Thực thi
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        // Lấy TripID, PaymentStatus, BookingStatus
+                        int adultTripID = rs.getInt("TripID");
+                        String paymentStatus = rs.getString("PaymentStatus");
+                        String bookingStatus = rs.getString("BookingStatus");
+
+                        // Kiểm tra PaymentStatus & BookingStatus
+                        if (!"Paid".equalsIgnoreCase(paymentStatus)) {
+                            return false;
+                        }
+                        if (!"Active".equalsIgnoreCase(bookingStatus)) {
+                            return false;
+                        }
+
+                        // So sánh TripID vé người lớn với TripID vé trẻ em
+                        int childTripID = childCartItem.getTrip().getTripID();
+                        if (adultTripID != childTripID) {
+                            return false;
+                        }
+
+                        // Qua tất cả check => hợp lệ
+                        return true;
+                    } else {
+                        // Không tìm thấy TicketID tương ứng
+                        return false;
+                    }
+                }
+            }
+        } catch (NumberFormatException e) {
+            // adultTicketCode không phải số
+            e.printStackTrace();
+            return false;
+        } catch (SQLException e) {
+            // Lỗi DB
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public int insertTicket(Ticket ticket) throws SQLException {

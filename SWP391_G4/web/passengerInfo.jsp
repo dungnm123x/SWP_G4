@@ -30,6 +30,8 @@
 
                         <!-- Cột nhập thông tin hành khách -->
                         <td class="p-2">
+                            <input type="hidden" name="adultTicketCode" id="adultTicketCodeHidden" />
+
                             <input type="hidden" name="passengerName${status.index}" />
                             <input type="text" class="form-control mb-2"
                                    name="fullName${status.index}" 
@@ -216,6 +218,24 @@
                         </div>
                     </div>
                 </div>
+                <!-- Modal: Trẻ em đi 1 mình phải có vé người lớn -->
+                <div id="childAloneModal" class="modal">
+                    <div class="modal-content">
+                        <h5>Trẻ em đi 1 mình</h5>
+                        <p>Theo quy định, trẻ em không được đi 1 mình. Vui lòng nhập mã vé người lớn đi kèm.</p>
+                        <input type="text" id="adultTicketCodeInput" class="form-control"
+                               placeholder="Nhập mã vé người lớn" />
+                        <div class="mt-3">
+                            <button type="button" onclick="closeModal('childAloneModal')" class="btn btn-secondary">
+                                Hủy
+                            </button>
+                            <button type="button" onclick="confirmChildAlone()" class="btn btn-primary">
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </c:forEach>
         </tbody>
     </table>
@@ -282,6 +302,7 @@
                 <input type="hidden" name="departureDay" value="${param.departureDay}" />
                 <input type="hidden" name="tripType" value="${param.tripType}" />
                 <input type="hidden" name="returnDate" value="${param.returnDate}" />
+                <input type="hidden" name="adultTicketCode" id="adultTicketCodeHidden" />
 
                 <div class="table-responsive">
                     <table class="table table-bordered text-center">
@@ -491,6 +512,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Modal: Trẻ em đi 1 mình phải có vé người lớn -->
+                            <div id="childAloneModal" class="modal">
+                                <div class="modal-content">
+                                    <h5>Trẻ em đi 1 mình</h5>
+                                    <p>Theo quy định, trẻ em không được đi 1 mình. Vui lòng nhập mã vé người lớn đi kèm.</p>
+                                    <input type="text" id="adultTicketCodeInput" class="form-control"
+                                           placeholder="Nhập mã vé người lớn" />
+                                    <div class="mt-3">
+                                        <button type="button" onclick="closeModal('childAloneModal')" class="btn btn-secondary">
+                                            Hủy
+                                        </button>
+                                        <button type="button" onclick="confirmChildAlone()" class="btn btn-primary">
+                                            Xác nhận
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                         </c:forEach>
                         </tbody>
                     </table>
@@ -570,12 +609,12 @@
 
             <!-- Cuối body => gọi hàm bind lần đầu -->
             <script>
-                
-                    reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
-                    updateTotalAmount();
+
+                reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
+                updateTotalAmount();
 
 
-                
+
             </script>
         </body>
     </html>

@@ -35,9 +35,9 @@ function updateDiscountNoModal(selectElement, priceId, discountId, totalId) {
  *    - Nếu không cần modal => chỉ tính discount như bình thường.
  */
 function updateDiscount(
-    selectElement, priceId, discountId, totalId,
-    ageModalId, vipModalId, idNumberInputId
-) {
+        selectElement, priceId, discountId, totalId,
+        ageModalId, vipModalId, idNumberInputId
+        ) {
     let rowEl = selectElement.closest('tr');
     let alreadyConfirmed = (rowEl.getAttribute('data-confirmedDOB') === 'true');
     let currentType = selectElement.value;
@@ -77,7 +77,7 @@ function updateDiscount(
  *    - Gửi Ajax confirmDOB (nếu muốn)
  *    - Tính lại giá
  */
-function confirmAge(  modalId, selectId, priceId, discountId, totalId,dayId, monthId, yearId, idNumberInputId) {
+function confirmAge(modalId, selectId, priceId, discountId, totalId, dayId, monthId, yearId, idNumberInputId) {
     // Đóng modal
     closeModal(modalId);
 
@@ -129,11 +129,11 @@ function confirmAge(  modalId, selectId, priceId, discountId, totalId,dayId, mon
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: params.toString()
     })
-    .then(resp => resp.text())
-    .then(result => {
-        console.log("DOB confirmed on server:", result);
-    })
-    .catch(err => console.error(err));
+            .then(resp => resp.text())
+            .then(result => {
+                console.log("DOB confirmed on server:", result);
+            })
+            .catch(err => console.error(err));
 
     // Tính lại tiền
     let discountAmount = basePrice * rate / 100;
@@ -199,11 +199,11 @@ function reapplyDiscount() {
     document.querySelectorAll('select[id^="passengerType"]').forEach(selectEl => {
         let idx = selectEl.id.replace('passengerType', '');
         updateDiscountNoModal(
-            selectEl,
-            'price' + idx,
-            'discount' + idx,
-            'displayTotal' + idx
-        );
+                selectEl,
+                'price' + idx,
+                'discount' + idx,
+                'displayTotal' + idx
+                );
     });
 }
 
@@ -223,13 +223,38 @@ function updateTotalAmount() {
         totalElem.innerText = sum.toLocaleString();
     }
 }
+function checkIfSingleChildTicket() {
+    // Lấy danh sách select passengerType
+    let selects = document.querySelectorAll('select[id^="passengerType"]');
+    // Nếu chỉ có 1 vé
+    if (selects.length === 1) {
+        let type = selects[0].value;
+        if (type === "Trẻ em") {
+            // Mở modal
+            document.getElementById("childAloneModal").style.display = 'flex';
+        }
+    }
+}
+
+// Hàm confirmChildAlone: khi user bấm nút “Xác nhận” trong modal
+function confirmChildAlone() {
+    let code = document.getElementById("adultTicketCodeInput").value.trim();
+    if (!code) {
+        alert("Vui lòng nhập mã vé người lớn.");
+        return;
+    }
+    // Gán vào input hidden
+    document.getElementById("adultTicketCodeHidden").value = code;
+    // Đóng modal
+    closeModal("childAloneModal");
+}
 
 /**
  * 10) Hàm rebindRemoveButtons: Gắn sự kiện xóa vé (AJAX)
  */
 function rebindRemoveButtons() {
     document.querySelectorAll(".btn-remove").forEach(btn => {
-        btn.addEventListener("click", function(e) {
+        btn.addEventListener("click", function (e) {
             e.preventDefault();
             let seatID = this.getAttribute("data-seatid");
             let params = new URLSearchParams();
@@ -241,21 +266,21 @@ function rebindRemoveButtons() {
                 headers: {"Content-Type": "application/x-www-form-urlencoded"},
                 body: params.toString()
             })
-            .then(resp => resp.text())
-            .then(result => {
-                if (result === "EMPTY") {
-                    // Giỏ rỗng => quay lại schedule
-                    window.location.href = "schedule";
-                    return;
-                }
-                // Cập nhật lại table
-                document.querySelector(".table-responsive").innerHTML = result;
-                // Gọi lại hàm bind + tính tiền
-                rebindRemoveButtons();
-                reapplyDiscount();
-                updateTotalAmount();
-            })
-            .catch(err => console.error(err));
+                    .then(resp => resp.text())
+                    .then(result => {
+                        if (result === "EMPTY") {
+                            // Giỏ rỗng => quay lại schedule
+                            window.location.href = "schedule";
+                            return;
+                        }
+                        // Cập nhật lại table
+                        document.querySelector(".table-responsive").innerHTML = result;
+                        // Gọi lại hàm bind + tính tiền
+                        rebindRemoveButtons();
+                        reapplyDiscount();
+                        updateTotalAmount();
+                    })
+                    .catch(err => console.error(err));
         });
     });
 }
@@ -271,4 +296,6 @@ document.addEventListener("DOMContentLoaded", function () {
     rebindRemoveButtons();
     reapplyDiscount();
     updateTotalAmount();
+
+    checkIfSingleChildTicket();
 });

@@ -80,16 +80,38 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
-        Map<String, Boolean> confirmedMap = (Map<String, Boolean>) session.getAttribute("confirmedDOBMap");
-        if (confirmedMap == null) {
-            confirmedMap = new HashMap<>();
-            session.setAttribute("confirmedDOBMap", confirmedMap);
+//        Map<String, Boolean> confirmedMap = (Map<String, Boolean>) session.getAttribute("confirmedDOBMap");
+//        if (confirmedMap == null) {
+//            confirmedMap = new HashMap<>();
+//            session.setAttribute("confirmedDOBMap", confirmedMap);
+        //}
+// Giả sử ta có giỏ hàng
+        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
+        if (cartItems == null) {
+            cartItems = new ArrayList<>();
+            session.setAttribute("cartItems", cartItems);
         }
 
-// Mỗi item => key = seatID (hoặc unique)
-// Mỗi lần confirmDOB => confirmedMap.put(seatID, true)
-// Lúc render => data-confirmedDOB="${confirmedMap[item.seatID]}"
-            // GÁN TỪ USER (profile) sang bookingName, bookingEmail, ...
+        // Lấy cờ confirmedDOB
+        boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
+        if (confirmedDOB == null) {
+            confirmedDOB = new boolean[cartItems.size()];
+            session.setAttribute("confirmedDOB", confirmedDOB);
+        }
+
+        // Giả sử logic: nếu “trẻ em” mà quay về trang này => đặt lại confirmedDOB = false cho những vé là “Trẻ em”.
+        for (int i = 0; i < cartItems.size(); i++) {
+            CartItem item = cartItems.get(i);
+            // Giả sử ta cũng có list typeList
+            List<String> typeList = (List<String>) session.getAttribute("typeList");
+            if (typeList != null && i < typeList.size()) {
+                String passengerType = typeList.get(i);
+                if ("Trẻ em".equals(passengerType)) {
+                    confirmedDOB[i] = true;  // reset lại
+                }
+            }
+        }
+        session.setAttribute("confirmedDOB", confirmedDOB);
         session.setAttribute("bookingName", user.getFullName());
         session.setAttribute("bookingEmail", user.getEmail());
         session.setAttribute("bookingPhone", user.getPhoneNumber());
@@ -248,6 +270,32 @@ public class PassengerInfoServlet extends HttpServlet {
 //            }
 //            return;
 //        }
+        if (cartItems.size() == 1) {
+            // Giả sử ta lấy typeList từ session
+            List<String> typeList = (List<String>) session.getAttribute("typeList");
+            if (typeList != null && typeList.size() == 1) {
+                String type = typeList.get(0);
+                if ("Trẻ em".equals(type)) {
+                    // Bắt buộc phải có adultTicketCode
+                    String adultTicketCode = request.getParameter("adultTicketCode");
+                    if (adultTicketCode == null || adultTicketCode.trim().isEmpty()) {
+                        request.setAttribute("errorMessage", "Trẻ em đi một mình - vui lòng nhập mã vé người lớn đi kèm.");
+                        request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                        return;
+                    }
+
+                    // Kiểm tra hợp lệ
+                    TicketDAO ticketDAO = new TicketDAO();
+                    boolean valid = ticketDAO.checkAdultTicketValid(adultTicketCode, cartItems.get(0));
+
+                    if (!valid) {
+                        request.setAttribute("errorMessage", "Mã vé người lớn không hợp lệ hoặc không cùng chuyến!");
+                        request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                        return;
+                    }
+                }
+            }
+        }
         if ("confirmedDOBMap".equals(action)) {
             String indexStr = request.getParameter("index");
             String dob = request.getParameter("dob");
@@ -333,7 +381,6 @@ public class PassengerInfoServlet extends HttpServlet {
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
                 return;
             }
-            
 
 // Kiểm tra nếu tên hoặc CCCD chỉ chứa dấu cách hoặc rỗng
             if (normalizedFullName.isEmpty()) {
