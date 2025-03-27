@@ -15,7 +15,7 @@
     <div class="collapse navbar-collapse d-flex justify-content-center" id="navbarSupportedContent">
         <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link text-white" href="home"><i class="fas fa-house"></i> <strong>Home</strong></a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="cancel-ticket"><i class="fas fa-ticket-alt"></i> <strong>Hoàn vé</strong></a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="cancel-ticket"><i class="fas fa-ticket-alt"></i> <strong>Hủy vé</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="blog-list"><i class="fas fa-newspaper"></i> <strong>Blog</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="rule-list"><i class="fas fa-file-contract"></i> <strong>Quy Định</strong></a></li>
             <li class="nav-item"><a class="nav-link text-white" href="feedback"><i class="fas fa-comment-dots"></i> <strong>Feedback</strong></a></li>
@@ -50,8 +50,9 @@
         if (user) {
             userDropdown.innerHTML = "<strong>Hello, " + userName + "</strong>";
             userMenu.innerHTML = '<a class="dropdown-item" href="updateuser">Profile</a>'
-                    + '<a class="dropdown-item" href="order-list">Purchase order</a>' +
-                    '<a class="dropdown-item" href="logout">Logout</a>';
+                    + '<a class="dropdown-item" href="order-list">Lịch sử mua vé</a>' + 
+                    '<a class="dropdown-item" href="refund-list">Lịch sử trả vé</a>'+
+                    '<a class="dropdown-item" href="logout">Đăng Xuất</a>';
         }
 
         // Giữ dropdown mở khi click vào menu

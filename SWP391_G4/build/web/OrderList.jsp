@@ -9,6 +9,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%-- For date formatting --%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <html>
     <head>
         <title>Quản lí hóa đơn</title>
@@ -25,8 +28,10 @@
                     justify-content: center;
                 }
                 th {
-                    background-color: #077BFF !important;;
-                    color: white !important;;
+                    background-color: #077BFF !important;
+                    ;
+                    color: white !important;
+                    ;
                 }
                 .pagination a, .pagination span {
                     padding: 8px 12px;
@@ -60,6 +65,17 @@
                     border: none;
                     font-size: 16px;
                     transition: background-color 0.3s ease
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    border: 2px solid black; /* Viền ngoài */
+                }
+
+                th, td {
+                    border: 1px solid black; /* Viền ô */
+                    padding: 8px;
+                    text-align: center;
                 }
             </style>
         </head>
@@ -129,7 +145,9 @@
                                     <td rowspan="${fn:length(booking.tickets)}"><fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" /></td>                                 
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.formattedBookingDate}</td>
                                     <td rowspan="${fn:length(booking.tickets)}">
-                                        <a href="order-list?action=view&id=${booking.bookingID}"><button>Xem</button></a>
+                                        <a href="order-list?action=view&id=${booking.bookingID}"class="btn btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
                                     </td>
                                 </c:if>
 

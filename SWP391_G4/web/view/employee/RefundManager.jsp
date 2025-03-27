@@ -19,6 +19,17 @@
         <link rel="stylesheet" href="css/employee.css">
         <style>
             /* Add some basic styling for pagination */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 2px solid black; /* Viền ngoài */
+            }
+
+            th, td {
+                border: 1px solid black; /* Viền ô */
+                padding: 8px;
+                text-align: center;
+            }
             .pagination {
                 margin-top: 20px;
                 display:flex;
@@ -122,10 +133,7 @@
                 </a>
             </c:if>
 
-            <h1>Danh sách hoàn tiền</h1>
-
-
-
+            <h1>Danh sách đơn hoàn tiền</h1>
             <%-- Filter Form --%>
             <div class="filter-section">
                 <form action="refund" method="get"> 
@@ -150,7 +158,7 @@
                         <option value="Complete" ${param.refundStatus == 'Complete' ? 'selected' : ''}>Hoàn tất</option>
                     </select>
 
-                   
+
 
                     <button type="submit">Lọc</button>
                 </form>
