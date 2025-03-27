@@ -165,13 +165,14 @@
                 <div class="d-flex justify-content-between mt-4">
                     <!-- confirm.jsp -->
                     <c:url var="reInputURL" value="passengerinfo">
-                        <!-- Lấy param từ request, y hệt param mà passengerInfo.jsp cần -->
+                        <c:param name="tripID" value="${param.tripID}" />
                         <c:param name="departureStationID" value="${param.departureStationID}" />
                         <c:param name="arrivalStationID" value="${param.arrivalStationID}" />
                         <c:param name="departureDay" value="${param.departureDay}" />
                         <c:param name="tripType" value="${param.tripType}" />
                         <c:param name="returnDate" value="${param.returnDate}" />
                     </c:url>
+
 
                     <a href="${reInputURL}" class="btn btn-secondary">
                         Nhập lại

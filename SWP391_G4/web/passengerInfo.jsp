@@ -30,7 +30,12 @@
 
                         <!-- Cột nhập thông tin hành khách -->
                         <td class="p-2">
-                            <input type="hidden" name="adultTicketCode" id="adultTicketCodeHidden" />
+                            <!-- Ở chế độ partialMode -->
+                            <input type="hidden" name="adultTicketCode" 
+                                   id="adultTicketCodeHidden${status.index}" />
+
+
+
 
                             <input type="hidden" name="passengerName${status.index}" />
                             <input type="text" class="form-control mb-2"
@@ -138,12 +143,14 @@
 
                         <!-- Nút xóa -->
                         <td>
-                            <input type="hidden" id="seatIDHidden" name="seatID" />
+                            <input type="hidden" name="seatID" 
+                                   id="seatIDHidden${status.index}" />
                             <button type="button"
                                     class="btn btn-danger btn-remove"
-                                    data-seatid="${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}">
+                                    data-seatid="${item.trip.tripID}_${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}">
                                 Xóa vé
                             </button>
+
                         </td>
                     </tr>
 
@@ -244,7 +251,7 @@
 
         reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
         updateTotalAmount();
-
+        checkIfSingleChildTicket();
 
     </script>
 </c:when>
@@ -303,6 +310,7 @@
                 <input type="hidden" name="tripType" value="${param.tripType}" />
                 <input type="hidden" name="returnDate" value="${param.returnDate}" />
                 <input type="hidden" name="adultTicketCode" id="adultTicketCodeHidden" />
+                <input type="hidden" name="tripID${status.index}" value="${item.trip.tripID}" />
 
                 <div class="table-responsive">
                     <table class="table table-bordered text-center">
@@ -434,9 +442,10 @@
                                         <input type="hidden" id="seatIDHidden" name="seatID" />
                                         <button type="button"
                                                 class="btn btn-danger btn-remove"
-                                                data-seatid="${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}">
+                                                data-seatid="${item.trip.tripID}_${item.trainName}_${item.departureDate}_${item.carriageNumber}_${item.seatNumber}">
                                             Xóa vé
                                         </button>
+
                                     </td>
                                 </tr>
 
@@ -612,7 +621,7 @@
 
                 reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
                 updateTotalAmount();
-
+                checkIfSingleChildTicket();
 
 
             </script>

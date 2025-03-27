@@ -257,28 +257,56 @@ function rebindRemoveButtons() {
         btn.addEventListener("click", function (e) {
             e.preventDefault();
             let seatID = this.getAttribute("data-seatid");
+
+            // Xây dựng form data
             let params = new URLSearchParams();
             params.append("action", "removeOne");
             params.append("seatID", seatID);
+            params.append("renderPartial", "true");
 
-            fetch("passengerinfo?renderPartial=true", {
+            // Đếm số vé hiện có trong bảng (mỗi <tr> đại diện 1 vé)
+            let rowCount = document.querySelectorAll('tr[data-confirmedDOB]').length;
+
+            // Lặp để lấy giá trị fullNameX, passengerTypeX, idNumberX, ...
+            for (let i = 0; i < rowCount; i++) {
+                let fullNameEl = document.querySelector(`input[name="fullName${i}"]`);
+                let passTypeEl = document.querySelector(`select[name="passengerType${i}"]`);
+                let idNumberEl = document.querySelector(`input[name="idNumber${i}"]`);
+                // (Nếu có thêm vipCard${i}, birthDay${i}, ... thì cũng append vào params)
+
+                if (fullNameEl) {
+                    params.append(`fullName${i}`, fullNameEl.value);
+                }
+                if (passTypeEl) {
+                    params.append(`passengerType${i}`, passTypeEl.value);
+                }
+                if (idNumberEl) {
+                    params.append(`idNumber${i}`, idNumberEl.value);
+                }
+            }
+
+            // Gửi AJAX POST
+            fetch("passengerinfo", {
                 method: "POST",
                 headers: {"Content-Type": "application/x-www-form-urlencoded"},
                 body: params.toString()
             })
                     .then(resp => resp.text())
                     .then(result => {
-                        if (result === "EMPTY") {
-                            // Giỏ rỗng => quay lại schedule
-                            window.location.href = "schedule";
-                            return;
+                        if (result.startsWith("EMPTY|")) {
+                            // Tách lấy url
+                            const parts = result.split("|");
+                            const redirectURL = parts[1];
+                            window.location.href = redirectURL;
+                        
+                        } else {
+                            // Cập nhật lại table partial
+                            document.querySelector(".table-responsive").innerHTML = result;
+                            // Gắn lại event xóa, tính lại giá, v.v.
+                            rebindRemoveButtons();
+                            reapplyDiscount();
+                            updateTotalAmount();
                         }
-                        // Cập nhật lại table
-                        document.querySelector(".table-responsive").innerHTML = result;
-                        // Gọi lại hàm bind + tính tiền
-                        rebindRemoveButtons();
-                        reapplyDiscount();
-                        updateTotalAmount();
                     })
                     .catch(err => console.error(err));
         });
