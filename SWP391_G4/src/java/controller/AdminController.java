@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import model.CalendarEvent;
 import model.Feedback;
+import model.StationWithCoordinates;
 import model.User;
 import model.Train;
 
@@ -40,6 +41,22 @@ public class AdminController extends HttpServlet {
         try {
             if ("dashboard".equals(view)) {
                 DashBoardDAO dashBoardDAO = new DashBoardDAO();
+                String period = request.getParameter("period");
+                if (period == null || period.isEmpty()) {
+                    period = "monthly";
+                }
+                String selectedDate = request.getParameter("selectedDate");
+                if (selectedDate == null || selectedDate.isEmpty()) {
+                    selectedDate = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+                }
+                List<DashBoardDAO.RevenueData> unusedRevenue = dashBoardDAO.getRevenueData(period, "Unused", selectedDate);
+                List<DashBoardDAO.RevenueData> usedRevenue1 = dashBoardDAO.getRevenueData(period, "Used", selectedDate);
+                List<DashBoardDAO.RevenueData> usedRevenue2 = dashBoardDAO.getRevenueData(period, "Used", selectedDate);
+                request.setAttribute("unusedRevenue", unusedRevenue);
+                request.setAttribute("usedRevenue1", usedRevenue1);
+                request.setAttribute("usedRevenue2", usedRevenue2);
+                request.setAttribute("period", period);
+                request.setAttribute("selectedDate", selectedDate);
                 int totalUsers = dashBoardDAO.getTotalUsers();
                 int totalEmployees = dashBoardDAO.getTotalEmployees();
                 int totalCustomers = dashBoardDAO.getTotalCustomers();
@@ -49,27 +66,6 @@ public class AdminController extends HttpServlet {
                 int totalBlogs = dashBoardDAO.getTotalBlogs();
                 int totalRules = dashBoardDAO.getTotalRules();
                 int totalStations = dashBoardDAO.getTotalStations();
-
-                int[] starDistribution = dashBoardDAO.getStarDistribution();
-                request.setAttribute("starDistribution", starDistribution);
-
-// Get the selected period (default to "monthly")
-                String period = request.getParameter("period");
-                if (period == null || period.isEmpty()) {
-                    period = "monthly";
-                }
-
-// Fetch revenue data for each ticket status
-                List<DashBoardDAO.RevenueData> unusedRevenue = dashBoardDAO.getRevenueData(period, "Unused");
-                List<DashBoardDAO.RevenueData> usedRevenue1 = dashBoardDAO.getRevenueData(period, "Used");
-                List<DashBoardDAO.RevenueData> usedRevenue2 = dashBoardDAO.getRevenueData(period, "Used");
-
-// Pass the data to the JSP
-                request.setAttribute("unusedRevenue", unusedRevenue);
-                request.setAttribute("usedRevenue1", usedRevenue1);
-                request.setAttribute("usedRevenue2", usedRevenue2);
-                request.setAttribute("period", period);
-
                 request.setAttribute("totalUsers", totalUsers);
                 request.setAttribute("totalEmployees", totalEmployees);
                 request.setAttribute("totalCustomers", totalCustomers);
@@ -81,6 +77,10 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalStations", totalStations);
                 List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
                 request.setAttribute("feedbackList", feedbackList);
+                int[] starDistribution = dashBoardDAO.getStarDistribution();
+                request.setAttribute("starDistribution", starDistribution);
+                List<StationWithCoordinates> stationsWithCoords = dashBoardDAO.getStationsWithCoordinates();
+                request.setAttribute("stationsWithCoords", stationsWithCoords);
 
                 request.setAttribute("type", "dashboard");
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
