@@ -640,7 +640,7 @@ public class DAOAdmin extends DBContext {
     }
     public List<CalendarEvent> getAllCalendarEvents() throws SQLException {
         List<CalendarEvent> events = new ArrayList<>();
-        String query = "SELECT * FROM CalendarEvent"; // Lấy tất cả các sự kiện từ bảng
+        String query = "SELECT * FROM CalendarEvent WHERE Status = 1"; // Lấy tất cả các sự kiện từ bảng
         try (PreparedStatement ps = connection.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {

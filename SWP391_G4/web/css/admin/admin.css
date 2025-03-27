@@ -564,6 +564,9 @@ form {
 
 /* Adjust the dashboard-item to ensure proper sizing */
 .dashboard-item {
+    display: inline-block; /* Để các phần tử nằm cạnh nhau */
+    vertical-align: top;     /* Để các phần tử căn chỉnh trên cùng */
+    width: 30%;
     background: white;
     padding: 20px;
     border-radius: 10px;
