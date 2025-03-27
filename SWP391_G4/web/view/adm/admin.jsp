@@ -582,8 +582,6 @@
                                                 <label for="editDescription">Mô tả:</label>
                                                 <textarea id="editDescription" name="description" class="input-field textarea-field" rows="3"></textarea>
                                             </div>
-                                            <button type="submit" class="btn-custom btn-primary-custom">Lưu Thay Đổi</button>
-                                            <button type="button" class="btn-custom btn-danger-custom" id="deleteEventBtn">Xóa Sự Kiện</button>
                                         </form>
                                     </div>
                                 </div>
