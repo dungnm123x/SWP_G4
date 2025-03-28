@@ -115,7 +115,7 @@ public class OrderListServlet extends HttpServlet {
             }
         }
         // ... (Filtering parameters - ensure routeId is handled) ...
-        HttpSession session = request.getSession(); // Không cần (false), vì chắc chắn đã có session
+        HttpSession session = request.getSession(); 
         int userID = (Integer) session.getAttribute("loggedInUserID");
         String customerName = request.getParameter("customerName");
         String phone = request.getParameter("phone");

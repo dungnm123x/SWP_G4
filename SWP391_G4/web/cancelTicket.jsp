@@ -86,28 +86,25 @@
                         </thead>
                         <tbody>
                             <c:forEach var="ticket" items="${tickets}">
-                                <c:if test="${empty filterTicketID or ticket.ticketID eq filterTicketID}">
-                                    <c:if test="${empty param.filterPassengerName or fn:containsIgnoreCase(ticket.passengerName, param.filterPassengerName)}">
-                                        <c:if test="${empty param.filterCCCD or fn:contains(ticket.cccd, param.filterCCCD)}">
-                                            <c:if test="${empty param.filterRoute or fn:containsIgnoreCase(ticket.route, param.filterRoute)}">
-                                                <tr>
-                                                    <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
-                                                    <td>${ticket.ticketID}</td>
-                                                    <td>${ticket.passengerName}</td>
-                                                    <td>${ticket.passengerType}</td>
-                                                    <td>${ticket.cccd}</td>
-                                                    <td>${ticket.route}</td>
-                                                    <td>${ticket.trainCode}</td>
-                                                    <td>${ticket.departureTime}</td>
-                                                    <td>${ticket.carriageNumber}</td>
-                                                    <td>${ticket.seatNumber}</td>
-                                                    <td>${ticket.ticketPrice} VND</td>
-                                                    <td>${ticket.ticketStatus}</td>
-                                                </tr>
-                                            </c:if>
-                                        </c:if>
-                                    </c:if>
-                                </c:if>
+                                <c:if test="${(empty param.filterTicketID or fn:contains(ticket.ticketID, param.filterTicketID)) 
+                                              and (empty param.filterPassengerName or fn:containsIgnoreCase(ticket.passengerName, param.filterPassengerName)) 
+                                              and (empty param.filterCCCD or fn:contains(ticket.cccd, param.filterCCCD)) 
+                                              and (empty param.filterRoute or fn:containsIgnoreCase(ticket.route, param.filterRoute))}">
+                                      <tr>
+                                          <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
+                                          <td>${ticket.ticketID}</td>
+                                          <td>${ticket.passengerName}</td>
+                                          <td>${ticket.passengerType}</td>
+                                          <td>${ticket.cccd}</td>
+                                          <td>${ticket.route}</td>
+                                          <td>${ticket.trainCode}</td>
+                                          <td>${ticket.departureTime}</td>
+                                          <td>${ticket.carriageNumber}</td>
+                                          <td>${ticket.seatNumber}</td>
+                                          <td>${ticket.ticketPrice} VND</td>
+                                          <td>${ticket.ticketStatus}</td>
+                                      </tr>
+                                </c:if>                        
                             </c:forEach>
                         </tbody>
                     </table>
@@ -156,9 +153,6 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Yêu cầu trả vé</button>
-                    <c:if test="${not empty error}">
-                        <div class="alert alert-danger text-center">${error}</div>
-                    </c:if>
                 </div>
             </form>
 

@@ -41,6 +41,7 @@ public class TicketDAO extends DBContext {
                     TicketDTO ticket = new TicketDTO();
                     ticket.setTicketID(rs.getInt("TicketID"));
                     ticket.setPassengerName(rs.getString("PassengerName"));
+                    ticket.setPassengerType(rs.getString("PassengerType"));
                     ticket.setCccd(rs.getString("CCCD"));
                     ticket.setBookingID(rs.getInt("BookingID"));
                     ticket.setSeatID(rs.getInt("SeatID"));

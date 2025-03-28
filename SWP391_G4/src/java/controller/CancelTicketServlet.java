@@ -74,51 +74,74 @@ public class CancelTicketServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
+        TicketDAO ticketDAO = new TicketDAO();
+        List<RailwayDTO> allTickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
+        List<RailwayDTO> availableTickets = new ArrayList<>();
 
-        // Lấy danh sách vé từ session (nếu đã có)
-        List<RailwayDTO> availableTickets = (List<RailwayDTO>) session.getAttribute("availableTickets");
-
-        if (availableTickets == null) {
-            // Nếu danh sách chưa có trong session, truy vấn từ CSDL và lưu vào session
-            TicketDAO ticketDAO = new TicketDAO();
-            List<RailwayDTO> tickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
-            availableTickets = new ArrayList<>();
-
-            for (RailwayDTO ticket : tickets) {
-                if ("Unused".equals(ticket.getTicketStatus())) {
-                    availableTickets.add(ticket);
-                }
+        for (RailwayDTO ticket : allTickets) {
+            if ("Unused".equals(ticket.getTicketStatus())) {
+                availableTickets.add(ticket);
             }
-
-            // Lưu vào session để không cần truy vấn lại
-            session.setAttribute("availableTickets", availableTickets);
         }
 
-        // Xử lý phân trang
+        // Lấy thông tin lọc từ request
+        String filterTicketID = request.getParameter("filterTicketID");
+        String filterPassengerName = request.getParameter("filterPassengerName");
+        String filterCCCD = request.getParameter("filterCCCD");
+        String filterRoute = request.getParameter("filterRoute");
+
+        // 1. Lọc danh sách vé trước khi phân trang
+        List<RailwayDTO> filteredTickets = new ArrayList<>();
+        for (RailwayDTO ticket : availableTickets) {
+            boolean matches = true;
+
+            if (filterTicketID != null && !filterTicketID.isEmpty() && !String.valueOf(ticket.getTicketID()).contains(filterTicketID)) {
+                matches = false;
+            }
+            if (filterPassengerName != null && !filterPassengerName.isEmpty() && !ticket.getPassengerName().toLowerCase().contains(filterPassengerName.toLowerCase())) {
+                matches = false;
+            }
+            if (filterCCCD != null && !filterCCCD.isEmpty() && !ticket.getCccd().contains(filterCCCD)) {
+                matches = false;
+            }
+            if (filterRoute != null && !filterRoute.isEmpty() && !ticket.getRoute().toLowerCase().contains(filterRoute.toLowerCase())) {
+                matches = false;
+            }
+
+            if (matches) {
+                filteredTickets.add(ticket);
+            }
+        }
+
+        // 2. Xử lý phân trang
         int page = 1;
-        int recordsPerPage = 5; // Số vé hiển thị trên mỗi trang
+        int recordsPerPage = 5;
         String pageParam = request.getParameter("page");
 
         if (pageParam != null) {
             page = Integer.parseInt(pageParam);
         }
 
+        int totalRecords = filteredTickets.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
         int start = (page - 1) * recordsPerPage;
-        int end = Math.min(start + recordsPerPage, availableTickets.size());
-        List<RailwayDTO> paginatedTickets = availableTickets.subList(start, end);
+        int end = Math.min(start + recordsPerPage, totalRecords);
+        List<RailwayDTO> paginatedTickets = filteredTickets.subList(start, end);
 
-        // Tổng số trang
-        int totalPages = (int) Math.ceil((double) availableTickets.size() / recordsPerPage);
-        String filterTicketID = request.getParameter("filterTicketID");
-        if (filterTicketID != null && !filterTicketID.isEmpty() && !filterTicketID.matches("\\d+")) {
-            filterTicketID = null;
-            request.setAttribute("error", "Mã vé chỉ được chứa số!");
+        // 3. Nếu không tìm thấy vé, hiển thị thông báo
+        if (filteredTickets.isEmpty()) {
+            request.setAttribute("error", "Không tìm thấy vé nào phù hợp.");
         }
 
-        request.setAttribute("filterTicketID", filterTicketID);
+        // 4. Truyền dữ liệu đến JSP
         request.setAttribute("tickets", paginatedTickets);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("filterTicketID", filterTicketID);
+        request.setAttribute("filterPassengerName", filterPassengerName);
+        request.setAttribute("filterCCCD", filterCCCD);
+        request.setAttribute("filterRoute", filterRoute);
+
         request.getRequestDispatcher("cancelTicket.jsp").forward(request, response);
     }
 
