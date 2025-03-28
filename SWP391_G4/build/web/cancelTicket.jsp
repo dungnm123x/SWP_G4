@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -39,6 +40,31 @@
     <body>
         <div class="container mt-4">
             <h2 class="text-center">Hủy Vé</h2>
+            <form method="get" action="cancel-ticket">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Mã vé:</label>
+                        <input type="text" class="form-control" name="filterTicketID" value="${param.filterTicketID}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tên:</label>
+                        <input type="text" class="form-control" name="filterPassengerName" value="${param.filterPassengerName}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>CCCD:</label>
+                        <input type="text" class="form-control" name="filterCCCD" value="${param.filterCCCD}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Hành trình:</label>
+                        <input type="text" class="form-control" name="filterRoute" value="${param.filterRoute}">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                    <a href="cancel-ticket" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+
             <form id="cancelForm" action="cancel-ticket" method="post">
                 <div class="table-container">
                     <table class="table table-bordered table-hover text-center">
@@ -59,22 +85,51 @@
                         </thead>
                         <tbody>
                             <c:forEach var="ticket" items="${tickets}">
-                                <tr>
-                                    <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
-                                    <td>${ticket.ticketID}</td>
-                                    <td>${ticket.passengerName}</td>
-                                    <td>${ticket.cccd}</td>
-                                    <td>${ticket.route}</td>
-                                    <td>${ticket.trainCode}</td>
-                                    <td>${ticket.departureTime}</td>
-                                    <td>${ticket.carriageNumber}</td>
-                                    <td>${ticket.seatNumber}</td>
-                                    <td>${ticket.ticketPrice} VND</td>
-                                    <td>${ticket.ticketStatus}</td>
-                                </tr>
+                                <c:if test="${empty filterTicketID or ticket.ticketID eq filterTicketID}">
+                                    <c:if test="${empty param.filterPassengerName or fn:containsIgnoreCase(ticket.passengerName, param.filterPassengerName)}">
+                                        <c:if test="${empty param.filterCCCD or fn:contains(ticket.cccd, param.filterCCCD)}">
+                                            <c:if test="${empty param.filterRoute or fn:containsIgnoreCase(ticket.route, param.filterRoute)}">
+                                                <tr>
+                                                    <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
+                                                    <td>${ticket.ticketID}</td>
+                                                    <td>${ticket.passengerName}</td>
+                                                    <td>${ticket.cccd}</td>
+                                                    <td>${ticket.route}</td>
+                                                    <td>${ticket.trainCode}</td>
+                                                    <td>${ticket.departureTime}</td>
+                                                    <td>${ticket.carriageNumber}</td>
+                                                    <td>${ticket.seatNumber}</td>
+                                                    <td>${ticket.ticketPrice} VND</td>
+                                                    <td>${ticket.ticketStatus}</td>
+                                                </tr>
+                                            </c:if>
+                                        </c:if>
+                                    </c:if>
+                                </c:if>
                             </c:forEach>
                         </tbody>
                     </table>
+                    <div class="pagination">
+                        <c:if test="${totalPages > 1}">
+                            <ul class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=${currentPage - 1}&filterTicketID=${param.filterTicketID}&filterPassengerName=${param.filterPassengerName}&filterCCCD=${param.filterCCCD}&filterRoute=${param.filterRoute}">Trước</a>
+                                    </li>
+                                </c:if>
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                        <a class="page-link" href="?page=${i}&filterTicketID=${param.filterTicketID}&filterPassengerName=${param.filterPassengerName}&filterCCCD=${param.filterCCCD}&filterRoute=${param.filterRoute}">${i}</a>
+                                    </li>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=${currentPage + 1}&filterTicketID=${param.filterTicketID}&filterPassengerName=${param.filterPassengerName}&filterCCCD=${param.filterCCCD}&filterRoute=${param.filterRoute}">Sau</a>
+                                    </li>
+                                </c:if>
+                            </ul>
+                        </c:if>
+                    </div>  
                     <c:if test="${empty tickets}">
                         <p class="no-results text-center">Không có vé nào.</p>
                     </c:if>
@@ -109,4 +164,4 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
-</html>
+</html> 
