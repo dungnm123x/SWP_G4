@@ -12,6 +12,7 @@ public class Ticket {
 
     private int ticketID; // auto
     private String passengerName;
+    private String passengerType;
     private String cccd;  // CMND/Hộ chiếu
     private int bookingID;
     private int seatID;
@@ -24,9 +25,10 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(int ticketID, String passengerName, String cccd, int bookingID, int seatID, int tripID, int refundID, double ticketPrice, String ticketStatus) {
+    public Ticket(int ticketID, String passengerName,String passengerType, String cccd, int bookingID, int seatID, int tripID, int refundID, double ticketPrice, String ticketStatus) {
         this.ticketID = ticketID;
         this.passengerName = passengerName;
+        this.passengerType = passengerType;
         this.cccd = cccd;
         this.bookingID = bookingID;
         this.seatID = seatID;
@@ -51,6 +53,15 @@ public class Ticket {
         this.passengerName = passengerName;
     }
 
+    public String getPassengerType() {
+        return passengerType;
+    }
+
+    public void setPassengerType(String passengerType) {
+        this.passengerType = passengerType;
+    }
+
+    
     public String getCccd() {
         return cccd;
     }

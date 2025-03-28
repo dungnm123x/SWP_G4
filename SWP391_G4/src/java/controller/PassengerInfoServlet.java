@@ -110,6 +110,22 @@ public class PassengerInfoServlet extends HttpServlet {
         }
         return newArr;
     }
+    
+    // Phương thức tiện ích để gửi lỗi theo đúng url (AJAX partial hay forward)
+    private void sendError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
+            throws IOException, ServletException {
+        HttpSession session = request.getSession();
+        String previousURL = (String) session.getAttribute("previousURL");
+        String renderPartial = request.getParameter("renderPartial");
+        if ("true".equals(renderPartial)) {
+            response.setContentType("text/plain");
+            // Gửi về dạng "ERROR|<previousURL>|<errorMessage>"
+            response.getWriter().write("ERROR|" + previousURL + "|" + errorMessage);
+        } else {
+            request.setAttribute("errorMessage", errorMessage);
+            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+        }
+    }
 
     //======================== doPost ========================//
     @Override
@@ -226,7 +242,7 @@ public class PassengerInfoServlet extends HttpServlet {
                     session.setAttribute("confirmedDOB", newConfirmedDOB);
                 }
 
-                // <-- Chèn đoạn cập nhật readonly cho các vé "Trẻ em" ngay ở đây:
+                // Chèn đoạn cập nhật readonly cho các vé "Trẻ em"
                 typeList = (List<String>) session.getAttribute("typeList");
                 confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
                 for (int i = 0; i < cartItems.size(); i++) {
@@ -239,22 +255,18 @@ public class PassengerInfoServlet extends HttpServlet {
 
             // Nếu giỏ hàng trống, chuyển hướng về previousURL
             if (cartItems.isEmpty()) {
-                // 1) Nếu đang ở chế độ AJAX partial => chỉ write("EMPTY") rồi return
-                if ("true".equals(request.getParameter("renderPartial"))) {
+                if ("true".equals(renderPartial)) {
                     response.setContentType("text/plain");
                     String finalURL = (previousURL != null && !previousURL.isEmpty())
                             ? previousURL : "schedule";
                     response.getWriter().write("EMPTY|" + finalURL);
                     return;
-
                 } else {
-                    // 2) Nếu KHÔNG phải AJAX partial => server redirect
                     response.sendRedirect(previousURL != null ? previousURL : "schedule");
                     return;
                 }
             }
 
-            // Nếu renderPartial => forward sang JSP với partialMode
             if ("true".equals(renderPartial)) {
                 request.setAttribute("partialMode", true);
                 request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
@@ -328,8 +340,7 @@ public class PassengerInfoServlet extends HttpServlet {
             try {
                 tripID = Integer.parseInt(tripIDStr);
             } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "Thiếu hoặc sai tripID ở vé thứ " + (i + 1));
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                sendError(request, response, "Thiếu hoặc sai tripID ở vé thứ " + (i + 1));
                 return;
             }
 
@@ -346,26 +357,21 @@ public class PassengerInfoServlet extends HttpServlet {
 
             // Kiểm tra vé trùng theo TicketDAO
             if (ticketDAO.isTicketActiveByCCCD(idNumber, tripID)) {
-                request.setAttribute("errorMessage",
-                        "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                sendError(request, response, "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
                 return;
             }
             if (normalizedFullName.isEmpty()) {
-                request.setAttribute("errorMessage", "Họ tên không hợp lệ, vui lòng nhập lại.");
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                sendError(request, response, "Họ tên không hợp lệ, vui lòng nhập lại.");
                 return;
             }
             if (normalizedCCCD.isEmpty() && needCCCDRegex) {
-                request.setAttribute("errorMessage", "CMND/Hộ chiếu không hợp lệ, vui lòng nhập lại.");
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                sendError(request, response, "CMND/Hộ chiếu không hợp lệ, vui lòng nhập lại.");
                 return;
             }
             if (needCCCDRegex) {
                 String cccdRegex = "^(\\d{9}|\\d{12})$";
                 if (!normalizedCCCD.matches(cccdRegex)) {
-                    request.setAttribute("errorMessage", "CCCD/Hộ chiếu phải là 9 hoặc 12 chữ số!");
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "CCCD/Hộ chiếu phải là 9 hoặc 12 chữ số!");
                     return;
                 }
             }
@@ -374,17 +380,13 @@ public class PassengerInfoServlet extends HttpServlet {
             boolean thisIsReturnTrip = currentItem.isReturnTrip();
             if (thisIsReturnTrip) {
                 if (cccdSetReturn.contains(idNumber)) {
-                    request.setAttribute("errorMessage",
-                            "Không được trùng CCCD/Hộ chiếu trong cùng chuyến về: " + idNumber);
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "Không được trùng CCCD/Hộ chiếu trong cùng chuyến về: " + idNumber);
                     return;
                 }
                 cccdSetReturn.add(idNumber);
             } else {
                 if (cccdSetGo.contains(idNumber)) {
-                    request.setAttribute("errorMessage",
-                            "Không được trùng CCCD/Hộ chiếu trong cùng chuyến đi: " + idNumber);
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "Không được trùng CCCD/Hộ chiếu trong cùng chuyến đi: " + idNumber);
                     return;
                 }
                 cccdSetGo.add(idNumber);
@@ -397,16 +399,12 @@ public class PassengerInfoServlet extends HttpServlet {
                 String yearStr = request.getParameter("birthYear" + i);
                 int age = calculateAge(dayStr, monthStr, yearStr);
                 if (age < 6) {
-                    request.setAttribute("errorMessage",
-                            "Trẻ em dưới 6 tuổi không cần vé: " + fullName);
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "Trẻ em dưới 6 tuổi không cần vé: " + fullName);
                     return;
                 } else if (age <= 10) {
                     discountRate = 50.0;
                 } else {
-                    request.setAttribute("errorMessage",
-                            "Hành khách '" + fullName + "' không đúng độ tuổi Trẻ em (6-10).");
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "Hành khách '" + fullName + "' không đúng độ tuổi Trẻ em (6-10).");
                     return;
                 }
             } else if ("Người cao tuổi".equals(passengerType)) {
@@ -415,9 +413,7 @@ public class PassengerInfoServlet extends HttpServlet {
                 String yearStr = request.getParameter("birthYear" + i);
                 int age = calculateAge(dayStr, monthStr, yearStr);
                 if (age < 60) {
-                    request.setAttribute("errorMessage",
-                            "Hành khách '" + fullName + "' chưa đủ 60 tuổi để giảm giá người cao tuổi.");
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "Hành khách '" + fullName + "' chưa đủ 60 tuổi để giảm giá người cao tuổi.");
                     return;
                 } else {
                     discountRate = 30.0;
@@ -427,9 +423,7 @@ public class PassengerInfoServlet extends HttpServlet {
             } else if ("VIP".equals(passengerType)) {
                 String vipCard = request.getParameter("vipCard" + i);
                 if (vipCard == null || vipCard.trim().isEmpty()) {
-                    request.setAttribute("errorMessage",
-                            "Vui lòng nhập thẻ VIP cho hành khách: " + fullName);
-                    request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+                    sendError(request, response, "Vui lòng nhập thẻ VIP cho hành khách: " + fullName);
                     return;
                 }
                 discountRate = 10.0;
@@ -456,23 +450,19 @@ public class PassengerInfoServlet extends HttpServlet {
         String normalizedBookingName = normalizeString(bookingName);
         String normalizedBookingCCCD = normalizeString(bookingCCCD);
         if (normalizedBookingName.isEmpty()) {
-            request.setAttribute("errorMessage", "Họ và tên người đặt vé không được để trống hoặc chỉ chứa khoảng trắng.");
-            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+            sendError(request, response, "Họ và tên người đặt vé không được để trống hoặc chỉ chứa khoảng trắng.");
             return;
         }
         if (normalizedBookingCCCD.isEmpty()) {
-            request.setAttribute("errorMessage", "CMND/Hộ chiếu của người đặt vé không được để trống hoặc chỉ chứa khoảng trắng.");
-            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+            sendError(request, response, "CMND/Hộ chiếu của người đặt vé không được để trống hoặc chỉ chứa khoảng trắng.");
             return;
         }
         if (bookingEmail.isEmpty() || !bookingEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            request.setAttribute("errorMessage", "Email không hợp lệ. Vui lòng nhập đúng định dạng.");
-            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+            sendError(request, response, "Email không hợp lệ. Vui lòng nhập đúng định dạng.");
             return;
         }
         if (bookingPhone.isEmpty() || !bookingPhone.matches("^\\d{10,11}$")) {
-            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ. Vui lòng nhập 10-11 chữ số.");
-            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
+            sendError(request, response, "Số điện thoại không hợp lệ. Vui lòng nhập 10-11 chữ số.");
             return;
         }
 

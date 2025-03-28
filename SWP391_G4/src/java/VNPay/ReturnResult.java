@@ -187,7 +187,8 @@ public class ReturnResult extends HttpServlet {
             // Lấy danh sách CCCD
             List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
             List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
-            if (idNumberList == null || fullNameList == null || idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size()) {
+            List<String> typeList = (List<String>) session.getAttribute("typeList");
+            if (idNumberList == null || fullNameList == null || typeList == null || idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size()) {
                 request.setAttribute("error", "Không khớp số lượng tên/CCCD với số vé trong giỏ!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
@@ -197,9 +198,11 @@ public class ReturnResult extends HttpServlet {
                 CartItem item = cartItems.get(i);
                 String passengerCCCD = idNumberList.get(i);
                 String passengerName = fullNameList.get(i);
+                String passengerType = typeList.get(i);
                 Ticket ticket = new Ticket();
                 
                 ticket.setPassengerName(passengerName);
+                ticket.setPassengerType(passengerType);
                 ticket.setCccd(passengerCCCD);
                 ticket.setBookingID(bookingID);
                 ticket.setSeatID(Integer.parseInt(item.getSeatID()));
