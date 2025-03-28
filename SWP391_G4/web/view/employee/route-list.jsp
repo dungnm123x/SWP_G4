@@ -22,7 +22,33 @@
             }
             .admin-back-button i {
                 margin-right: 8px;
-            }</style>
+            }
+        .pagination {
+                margin-top: 20px;
+                display:flex;
+                justify-content: center;
+            }
+
+            .pagination a, .pagination span {
+                padding: 8px 12px;
+                margin: 0 3px;
+                border: 1px solid #ddd;
+                text-decoration: none;
+                color: black;
+                background-color: white;
+            }
+
+            .pagination a:hover {
+                background-color: #ddd;
+            }
+
+            .pagination span { /* Style for the current page */
+                font-weight: bold;
+                background-color: #4CAF50; /* Or your preferred color */
+                color: white;
+                border-color: #4CAF50;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -143,5 +169,26 @@
                     </tr>
                 </c:forEach>
             </table>
+                <div class="pagination">
+                <c:if test="${currentPage > 1}">
+                    <a href="route?page=${currentPage - 1}">&laquo; Previous</a>
+                </c:if>
+
+                <c:forEach begin="1" end="${totalPages}" var="i">
+                    <c:choose>
+                        <c:when test="${currentPage == i}">
+                            <span>${i}</span> <%-- Current page: no link --%>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="route?page=${i}">${i}</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+
+                <c:if test="${currentPage < totalPages}">
+                    <a href="route?page=${currentPage + 1}">Next &raquo;</a>
+                </c:if>
+            </div>
+        </div>
     </body>
 </html>
