@@ -138,7 +138,7 @@ public class ReturnResult extends HttpServlet {
         if ("00".equals(vnp_TransactionStatus)) {
             ConcurrentHashMap<String, TimerTask> seatTasks = CartServlet.getSeatBookingTasks();
             // A) Tính tổng tiền
-            double totalPrice = 0;
+
             for (CartItem item : cartItems) {
                 String seatID = item.getSeatID();
                 TimerTask task = seatTasks.get(seatID);
@@ -147,7 +147,17 @@ public class ReturnResult extends HttpServlet {
                     seatTasks.remove(seatID);
                     System.out.println("Đã cancel TimerTask cho seat " + seatID);
                 }
-                totalPrice += item.getPrice();
+
+            }
+            double totalPrice = 0;
+            try {
+                long vnpAmountLong = Long.parseLong(vnp_Amount);
+                totalPrice = vnpAmountLong / 100.0;  // Lấy từ tham số VNPay
+            } catch (NumberFormatException e) {
+                // fallback: cộng trực tiếp từ giỏ hàng (lúc này item.getPrice() đã là final)
+                for (CartItem item : cartItems) {
+                    totalPrice += item.getPrice();
+                }
             }
 
             // B) Tạo Booking (PaymentStatus = "Paid")
