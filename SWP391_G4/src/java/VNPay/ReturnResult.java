@@ -253,6 +253,15 @@ public class ReturnResult extends HttpServlet {
             request.setAttribute("bookingName", bookingName);
             request.setAttribute("bookingEmail", bookingEmail);
             request.setAttribute("bookingPhone", bookingPhone);
+            session.removeAttribute("cartItems");
+            session.removeAttribute("fullNameList");
+            session.removeAttribute("typeList");
+            session.removeAttribute("idNumberList");
+            session.removeAttribute("birthDayList");
+            session.removeAttribute("birthMonthList");
+            session.removeAttribute("birthYearList");
+            session.removeAttribute("totalAmount");
+            session.removeAttribute("bookingCCCD");
 
             request.getRequestDispatcher("success.jsp").forward(request, response);
             try {
