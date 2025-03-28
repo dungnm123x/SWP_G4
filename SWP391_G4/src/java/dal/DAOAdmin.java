@@ -142,7 +142,7 @@ public class DAOAdmin extends DBContext {
 
     public List<User> getAllUsers(int page, int pageSize) throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM [User] WHERE UserID != 1 ORDER BY UserID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String query = "SELECT * FROM [User] ORDER BY UserID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, (page - 1) * pageSize);
             stmt.setInt(2, pageSize);
@@ -293,57 +293,10 @@ public class DAOAdmin extends DBContext {
         }
     }
 
-    // Phương thức kiểm tra xem người dùng có phải là Admin gốc hay không
-    public boolean isRootAdmin(int userId) throws SQLException {
-        String query = "SELECT 1 FROM [User] WHERE UserID = ? AND RoleID = 1";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
-
-    // Phương thức kiểm tra xem người dùng có được phân quyền Admin hay không
-    public boolean isAuthorizedAdmin(int userId) throws SQLException {
-        String query = "SELECT 1 FROM AdminAuthorization WHERE UserID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
-
-    // Phương thức phân quyền Admin cho người dùng
-    public boolean authorizeAdmin(int userId, int authorizedBy) throws SQLException {
-        String query = "INSERT INTO AdminAuthorization (UserID, AuthorizedBy) VALUES (?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, authorizedBy);
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected > 0) {
-                // Cập nhật roleID thành 2 (nhân viên)
-                updateUserRole(userId, 2);
-                return true;
-            }
-            return false;
-        }
-    }
-
-    // Phương thức thu hồi quyền Admin của người dùng
-    public boolean revokeAdminAuthorization(int userId) throws SQLException {
-        String query = "DELETE FROM AdminAuthorization WHERE UserID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        }
-    }
     // Phương thức tìm kiếm người dùng
-
     public List<User> searchUsers(String keyword) throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM [User] WHERE UserID != 1 AND (Username LIKE ? OR FullName LIKE ? OR Email LIKE ?)";
+        String query = "SELECT * FROM [User] WHERE (Username LIKE ? OR FullName LIKE ? OR Email LIKE ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             String searchPattern = "%" + keyword + "%";
             stmt.setString(1, searchPattern);
@@ -363,7 +316,7 @@ public class DAOAdmin extends DBContext {
     // Phương thức lấy danh sách tất cả người dùng (để hiển thị trong trang phân quyền)
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM [User] WHERE UserID != 1;"; // Loại bỏ Admin gốc
+        String query = "SELECT * FROM [User]"; // Loại bỏ Admin gốc
         try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 users.add(new User(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
@@ -374,14 +327,18 @@ public class DAOAdmin extends DBContext {
         return users;
     }
 
-    // Phương thức cập nhật roleID của user
-    public boolean updateUserRole(int userId, int roleId) {
+    public boolean updateUserRole(int userId, int roleId) throws SQLException {
         String query = "UPDATE [User] SET RoleID = ? WHERE UserID = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, roleId);
             ps.setInt(2, userId);
-            return ps.executeUpdate() > 0;
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
+            // Kiểm tra lỗi từ trigger
+            if (e.getMessage().contains("Hệ thống cần ít nhất một Admin")) {
+                throw new SQLException("Không thể thay đổi vai trò. Hệ thống cần ít nhất một Admin.");
+            }
             e.printStackTrace();
             return false;
         }
@@ -596,6 +553,7 @@ public class DAOAdmin extends DBContext {
         }
         return 0;
     }
+
     // Method to add a new calendar event
     public boolean addCalendarEvent(CalendarEvent event) throws SQLException {
         String query = "INSERT INTO CalendarEvent (UserID, Title, StartDate, EndDate, AllDay, Description) VALUES (?, ?, ?, ?, ?, ?)";
@@ -638,11 +596,11 @@ public class DAOAdmin extends DBContext {
         }
         return events;
     }
+
     public List<CalendarEvent> getAllCalendarEvents() throws SQLException {
         List<CalendarEvent> events = new ArrayList<>();
         String query = "SELECT * FROM CalendarEvent WHERE Status = 1"; // Lấy tất cả các sự kiện từ bảng
-        try (PreparedStatement ps = connection.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 CalendarEvent event = new CalendarEvent();
                 event.setEventID(rs.getInt("EventID"));
@@ -661,7 +619,7 @@ public class DAOAdmin extends DBContext {
 
     // Method to update an existing calendar event
     public boolean updateCalendarEvent(CalendarEvent event) throws SQLException {
-        String query = "UPDATE CalendarEvent SET Title = ?, StartDate = ?, EndDate = ?, AllDay = ?, Description = ? WHERE EventID = ? AND UserID = ?";
+        String query = "UPDATE CalendarEvent SET Title = ?, StartDate = ?, EndDate = ?, AllDay = ?, Description = ? WHERE EventID = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, event.getTitle());
             ps.setTimestamp(2, new Timestamp(event.getStartDate().getTime()));
@@ -673,20 +631,19 @@ public class DAOAdmin extends DBContext {
             ps.setBoolean(4, event.isAllDay());
             ps.setString(5, event.getDescription());
             ps.setInt(6, event.getEventID());
-            ps.setInt(7, event.getUserID());
             return ps.executeUpdate() > 0;
         }
     }
 
     // Method to delete a calendar event (soft delete)
-    public boolean deleteCalendarEvent(int eventId, int userId) throws SQLException {
-        String query = "UPDATE CalendarEvent SET Status = 0 WHERE EventID = ? AND UserID = ?";
+    public boolean deleteCalendarEvent(int eventId) throws SQLException {
+        String query = "UPDATE CalendarEvent SET Status = 0 WHERE EventID = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, eventId);
-            ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         }
     }
+
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet.");

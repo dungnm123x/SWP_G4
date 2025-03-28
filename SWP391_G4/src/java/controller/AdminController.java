@@ -125,7 +125,7 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("currentPage", page);
             } else if ("userauthorization".equals(view)) {
                 // Similar logic for user authorization
-                if (user != null && user.getUserId() == 1) {
+                if (user != null && user.getRoleID() == 1) {
                     try {
                         String searchKeyword = request.getParameter("search");
                         List<User> users;
@@ -412,7 +412,7 @@ public class AdminController extends HttpServlet {
         } else if ("deleteCalendarEvent".equals(action)) {
             try {
                 int eventId = Integer.parseInt(request.getParameter("eventId"));
-                boolean success = dao.deleteCalendarEvent(eventId, user.getUserId());
+                boolean success = dao.deleteCalendarEvent(eventId);
                 if (success) {
                     request.getSession().setAttribute("message2", "✅ Xóa sự kiện thành công!");
                 } else {
@@ -481,36 +481,6 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
                 response.sendRedirect("admin?view=" + request.getParameter("type"));
             }
-        } else if ("authorizeUser".equals(action)) {
-            try {
-                int userId = Integer.parseInt(request.getParameter("userId"));
-                int authorizedBy = ((User) request.getSession().getAttribute("user")).getUserId();
-
-                if (dao.authorizeAdmin(userId, authorizedBy)) {
-                    request.getSession().setAttribute("message2", "✅ Phân quyền Admin thành công!");
-                } else {
-                    request.getSession().setAttribute("message2", "❌ Phân quyền Admin thất bại.");
-                }
-                response.sendRedirect("admin?view=userauthorization");
-                return;
-            } catch (SQLException e) {
-                throw new ServletException(e);
-            }
-        } // Action: Thu hồi quyền người dùng
-        else if ("revokeUser".equals(action)) {
-            try {
-                int userId = Integer.parseInt(request.getParameter("userId"));
-
-                if (dao.revokeAdminAuthorization(userId)) {
-                    request.getSession().setAttribute("message2", "✅ Thu hồi quyền thành công!");
-                } else {
-                    request.getSession().setAttribute("message2", "❌ Thu hồi quyền thất bại.");
-                }
-                response.sendRedirect("admin?view=userauthorization");
-                return;
-            } catch (SQLException e) {
-                throw new ServletException(e);
-            }
         } // Action: Đặt Role cho User
         else if ("setUserRole".equals(action)) {
             try {
@@ -522,14 +492,19 @@ public class AdminController extends HttpServlet {
                 } else {
                     request.getSession().setAttribute("message2", "❌ Đặt Role thất bại.");
                 }
-                response.sendRedirect("admin?view=userauthorization");
-                return;
+            } catch (SQLException e) {
+                if (e.getMessage().contains("Hệ thống cần ít nhất một Admin")) {
+                    request.getSession().setAttribute("message2", "⚠️ Không thể thay đổi vai trò. Hệ thống cần ít nhất một Admin.");
+                } else {
+                    e.printStackTrace();
+                    request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
-                response.sendRedirect("admin?view=userauthorization");
-                return;
             }
+            response.sendRedirect("admin?view=userauthorization");
+            return;
         }
 
     }
