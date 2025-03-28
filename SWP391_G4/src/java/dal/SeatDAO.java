@@ -15,48 +15,38 @@ import model.Seat;
 
 public class SeatDAO extends DBContext<RailwayDTO> {
 
-//    public List<Seat> getSeatsByCarriageID(int carriageID) {
-//        List<Seat> list = new ArrayList<>();
-//        String sql = "SELECT SeatID, SeatNumber, Status, SeatType, CarriageID FROM Seat WHERE CarriageID = ?";
-//
-//        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-//            stm.setInt(1, carriageID);
-//
-//            try (ResultSet rs = stm.executeQuery()) {
-//                while (rs.next()) {
-//
-//                    Carriage carriage = new Carriage(rs.getInt("CarriageID"), null, null, null, 0);
-//
-//                    Seat seat = new Seat();
-//                    seat.setSeatID(rs.getInt("SeatID"));
-//                    seat.setSeatNumber(String.valueOf(rs.getInt("SeatNumber"))); // Chuyển số thành chuỗi
-//                    seat.setStatus(rs.getString("Status") != null ? rs.getString("Status") : "Unknown");
-//                    seat.setSeatType(rs.getString("SeatType"));
-//                    seat.setCarriage(carriage);
-//
-//                    list.add(seat);
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return list;
-//    }
+    public String getSeatStatus(String seatID) {
+        String sql = "SELECT Status FROM Seat WHERE SeatID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, seatID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("Status");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Nếu không tìm thấy
+    }
 
     public List<Seat> getSeatsForTrip(int carriageID, int tripID) {
         List<Seat> result = new ArrayList<>();
         String sql = """
-        SELECT 
+        SELECT
           s.SeatID,
           s.SeatNumber,
-          CASE WHEN EXISTS (
-             SELECT 1 FROM Ticket t
-             WHERE t.SeatID = s.SeatID
-               AND t.TripID = ?
-               AND t.TicketStatus IN ('Unused','Used','Reserved')
-          ) 
-          THEN 'Booked' 
-          ELSE 'Available'
+          CASE
+            WHEN s.Status = 'Booked' THEN 'Booked'
+            WHEN s.Status = 'Out of Service' THEN 'Out of Service'
+            WHEN EXISTS (
+               SELECT 1 FROM Ticket t
+               WHERE t.SeatID = s.SeatID
+                 AND t.TripID = ?
+                 AND t.TicketStatus IN ('Unused','Used','Reserved')
+            )
+            THEN 'Booked'
+            ELSE 'Available'
           END AS SeatStatus
         FROM Seat s
         WHERE s.CarriageID = ?
@@ -78,9 +68,28 @@ public class SeatDAO extends DBContext<RailwayDTO> {
         }
         return result;
     }
+//    public List<Seat> getSeatsForTrip(int carriageID, int tripID) {
+//        List<Seat> result = new ArrayList<>();
+//        String sql = "SELECT SeatID, SeatNumber, Status AS SeatStatus FROM Seat WHERE CarriageID = ? ORDER BY SeatNumber";
+//        try (PreparedStatement st = connection.prepareStatement(sql)) {
+//            st.setInt(1, carriageID);
+//            try (ResultSet rs = st.executeQuery()) {
+//                while (rs.next()) {
+//                    Seat seat = new Seat();
+//                    seat.setSeatID(rs.getInt("SeatID"));
+//                    seat.setSeatNumber(rs.getString("SeatNumber"));
+//                    seat.setStatus(rs.getString("SeatStatus"));
+//                    result.add(seat);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
 
     public void updateSeatStatus(String seatID, String status) {
-        String sql = "UPDATE Seats SET status = ? WHERE seatID = ?";
+        String sql = "UPDATE Seat SET status = ? WHERE seatID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, status);
             stmt.setString(2, seatID);
