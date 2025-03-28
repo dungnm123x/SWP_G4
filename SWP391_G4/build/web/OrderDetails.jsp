@@ -290,7 +290,7 @@
                     <p><strong>Id hóa đơn:</strong> ${booking.bookingID}</p>
                     <p><strong>Ngày đặt:</strong> ${booking.formattedBookingDate}</p>
                     <p><strong>Tình trạng:</strong> ${booking.paymentStatus}</p>
-                    <p><strong>Số vé:</strong> ${fn:length(booking.tickets)}</p>
+                    <p><strong>Tổng số vé:</strong> ${fn:length(booking.tickets)}</p>
                     <p><strong>Tổng giá:</strong> <fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" /></p>
                 </div>
 
@@ -320,7 +320,8 @@
                                     <th>Toa</th>
                                     <th>Ghế</th>
                                     <th>Loại toa</th>
-                                    <th>Tên KH</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Đối Tượng</th>
                                     <th>CCCD</th>
                                     <th>Giá vé</th>
                                     <th>Tình trạng</th>
@@ -338,6 +339,7 @@
                                         <td>${ticket.seatNumber}</td>
                                         <td>${ticket.carriageType}</td>
                                         <td>${ticket.passengerName}</td>
+                                        <td>${ticket.passengerType}</td>
                                         <td>${ticket.cccd}</td>
                                         <td><fmt:formatNumber value="${ticket.ticketPrice}" type="currency" currencySymbol="VND" /></td>
                                         <td>${ticket.ticketStatus}</td>

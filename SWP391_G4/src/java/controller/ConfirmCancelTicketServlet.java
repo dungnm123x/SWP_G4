@@ -175,13 +175,14 @@ public class ConfirmCancelTicketServlet extends HttpServlet {
                 .append("<p>Hệ thống xác nhận rằng vé của bạn đã được hủy thành công. Dưới đây là chi tiết vé:</p>");
 
         emailContent.append("<table><tr>")
-                .append("<th>Mã vé</th><th>Tên</th><th>CCCD</th><th>Hành trình</th><th>Tàu</th><th>Thời gian khởi hành</th><th>Toa</th><th>Chỗ ngồi</th><th>Giá vé</th><th>Tiền hoàn</th></tr>");
+                .append("<th>Mã vé</th><th>Tên</th><th>Đối Tượng</th><th>CCCD</th><th>Hành trình</th><th>Tàu</th><th>Thời gian khởi hành</th><th>Toa</th><th>Chỗ ngồi</th><th>Giá vé</th><th>Tiền hoàn</th></tr>");
 
         int totalTickets = 0;
         for (RailwayDTO ticket : pendingTickets) {
             emailContent.append("<tr>")
                     .append("<td>").append(ticket.getTicketID()).append("</td>")
                     .append("<td>").append(ticket.getPassengerName()).append("</td>")
+                    .append("<td>").append(ticket.getPassengerType()).append("</td>")
                     .append("<td>").append(ticket.getCccd()).append("</td>")
                     .append("<td>").append(ticket.getRoute()).append("</td>")
                     .append("<td>").append(ticket.getTrainCode()).append("</td>")

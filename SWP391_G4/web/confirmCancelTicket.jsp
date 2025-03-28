@@ -57,6 +57,7 @@
                             <tr>
                                 <th>Mã vé</th>
                                 <th>Tên</th>
+                                <th>Đội Tượng</th>
                                 <th>CCCD</th>
                                 <th>Hành trình</th>
                                 <th>Tàu</th>
@@ -77,6 +78,7 @@
                                 <tr>
                                     <td>${ticket.ticketID}</td>
                                     <td>${ticket.passengerName}</td>
+                                    <td>${ticket.passengerType}</td>
                                     <td>${ticket.cccd}</td>
                                     <td>${ticket.route}</td>
                                     <td>${ticket.trainCode}</td>

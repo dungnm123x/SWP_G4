@@ -51,16 +51,32 @@ public class RefundListServlet extends HttpServlet {
             HttpSession session = request.getSession(); // Không cần (false), vì chắc chắn đã có session
             int userID = (Integer) session.getAttribute("loggedInUserID");
             String bankAccountID = request.getParameter("bankAccountID");
+            bankAccountID = (bankAccountID != null) ? bankAccountID.trim() : "";
+
             String refundDate = request.getParameter("refundDate");
+            refundDate = (refundDate != null) ? refundDate.trim() : "";
+
             String refundStatus = request.getParameter("refundStatus");
-            String customerName = request.getParameter("customerName");
-            String phoneNumber = request.getParameter("phoneNumber");
-            String customerEmail = request.getParameter("customerEmail");
+            refundStatus = (refundStatus != null) ? refundStatus.trim() : "";
 
-            // Gọi DAO với các điều kiện lọc
-            List<RefundDTO> refunds = refundDAO.getAllRefundDetailsByUser(userID,bankAccountID, refundDate, refundStatus,
-                    customerName, phoneNumber, customerEmail);
+            String bankName = request.getParameter("bankName");
+            bankName = (bankName != null) ? bankName.trim() : "";
 
+// Lấy TicketID (chuyển về Integer nếu có)
+            Integer ticketID = null;
+            String ticketIDParam = request.getParameter("ticketID");
+            if (ticketIDParam != null && !ticketIDParam.trim().isEmpty()) {
+                try {
+                    ticketID = Integer.parseInt(ticketIDParam.trim());
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "Mã vé không hợp lệ.");
+                    request.getRequestDispatcher("RefundList.jsp").forward(request, response);
+                    return;
+                }
+            }
+
+// Gọi DAO với các điều kiện lọc mới
+            List<RefundDTO> refunds = refundDAO.getAllRefundDetailsByUser(userID, bankAccountID, refundDate, refundStatus, bankName, ticketID);
             // Nếu không có kết quả, hiển thị thông báo
             if (refunds.isEmpty()) {
                 request.setAttribute("message", "Không tìm thấy dữ liệu phù hợp.");

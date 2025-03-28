@@ -344,19 +344,19 @@
             <div class="info-block">
                 <!-- Refund Information -->
                 <div class="info-section">
-                    <div class="section-title">Thông tin đặt vé:</div>
+                    <div class="section-title">Thông tin hóa đơn trả tiền:</div>
                     <p><strong>Id hóa đơn:</strong> ${refund.refundID}</p>
                     <p><strong>Ngày yêu cầu:</strong> ${refund.refundDate}</p>
                     <p><strong>Ngày trả:</strong> ${refund.confirmRefundDate}</p>
                     <p><strong>Tình trạng:</strong> ${refund.refundStatus}</p>
-                    <p><strong>Số vé:</strong> ${fn:length(refund.tickets)}</p>
-                    <p><strong>Tổng giá:</strong> <fmt:formatNumber value="${refund.totalRefund}" type="currency" currencySymbol="VND" /></p>
+                    <p><strong>Tổng số vé:</strong> ${fn:length(refund.tickets)}</p>
+                    <p><strong>Tổng số tiền hoàn:</strong> <fmt:formatNumber value="${refund.totalRefund}" type="currency" currencySymbol="VND" /></p>
                 </div>
 
                 <!-- Customer Information -->
                 <div class="info-section">
                     <div class="section-title">Thông tin người đặt:</div>
-                    <p><strong>Tên:</strong> ${refund.customerName}</p>
+                    <p><strong>Tên người dùng:</strong> ${refund.customerName}</p>
                     <p><strong>SĐT:</strong> ${refund.phoneNumber}</p>
                     <p><strong>Email:</strong> ${refund.customerEmail}</p>
                     <p><strong>Ngân hàng</strong> ${refund.bankName}</p>
@@ -375,9 +375,11 @@
                                 <th>Khởi hành</th>
                                 <th>Toa</th>
                                 <th>Ghế</th>
-                                <th>Hành khách</th>
+                                <th>Tên hành khách</th>
+                                <th>Đối Tượng</th>
                                 <th>CCCD</th>
                                 <th>Giá vé</th>
+                                <th>Tiền hoàn</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -390,8 +392,10 @@
                                     <td>${ticket.carriageNumber}</td>
                                     <td>${ticket.seatNumber}</td>
                                     <td>${ticket.passengerName}</td>
+                                    <td>${ticket.passengerType}</td>
                                     <td>${ticket.cccd}</td>
                                     <td><fmt:formatNumber value="${ticket.ticketPrice}" type="currency" currencySymbol="VND" /></td>
+                                    <td><fmt:formatNumber value="${ticket.ticketPrice*0.8}" type="currency" currencySymbol="VND" /></td>
                                 </tr>
                             </c:forEach>
                         </tbody>

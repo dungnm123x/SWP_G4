@@ -295,8 +295,8 @@
             <div class="info-block">
                 <!-- Refund Information -->
                 <div class="info-section">
-                    <div class="section-title">Thông tin đặt vé:</div>
-                    <p><strong>Id hóa đơn:</strong> ${refund.refundID}</p>
+                    <div class="section-title">Thông tin hóa đơn trả tiền:</div>
+                    <p><strong>ID hóa đơn:</strong> ${refund.refundID}</p>
                     <p><strong>Ngày yêu cầu:</strong> ${refund.refundDate}</p>
                     <p><strong>Ngày trả:</strong> ${refund.confirmRefundDate}</p>
                     <p><strong>Tình trạng:</strong> ${refund.refundStatus}</p>
@@ -326,9 +326,11 @@
                                 <th>Khởi hành</th>
                                 <th>Toa</th>
                                 <th>Ghế</th>
-                                <th>Hành khách</th>
+                                <th>Tên Hành khách</th>
+                                <th>Đối Tượng</th>
                                 <th>CCCD</th>
                                 <th>Giá vé</th>
+                                <th>Tiền hoàn</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -341,8 +343,10 @@
                                     <td>${ticket.carriageNumber}</td>
                                     <td>${ticket.seatNumber}</td>
                                     <td>${ticket.passengerName}</td>
+                                    <td>${ticket.passengerType}</td>
                                     <td>${ticket.cccd}</td>
                                     <td><fmt:formatNumber value="${ticket.ticketPrice}" type="currency" currencySymbol="VND" /></td>
+                                    <td><fmt:formatNumber value="${ticket.ticketPrice*0.8}" type="currency" currencySymbol="VND" /></td>
                                 </tr>
                             </c:forEach>
                         </tbody>

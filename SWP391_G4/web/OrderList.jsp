@@ -118,10 +118,10 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Tên khách hàng</th>
+                        <th>Tên người dùng</th>
                         <th>SĐT</th>
                         <th>Email</th>
-                        <th>Vé</th>
+                        <th>ID Vé</th>
                         <th>Tuyến</th>
                         <th>Tổng tiền</th>
                         <th>Ngày mua</th>

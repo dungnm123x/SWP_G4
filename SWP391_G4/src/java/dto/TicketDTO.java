@@ -8,6 +8,7 @@ public class TicketDTO {
     private int ticketID;
     private String passengerName;
     private String cccd; // Or whatever ID you use
+    private String passengerType;
     private int bookingID;
     private int seatID;
     private int tripID;
@@ -22,10 +23,11 @@ public class TicketDTO {
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
 
-    public TicketDTO(int ticketID, String passengerName, String cccd, int bookingID, int seatID, int tripID, double ticketPrice, String ticketStatus, String seatNumber, String carriageNumber, String carriageType, String trainName, String routeName, LocalDateTime departureTime, LocalDateTime arrivalTime) {
+    public TicketDTO(int ticketID, String passengerName, String cccd,String passengerType, int bookingID, int seatID, int tripID, double ticketPrice, String ticketStatus, String seatNumber, String carriageNumber, String carriageType, String trainName, String routeName, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         this.ticketID = ticketID;
         this.passengerName = passengerName;
         this.cccd = cccd;
+        this.passengerType=passengerType;
         this.bookingID = bookingID;
         this.seatID = seatID;
         this.tripID = tripID;
@@ -65,6 +67,14 @@ public class TicketDTO {
 
     public void setCccd(String cccd) {
         this.cccd = cccd;
+    }
+
+    public String getPassengerType() {
+        return passengerType;
+    }
+
+    public void setPassengerType(String passengerType) {
+        this.passengerType = passengerType;
     }
 
     public int getBookingID() {
