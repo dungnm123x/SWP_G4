@@ -5,6 +5,7 @@
 package VNPay;
 
 import Utils.BookingEmailSender;
+import controller.CartServlet;
 import dal.BookingDAO;
 import dal.TicketDAO;
 import java.io.IOException;
@@ -23,6 +24,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import model.Booking;
 import model.CartItem;
 import model.Ticket;
@@ -133,9 +136,17 @@ public class ReturnResult extends HttpServlet {
 
         // 5) Kiểm tra kết quả thanh toán: "00" = thành công
         if ("00".equals(vnp_TransactionStatus)) {
+            ConcurrentHashMap<String, TimerTask> seatTasks = CartServlet.getSeatBookingTasks();
             // A) Tính tổng tiền
             double totalPrice = 0;
             for (CartItem item : cartItems) {
+                String seatID = item.getSeatID();
+                TimerTask task = seatTasks.get(seatID);
+                if (task != null) {
+                    task.cancel();        // Hủy
+                    seatTasks.remove(seatID);
+                    System.out.println("Đã cancel TimerTask cho seat " + seatID);
+                }
                 totalPrice += item.getPrice();
             }
 
