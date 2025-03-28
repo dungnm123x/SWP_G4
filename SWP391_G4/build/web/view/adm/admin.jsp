@@ -118,9 +118,7 @@
                     <li><a href="admin?view=dashboard">Dashboard</a></li>
                     <li><a href="admin?view=employees">Quản lý nhân viên</a></li>
                     <li><a href="admin?view=customers">Quản lý khách hàng</a></li>
-                        <c:if test="${sessionScope.user.userId == 1}">
-                        <li><a href="admin?view=userauthorization">Phân quyền</a></li>
-                        </c:if>
+                    <li><a href="admin?view=userauthorization">Phân quyền</a></li>
                     <li><a href="admin?view=calendar">Lịch</a></li>
                     <li><a class="nav-link" href="updateuser">Hồ sơ của tôi</a></li>
                 </ul>
@@ -707,8 +705,8 @@
                                 }
                                 });
                                 });</script>
-                        </c:when>
-                        <c:when test="${type == 'userauthorization'}">
+                            </c:when>
+                            <c:when test="${type == 'userauthorization'}">
                             <div class="search-container">
                                 <form method="get" action="admin">
                                     <input type="hidden" name="view" value="userauthorization">
@@ -718,6 +716,13 @@
                                 </form>
                             </div>
                             <h2>Phân quyền người dùng</h2>
+                            <%-- Display message2 if it exists --%>
+                            <c:if test="${not empty sessionScope.message2}">
+                                <div class="alert alert-info">
+                                    ${sessionScope.message2}
+                                    <% session.removeAttribute("message2"); %> <%-- Clear message after display --%>
+                                </div>
+                            </c:if>
                             <table border="1">
                                 <thead>
                                     <tr>
