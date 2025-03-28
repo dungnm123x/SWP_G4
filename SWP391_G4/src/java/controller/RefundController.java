@@ -53,11 +53,17 @@ public class RefundController extends HttpServlet {
         try {
             // Lấy dữ liệu từ form lọc
             String bankAccountID = request.getParameter("bankAccountID");
+            bankAccountID = (bankAccountID != null) ? bankAccountID.trim() : "";
             String refundDate = request.getParameter("refundDate");
+            refundDate = (refundDate != null) ? refundDate.trim() : "";
             String refundStatus = request.getParameter("refundStatus");
+            refundStatus = (refundStatus != null) ? refundStatus.trim() : "";
             String customerName = request.getParameter("customerName");
+            customerName = (customerName != null) ? customerName.trim() : "";
             String phoneNumber = request.getParameter("phoneNumber");
+            phoneNumber = (phoneNumber != null) ? phoneNumber.trim() : "";
             String customerEmail = request.getParameter("customerEmail");
+            customerEmail = (customerEmail != null) ? customerEmail.trim() : "";
 
             // Gọi DAO với các điều kiện lọc
             List<RefundDTO> refunds = refundDAO.getAllRefundDetails(bankAccountID, refundDate, refundStatus,
@@ -114,6 +120,7 @@ public class RefundController extends HttpServlet {
                             + "<p>Chào <strong>" + refund.getCustomerName() + "</strong>,</p>"
                             + "<p>Chúng tôi đã hoàn tiền thành công cho bạn với thông tin chi tiết sau:</p>"
                             + "<table style='width:100%; border-collapse:collapse;'>"
+                            + "  <tr><td style='padding:8px; border-bottom:1px solid #ddd;'><strong>Mã đơn hủy:</strong></td><td style='padding:8px; border-bottom:1px solid #ddd;'>" + refund.getRefundID() + "</td></tr>"
                             + "  <tr><td style='padding:8px; border-bottom:1px solid #ddd;'><strong>Ngân hàng:</strong></td><td style='padding:8px; border-bottom:1px solid #ddd;'>" + refund.getBankName() + "</td></tr>"
                             + "  <tr><td style='padding:8px; border-bottom:1px solid #ddd;'><strong>Số tài khoản:</strong></td><td style='padding:8px; border-bottom:1px solid #ddd;'>" + refund.getBankAccountID() + "</td></tr>"
                             + "  <tr><td style='padding:8px; border-bottom:1px solid #ddd;'><strong>Số tiền hoàn:</strong></td><td style='padding:8px; border-bottom:1px solid #ddd;'>" + refund.getTotalRefund() + " VND</td></tr>"

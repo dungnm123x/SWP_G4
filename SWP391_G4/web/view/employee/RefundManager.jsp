@@ -137,7 +137,7 @@
             <%-- Filter Form --%>
             <div class="filter-section">
                 <form action="refund" method="get"> 
-                    <label>Tên khách hàng:</label>
+                    <label>Tên người dùng:</label>
                     <input type="text" name="customerName" value="${param.customerName}" />
 
                     <label>Số điện thoại:</label>
@@ -148,7 +148,7 @@
                     <br><label>Số tài khoản:</label>
                     <input type="text" name="bankAccountID" value="${param.bankAccountID}" />
 
-                    <label>Ngày hoàn:</label>
+                    <label>Ngày yêu cầu:</label>
                     <input type="date" name="refundDate" value="${param.refundDate}" />
 
                     <label>Trạng thái:</label>
@@ -179,13 +179,14 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Tên khách hàng</th>
+                                <th>Tên người dùng</th>
                                 <th>Email</th>
                                 <th>SĐT</th>
                                 <th>Ngân hàng</th>
                                 <th>Số tài khoản</th>
                                 <th>Vé</th>
-                                <th>Số tiền hoàn</th>
+                                <th>Tổng tiền hoàn</th>
+                                <th>Ngày yêu cầu</th>
                                 <th>Trạng thái</th>
                                 <th>Chi tiết</th>
                             </tr>
@@ -210,6 +211,7 @@
                                         <td rowspan="${rowCount}">${refund.bankAccountID}</td>
                                         <td>${refund.ticketID}</td>
                                         <td rowspan="${rowCount}"><fmt:formatNumber value="${refund.totalRefund}" type="currency" currencySymbol="VND" /></td>
+                                       <td rowspan="${rowCount}">${refund.refundDate}</td>
                                         <td rowspan="${rowCount}">${refund.refundStatus}</td>
                                         <td rowspan="${rowCount}">
                                             <a href="refundDetails?refundID=${refund.refundID}" class="btn btn-primary btn-sm">
@@ -229,6 +231,5 @@
                     </table>
                 </c:otherwise>
             </c:choose>
-
     </body>
 </html>

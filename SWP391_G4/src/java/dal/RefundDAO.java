@@ -115,7 +115,7 @@ public class RefundDAO extends DBContext {
         List<RefundDTO> refundList = new ArrayList<>();
         String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate,r.ConfirmRefundDate, r.RefundStatus, r.TotalRefund, "
                 + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
-                + "t.TicketID, t.CCCD, "
+                + "t.TicketID, t.CCCD,t.PassengerType, "
                 + "tr.TrainName AS TrainName, "
                 + "sd.StationName AS DepartureStation, sa.StationName AS ArrivalStation, "
                 + "tp.DepartureTime, c.CarriageNumber, s.SeatNumber, tp.TripType "
@@ -192,6 +192,7 @@ public class RefundDAO extends DBContext {
                         rs.getString("PhoneNumber"),
                         rs.getInt("TicketID"),
                         rs.getString("CCCD"),
+                        rs.getString("PassengerType"),
                         rs.getString("TrainName"),
                         route, // ✅ Tuyến đường
                         rs.getTimestamp("DepartureTime"),
@@ -207,7 +208,7 @@ public class RefundDAO extends DBContext {
     public RefundDTO getRefundDetailsByID(int refundID) throws SQLException {
         String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate,r.ConfirmRefundDate, r.RefundStatus, r.TotalRefund, "
                 + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
-                + "t.TicketID, t.CCCD, tr.TrainName, sd.StationName AS DepartureStation, "
+                + "t.TicketID, t.CCCD,t.PassengerType, tr.TrainName, sd.StationName AS DepartureStation, "
                 + "sa.StationName AS ArrivalStation, tp.DepartureTime, c.CarriageNumber, "
                 + "s.SeatNumber, tp.TripType, t.TicketPrice "
                 + "FROM Refund r "
@@ -242,7 +243,7 @@ public class RefundDAO extends DBContext {
                                 rs.getString("customerName"),
                                 rs.getString("customerEmail"),
                                 rs.getString("PhoneNumber"),
-                                0, "", "", "", null, 0, 0, "" // Giá trị mặc định cho vé
+                                0, "", "", "", "", null, 0, 0, "" // Giá trị mặc định cho vé
                         );
                     }
 
@@ -250,6 +251,7 @@ public class RefundDAO extends DBContext {
                             rs.getInt("TicketID"),
                             rs.getString("customerName"),
                             rs.getString("CCCD"),
+                            rs.getString("PassengerType"),
                             0, 0, 0,
                             rs.getDouble("TicketPrice"),
                             "Refunded",
@@ -289,11 +291,11 @@ public class RefundDAO extends DBContext {
     }
 
     public List<RefundDTO> getAllRefundDetailsByUser(int userID, String bankAccountID, String refundDate, String refundStatus,
-            String customerName, String phoneNumber, String customerEmail) throws SQLException {
+            String bankName, Integer ticketID) throws SQLException {
         List<RefundDTO> refundList = new ArrayList<>();
         String sql = "SELECT r.RefundID, r.BankAccountID, r.BankName, r.RefundDate, r.ConfirmRefundDate, r.RefundStatus, r.TotalRefund, "
                 + "u.UserID, u.FullName AS customerName, u.Email AS customerEmail, u.PhoneNumber, "
-                + "t.TicketID, t.CCCD, "
+                + "t.TicketID, t.CCCD, t.PassengerType, "
                 + "tr.TrainName AS TrainName, "
                 + "sd.StationName AS DepartureStation, sa.StationName AS ArrivalStation, "
                 + "tp.DepartureTime, c.CarriageNumber, s.SeatNumber, tp.TripType "
@@ -307,7 +309,7 @@ public class RefundDAO extends DBContext {
                 + "JOIN Route rt ON tp.RouteID = rt.RouteID "
                 + "JOIN Station sd ON rt.DepartureStationID = sd.StationID "
                 + "JOIN Station sa ON rt.ArrivalStationID = sa.StationID "
-                + "WHERE r.UserID = ?";  // ✅ Điều kiện bắt buộc theo UserID
+                + "WHERE r.UserID = ?";  // ✅ Lọc theo UserID (bắt buộc)
 
         List<Object> parameters = new ArrayList<>();
         parameters.add(userID);
@@ -330,22 +332,16 @@ public class RefundDAO extends DBContext {
             parameters.add(refundStatus);
         }
 
-        // Lọc theo tên khách hàng
-        if (customerName != null && !customerName.trim().isEmpty()) {
-            sql += " AND u.FullName LIKE ?";
-            parameters.add("%" + customerName + "%");
+        // Lọc theo ngân hàng
+        if (bankName != null && !bankName.trim().isEmpty()) {
+            sql += " AND r.BankName = ?";
+            parameters.add(bankName);
         }
 
-        // Lọc theo số điện thoại
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
-            sql += " AND u.PhoneNumber LIKE ?";
-            parameters.add("%" + phoneNumber + "%");
-        }
-
-        // Lọc theo email
-        if (customerEmail != null && !customerEmail.trim().isEmpty()) {
-            sql += " AND u.Email LIKE ?";
-            parameters.add("%" + customerEmail + "%");
+        // Lọc theo TicketID
+        if (ticketID != null) {
+            sql += " AND t.TicketID = ?";
+            parameters.add(ticketID);
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -371,6 +367,7 @@ public class RefundDAO extends DBContext {
                         rs.getString("PhoneNumber"),
                         rs.getInt("TicketID"),
                         rs.getString("CCCD"),
+                        rs.getString("PassengerType"),
                         rs.getString("TrainName"),
                         route, // ✅ Tuyến đường
                         rs.getTimestamp("DepartureTime"),
@@ -382,7 +379,6 @@ public class RefundDAO extends DBContext {
         }
         return refundList;
     }
-
     @Override
     public void insert(Object model) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

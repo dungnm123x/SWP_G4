@@ -23,6 +23,7 @@ public class RefundDTO {
     // Thông tin vé & chuyến đi
     private int ticketID;
     private String cccd;
+    private String passengerType;
     private String trainName;
     private String routeName;
     private Timestamp departureTime;
@@ -32,7 +33,7 @@ public class RefundDTO {
 
     public RefundDTO(int refundID, String bankAccountID, String bankName, Timestamp refundDate,Timestamp confirmRefundDate, String refundStatus,
             BigDecimal totalRefund, int userID, String customerName, String customerEmail, String phoneNumber,
-            int ticketID, String cccd, String trainName, String routeName, Timestamp departureTime,
+            int ticketID, String cccd,String passengerType, String trainName, String routeName, Timestamp departureTime,
             int carriageNumber, int seatNumber, String tripType) {
         this.refundID = refundID;
         this.bankAccountID = bankAccountID;
@@ -47,6 +48,7 @@ public class RefundDTO {
         this.phoneNumber = phoneNumber;
         this.ticketID = ticketID;
         this.cccd = cccd;
+        this.passengerType=passengerType;
         this.trainName = trainName;
         this.routeName = routeName;
         this.departureTime = departureTime;
@@ -157,6 +159,14 @@ public class RefundDTO {
 
     public void setCccd(String cccd) {
         this.cccd = cccd;
+    }
+
+    public String getPassengerType() {
+        return passengerType;
+    }
+
+    public void setPassengerType(String passengerType) {
+        this.passengerType = passengerType;
     }
 
     public String getTrainName() {
