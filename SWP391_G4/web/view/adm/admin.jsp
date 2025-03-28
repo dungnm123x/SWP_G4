@@ -214,7 +214,7 @@
                                                 <input type="hidden" name="view" value="dashboard">
                                                 <label for="period">Chọn khoảng thời gian:</label>
                                                 <select name="period" id="period" onchange="updateDateInput()">
-                                                    
+
                                                     <option value="monthly" ${period == 'monthly' ? 'selected' : ''}>Hàng tháng</option>
                                                     <option value="yearly" ${period == 'yearly' ? 'selected' : ''}>Hàng năm</option>
                                                 </select>
@@ -598,6 +598,18 @@
                                 document.getElementById(modalId).style.display = 'none';
                                 }
 
+                                // Form validation for adding events (assuming it exists)
+                                function validateAddEventForm() {
+                                // Add your validation logic here if needed
+                                return true;
+                                }
+
+                                // Form validation for editing events (assuming it exists)
+                                function validateEditEventForm() {
+                                // Add your validation logic here if needed
+                                return true;
+                                }
+
                                 document.addEventListener('DOMContentLoaded', function () {
                                 const calendarEl = document.getElementById('calendar');
                                 const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -646,8 +658,7 @@
                                         document.getElementById('startDate').value = info.dateStr + 'T00:00';
                                         document.getElementById('endDate').value = info.dateStr + 'T23:59';
                                         document.getElementById('allDay').checked = true;
-                                        }
-                                ,
+                                        },
                                         eventClick: function (info) {
                                         document.getElementById('editEventId').value = info.event.id;
                                         document.getElementById('editTitle').value = info.event.title;
@@ -660,25 +671,42 @@
                                         document.getElementById('editAllDay').checked = info.event.allDay;
                                         document.getElementById('editDescription').value = info.event.extendedProps.description || '';
                                         openModal('editEventModal');
-                                        document.getElementById('deleteEventBtn').onclick = function () {
-                                        if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
-                                        const form = document.createElement('form');
-                                        form.method = 'post';
-                                        form.action = 'admin';
-                                        form.innerHTML = `
-                                                        <input type="hidden" name="action" value="deleteCalendarEvent">
-                                                        <input type="hidden" name="eventId" value="${info.event.id}">
-                                                    `;
-                                        document.body.appendChild(form);
-                                        form.submit();
                                         }
-                                        };
-                                        }
-                                }
-                                );
-                                calendar.render();
                                 });
-                            </script>
+                                calendar.render();
+                                // Add event listener for the delete button
+                                document.getElementById('deleteEventBtn').addEventListener('click', function () {
+                                const eventId = document.getElementById('editEventId').value;
+                                if (confirm('Bạn có chắc chắn muốn xóa sự kiện này không?')) {
+                                fetch('admin', {
+                                method: 'POST',
+                                        headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: 'action=deleteCalendarEvent&eventId=' + encodeURIComponent(eventId)
+                                })
+                                        .then(response => {
+                                        if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                        }
+                                        return response.text();
+                                        })
+                                        .then(data => {
+                                        // Assuming the server redirects or sends a success message
+                                        alert('✅ Xóa sự kiện thành công!');
+                                        const event = calendar.getEventById(eventId);
+                                        if (event) {
+                                        event.remove(); // Remove the event from the calendar
+                                        }
+                                        closeModal('editEventModal');
+                                        })
+                                        .catch(error => {
+                                        console.error('Error:', error);
+                                        alert('❌ Xóa sự kiện thất bại! Lỗi: ' + error.message);
+                                        });
+                                }
+                                });
+                                });</script>
                         </c:when>
                         <c:when test="${type == 'userauthorization'}">
                             <div class="search-container">

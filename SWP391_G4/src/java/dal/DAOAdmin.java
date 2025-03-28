@@ -661,7 +661,7 @@ public class DAOAdmin extends DBContext {
 
     // Method to update an existing calendar event
     public boolean updateCalendarEvent(CalendarEvent event) throws SQLException {
-        String query = "UPDATE CalendarEvent SET Title = ?, StartDate = ?, EndDate = ?, AllDay = ?, Description = ? WHERE EventID = ? AND UserID = ?";
+        String query = "UPDATE CalendarEvent SET Title = ?, StartDate = ?, EndDate = ?, AllDay = ?, Description = ? WHERE EventID = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, event.getTitle());
             ps.setTimestamp(2, new Timestamp(event.getStartDate().getTime()));
@@ -673,17 +673,15 @@ public class DAOAdmin extends DBContext {
             ps.setBoolean(4, event.isAllDay());
             ps.setString(5, event.getDescription());
             ps.setInt(6, event.getEventID());
-            ps.setInt(7, event.getUserID());
             return ps.executeUpdate() > 0;
         }
     }
 
     // Method to delete a calendar event (soft delete)
-    public boolean deleteCalendarEvent(int eventId, int userId) throws SQLException {
-        String query = "UPDATE CalendarEvent SET Status = 0 WHERE EventID = ? AND UserID = ?";
+    public boolean deleteCalendarEvent(int eventId) throws SQLException {
+        String query = "UPDATE CalendarEvent SET Status = 0 WHERE EventID = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, eventId);
-            ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         }
     }

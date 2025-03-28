@@ -412,7 +412,7 @@ public class AdminController extends HttpServlet {
         } else if ("deleteCalendarEvent".equals(action)) {
             try {
                 int eventId = Integer.parseInt(request.getParameter("eventId"));
-                boolean success = dao.deleteCalendarEvent(eventId, user.getUserId());
+                boolean success = dao.deleteCalendarEvent(eventId);
                 if (success) {
                     request.getSession().setAttribute("message2", "✅ Xóa sự kiện thành công!");
                 } else {
