@@ -25,6 +25,7 @@ public class BookingEmailSender {
             List<CartItem> cartItems,
             List<String> fullNameList,
             List<String> idNumberList,
+            List<String> typeList,
             String bookingPhone
     ) throws UnsupportedEncodingException {
 
@@ -54,6 +55,7 @@ public class BookingEmailSender {
                     .append("<p><strong>Giá:</strong> ").append(item.getPrice()).append(" VND</p>")
                     .append("<p><strong>Hành khách:</strong> ").append(fullNameList.get(i)).append("</p>")
                     .append("<p><strong>CMND/CCCD:</strong> ").append(idNumberList.get(i)).append("</p>")
+                    .append("<p><strong>Đối tượng:</strong> ").append(typeList.get(i)).append("</p>")
                     .append("</div>");
         }
 

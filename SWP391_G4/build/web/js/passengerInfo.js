@@ -39,20 +39,23 @@ function updateDiscount(
         ageModalId, vipModalId, idNumberInputId
         ) {
     let rowEl = selectElement.closest('tr');
-    let alreadyConfirmed = (rowEl.getAttribute('data-confirmedDOB') === 'true');
+
+    // Khi người dùng thay đổi lựa chọn, reset flag xác nhận tuổi để cho phép popup xuất hiện lại
+    rowEl.setAttribute('data-confirmedDOB', 'false');
+
     let currentType = selectElement.value;
 
-    // Mở khóa input CCCD trước (nếu nó đang readonly)
+    // Mở khóa input CCCD trước (nếu đang readonly)
     let cccdInput = document.getElementById(idNumberInputId);
     cccdInput.readOnly = false;
 
-    // Nếu là "Trẻ em" hoặc "Người cao tuổi" và CHƯA xác nhận => mở modal
-    if ((currentType === "Trẻ em" || currentType === "Người cao tuổi") && !alreadyConfirmed) {
+    // Nếu là "Trẻ em" hoặc "Người cao tuổi" => mở modal để xác nhận tuổi
+    if (currentType === "Trẻ em" || currentType === "Người cao tuổi") {
         document.getElementById(ageModalId).style.display = 'flex';
         return;
     }
 
-    // Nếu là VIP => mở modal
+    // Nếu là VIP => mở modal xác nhận VIP
     if (currentType === "VIP") {
         document.getElementById(vipModalId).style.display = 'flex';
         return;
@@ -69,6 +72,7 @@ function updateDiscount(
 
     updateTotalAmount();
 }
+
 
 /**
  * 4) Hàm confirmAge: Xử lý khi user nhấn "Xác nhận" trong modal tuổi
@@ -223,18 +227,6 @@ function updateTotalAmount() {
         totalElem.innerText = sum.toLocaleString();
     }
 }
-function checkIfSingleChildTicket() {
-    // Lấy danh sách select passengerType
-    let selects = document.querySelectorAll('select[id^="passengerType"]');
-    // Nếu chỉ có 1 vé
-    if (selects.length === 1) {
-        let type = selects[0].value;
-        if (type === "Trẻ em") {
-            // Mở modal
-            document.getElementById("childAloneModal").style.display = 'flex';
-        }
-    }
-}
 
 // Hàm confirmChildAlone: khi user bấm nút “Xác nhận” trong modal
 function confirmChildAlone() {
@@ -267,7 +259,7 @@ function rebindRemoveButtons() {
             // Đếm số vé hiện có trong bảng (mỗi <tr> đại diện 1 vé)
             let rowCount = document.querySelectorAll('tr[data-confirmedDOB]').length;
 
-            // Lặp để lấy giá trị fullNameX, passengerTypeX, idNumberX, ...
+            // Lặp để lấy giá trị fullNameX, passengerTypeX, idNumberX,
             for (let i = 0; i < rowCount; i++) {
                 let fullNameEl = document.querySelector(`input[name="fullName${i}"]`);
                 let passTypeEl = document.querySelector(`select[name="passengerType${i}"]`);
@@ -298,7 +290,7 @@ function rebindRemoveButtons() {
                             const parts = result.split("|");
                             const redirectURL = parts[1];
                             window.location.href = redirectURL;
-                        
+
                         } else {
                             // Cập nhật lại table partial
                             document.querySelector(".table-responsive").innerHTML = result;
@@ -325,5 +317,4 @@ document.addEventListener("DOMContentLoaded", function () {
     reapplyDiscount();
     updateTotalAmount();
 
-    checkIfSingleChildTicket();
 });

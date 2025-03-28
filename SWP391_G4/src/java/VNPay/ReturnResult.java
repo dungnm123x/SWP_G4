@@ -200,7 +200,7 @@ public class ReturnResult extends HttpServlet {
                 String passengerName = fullNameList.get(i);
                 String passengerType = typeList.get(i);
                 Ticket ticket = new Ticket();
-                
+
                 ticket.setPassengerName(passengerName);
                 ticket.setPassengerType(passengerType);
                 ticket.setCccd(passengerCCCD);
@@ -228,6 +228,7 @@ public class ReturnResult extends HttpServlet {
             request.setAttribute("cartItems", cartItems);
             request.setAttribute("fullNameList", session.getAttribute("fullNameList"));
             request.setAttribute("idNumberList", session.getAttribute("idNumberList"));
+            request.setAttribute("typeList", session.getAttribute("typeList"));
             request.setAttribute("bookingName", bookingName);
             request.setAttribute("bookingEmail", bookingEmail);
             request.setAttribute("bookingPhone", bookingPhone);
@@ -240,6 +241,7 @@ public class ReturnResult extends HttpServlet {
                         cartItems,
                         (List<String>) session.getAttribute("fullNameList"),
                         (List<String>) session.getAttribute("idNumberList"),
+                        (List<String>) session.getAttribute("typeList"),
                         bookingPhone
                 );
             } catch (Exception e) {
