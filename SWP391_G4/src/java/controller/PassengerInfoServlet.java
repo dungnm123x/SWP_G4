@@ -7,15 +7,15 @@ import java.net.URLEncoder;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.HashSet;
-import java.util.Set;
 import model.CartItem;
 import model.User;
 
@@ -27,10 +27,11 @@ public class PassengerInfoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        // Kiểm tra đăng nhập
+        // 1) Kiểm tra đăng nhập
         if (user == null) {
             String qs = request.getQueryString();
             String reqURL = "passengerinfo" + (qs != null && !qs.isEmpty() ? "?" + qs : "");
@@ -39,20 +40,24 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
-        // Lấy giỏ hàng; nếu null, khởi tạo
+        // 2) Lấy giỏ hàng; nếu null, khởi tạo
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
         if (cartItems == null) {
             cartItems = new ArrayList<>();
             session.setAttribute("cartItems", cartItems);
         }
 
-        // Đồng bộ các danh sách dữ liệu với số lượng vé hiện có
-        session.setAttribute("fullNameList", syncList((List<String>) session.getAttribute("fullNameList"), cartItems.size(), ""));
-        session.setAttribute("typeList", syncList((List<String>) session.getAttribute("typeList"), cartItems.size(), "Người lớn"));
-        session.setAttribute("idNumberList", syncList((List<String>) session.getAttribute("idNumberList"), cartItems.size(), ""));
-        session.setAttribute("confirmedDOB", syncBooleanArray((boolean[]) session.getAttribute("confirmedDOB"), cartItems.size()));
+        // 3) Đồng bộ các danh sách dữ liệu với số lượng vé hiện có
+        session.setAttribute("fullNameList",
+                syncList((List<String>) session.getAttribute("fullNameList"), cartItems.size(), ""));
+        session.setAttribute("typeList",
+                syncList((List<String>) session.getAttribute("typeList"), cartItems.size(), "Người lớn"));
+        session.setAttribute("idNumberList",
+                syncList((List<String>) session.getAttribute("idNumberList"), cartItems.size(), ""));
+        session.setAttribute("confirmedDOB",
+                syncBooleanArray((boolean[]) session.getAttribute("confirmedDOB"), cartItems.size()));
 
-        // Nếu loại vé là "Trẻ em", tự động đánh dấu confirmedDOB = true
+        // 4) Nếu loại vé là "Trẻ em", tự động đánh dấu confirmedDOB = true
         List<String> typeList = (List<String>) session.getAttribute("typeList");
         boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
         for (int i = 0; i < cartItems.size(); i++) {
@@ -62,12 +67,19 @@ public class PassengerInfoServlet extends HttpServlet {
         }
         session.setAttribute("confirmedDOB", confirmedDOB);
 
-        // Lưu thông tin người đặt vé
+        // 5) Lưu thông tin người đặt vé mặc định (nếu user đã đăng nhập)
         session.setAttribute("bookingName", user.getFullName());
         session.setAttribute("bookingEmail", user.getEmail());
         session.setAttribute("bookingPhone", user.getPhoneNumber());
 
-        // Lưu previousURL từ query string
+        // 6) Lưu passengerinfoURL để tiện redirect nếu có lỗi
+        String passengerinfoURL = request.getRequestURL().toString();
+        if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
+            passengerinfoURL += "?" + request.getQueryString();
+        }
+        session.setAttribute("passengerinfoURL", passengerinfoURL);
+
+        // 7) Lưu previousURL (để nút "Quay lại" hay "Tiếp tục" có thể dùng)
         String depID = request.getParameter("departureStationID");
         String arrID = request.getParameter("arrivalStationID");
         String dDay = request.getParameter("departureDay");
@@ -81,50 +93,8 @@ public class PassengerInfoServlet extends HttpServlet {
                 + "&returnDate=" + URLEncoder.encode(rDate != null ? rDate : "", "UTF-8");
         session.setAttribute("previousURL", previousURL);
 
+        // 8) Forward sang trang passengerInfo.jsp
         request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
-    }
-
-    // Hàm đồng bộ danh sách: nếu size hiện tại không bằng newSize, tạo list mới với giá trị mặc định cho phần thiếu
-    private List<String> syncList(List<String> list, int newSize, String defaultValue) {
-        if (list == null) {
-            list = new ArrayList<>();
-        }
-        if (list.size() < newSize) {
-            for (int i = list.size(); i < newSize; i++) {
-                list.add(defaultValue);
-            }
-        } else if (list.size() > newSize) {
-            list = list.subList(0, newSize);
-        }
-        return list;
-    }
-
-    // Đồng bộ mảng boolean
-    private boolean[] syncBooleanArray(boolean[] arr, int newSize) {
-        boolean[] newArr = new boolean[newSize];
-        if (arr != null) {
-            int min = Math.min(arr.length, newSize);
-            for (int i = 0; i < min; i++) {
-                newArr[i] = arr[i];
-            }
-        }
-        return newArr;
-    }
-    
-    // Phương thức tiện ích để gửi lỗi theo đúng url (AJAX partial hay forward)
-    private void sendError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
-            throws IOException, ServletException {
-        HttpSession session = request.getSession();
-        String previousURL = (String) session.getAttribute("previousURL");
-        String renderPartial = request.getParameter("renderPartial");
-        if ("true".equals(renderPartial)) {
-            response.setContentType("text/plain");
-            // Gửi về dạng "ERROR|<previousURL>|<errorMessage>"
-            response.getWriter().write("ERROR|" + previousURL + "|" + errorMessage);
-        } else {
-            request.setAttribute("errorMessage", errorMessage);
-            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
-        }
     }
 
     //======================== doPost ========================//
@@ -143,7 +113,7 @@ public class PassengerInfoServlet extends HttpServlet {
         String tripType = request.getParameter("tripType");
         String returnDate = request.getParameter("returnDate");
 
-        // Sử dụng previousURL đã lưu trong session (đã được set ở doGet)
+        // Lấy previousURL đã lưu trong session
         String previousURL = (String) session.getAttribute("previousURL");
 
         // Lấy cartItems
@@ -153,9 +123,8 @@ public class PassengerInfoServlet extends HttpServlet {
             session.setAttribute("cartItems", cartItems);
         }
 
-        //==================================================
+        //================= Xử lý từng action =================
         // 1) CLEAR ALL
-        //==================================================
         if ("clearAll".equals(action)) {
             if (!cartItems.isEmpty()) {
                 SeatDAO seatDAO = new SeatDAO();
@@ -169,16 +138,17 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
-        //==================================================
         // 2) REMOVE ONE
-        //==================================================
         if ("removeOne".equals(action)) {
-            // Cập nhật session lists nếu dữ liệu được gửi lên (AJAX có gửi đầy đủ dữ liệu form)
+            // Nếu là request AJAX => cập nhật dữ liệu session trước khi xóa
             if (request.getParameter("fullName0") != null) {
                 int passengerCount = cartItems.size();
                 List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
                 List<String> typeList = (List<String>) session.getAttribute("typeList");
                 List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
+                List<String> birthDayList = (List<String>) session.getAttribute("birthDayList");
+                List<String> birthMonthList = (List<String>) session.getAttribute("birthMonthList");
+                List<String> birthYearList = (List<String>) session.getAttribute("birthYearList");
                 for (int i = 0; i < passengerCount; i++) {
                     String nameParam = request.getParameter("fullName" + i);
                     if (nameParam != null) {
@@ -192,30 +162,53 @@ public class PassengerInfoServlet extends HttpServlet {
                     if (idParam != null) {
                         idNumberList.set(i, idParam);
                     }
+                    String dayParam = request.getParameter("birthDay" + i);
+                    if (dayParam != null) {
+                        birthDayList.set(i, dayParam);
+                    }
+                    String monthParam = request.getParameter("birthMonth" + i);
+                    if (monthParam != null) {
+                        birthMonthList.set(i, monthParam);
+                    }
+                    String yearParam = request.getParameter("birthYear" + i);
+                    if (yearParam != null) {
+                        birthYearList.set(i, yearParam);
+                    }
                 }
+
                 session.setAttribute("fullNameList", fullNameList);
                 session.setAttribute("typeList", typeList);
                 session.setAttribute("idNumberList", idNumberList);
+                session.setAttribute("birthDayList", birthDayList);
+                session.setAttribute("birthMonthList", birthMonthList);
+                session.setAttribute("birthYearList", birthYearList);
             }
 
-            // Xác định vé cần xóa dựa trên seatID
+            // Tìm vé cần xóa dựa trên seatID
             String seatID = request.getParameter("seatID");
             int removeIndex = -1;
             for (int i = 0; i < cartItems.size(); i++) {
                 CartItem item = cartItems.get(i);
-                String currentSeatID = item.getTrip().getTripID() + "_" + item.getTrainName() + "_"
-                        + item.getDepartureDate() + "_" + item.getCarriageNumber() + "_" + item.getSeatNumber();
+                String currentSeatID = item.getTrip().getTripID() + "_"
+                        + item.getTrainName() + "_"
+                        + item.getDepartureDate() + "_"
+                        + item.getCarriageNumber() + "_"
+                        + item.getSeatNumber();
                 if (currentSeatID.equals(seatID)) {
                     removeIndex = i;
                     break;
                 }
             }
-            // ... (phần cập nhật fullNameList, typeList, idNumberList và mảng confirmedDOB sau khi xóa vé)
+
+            // Xóa vé và cập nhật list
             if (removeIndex != -1) {
                 cartItems.remove(removeIndex);
                 List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
                 List<String> typeList = (List<String>) session.getAttribute("typeList");
                 List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
+                List<String> birthDayList = (List<String>) session.getAttribute("birthDayList");
+                List<String> birthMonthList = (List<String>) session.getAttribute("birthMonthList");
+                List<String> birthYearList = (List<String>) session.getAttribute("birthYearList");
                 if (removeIndex < fullNameList.size()) {
                     fullNameList.remove(removeIndex);
                 }
@@ -225,10 +218,21 @@ public class PassengerInfoServlet extends HttpServlet {
                 if (removeIndex < idNumberList.size()) {
                     idNumberList.remove(removeIndex);
                 }
+                if (removeIndex < birthDayList.size()) {
+                    birthDayList.remove(removeIndex);
+                }
+                if (removeIndex < birthMonthList.size()) {
+                    birthMonthList.remove(removeIndex);
+                }
+                if (removeIndex < birthYearList.size()) {
+                    birthYearList.remove(removeIndex);
+                }
                 session.setAttribute("fullNameList", fullNameList);
                 session.setAttribute("typeList", typeList);
                 session.setAttribute("idNumberList", idNumberList);
-
+                session.setAttribute("birthDayList", birthDayList);
+                session.setAttribute("birthMonthList", birthMonthList);
+                session.setAttribute("birthYearList", birthYearList);
                 // Cập nhật mảng confirmedDOB
                 boolean[] confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
                 if (confirmedDOB != null && confirmedDOB.length > removeIndex) {
@@ -242,7 +246,7 @@ public class PassengerInfoServlet extends HttpServlet {
                     session.setAttribute("confirmedDOB", newConfirmedDOB);
                 }
 
-                // Chèn đoạn cập nhật readonly cho các vé "Trẻ em"
+                // Đánh dấu lại confirmedDOB cho trẻ em
                 typeList = (List<String>) session.getAttribute("typeList");
                 confirmedDOB = (boolean[]) session.getAttribute("confirmedDOB");
                 for (int i = 0; i < cartItems.size(); i++) {
@@ -253,9 +257,10 @@ public class PassengerInfoServlet extends HttpServlet {
                 session.setAttribute("confirmedDOB", confirmedDOB);
             }
 
-            // Nếu giỏ hàng trống, chuyển hướng về previousURL
+            // Nếu giỏ hàng trống => quay về previousURL
             if (cartItems.isEmpty()) {
                 if ("true".equals(renderPartial)) {
+                    // AJAX => trả về EMPTY
                     response.setContentType("text/plain");
                     String finalURL = (previousURL != null && !previousURL.isEmpty())
                             ? previousURL : "schedule";
@@ -267,18 +272,15 @@ public class PassengerInfoServlet extends HttpServlet {
                 }
             }
 
+            // Giỏ vẫn còn => forward lại passengerInfo.jsp
             if ("true".equals(renderPartial)) {
                 request.setAttribute("partialMode", true);
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
-            } else {
-                request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
             }
+            request.getRequestDispatcher("passengerInfo.jsp").forward(request, response);
             return;
         }
 
-        //==================================================
         // 2.5) AJAX confirmDOB
-        //==================================================
         if ("confirmedDOBMap".equals(action)) {
             String indexStr = request.getParameter("index");
             String dob = request.getParameter("dob");
@@ -303,14 +305,14 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
-        //==================================================
         // 3) Xử lý bấm "Tiếp tục" => chuyển sang confirm.jsp
-        //==================================================
         List<CartItem> cartItems2 = (List<CartItem>) session.getAttribute("cartItems");
         if (cartItems2 == null || cartItems2.isEmpty()) {
             response.sendRedirect(previousURL != null ? previousURL : "schedule");
             return;
         }
+
+        // Số vé
         int passengerCount;
         try {
             passengerCount = Integer.parseInt(request.getParameter("passengerCount"));
@@ -324,18 +326,23 @@ public class PassengerInfoServlet extends HttpServlet {
         List<String> idNumberListFinal = new ArrayList<>();
         List<String> typeListFinal = new ArrayList<>();
         List<Double> finalPriceList = new ArrayList<>();
-
-        // Dùng TicketDAO cho kiểm tra vé
+        List<String> birthDayListFinal = new ArrayList<>();
+        List<String> birthMonthListFinal = new ArrayList<>();
+        List<String> birthYearListFinal = new ArrayList<>();
+        // Các Set kiểm tra trùng CCCD
         TicketDAO ticketDAO = new TicketDAO();
-        // Các Set kiểm tra trùng CCCD trong cùng chuyến đi/ về
         Set<String> cccdSetGo = new HashSet<>();
         Set<String> cccdSetReturn = new HashSet<>();
 
+        // ================= Vòng lặp đọc thông tin vé =================
         for (int i = 0; i < passengerCount; i++) {
             String fullName = request.getParameter("fullName" + i);
             String passengerType = request.getParameter("passengerType" + i);
             String idNumber = request.getParameter("idNumber" + i);
             String tripIDStr = request.getParameter("tripID" + i);
+            String birthDayList = request.getParameter("birthDayList" + i);
+            String birthMonthList = request.getParameter("birthMonthList" + i);
+            String birthYearList = request.getParameter("birthYearList" + i);
             int tripID = 0;
             try {
                 tripID = Integer.parseInt(tripIDStr);
@@ -355,7 +362,7 @@ public class PassengerInfoServlet extends HttpServlet {
             String normalizedCCCD = normalizeString(idNumber);
             boolean needCCCDRegex = !"Trẻ em".equals(passengerType);
 
-            // Kiểm tra vé trùng theo TicketDAO
+            // Kiểm tra vé trùng (đã mua) theo CCCD
             if (ticketDAO.isTicketActiveByCCCD(idNumber, tripID)) {
                 sendError(request, response, "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
                 return;
@@ -376,6 +383,7 @@ public class PassengerInfoServlet extends HttpServlet {
                 }
             }
 
+            // Kiểm tra trùng CCCD trong cùng chuyến đi / về
             CartItem currentItem = cartItems2.get(i);
             boolean thisIsReturnTrip = currentItem.isReturnTrip();
             if (thisIsReturnTrip) {
@@ -392,6 +400,7 @@ public class PassengerInfoServlet extends HttpServlet {
                 cccdSetGo.add(idNumber);
             }
 
+            // Tính discount
             double discountRate = 0.0;
             if ("Trẻ em".equals(passengerType)) {
                 String dayStr = request.getParameter("birthDay" + i);
@@ -430,18 +439,23 @@ public class PassengerInfoServlet extends HttpServlet {
             }
 
             double discountAmount = basePrice * discountRate / 100.0;
-            double finalPrice = basePrice - discountAmount + 1000;
+            double finalPrice = basePrice - discountAmount + 1000; // +1000 phí bảo hiểm
             totalAmount += finalPrice;
             finalPriceList.add(finalPrice);
 
-            // Lưu dữ liệu tạm cho vé này
+            // Lưu dữ liệu tạm
             fullNameListFinal.add(fullName);
             idNumberListFinal.add(idNumber);
             typeListFinal.add(passengerType);
+            birthDayListFinal.add(birthDayList);
+            birthMonthListFinal.add(birthMonthList);
+            birthYearListFinal.add(birthYearList);
         }
 
+        // Lưu finalPriceList vào session (nếu cần hiển thị ở confirm)
         session.setAttribute("finalPriceList", finalPriceList);
 
+        // 4) Kiểm tra thông tin người đặt vé
         String bookingName = request.getParameter("bookingName");
         String bookingEmail = request.getParameter("bookingEmail");
         String bookingPhone = request.getParameter("bookingPhone");
@@ -466,6 +480,7 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
+        // 5) Lưu lại vào session
         session.setAttribute("bookingName", bookingName);
         session.setAttribute("bookingEmail", bookingEmail);
         session.setAttribute("bookingPhone", bookingPhone);
@@ -474,8 +489,12 @@ public class PassengerInfoServlet extends HttpServlet {
         session.setAttribute("fullNameList", fullNameListFinal);
         session.setAttribute("idNumberList", idNumberListFinal);
         session.setAttribute("typeList", typeListFinal);
+        session.setAttribute("birthDayList", birthDayListFinal);
+        session.setAttribute("birthMonthList", birthMonthListFinal);
+        session.setAttribute("birthYearList", birthYearListFinal);
         session.setAttribute("totalAmount", totalAmount);
 
+        // 6) Forward sang confirm.jsp
         request.setAttribute("cartItems", cartItems2);
         request.setAttribute("tripID", cartItems2.get(0).getTrip().getTripID());
         request.setAttribute("departureStationID", departureStationID);
@@ -486,14 +505,60 @@ public class PassengerInfoServlet extends HttpServlet {
 
         request.getRequestDispatcher("confirm.jsp").forward(request, response);
 
-        // Debug log
-        for (int i = 0; i < Math.min(passengerCount, cartItems2.size()); i++) {
-            System.out.println("fullName" + i + " = " + fullNameListFinal.get(i));
-            System.out.println("idNumber" + i + " = " + idNumberListFinal.get(i));
-        }
+        // Debug log (nếu cần)
+        // for (int i = 0; i < passengerCount; i++) {
+        //     System.out.println("fullName" + i + " = " + fullNameListFinal.get(i));
+        //     System.out.println("idNumber" + i + " = " + idNumberListFinal.get(i));
+        // }
     }
 
     //======================== Utility methods ========================//
+    // Đồng bộ danh sách string
+    private List<String> syncList(List<String> list, int newSize, String defaultValue) {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        if (list.size() < newSize) {
+            for (int i = list.size(); i < newSize; i++) {
+                list.add(defaultValue);
+            }
+        } else if (list.size() > newSize) {
+            list = list.subList(0, newSize);
+        }
+        return list;
+    }
+
+    // Đồng bộ mảng boolean
+    private boolean[] syncBooleanArray(boolean[] arr, int newSize) {
+        boolean[] newArr = new boolean[newSize];
+        if (arr != null) {
+            int min = Math.min(arr.length, newSize);
+            for (int i = 0; i < min; i++) {
+                newArr[i] = arr[i];
+            }
+        }
+        return newArr;
+    }
+
+    // Gửi lỗi và dừng xử lý
+    private void sendError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
+            throws IOException, ServletException {
+        HttpSession session = request.getSession();
+        String passengerinfoURL = (String) session.getAttribute("passengerinfoURL");
+        String renderPartial = request.getParameter("renderPartial");
+
+        if ("true".equals(renderPartial)) {
+            // Nếu là AJAX partial => trả về text
+            response.setContentType("text/plain");
+            response.getWriter().write("ERROR|" + passengerinfoURL + "|" + errorMessage);
+        } else {
+            // Nếu là form submit thường => lưu lỗi vào session và redirect
+            session.setAttribute("errorMessage", errorMessage);
+            response.sendRedirect(passengerinfoURL);
+        }
+    }
+
+    // Tính tuổi
     private int calculateAge(String dayStr, String monthStr, String yearStr) {
         try {
             int d = Integer.parseInt(dayStr);
@@ -511,6 +576,7 @@ public class PassengerInfoServlet extends HttpServlet {
         }
     }
 
+    // Chuẩn hóa chuỗi (loại bỏ dấu, chuyển thường, cắt khoảng trắng thừa)
     private String normalizeString(String input) {
         if (input == null) {
             return "";
@@ -520,7 +586,10 @@ public class PassengerInfoServlet extends HttpServlet {
             return "";
         }
         String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
-        return Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("").toLowerCase();
+        return Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+                .matcher(normalized)
+                .replaceAll("")
+                .toLowerCase();
     }
 
     @Override

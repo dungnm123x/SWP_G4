@@ -165,7 +165,7 @@
                 <div class="d-flex justify-content-between mt-4">
                     <!-- confirm.jsp -->
                     <c:url var="reInputURL" value="passengerinfo">
-                        <c:param name="tripID" value="${param.tripID}" />
+                        <c:param name="tripID" value="${tripID}" />
                         <c:param name="departureStationID" value="${param.departureStationID}" />
                         <c:param name="arrivalStationID" value="${param.arrivalStationID}" />
                         <c:param name="departureDay" value="${param.departureDay}" />

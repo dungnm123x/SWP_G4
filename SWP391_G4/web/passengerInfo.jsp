@@ -159,21 +159,34 @@
                     <div class="modal-content">
                         <h5>Nhập ngày tháng năm sinh</h5>
                         <div class="mb-2">
-                            <select id="birthDay${status.index}">
-                                <c:forEach var="i" begin="1" end="31">
-                                    <option value="${i}">${i}</option>
+                            <select id="birthDay${status.index}" 
+                                    name="birthDay${status.index}">
+                                <c:forEach var="d" begin="1" end="31">
+                                    <option value="${d}">
+                                        ${d}
+                                    </option>
                                 </c:forEach>
                             </select>
-                            <select id="birthMonth${status.index}">
-                                <c:forEach var="i" begin="1" end="12">
-                                    <option value="${i}">${i}</option>
+
+                            <select id="birthMonth${status.index}" 
+                                    name="birthMonth${status.index}">
+                                <c:forEach var="m" begin="1" end="12">
+                                    <option value="${m}">
+                                        ${m}
+                                    </option>
                                 </c:forEach>
                             </select>
-                            <select id="birthYear${status.index}">
-                                <c:forEach var="i" begin="1920" end="2025">
-                                    <option value="${i}">${i}</option>
+
+                            <select id="birthYear${status.index}" 
+                                    name="birthYear${status.index}">
+                                <c:forEach var="y" begin="1920" end="2025">
+                                    <option value="${y}">
+                                        ${y}
+                                    </option>
                                 </c:forEach>
                             </select>
+
+
                         </div>
                         <div>
                             <button type="button" 
@@ -225,23 +238,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Modal: Trẻ em đi 1 mình phải có vé người lớn -->
-                <div id="childAloneModal" class="modal">
-                    <div class="modal-content">
-                        <h5>Trẻ em đi 1 mình</h5>
-                        <p>Theo quy định, trẻ em không được đi 1 mình. Vui lòng nhập mã vé người lớn đi kèm.</p>
-                        <input type="text" id="adultTicketCodeInput" class="form-control"
-                               placeholder="Nhập mã vé người lớn" />
-                        <div class="mt-3">
-                            <button type="button" onclick="closeModal('childAloneModal')" class="btn btn-secondary">
-                                Hủy
-                            </button>
-                            <button type="button" onclick="confirmChildAlone()" class="btn btn-primary">
-                                Xác nhận
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
 
             </c:forEach>
         </tbody>
@@ -296,11 +293,13 @@
             <h3 class="text-primary mb-3">📋 Nhập thông tin hành khách</h3>
 
             <!-- Hiển thị thông báo lỗi nếu có -->
-            <c:if test="${not empty errorMessage}">
+            <c:if test="${not empty sessionScope.errorMessage}">
                 <div class="alert alert-danger">
-                    ${errorMessage}
+                    ${sessionScope.errorMessage}
                 </div>
+                <c:remove var="errorMessage" scope="session"/>
             </c:if>
+
 
             <!-- FORM submit sang Servlet -->
             <form method="post" action="passengerinfo">
@@ -454,21 +453,35 @@
                                 <div class="modal-content">
                                     <h5>Nhập ngày tháng năm sinh</h5>
                                     <div class="mb-2">
-                                        <select id="birthDay${status.index}" name="birthDay${status.index}">
-                                            <c:forEach var="i" begin="1" end="31">
-                                                <option value="${i}">${i}</option>
+                                        <!-- Ô chọn ngày sinh -->
+                                        <select id="birthDay${status.index}" 
+                                                name="birthDay${status.index}">
+                                            <c:forEach var="d" begin="1" end="31">
+                                                <option value="${d}">
+                                                    ${d}
+                                                </option>
                                             </c:forEach>
                                         </select>
-                                        <select id="birthMonth${status.index}" name="birthMonth${status.index}">
-                                            <c:forEach var="i" begin="1" end="12">
-                                                <option value="${i}">${i}</option>
+
+                                        <select id="birthMonth${status.index}" 
+                                                name="birthMonth${status.index}">
+                                            <c:forEach var="m" begin="1" end="12">
+                                                <option value="${m}">
+                                                    ${m}
+                                                </option>
                                             </c:forEach>
                                         </select>
-                                        <select id="birthYear${status.index}" name="birthYear${status.index}">
-                                            <c:forEach var="i" begin="1920" end="2025">
-                                                <option value="${i}">${i}</option>
+
+                                        <select id="birthYear${status.index}" 
+                                                name="birthYear${status.index}">
+                                            <c:forEach var="y" begin="1920" end="2025">
+                                                <option value="${y}">
+                                                    ${y}
+                                                </option>
                                             </c:forEach>
                                         </select>
+
+
                                     </div>
                                     <div>
                                         <button type="button" 
@@ -520,25 +533,7 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Modal: Trẻ em đi 1 mình phải có vé người lớn -->
-                            <div id="childAloneModal" class="modal">
-                                <div class="modal-content">
-                                    <h5>Trẻ em đi 1 mình</h5>
-                                    <p>Theo quy định, trẻ em không được đi 1 mình. Vui lòng nhập mã vé người lớn đi kèm.</p>
-                                    <input type="text" id="adultTicketCodeInput" class="form-control"
-                                           placeholder="Nhập mã vé người lớn" />
-                                    <div class="mt-3">
-                                        <button type="button" onclick="closeModal('childAloneModal')" class="btn btn-secondary">
-                                            Hủy
-                                        </button>
-                                        <button type="button" onclick="confirmChildAlone()" class="btn btn-primary">
-                                            Xác nhận
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
+                            </div>                           
                         </c:forEach>
                         </tbody>
                     </table>
@@ -621,9 +616,6 @@
 
                 reapplyDiscount(); // Gọi cho tất cả các hàng => updateDiscountNoModal()
                 updateTotalAmount();
-                checkIfSingleChildTicket();
-
-
             </script>
         </body>
     </html>
