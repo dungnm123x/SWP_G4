@@ -128,18 +128,19 @@ public class TicketDAO extends DBContext {
     }
 
     public int insertTicket(Ticket ticket) throws SQLException {
-        String sql = "INSERT INTO Ticket (PassengerName,CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Ticket (PassengerName,passengerType,CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?,?)";
 
         // Tạo PreparedStatement có yêu cầu trả về khóa tự sinh
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, ticket.getPassengerName());
-            ps.setString(2, ticket.getCccd());
-            ps.setInt(3, ticket.getBookingID());
-            ps.setInt(4, ticket.getSeatID());
-            ps.setInt(5, ticket.getTripID());
-            ps.setDouble(6, ticket.getTicketPrice());
-            ps.setString(7, ticket.getTicketStatus());
+            ps.setString(2, ticket.getPassengerType());
+            ps.setString(3, ticket.getCccd());
+            ps.setInt(4, ticket.getBookingID());
+            ps.setInt(5, ticket.getSeatID());
+            ps.setInt(6, ticket.getTripID());
+            ps.setDouble(7, ticket.getTicketPrice());
+            ps.setString(8, ticket.getTicketStatus());
 
             ps.executeUpdate(); // Thực thi INSERT
 
@@ -292,6 +293,7 @@ public class TicketDAO extends DBContext {
                     tickets.add(new Ticket(
                             rs.getInt("TicketID"),
                             rs.getString("PassengerName"),
+                            rs.getString("passengerType"),
                             rs.getString("CCCD"),
                             rs.getInt("BookingID"),
                             rs.getInt("SeatID"),
