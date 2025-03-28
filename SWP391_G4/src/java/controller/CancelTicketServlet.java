@@ -66,7 +66,7 @@ public class CancelTicketServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
@@ -74,19 +74,53 @@ public class CancelTicketServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        TicketDAO ticketDAO = new TicketDAO();
 
-        // Lấy danh sách vé chưa sử dụng (Unused)
-        List<RailwayDTO> tickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
-        List<RailwayDTO> availableTickets = new ArrayList<>();
-        
-        for (RailwayDTO ticket : tickets) {
-            if ("Unused".equals(ticket.getTicketStatus())) {
-                availableTickets.add(ticket);
+        // Lấy danh sách vé từ session (nếu đã có)
+        List<RailwayDTO> availableTickets = (List<RailwayDTO>) session.getAttribute("availableTickets");
+
+        if (availableTickets == null) {
+            // Nếu danh sách chưa có trong session, truy vấn từ CSDL và lưu vào session
+            TicketDAO ticketDAO = new TicketDAO();
+            List<RailwayDTO> tickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
+            availableTickets = new ArrayList<>();
+
+            for (RailwayDTO ticket : tickets) {
+                if ("Unused".equals(ticket.getTicketStatus())) {
+                    availableTickets.add(ticket);
+                }
             }
+
+            // Lưu vào session để không cần truy vấn lại
+            session.setAttribute("availableTickets", availableTickets);
         }
 
-        request.setAttribute("tickets", availableTickets);
+        // Xử lý phân trang
+        int page = 1;
+        int recordsPerPage = 5; // Số vé hiển thị trên mỗi trang
+        String pageParam = request.getParameter("page");
+
+        if (pageParam != null) {
+            page = Integer.parseInt(pageParam);
+        }
+
+        int start = (page - 1) * recordsPerPage;
+        int end = Math.min(start + recordsPerPage, availableTickets.size());
+        List<RailwayDTO> paginatedTickets = availableTickets.subList(start, end);
+
+        // Tổng số trang
+        int totalPages = (int) Math.ceil((double) availableTickets.size() / recordsPerPage);
+        String filterTicketID = request.getParameter("filterTicketID");
+
+// Kiểm tra nếu filterTicketID không phải số thì đặt về null
+        if (filterTicketID != null && !filterTicketID.matches("\\d+")) {
+            filterTicketID = null;
+            request.setAttribute("error", "Mã vé chỉ được chứa số!");
+        }
+
+        request.setAttribute("filterTicketID", filterTicketID);
+        request.setAttribute("tickets", paginatedTickets);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("cancelTicket.jsp").forward(request, response);
     }
 
@@ -101,80 +135,102 @@ public class CancelTicketServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);
 
-    if (session == null || session.getAttribute("user") == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-    User user = (User) session.getAttribute("user");
-    String[] selectedTicketIDs = request.getParameterValues("selectedTickets");
+        User user = (User) session.getAttribute("user");
+        String[] selectedTicketIDs = request.getParameterValues("selectedTickets");
 
-    // Kiểm tra nếu không có vé nào được chọn
-    if (selectedTicketIDs == null || selectedTicketIDs.length == 0) {
-        request.setAttribute("error", "Vui lòng chọn ít nhất một vé để hủy.");
-        
-        // Lấy lại danh sách vé chưa sử dụng
         TicketDAO ticketDAO = new TicketDAO();
         List<RailwayDTO> allTickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
         List<RailwayDTO> availableTickets = new ArrayList<>();
-        
-        // Lọc danh sách vé chưa sử dụng
+
+        // Lọc vé chưa sử dụng
         for (RailwayDTO ticket : allTickets) {
             if ("Unused".equals(ticket.getTicketStatus())) {
                 availableTickets.add(ticket);
             }
         }
 
-        request.setAttribute("tickets", availableTickets);
-        request.getRequestDispatcher("cancelTicket.jsp").forward(request, response);
-        return;
-    }
+        if (selectedTicketIDs == null || selectedTicketIDs.length == 0) {
+            request.setAttribute("error", "Vui lòng chọn ít nhất một vé để hủy.");
+            restorePagination(request, response, availableTickets); // Gọi hàm khôi phục phân trang
+            return;
+        }
 
-    TicketDAO ticketDAO = new TicketDAO();
-    List<RailwayDTO> allTickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
-    List<RailwayDTO> cancelableTickets = new ArrayList<>();
-    List<String> invalidTickets = new ArrayList<>();
-    LocalDateTime now = LocalDateTime.now();
+        List<RailwayDTO> cancelableTickets = new ArrayList<>();
+        List<String> invalidTickets = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
 
-    for (String ticketID : selectedTicketIDs) {
-        for (RailwayDTO ticket : allTickets) {
-            if (ticket.getTicketID() == Integer.parseInt(ticketID)) {
-                LocalDateTime departureTime = ticket.getDepartureTime().toLocalDateTime();
-                Duration duration = Duration.between(now, departureTime);
+        for (String ticketID : selectedTicketIDs) {
+            for (RailwayDTO ticket : allTickets) {
+                if (ticket.getTicketID() == Integer.parseInt(ticketID)) {
+                    LocalDateTime departureTime = ticket.getDepartureTime().toLocalDateTime();
+                    Duration duration = Duration.between(now, departureTime);
 
-                if (now.isAfter(departureTime)) {
-                    invalidTickets.add("Vé " + ticketID + " đã quá hạn để hủy.");
-                } else if (duration.toHours() < 12) {
-                    invalidTickets.add("Vé " + ticketID + " không thể hủy vì còn dưới 12 tiếng trước khi khởi hành.");
-                } else {
-                    cancelableTickets.add(ticket);
+                    if (now.isAfter(departureTime)) {
+                        invalidTickets.add("Vé " + ticketID + " đã quá hạn để hủy.");
+                    } else if (duration.toHours() < 12) {
+                        invalidTickets.add("Vé " + ticketID + " không thể hủy vì còn dưới 12 tiếng trước khi khởi hành.");
+                    } else {
+                        cancelableTickets.add(ticket);
+                    }
+                    break;
                 }
-                break;
             }
         }
+
+        if (!invalidTickets.isEmpty()) {
+            request.setAttribute("error", String.join("<br>", invalidTickets));
+            restorePagination(request, response, availableTickets); // Giữ nguyên phân trang khi có lỗi
+            return;
+        }
+
+        // Lưu danh sách vé đang chờ hủy vào session
+        session.setAttribute("pendingCancelTickets", cancelableTickets);
+        response.sendRedirect("confirm-cancel");
     }
 
-    if (!invalidTickets.isEmpty()) {
-        request.setAttribute("error", String.join("<br>", invalidTickets));
-        
-        // Lấy lại danh sách vé chưa sử dụng
-        List<RailwayDTO> availableTickets = new ArrayList<>();
-        for (RailwayDTO ticket : allTickets) {
-            if ("Unused".equals(ticket.getTicketStatus())) {
-                availableTickets.add(ticket);
-            }
+    private void restorePagination(HttpServletRequest request, HttpServletResponse response, List<RailwayDTO> allTickets)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
         }
 
-        request.setAttribute("tickets", availableTickets);
+        int page = 1;
+        int recordsPerPage = 5; // Số vé hiển thị mỗi trang
+        String pageParam = request.getParameter("page");
+
+        if (pageParam != null) {
+            page = Integer.parseInt(pageParam);
+        }
+
+        int start = (page - 1) * recordsPerPage;
+        int end = Math.min(start + recordsPerPage, allTickets.size());
+        List<RailwayDTO> paginatedTickets = allTickets.subList(start, end);
+
+        int totalPages = (int) Math.ceil((double) allTickets.size() / recordsPerPage);
+        String filterTicketID = request.getParameter("filterTicketID");
+
+// Kiểm tra nếu filterTicketID không phải số thì đặt về null
+        if (filterTicketID != null && !filterTicketID.matches("\\d+")) {
+            filterTicketID = null;
+            request.setAttribute("error", "Mã vé chỉ được chứa số!");
+        }
+
+        request.setAttribute("filterTicketID", filterTicketID);
+        request.setAttribute("tickets", paginatedTickets);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         request.getRequestDispatcher("cancelTicket.jsp").forward(request, response);
-        return;
-    }
-
-    // Lưu danh sách vé đang chờ hủy vào session
-    session.setAttribute("pendingCancelTickets", cancelableTickets);
-    response.sendRedirect("confirm-cancel");
     }
 
     /**

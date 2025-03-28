@@ -121,7 +121,7 @@
                         <th>Tên khách hàng</th>
                         <th>SĐT</th>
                         <th>Email</th>
-                        <th>Tàu</th>
+                        <th>Vé</th>
                         <th>Tuyến</th>
                         <th>Tổng tiền</th>
                         <th>Ngày mua</th>
@@ -139,7 +139,7 @@
                                     <td rowspan="${fn:length(booking.tickets)}">${booking.customerEmail}</td>
                                 </c:if>
 
-                                <td>${ticket.trainName}</td>
+                                <td>${ticket.ticketID}</td>
                                 <td>${ticket.routeName}</td>
                                 <c:if test="${loop.first}">
                                     <td rowspan="${fn:length(booking.tickets)}"><fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="VND" /></td>                                 
