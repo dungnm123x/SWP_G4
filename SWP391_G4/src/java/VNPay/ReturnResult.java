@@ -188,7 +188,7 @@ public class ReturnResult extends HttpServlet {
             List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
             List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
             List<String> typeList = (List<String>) session.getAttribute("typeList");
-            if (idNumberList == null || fullNameList == null || typeList == null || idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size()) {
+            if (idNumberList == null || fullNameList == null || typeList == null || idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size() || typeList.size() != cartItems.size()) {
                 request.setAttribute("error", "Không khớp số lượng tên/CCCD với số vé trong giỏ!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
