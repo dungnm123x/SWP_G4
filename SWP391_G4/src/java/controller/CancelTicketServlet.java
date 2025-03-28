@@ -110,9 +110,7 @@ public class CancelTicketServlet extends HttpServlet {
         // Tổng số trang
         int totalPages = (int) Math.ceil((double) availableTickets.size() / recordsPerPage);
         String filterTicketID = request.getParameter("filterTicketID");
-
-// Kiểm tra nếu filterTicketID không phải số thì đặt về null
-        if (filterTicketID != null && !filterTicketID.matches("\\d+")) {
+        if (filterTicketID != null && !filterTicketID.isEmpty() && !filterTicketID.matches("\\d+")) {
             filterTicketID = null;
             request.setAttribute("error", "Mã vé chỉ được chứa số!");
         }

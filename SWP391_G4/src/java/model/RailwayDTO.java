@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class RailwayDTO {
     private int ticketID;
     private String cccd;
+    private String passengerType;
     private String route;
     private String trainCode;
     private Timestamp departureTime;
@@ -15,11 +16,12 @@ public class RailwayDTO {
     private String tripType; // ✅ Thêm trường này
     private String passengerName;
 
-    public RailwayDTO(int ticketID,String passengerName, String cccd, String route, String trainCode, Timestamp departureTime,
+    public RailwayDTO(int ticketID,String passengerName, String cccd,String passengerType, String route, String trainCode, Timestamp departureTime,
                       int carriageNumber, int seatNumber, double ticketPrice, String ticketStatus, String tripType) {
         this.ticketID = ticketID;
         this.passengerName=passengerName;
         this.cccd = cccd;
+        this.passengerType=passengerType;
         this.route = route;
         this.trainCode = trainCode;
         this.departureTime = departureTime;
@@ -33,6 +35,7 @@ public class RailwayDTO {
     public int getTicketID() { return ticketID; }
     public String getPassengerName(){return passengerName;};
     public String getCccd() { return cccd; }
+    public String getPassengerType(){return passengerType;};
     public String getRoute() { return route; }
     public String getTrainCode() { return trainCode; }
     public Timestamp getDepartureTime() { return departureTime; }

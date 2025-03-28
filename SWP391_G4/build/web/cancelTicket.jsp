@@ -73,6 +73,7 @@
                                 <th>Chọn</th>
                                 <th>Mã vé</th>
                                 <th>Tên</th>
+                                <th>Đối Tượng</th>
                                 <th>CCCD</th>
                                 <th>Hành trình</th>
                                 <th>Tàu</th>
@@ -93,6 +94,7 @@
                                                     <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
                                                     <td>${ticket.ticketID}</td>
                                                     <td>${ticket.passengerName}</td>
+                                                    <td>${ticket.passengerType}</td>
                                                     <td>${ticket.cccd}</td>
                                                     <td>${ticket.route}</td>
                                                     <td>${ticket.trainCode}</td>

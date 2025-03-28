@@ -239,7 +239,7 @@ public class TicketDAO extends DBContext {
 
     public List<RailwayDTO> getDetailedTicketsByUserID(int userID) {
         List<RailwayDTO> tickets = new ArrayList<>();
-        String sql = "SELECT t.TicketID,t.PassengerName, t.CCCD, s.SeatNumber, c.CarriageNumber, "
+        String sql = "SELECT t.TicketID,t.PassengerName, t.CCCD,t.PassengerType, s.SeatNumber, c.CarriageNumber, "
                 + "st1.StationName AS DepartureStation, st2.StationName AS ArrivalStation, "
                 + "tr.DepartureTime, tr.TrainID, trn.TrainName, t.TicketPrice, t.TicketStatus, "
                 + "CASE "
@@ -265,6 +265,7 @@ public class TicketDAO extends DBContext {
                             rs.getInt("TicketID"),
                             rs.getString("PassengerName"),
                             rs.getString("CCCD"),
+                            rs.getString("PassengerType"),
                             rs.getString("DepartureStation") + " → " + rs.getString("ArrivalStation"),
                             rs.getString("TrainName"), // Hiển thị tên tàu
                             rs.getTimestamp("DepartureTime"),
