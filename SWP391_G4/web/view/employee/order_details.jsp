@@ -302,6 +302,7 @@
                                     <th>Ghế</th>
                                     <th>Loại toa</th>
                                     <th>Tên KH</th>
+                                    <th>Đối Tượng</th>
                                     <th>CCCD</th>
                                     <th>Giá vé</th>
                                     <th>Tình trạng</th>
@@ -319,6 +320,7 @@
                                         <td>${ticket.seatNumber}</td>
                                         <td>${ticket.carriageType}</td>
                                         <td>${ticket.passengerName}</td>
+                                        <td>${ticket.passengerType}</td>
                                         <td>${ticket.cccd}</td>
                                         <td><fmt:formatNumber value="${ticket.ticketPrice}" type="currency" currencySymbol="VND" /></td>
                                         <td>${ticket.ticketStatus}</td>
