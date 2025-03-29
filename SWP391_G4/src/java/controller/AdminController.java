@@ -91,7 +91,6 @@ public class AdminController extends HttpServlet {
                 request.getRequestDispatcher("view/adm/admin.jsp").forward(request, response);
                 return;
             } else if ("calendar".equals(view)) {
-                // Handle the calendar view
                 List<CalendarEvent> events = dao.getAllCalendarEvents();
                 request.setAttribute("calendarEvents", events);
                 request.setAttribute("type", "calendar");
@@ -211,7 +210,11 @@ public class AdminController extends HttpServlet {
             throw new ServletException(e);
         }
     }
-
+    private void handleCalendarEventError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
+            throws ServletException, IOException {
+        request.getSession().setAttribute("message11", errorMessage);
+        response.sendRedirect("admin?view=calendar");
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -219,81 +222,76 @@ public class AdminController extends HttpServlet {
         String action = request.getParameter("action");
         User user = (User) request.getSession().getAttribute("user");
 
-        if ("addCalendarEvent".equals(action)) {
+        if ("addCalendarEvent".equals(action) || "updateCalendarEvent".equals(action)) {
             try {
-                // Retrieve form data
+                int eventId = 0;
+                if ("updateCalendarEvent".equals(action)) {
+                    eventId = Integer.parseInt(request.getParameter("eventId"));
+                }
                 String title = request.getParameter("title");
                 String startDateStr = request.getParameter("startDate");
                 String endDateStr = request.getParameter("endDate");
                 boolean allDay = "on".equals(request.getParameter("allDay"));
                 String description = request.getParameter("description");
 
-                // Validation 1: Check if title is empty or too long
+                // Validation 1: Title
                 if (title == null || title.trim().isEmpty()) {
-                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được để trống!");
-                    response.sendRedirect("admin?view=calendar");
+                    handleCalendarEventError(request, response, "❌ Tiêu đề không được để trống!");
                     return;
                 }
                 if (title.length() > 100) {
-                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được dài quá 100 ký tự!");
-                    response.sendRedirect("admin?view=calendar");
+                    handleCalendarEventError(request, response, "❌ Tiêu đề không được dài quá 100 ký tự!");
                     return;
                 }
 
-                // Validation 2: Check if description is too long
+                // Validation 2: Description
                 if (description != null && description.length() > 500) {
-                    request.getSession().setAttribute("message2", "❌ Mô tả không được dài quá 500 ký tự!");
-                    response.sendRedirect("admin?view=calendar");
+                    handleCalendarEventError(request, response, "❌ Mô tả không được dài quá 500 ký tự!");
                     return;
                 }
 
-                // Validation 3: Parse and validate dates
+                // Validation 3: Date Format
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                dateFormat.setLenient(false); // Ensure strict date parsing
-                Date startDate;
+                dateFormat.setLenient(false);
+                Date startDate = null;
                 Date endDate = null;
 
-                // Parse start date
-                if (startDateStr == null || startDateStr.isEmpty()) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được để trống!");
-                    response.sendRedirect("admin?view=calendar");
+                // Parse Start Date
+                if (startDateStr == null || startDateStr.trim().isEmpty()) {
+                    handleCalendarEventError(request, response, "❌ Ngày bắt đầu không được để trống!");
                     return;
                 }
                 try {
                     startDate = dateFormat.parse(startDateStr);
                 } catch (Exception e) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không hợp lệ!");
-                    response.sendRedirect("admin?view=calendar");
+                    handleCalendarEventError(request, response, "❌ Ngày bắt đầu không hợp lệ (yyyy-MM-ddTHH:mm)!");
                     return;
                 }
 
-                // Parse end date (if provided)
-                if (endDateStr != null && !endDateStr.isEmpty()) {
+                // Parse End Date (Optional)
+                if (endDateStr != null && !endDateStr.trim().isEmpty()) {
                     try {
                         endDate = dateFormat.parse(endDateStr);
                     } catch (Exception e) {
-                        request.getSession().setAttribute("message2", "❌ Ngày kết thúc không hợp lệ!");
-                        response.sendRedirect("admin?view=calendar");
+                        handleCalendarEventError(request, response, "❌ Ngày kết thúc không hợp lệ (yyyy-MM-ddTHH:mm)!");
+                        return;
+                    }
+
+                    // Validation 4: Start Date vs. End Date
+                    if (endDate != null && startDate.after(endDate)) {
+                        handleCalendarEventError(request, response, "❌ Ngày bắt đầu phải trước ngày kết thúc!");
                         return;
                     }
                 }
 
-                // Validation 4: Start date must be before end date (if end date is provided)
-                if (endDate != null && startDate.after(endDate)) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu phải trước ngày kết thúc!");
-                    response.sendRedirect("admin?view=calendar");
+                // Validation 5: Start Date in the Past (Optional, but Recommended)
+                Date now = new Date();
+                if (startDate.before(now) && !allDay) {
+                    handleCalendarEventError(request, response, "❌ Ngày bắt đầu không được là thời điểm trong quá khứ!");
                     return;
                 }
 
-                // Validation 5: Start date should not be in the past (optional)
-                Date currentDate = new Date();
-                if (startDate.before(currentDate)) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được là ngày trong quá khứ!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-
-                // If all validations pass, create the event
+                // If all validations pass, create or update the event
                 CalendarEvent event = new CalendarEvent();
                 event.setUserID(user.getUserId());
                 event.setTitle(title);
@@ -302,134 +300,41 @@ public class AdminController extends HttpServlet {
                 event.setAllDay(allDay);
                 event.setDescription(description);
 
-                boolean success = dao.addCalendarEvent(event);
-                if (success) {
-                    request.getSession().setAttribute("message2", "✅ Thêm sự kiện thành công!");
+                boolean success;
+                if ("addCalendarEvent".equals(action)) {
+                    success = dao.addCalendarEvent(event);
                 } else {
-                    request.getSession().setAttribute("message2", "❌ Thêm sự kiện thất bại!");
+                    event.setEventID(eventId);
+                    success = dao.updateCalendarEvent(event);
+                }
+
+                if (success) {
+                    request.getSession().setAttribute("message2", "✅ " + ("addCalendarEvent".equals(action) ? "Thêm" : "Cập nhật") + " sự kiện thành công!");
+                } else {
+                    request.getSession().setAttribute("message2", "❌ " + ("addCalendarEvent".equals(action) ? "Thêm" : "Cập nhật") + " sự kiện thất bại!");
                 }
                 response.sendRedirect("admin?view=calendar");
-                return;
+
             } catch (Exception e) {
                 e.printStackTrace();
-                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
-                response.sendRedirect("admin?view=calendar");
-                return;
-            }
-        } else if ("updateCalendarEvent".equals(action)) {
-            try {
-                int eventId = Integer.parseInt(request.getParameter("eventId"));
-                String title = request.getParameter("title");
-                String startDateStr = request.getParameter("startDate");
-                String endDateStr = request.getParameter("endDate");
-                boolean allDay = "on".equals(request.getParameter("allDay"));
-                String description = request.getParameter("description");
-
-                // Validation 1: Check if title is empty or too long
-                if (title == null || title.trim().isEmpty()) {
-                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được để trống!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-                if (title.length() > 100) {
-                    request.getSession().setAttribute("message2", "❌ Tiêu đề không được dài quá 100 ký tự!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-
-                // Validation 2: Check if description is too long
-                if (description != null && description.length() > 500) {
-                    request.getSession().setAttribute("message2", "❌ Mô tả không được dài quá 500 ký tự!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-
-                // Validation 3: Parse and validate dates
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                dateFormat.setLenient(false); // Ensure strict date parsing
-                Date startDate;
-                Date endDate = null;
-
-                // Parse start date
-                if (startDateStr == null || startDateStr.isEmpty()) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được để trống!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-                try {
-                    startDate = dateFormat.parse(startDateStr);
-                } catch (Exception e) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không hợp lệ!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-
-                // Parse end date (if provided)
-                if (endDateStr != null && !endDateStr.isEmpty()) {
-                    try {
-                        endDate = dateFormat.parse(endDateStr);
-                    } catch (Exception e) {
-                        request.getSession().setAttribute("message2", "❌ Ngày kết thúc không hợp lệ!");
-                        response.sendRedirect("admin?view=calendar");
-                        return;
-                    }
-                }
-
-                // Validation 4: Start date must be before end date (if end date is provided)
-                if (endDate != null && startDate.after(endDate)) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu phải trước ngày kết thúc!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-
-                // Validation 5: Start date should not be in the past (optional)
-                Date currentDate = new Date();
-                if (startDate.before(currentDate)) {
-                    request.getSession().setAttribute("message2", "❌ Ngày bắt đầu không được là ngày trong quá khứ!");
-                    response.sendRedirect("admin?view=calendar");
-                    return;
-                }
-
-                // If all validations pass, update the event
-                CalendarEvent event = new CalendarEvent();
-                event.setEventID(eventId);
-                event.setUserID(user.getUserId());
-                event.setTitle(title);
-                event.setStartDate(startDate);
-                event.setEndDate(endDate);
-                event.setAllDay(allDay);
-                event.setDescription(description);
-
-                boolean success = dao.updateCalendarEvent(event);
-                if (success) {
-                    request.getSession().setAttribute("message2", "✅ Cập nhật sự kiện thành công!");
-                } else {
-                    request.getSession().setAttribute("message2", "❌ Cập nhật sự kiện thất bại!");
-                }
-                response.sendRedirect("admin?view=calendar");
-                return;
-            } catch (Exception e) {
-                e.printStackTrace();
-                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
-                response.sendRedirect("admin?view=calendar");
-                return;
+                handleCalendarEventError(request, response, "⚠️ Lỗi hệ thống: " + e.getMessage());
             }
         } else if ("deleteCalendarEvent".equals(action)) {
             try {
                 int eventId = Integer.parseInt(request.getParameter("eventId"));
+
                 boolean success = dao.deleteCalendarEvent(eventId);
+
                 if (success) {
                     request.getSession().setAttribute("message2", "✅ Xóa sự kiện thành công!");
                 } else {
                     request.getSession().setAttribute("message2", "❌ Xóa sự kiện thất bại!");
                 }
                 response.sendRedirect("admin?view=calendar");
-                return;
+
             } catch (Exception e) {
                 e.printStackTrace();
-                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
-                response.sendRedirect("admin?view=calendar");
-                return;
+                handleCalendarEventError(request, response, "⚠️ Lỗi hệ thống: " + e.getMessage());
             }
         } else if ("addEmployee".equals(action)) {
             try {

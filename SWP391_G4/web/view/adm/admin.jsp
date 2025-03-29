@@ -18,6 +18,42 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+
+        <script>
+            function validateSearchForm(form) {
+            const searchInput = form.search.value.trim(); // Get the search input value
+
+            if (searchInput.length === 0) {
+            alert("Vui lòng nhập từ khóa tìm kiếm.");
+            return false; // Prevent form submission
+            }
+
+            // Kiểm tra xem chuỗi có chỉ chứa khoảng trắng hay không
+            if (/^\s*$/.test(searchInput)) {
+            alert("Vui lòng nhập từ khóa tìm kiếm.");
+            return false;
+            }
+
+            if (searchInput.length < 2) { // Minimum length
+            alert("Từ khóa tìm kiếm phải có ít nhất 2 ký tự.");
+            return false;
+            }
+
+            if (searchInput.length > 50) { // Maximum length
+            alert("Từ khóa tìm kiếm không được dài quá 50 ký tự.");
+            return false;
+            }
+
+            // Kiểm tra ký tự cho phép
+            const regex = /^[a-zA-Z0-9\s\u00C0-\u1FFF]*$/; // Cho phép chữ cái, số, khoảng trắng, tiếng Việt
+            if (!regex.test(searchInput)) {
+            alert("Từ khóa tìm kiếm chỉ được chứa chữ cái, số, khoảng trắng và tiếng Việt.");
+            return false;
+            }
+
+            return true; // Cho phép gửi form
+            }
+        </script>
         <script>
             function submitRoleForm(userId) {
             document.getElementById('roleForm' + userId).submit();
@@ -107,41 +143,7 @@
             return true;
             }
         </script>
-        <script>
-            function validateSearchForm(form) {
-            const searchInput = form.search.value.trim(); // Get the search input value
 
-            if (searchInput.length === 0) {
-            alert("Vui lòng nhập từ khóa tìm kiếm.");
-            return false; // Prevent form submission
-            }
-
-            // Kiểm tra xem chuỗi có chỉ chứa khoảng trắng hay không
-            if (/^\s*$/.test(searchInput)) {
-            alert("Vui lòng nhập từ khóa tìm kiếm.");
-            return false;
-            }
-
-            if (searchInput.length < 2) { // Minimum length
-            alert("Từ khóa tìm kiếm phải có ít nhất 2 ký tự.");
-            return false;
-            }
-
-            if (searchInput.length > 50) { // Maximum length
-            alert("Từ khóa tìm kiếm không được dài quá 50 ký tự.");
-            return false;
-            }
-
-            // Kiểm tra ký tự cho phép
-            const regex = /^[a-zA-Z0-9\s\u00C0-\u1FFF]*$/; // Cho phép chữ cái, số, khoảng trắng, tiếng Việt
-            if (!regex.test(searchInput)) {
-            alert("Từ khóa tìm kiếm chỉ được chứa chữ cái, số, khoảng trắng và tiếng Việt.");
-            return false;
-            }
-
-            return true; // Cho phép gửi form
-            }
-        </script>
     </head>
     <body>
         <div class="container">
@@ -190,7 +192,7 @@
                                     <div class="dashboard-item routes" style="background-color: #DBE1E1">
                                         <h3>Thống kê tuyến tàu</h3>
                                         <p>Tổng số tuyến: ${tripStatistics}</p>
-                                        <br>
+                                        
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
                                             <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
@@ -549,6 +551,13 @@
                         </c:when>
                         <c:when test="${type == 'calendar'}">
                             <h2>Quản Lý Lịch</h2>
+                            <c:if test="${not empty sessionScope.message11}">
+                                <div class="alert alert-info">
+                                    ${sessionScope.message11}
+                                </div>
+                                <c:remove var="message11" scope="session"/>
+                                <%-- Use JSTL to remove the attribute --%>
+                            </c:if>
                             <div class="calendar-container">
                                 <!-- Form to add a new event -->
                                 <div class="calendar-form">
@@ -615,6 +624,11 @@
                                             <div class="input-group">
                                                 <label for="editDescription">Mô tả:</label>
                                                 <textarea id="editDescription" name="description" class="input-field textarea-field" rows="3"></textarea>
+
+                                            </div>
+                                            <div class="modal-footer-custom">
+                                                <button type="submit" class="btn-custom btn-primary-custom">Lưu</button>
+                                                <button type="button" class="btn-custom btn-danger-custom" id="deleteEventBtn">Xóa</button>
                                             </div>
                                         </form>
                                     </div>
@@ -744,18 +758,19 @@
                             <div class="search-container">
                                 <form method="get" action="admin">
                                     <input type="hidden" name="view" value="userauthorization">
-                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
+                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm..." value="${param.search}">
                                     <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
                                     <a href="admin?view=userauthorization" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
                                 </form>
                             </div>
                             <h2>Phân quyền người dùng</h2>
-                            <%-- Display message2 if it exists --%>
+                            <%-- Display message10 if it exists --%>
                             <c:if test="${not empty sessionScope.message10}">
                                 <div class="alert alert-info">
                                     ${sessionScope.message10}
                                 </div>
-                                <c:remove var="message10" scope="session" /> <%-- Use JSTL to remove the attribute --%>
+                                <c:remove var="message10" scope="session"/>
+                                <%-- Use JSTL to remove the attribute --%>
                             </c:if>
                             <table border="1">
                                 <thead>
@@ -769,33 +784,49 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="userItem" items="${list}" varStatus="status">
-                                        <tr>
-                                            <td>${status.index + 1}</td>
-                                            <td>${userItem.username}</td>
-                                            <td>${userItem.fullName}</td>
-                                            <td>${userItem.email}</td>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${userItem.roleID == 1}">Admin</c:when>
-                                                    <c:when test="${userItem.roleID == 2}">Employee</c:when>
-                                                    <c:when test="${userItem.roleID == 3}">Customer</c:when>
-                                                    <c:otherwise>Unknown</c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                            <td>
-                                                <form id="roleForm${userItem.userId}" method="post" action="admin">
-                                                    <input type="hidden" name="action" value="setUserRole">
-                                                    <input type="hidden" name="userId" value="${userItem.userId}">
-                                                    <select name="roleId" class="form-select" onchange="submitRoleForm('${userItem.userId}')">
-                                                        <option value="1" ${userItem.roleID == 1 ? 'selected' : ''}><i class="bi bi-person-fill-gear"></i> Admin</option>
-                                                        <option value="2" ${userItem.roleID == 2 ? 'selected' : ''}><i class="bi bi-person-badge-fill"></i> Employee</option>
-                                                        <option value="3" ${userItem.roleID == 3 ? 'selected' : ''}><i class="bi bi-person-fill"></i> Customer</option>
-                                                    </select>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
+                                    <c:choose>
+                                        <c:when test="${not empty list}">
+                                            <c:forEach var="userItem" items="${list}" varStatus="status">
+                                                <tr>
+                                                    <td>${status.index + 1}</td>
+                                                    <td>${userItem.username}</td>
+                                                    <td>${userItem.fullName}</td>
+                                                    <td>${userItem.email}</td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${userItem.roleID == 1}">Admin</c:when>
+                                                            <c:when test="${userItem.roleID == 2}">Employee</c:when>
+                                                            <c:when test="${userItem.roleID == 3}">Customer</c:when>
+                                                            <c:otherwise>Unknown</c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td>
+                                                        <form id="roleForm${userItem.userId}" method="post" action="admin">
+                                                            <input type="hidden" name="action" value="setUserRole">
+                                                            <input type="hidden" name="userId" value="${userItem.userId}">
+                                                            <select name="roleId" class="form-select"
+                                                                    onchange="submitRoleForm('${userItem.userId}')">
+                                                                <option value="1" ${userItem.roleID == 1 ? 'selected' : ''}><i
+                                                                    class="bi bi-person-fill-gear"></i> Admin
+                                                                </option>
+                                                                <option value="2" ${userItem.roleID == 2 ? 'selected' : ''}><i
+                                                                    class="bi bi-person-badge-fill"></i> Employee
+                                                                </option>
+                                                                <option value="3" ${userItem.roleID == 3 ? 'selected' : ''}><i
+                                                                    class="bi bi-person-fill"></i> Customer
+                                                                </option>
+                                                            </select>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="6" style="text-align: center;">Không tìm thấy dữ liệu.</td>
+                                            </tr>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </tbody>
                             </table>
                             <div class="pagination">
