@@ -424,7 +424,7 @@
                                                         tension: 0.1
                                                 },
                                                 {
-                                                label: 'Số tiền đã nhận',
+                                                label: 'Số tiền đã trả',
                                                         data: refundAmount,
                                                         borderColor: 'rgba(54, 162, 235, 1)',
                                                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -432,7 +432,7 @@
                                                         tension: 0.1
                                                 },
                                                 {
-                                                label: 'Số tiền đã trả',
+                                                label: 'Số tiền đã nhận',
                                                         data: netRevenue,
                                                         borderColor: 'rgba(75, 192, 192, 1)',
                                                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -504,7 +504,7 @@
                             <h2>Quản Lý Lịch</h2>
                             <c:if test="${not empty sessionScope.message11}">
                                 <div class="alert alert-info">
-                                    ${sessionScope.message11}
+                                    <i class="fas fa-check-circle alert-icon"></i> ${sessionScope.message11}
                                 </div>
                                 <c:remove var="message11" scope="session"/>
                                 <%-- Use JSTL to remove the attribute --%>
