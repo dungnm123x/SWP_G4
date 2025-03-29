@@ -7,22 +7,10 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import model.CartItem;
 import model.Trip;
 
 public class CartServlet extends HttpServlet {
-
-    // Timer chạy nền
-    private static final Timer seatBookingTimer = new Timer(true);
-
-    // Map lưu TimerTask, key = seatID
-    private static final ConcurrentHashMap<String, TimerTask> seatBookingTasks = new ConcurrentHashMap<>();
-
-    // Cho phép chỗ khác (ReturnResult) truy cập Map để hủy TimerTask
-    public static ConcurrentHashMap<String, TimerTask> getSeatBookingTasks() {
-        return seatBookingTasks;
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -135,34 +123,9 @@ public class CartServlet extends HttpServlet {
         if (!exists) {
             // 1) Thêm vào giỏ
             cartItems.add(newItem);
-            // 2) Update DB => seat "Booked"
+            // 2) Update DB => cập nhật trạng thái ghế thành "Booked"
             SeatDAO seatDAO = new SeatDAO();
-            seatDAO.updateSeatStatus(seatID, "Booked");  // Giả sử hàm này cập nhật DB
-
-            // 3) Tạo TimerTask revert ghế sau 10 phút
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        // Kiểm tra xem ghế còn "Booked" không
-                        String currentStatus = seatDAO.getSeatStatus(seatID);
-                        if ("Booked".equalsIgnoreCase(currentStatus)) {
-                            // revert về Available
-                            seatDAO.updateSeatStatus(seatID, "Available");
-                            System.out.println("Ghế " + seatID + " đã bị revert => Available do timeout 10 phút.");
-                        }
-                        // Xóa task khỏi map
-                        seatBookingTasks.remove(seatID);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-
-            // Lưu vào map
-            seatBookingTasks.put(seatID, task);
-            // Lên lịch 10 phút (600000 ms)
-            seatBookingTimer.schedule(task, 600_000);
+            seatDAO.updateSeatStatus(seatID, "Booked");
         }
 
         session.setAttribute("cartItems", cartItems);
@@ -179,14 +142,6 @@ public class CartServlet extends HttpServlet {
         session.setAttribute("cartItems", cartItems);
         SeatDAO seatDAO = new SeatDAO();
         seatDAO.updateSeatStatus(seatID, "Available");
-
-        // 2) Nếu đang dùng TimerTask => hủy
-        ConcurrentHashMap<String, TimerTask> seatTasks = CartServlet.getSeatBookingTasks();
-        TimerTask task = seatTasks.get(seatID);
-        if (task != null) {
-            task.cancel();
-            seatTasks.remove(seatID);
-        }
     }
 
     @Override
