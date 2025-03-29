@@ -86,9 +86,10 @@
                     <p><strong>Tàu:</strong> ${item.trainName} - ${item.departureDate}</p>
                     <p><strong>Toa:</strong> ${item.carriageNumber} - Chỗ ${item.seatNumber}</p>
                     <p>
-                        <strong>Giá:</strong>
-                        <fmt:formatNumber value="${item.price}" pattern="#,##0"/> VND
+                        <strong>Tổng tiền:</strong>
+                        <fmt:formatNumber value="${totalAmount}" pattern="#,##0"/> VND
                     </p>
+
                     <p><strong>Hành khách:</strong> ${requestScope.fullNameList[status.index]}</p>
                     <p><strong>Số CMND/Hộ chiếu:</strong> ${requestScope.idNumberList[status.index]}</p>
                     <p><strong>Đối tượng:</strong> ${requestScope.typeList[status.index]}</p>

@@ -253,6 +253,8 @@ public class ReturnResult extends HttpServlet {
             request.setAttribute("bookingName", bookingName);
             request.setAttribute("bookingEmail", bookingEmail);
             request.setAttribute("bookingPhone", bookingPhone);
+            Object totalAmountValue = session.getAttribute("totalAmount");
+            request.setAttribute("totalAmount", totalAmountValue);
             session.removeAttribute("cartItems");
             session.removeAttribute("fullNameList");
             session.removeAttribute("typeList");

@@ -410,10 +410,13 @@ public class PassengerInfoServlet extends HttpServlet {
             boolean needCCCDRegex = !"Trẻ em".equals(passengerType);
 
             // Kiểm tra trùng CCCD => DB
-            if (ticketDAO.isTicketActiveByCCCD(idNumber, tripID)) {
-                sendError(request, response, "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
-                return;
+            if (!"Trẻ em".equals(passengerType)) {
+                if (ticketDAO.isTicketActiveByCCCD(idNumber, tripID)) {
+                    sendError(request, response, "CCCD '" + idNumber + "' đã có vé (đã thanh toán) trên chuyến này!");
+                    return;
+                }
             }
+
             if (normalizedFullName.isEmpty()) {
                 sendError(request, response, "Họ tên không hợp lệ, vui lòng nhập lại.");
                 return;
@@ -432,20 +435,22 @@ public class PassengerInfoServlet extends HttpServlet {
 
             // Xác định item => xem có phải chuyến về
             CartItem currentItem = cartItems2.get(i);
-            
+
             boolean thisIsReturnTrip = currentItem.isReturnTrip();
-            if (thisIsReturnTrip) {
-                if (cccdSetReturn.contains(idNumber)) {
-                    sendError(request, response, "Không được trùng CCCD/Hộ chiếu trong cùng chuyến về: " + idNumber);
-                    return;
+            if (!"Trẻ em".equals(passengerType)) {
+                if (thisIsReturnTrip) {
+                    if (cccdSetReturn.contains(idNumber)) {
+                        sendError(request, response, "Không được trùng CCCD/Hộ chiếu trong cùng chuyến về: " + idNumber);
+                        return;
+                    }
+                    cccdSetReturn.add(idNumber);
+                } else {
+                    if (cccdSetGo.contains(idNumber)) {
+                        sendError(request, response, "Không được trùng CCCD/Hộ chiếu trong cùng chuyến đi: " + idNumber);
+                        return;
+                    }
+                    cccdSetGo.add(idNumber);
                 }
-                cccdSetReturn.add(idNumber);
-            } else {
-                if (cccdSetGo.contains(idNumber)) {
-                    sendError(request, response, "Không được trùng CCCD/Hộ chiếu trong cùng chuyến đi: " + idNumber);
-                    return;
-                }
-                cccdSetGo.add(idNumber);
             }
 
             // Lấy departureDate => parse
@@ -498,7 +503,7 @@ public class PassengerInfoServlet extends HttpServlet {
             birthDayListFinal.add(dayStr);
             birthMonthListFinal.add(monthStr);
             birthYearListFinal.add(yearStr);
-            currentItem.setPrice(finalPrice);
+
         }
 
         // Lưu finalPriceList

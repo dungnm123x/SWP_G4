@@ -34,24 +34,24 @@ public class SeatDAO extends DBContext<RailwayDTO> {
         List<Seat> result = new ArrayList<>();
         String sql = """
         SELECT
-          s.SeatID,
-          s.SeatNumber,
-          CASE
-            WHEN s.Status = 'Booked' THEN 'Booked'
-            WHEN s.Status = 'Out of Service' THEN 'Out of Service'
-            WHEN EXISTS (
-               SELECT 1 FROM Ticket t
-               WHERE t.SeatID = s.SeatID
-                 AND t.TripID = ?
-                 AND t.TicketStatus IN ('Unused','Used','Reserved')
-            )
-            THEN 'Booked'
-            ELSE 'Available'
-          END AS SeatStatus
+            s.SeatID,
+            s.SeatNumber,
+            CASE
+                WHEN s.Status = 'Out of Service' THEN 'Out of Service'
+                WHEN s.Status = 'Booked' THEN 'Booked'
+                WHEN EXISTS (
+                    SELECT 1 FROM Ticket t
+                    WHERE t.SeatID = s.SeatID
+                      AND t.TripID = ?
+                      AND t.TicketStatus IN ('Used', 'Unused', 'Reserved')
+                ) THEN 'Booked'
+                ELSE 'Available'
+            END AS SeatStatus
         FROM Seat s
         WHERE s.CarriageID = ?
         ORDER BY s.SeatNumber
     """;
+
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, tripID);
             st.setInt(2, carriageID);
@@ -64,10 +64,11 @@ public class SeatDAO extends DBContext<RailwayDTO> {
                 result.add(seat);
             }
         } catch (SQLException e) {
-
+            e.printStackTrace();
         }
         return result;
     }
+
 //    public List<Seat> getSeatsForTrip(int carriageID, int tripID) {
 //        List<Seat> result = new ArrayList<>();
 //        String sql = "SELECT SeatID, SeatNumber, Status AS SeatStatus FROM Seat WHERE CarriageID = ? ORDER BY SeatNumber";
@@ -87,7 +88,6 @@ public class SeatDAO extends DBContext<RailwayDTO> {
 //        }
 //        return result;
 //    }
-
     public void updateSeatStatus(String seatID, String status) {
         String sql = "UPDATE Seat SET status = ? WHERE seatID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
