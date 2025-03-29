@@ -444,7 +444,11 @@ public class AdminController extends HttpServlet {
                 int userId = Integer.parseInt(request.getParameter("userId"));
                 int roleId = Integer.parseInt(request.getParameter("roleId"));
 
-                if (dao.updateUserRole(userId, roleId)) {
+                // Kiểm tra xem người dùng có status = 0 không
+                boolean isActiveUser = dao.isUserActive(userId); // Thêm hàm này vào DAO
+                if (!isActiveUser && roleId == 1) { // Nếu user không active và muốn set role Admin
+                    request.getSession().setAttribute("message10", "❌ Không thể đặt Role Admin cho người dùng bị vô hiệu hóa.");
+                } else if (dao.updateUserRole(userId, roleId)) {
                     request.getSession().setAttribute("message10", "✅ Đặt Role thành công!");
                 } else {
                     request.getSession().setAttribute("message10", "❌ Đặt Role thất bại.");

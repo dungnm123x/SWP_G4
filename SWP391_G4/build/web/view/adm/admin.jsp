@@ -21,129 +21,46 @@
 
         <script>
             function validateSearchForm(form) {
-            const searchInput = form.search.value.trim(); // Get the search input value
+                const searchInput = form.search.value.trim(); // Get the search input value
 
-            if (searchInput.length === 0) {
-            alert("Vui lòng nhập từ khóa tìm kiếm.");
-            return false; // Prevent form submission
-            }
+                if (searchInput.length === 0) {
+                    alert("Vui lòng nhập từ khóa tìm kiếm.");
+                    return false; // Prevent form submission
+                }
 
-            // Kiểm tra xem chuỗi có chỉ chứa khoảng trắng hay không
-            if (/^\s*$/.test(searchInput)) {
-            alert("Vui lòng nhập từ khóa tìm kiếm.");
-            return false;
-            }
+                // Kiểm tra xem chuỗi có chỉ chứa khoảng trắng hay không
+                if (/^\s*$/.test(searchInput)) {
+                    alert("Vui lòng nhập từ khóa tìm kiếm.");
+                    return false;
+                }
 
-            if (searchInput.length < 2) { // Minimum length
-            alert("Từ khóa tìm kiếm phải có ít nhất 2 ký tự.");
-            return false;
-            }
+                if (searchInput.length < 2) { // Minimum length
+                    alert("Từ khóa tìm kiếm phải có ít nhất 2 ký tự.");
+                    return false;
+                }
 
-            if (searchInput.length > 50) { // Maximum length
-            alert("Từ khóa tìm kiếm không được dài quá 50 ký tự.");
-            return false;
-            }
+                if (searchInput.length > 50) { // Maximum length
+                    alert("Từ khóa tìm kiếm không được dài quá 50 ký tự.");
+                    return false;
+                }
 
-            // Kiểm tra ký tự cho phép
-            const regex = /^[a-zA-Z0-9\s\u00C0-\u1FFF]*$/; // Cho phép chữ cái, số, khoảng trắng, tiếng Việt
-            if (!regex.test(searchInput)) {
-            alert("Từ khóa tìm kiếm chỉ được chứa chữ cái, số, khoảng trắng và tiếng Việt.");
-            return false;
-            }
+                // Kiểm tra ký tự cho phép
+                const regex = /^[a-zA-Z0-9\s\u00C0-\u1FFF]*$/; // Cho phép chữ cái, số, khoảng trắng, tiếng Việt
+                if (!regex.test(searchInput)) {
+                    alert("Từ khóa tìm kiếm chỉ được chứa chữ cái, số, khoảng trắng và tiếng Việt.");
+                    return false;
+                }
 
-            return true; // Cho phép gửi form
+                return true; // Cho phép gửi form
             }
         </script>
-
         <script>
             function submitRoleForm(userId) {
-            document.getElementById('roleForm' + userId).submit();
-            }
-
-            // Client-side validation for the Add Event form
-            function validateAddEventForm() {
-            const title = document.getElementById('title').value.trim();
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const description = document.getElementById('description').value.trim();
-            const currentDate = new Date().toISOString().slice(0, 16);
-            // Validate title
-            if (!title) {
-            alert('Tiêu đề không được để trống!');
-            return false;
-            }
-            if (title.length > 100) {
-            alert('Tiêu đề không được dài quá 100 ký tự!');
-            return false;
-            }
-
-            // Validate description
-            if (description.length > 500) {
-            alert('Mô tả không được dài quá 500 ký tự!');
-            return false;
-            }
-
-            // Validate start date
-            if (!startDate) {
-            alert('Ngày bắt đầu không được để trống!');
-            return false;
-            }
-            if (startDate < currentDate) {
-            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-            return false;
-            }
-
-            // Validate end date (if provided)
-            if (endDate && startDate >= endDate) {
-            alert('Ngày bắt đầu phải trước ngày kết thúc!');
-            return false;
-            }
-
-            return true;
-            }
-
-            // Client-side validation for the Edit Event form
-            function validateEditEventForm() {
-            const title = document.getElementById('editTitle').value.trim();
-            const startDate = document.getElementById('editStartDate').value;
-            const endDate = document.getElementById('editEndDate').value;
-            const description = document.getElementById('editDescription').value.trim();
-            const currentDate = new Date().toISOString().slice(0, 16);
-            // Validate title
-            if (!title) {
-            alert('Tiêu đề không được để trống!');
-            return false;
-            }
-            if (title.length > 100) {
-            alert('Tiêu đề không được dài quá 100 ký tự!');
-            return false;
-            }
-
-            // Validate description
-            if (description.length > 500) {
-            alert('Mô tả không được dài quá 500 ký tự!');
-            return false;
-            }
-
-            // Validate start date
-            if (!startDate) {
-            alert('Ngày bắt đầu không được để trống!');
-            return false;
-            }
-            if (startDate < currentDate) {
-            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-            return false;
-            }
-
-            // Validate end date (if provided)
-            if (endDate && startDate >= endDate) {
-            alert('Ngày bắt đầu phải trước ngày kết thúc!');
-            return false;
-            }
-
-            return true;
-            }
+                document.getElementById('roleForm' + userId).submit();
+                }
+                
         </script>
+
     </head>
     <body>
         <div class="container">
@@ -322,193 +239,194 @@
                             </div>
 
                             <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                var map = L.map('map').setView([16.0471, 108.2062], 6); // Center of Vietnam
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        var map = L.map('map').setView([16.0471, 108.2062], 6); // Center of Vietnam
 
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                }).addTo(map);
-                                // Add station markers dynamically from database
-                                var stations = [
+                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                        }).addTo(map);
+                                        // Add station markers dynamically from database
+                                        var stations = [
                                 <c:forEach var="station" items="${stationsWithCoords}" varStatus="loop">
-                                {
-                                name: '${station.stationName}',
-                                        lat: ${station.latitude},
-                                        lng: ${station.longitude},
-                                        address: '${station.address}'
-                                }<c:if test="${!loop.last}">,</c:if>
+                                        {
+                                        name: '${station.stationName}',
+                                                lat: ${station.latitude},
+                                                lng: ${station.longitude},
+                                                address: '${station.address}'
+                                        }<c:if test="${!loop.last}">,</c:if>
                                 </c:forEach>
-                                ];
-                                stations.forEach(function(station) {
-                                if (station.lat && station.lng) { // Check if coordinates exist
-                                L.marker([station.lat, station.lng])
-                                        .addTo(map)
-                                        .bindPopup('<b>' + station.name + '</b><br>' + station.address);
-                                }
-                                });
-                                });
+                                        ];
+                                        stations.forEach(function(station) {
+                                        if (station.lat && station.lng) { // Check if coordinates exist
+                                        L.marker([station.lat, station.lng])
+                                                .addTo(map)
+                                                .bindPopup('<b>' + station.name + '</b><br>' + station.address);
+                                        }
+                                        });
+                                        }
+                                        );
                             </script>
 
                             <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                const starDistribution = [${starDistribution[0]}, ${starDistribution[1]}, ${starDistribution[2]}, ${starDistribution[3]}, ${starDistribution[4]}];
-                                const ctx = document.getElementById('starDistributionChart').getContext('2d');
-                                const starDistributionChart = new Chart(ctx, {
-                                type: 'pie',
-                                        data: {
-                                        labels: ['1 Sao', '2 Sao', '3 Sao', '4 Sao', '5 Sao'],
-                                                datasets: [{
-                                                data: starDistribution,
-                                                        backgroundColor: [
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            const starDistribution = [${starDistribution[0]}, ${starDistribution[1]}, ${starDistribution[2]}, ${starDistribution[3]}, ${starDistribution[4]}];
+                                            const ctx = document.getElementById('starDistributionChart').getContext('2d');
+                                            const starDistributionChart = new Chart(ctx, {
+                                                type: 'pie',
+                                                data: {
+                                                    labels: ['1 Sao', '2 Sao', '3 Sao', '4 Sao', '5 Sao'],
+                                                    datasets: [{
+                                                            data: starDistribution,
+                                                            backgroundColor: [
                                                                 'rgba(255, 99, 132, 0.2)',
                                                                 'rgba(54, 162, 235, 0.2)',
                                                                 'rgba(255, 206, 86, 0.2)',
                                                                 'rgba(75, 192, 192, 0.2)',
                                                                 'rgba(153, 102, 255, 0.2)'
-                                                        ],
-                                                        borderColor: [
+                                                            ],
+                                                            borderColor: [
                                                                 'rgba(255, 99, 132, 1)',
                                                                 'rgba(54, 162, 235, 1)',
                                                                 'rgba(255, 206, 86, 1)',
                                                                 'rgba(75, 192, 192, 1)',
                                                                 'rgba(153, 102, 255, 1)'
-                                                        ],
-                                                        borderWidth: 1
-                                                }]
-                                        },
-                                        options: {
-                                        responsive: true,
-                                                plugins: {
-                                                legend: {
-                                                display: true,
-                                                        position: 'top',
+                                                            ],
+                                                            borderWidth: 1
+                                                        }]
                                                 },
+                                                options: {
+                                                    responsive: true,
+                                                    plugins: {
+                                                        legend: {
+                                                            display: true,
+                                                            position: 'top',
+                                                        },
                                                         title: {
-                                                        display: true,
-                                                                text: 'Phân Bố Sao Từ Phản Hồi Khách Hàng'
+                                                            display: true,
+                                                            text: 'Phân Bố Sao Từ Phản Hồi Khách Hàng'
                                                         }
+                                                    }
                                                 }
-                                        }
-                                });
-                                });
+                                            });
+                                        });
                             </script>
                             <script>
-                                function updateInputFields() {
-                                var viewType = document.getElementById("viewType").value;
-                                document.getElementById("monthInput").style.display = viewType === "monthly" ? "inline-block" : "none";
-                                document.getElementById("yearInput").style.display = viewType === "yearly" ? "inline-block" : "none";
-                                }
+                                        function updateInputFields() {
+                                            var viewType = document.getElementById("viewType").value;
+                                            document.getElementById("monthInput").style.display = viewType === "monthly" ? "inline-block" : "none";
+                                            document.getElementById("yearInput").style.display = viewType === "yearly" ? "inline-block" : "none";
+                                        }
 
-                                document.addEventListener('DOMContentLoaded', function () {
-                                var ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-                                var labels = [
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            var ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+                                            var labels = [
                                 <c:forEach var="label" items="${labels}" varStatus="loop">
-                                '${label}'${loop.last ? '' : ','}
+                                            '${label}'${loop.last ? '' : ','}
                                 </c:forEach>
-                                ];
-                                var bookingRevenue = [
+                                            ];
+                                            var bookingRevenue = [
                                 <c:forEach var="value" items="${bookingRevenue}" varStatus="loop">
                                     ${value}${loop.last ? '' : ','}
                                 </c:forEach>
-                                ];
-                                var refundAmount = [
+                                            ];
+                                            var refundAmount = [
                                 <c:forEach var="value" items="${refundAmount}" varStatus="loop">
                                     ${value}${loop.last ? '' : ','}
                                 </c:forEach>
-                                ];
-                                var netRevenue = [
+                                            ];
+                                            var netRevenue = [
                                 <c:forEach var="value" items="${netRevenue}" varStatus="loop">
                                     ${value}${loop.last ? '' : ','}
                                 </c:forEach>
-                                ];
-                                var revenueChart = new Chart(ctxRevenue, {
-                                type: 'line',
-                                        data: {
-                                        labels: labels,
-                                                datasets: [
-                                                {
-                                                label: 'Doanh thu',
-                                                        data: netRevenue,
-                                                        borderColor: 'rgba(75, 192, 192, 1)',
-                                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                        fill: false,
-                                                        tension: 0.1
-                                                },
-                                                {
-                                                label: 'Số tiền đã trả',
-                                                        data: refundAmount,
-                                                        borderColor: 'rgba(54, 162, 235, 1)',
-                                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                                        fill: false,
-                                                        tension: 0.1
-                                                },
-                                                {
-                                                label: 'Số tiền đã nhận',
-                                                        data: bookingRevenue,
-                                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                        fill: false,
-                                                        tension: 0.1
-                                                }
-                                                ]
-                                        },
-                                        options: {
-                                        responsive: true,
-                                                scales: {
-                                                x: {
-                                                title: {
-                                                display: true,
-                                                        text: '${viewType == "monthly" ? "Thời gian (Ngày)" : "Thời gian (Tháng)"}'
-                                                }
-                                                },
-                                                        y: {
-                                                        title: {
-                                                        display: true,
-                                                                text: 'Doanh thu (VNĐ)'
+                                            ];
+                                            var revenueChart = new Chart(ctxRevenue, {
+                                                type: 'line',
+                                                data: {
+                                                    labels: labels,
+                                                    datasets: [
+                                                        {
+                                                            label: 'Doanh thu',
+                                                            data: netRevenue,
+                                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                            fill: false,
+                                                            tension: 0.1
                                                         },
-                                                                beginAtZero: true
+                                                        {
+                                                            label: 'Số tiền đã trả',
+                                                            data: refundAmount,
+                                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                                            fill: false,
+                                                            tension: 0.1
+                                                        },
+                                                        {
+                                                            label: 'Số tiền đã nhận',
+                                                            data: bookingRevenue,
+                                                            borderColor: 'rgba(255, 99, 132, 1)',
+                                                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                            fill: false,
+                                                            tension: 0.1
                                                         }
+                                                    ]
                                                 },
-                                                plugins: {
-                                                legend: {
-                                                display: true,
-                                                        position: 'top'
+                                                options: {
+                                                    responsive: true,
+                                                    scales: {
+                                                        x: {
+                                                            title: {
+                                                                display: true,
+                                                                text: '${viewType == "monthly" ? "Thời gian (Ngày)" : "Thời gian (Tháng)"}'
+                                                            }
+                                                        },
+                                                        y: {
+                                                            title: {
+                                                                display: true,
+                                                                text: 'Doanh thu (VNĐ)'
+                                                            },
+                                                            beginAtZero: true
+                                                        }
+                                                    },
+                                                    plugins: {
+                                                        legend: {
+                                                            display: true,
+                                                            position: 'top'
+                                                        }
+                                                    }
                                                 }
-                                                }
-                                        }
-                                });
-                                });
+                                            });
+                                        });
                             </script>
                             <script>
-                                var ctxUser = document.getElementById('userChart').getContext('2d');
-                                var userChart = new Chart(ctxUser, {
-                                type: 'bar',
-                                        data: {
-                                        labels: ['Người dùng', 'Nhân viên', 'Khách hàng'],
+                                        var ctxUser = document.getElementById('userChart').getContext('2d');
+                                        var userChart = new Chart(ctxUser, {
+                                            type: 'bar',
+                                            data: {
+                                                labels: ['Người dùng', 'Nhân viên', 'Khách hàng'],
                                                 datasets: [{
-                                                label: 'Số lượng',
+                                                        label: 'Số lượng',
                                                         data: [${totalUsers}, ${totalEmployees}, ${totalCustomers}],
                                                         backgroundColor: [
-                                                                'rgba(255, 99, 132, 0.2)',
-                                                                'rgba(54, 162, 235, 0.2)',
-                                                                'rgba(255, 206, 86, 0.2)'
+                                                            'rgba(255, 99, 132, 0.2)',
+                                                            'rgba(54, 162, 235, 0.2)',
+                                                            'rgba(255, 206, 86, 0.2)'
                                                         ],
                                                         borderColor: [
-                                                                'rgba(255, 99, 132, 1)',
-                                                                'rgba(54, 162, 235, 1)',
-                                                                'rgba(255, 206, 86, 1)'
+                                                            'rgba(255, 99, 132, 1)',
+                                                            'rgba(54, 162, 235, 1)',
+                                                            'rgba(255, 206, 86, 1)'
                                                         ],
                                                         borderWidth: 1
-                                                }]
-                                        },
-                                        options: {
-                                        scales: {
-                                        y: {
-                                        beginAtZero: true
-                                        }
-                                        }
-                                        }
-                                });
+                                                    }]
+                                            },
+                                            options: {
+                                                scales: {
+                                                    y: {
+                                                        beginAtZero: true
+                                                    }
+                                                }
+                                            }
+                                        });
                             </script>
                         </c:when>
                         <c:when test="${type == 'calendar'}">
@@ -598,124 +516,212 @@
                             </div>
 
                             <script>
-                                function openModal(modalId) {
-                                document.getElementById(modalId).style.display = 'block';
-                                }
+                                        function openModal(modalId) {
+                                            document.getElementById(modalId).style.display = 'block';
+                                        }
 
-                                function closeModal(modalId) {
-                                document.getElementById(modalId).style.display = 'none';
-                                }
+                                        function closeModal(modalId) {
+                                            document.getElementById(modalId).style.display = 'none';
+                                        }
 
-                                // Form validation for adding events (assuming it exists)
-                                function validateAddEventForm() {
-                                // Add your validation logic here if needed
-                                return true;
-                                }
+                                        // Form validation for adding events (assuming it exists)
+                                        function validateAddEventForm() {
+                                            // Add your validation logic here if needed
+                                            return true;
+                                        }
 
-                                // Form validation for editing events (assuming it exists)
-                                function validateEditEventForm() {
-                                // Add your validation logic here if needed
-                                return true;
-                                }
+                                        // Form validation for editing events (assuming it exists)
+                                        function validateEditEventForm() {
+                                            // Add your validation logic here if needed
+                                            return true;
+                                        }
 
-                                document.addEventListener('DOMContentLoaded', function () {
-                                const calendarEl = document.getElementById('calendar');
-                                const calendar = new FullCalendar.Calendar(calendarEl, {
-                                initialView: 'dayGridMonth',
-                                        headerToolbar: {
-                                        left: 'prev,next today',
-                                                center: 'title',
-                                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                                        },
-                                        editable: true,
-                                        selectable: true,
-                                        events: [
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                        const calendarEl = document.getElementById('calendar');
+                                                const calendar = new FullCalendar.Calendar(calendarEl, {
+                                                initialView: 'dayGridMonth',
+                                                        headerToolbar: {
+                                                        left: 'prev,next today',
+                                                                center: 'title',
+                                                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                                        },
+                                                        editable: true,
+                                                        selectable: true,
+                                                        events: [
                                 <c:forEach var="event" items="${calendarEvents}" varStatus="loop">
-                                        {
-                                        id: '${event.eventID}',
-                                                title: '${event.title}',
-                                                start: <c:choose>
+                                                        {
+                                                        id: '${event.eventID}',
+                                                                title: '${event.title}',
+                                                                start: <c:choose>
                                         <c:when test="${event.allDay}">
-                                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
+                                                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd"/>'
                                         </c:when>
                                         <c:otherwise>
-                                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                                        '<fmt:formatDate value="${event.startDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
                                         </c:otherwise>
                                     </c:choose>,
-                                                end: <c:choose>
+                                                                end: <c:choose>
                                         <c:when test="${not empty event.endDate}">
                                             <c:choose>
                                                 <c:when test="${event.allDay}">
-                                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
+                                                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd"/>'
                                                 </c:when>
                                                 <c:otherwise>
-                                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
+                                                        '<fmt:formatDate value="${event.endDate}" pattern="yyyy-MM-dd'T'HH:mm:ss"/>'
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:when>
                                         <c:otherwise>
-                                        null
+                                                        null
                                         </c:otherwise>
                                     </c:choose>,
-                                                allDay: ${event.allDay},
-                                                description: '${event.description != null ? event.description : ""}'
-                                        }<c:if test="${!loop.last}">,</c:if>
+                                                                allDay: ${event.allDay},
+                                                                description: '${event.description != null ? event.description : ""}'
+                                                        }<c:if test="${!loop.last}">,</c:if>
                                 </c:forEach>
-                                        ],
-                                        dateClick: function (info) {
-                                        document.getElementById('startDate').value = info.dateStr + 'T00:00';
-                                        document.getElementById('endDate').value = info.dateStr + 'T23:59';
-                                        document.getElementById('allDay').checked = true;
-                                        },
-                                        eventClick: function (info) {
-                                        document.getElementById('editEventId').value = info.event.id;
-                                        document.getElementById('editTitle').value = info.event.title;
-                                        document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
-                                        if (info.event.end) {
-                                        document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
-                                        } else {
-                                        document.getElementById('editEndDate').value = '';
+                                                        ],
+                                                dateClick: function (info) {
+                                                    document.getElementById('startDate').value = info.dateStr + 'T00:00';
+                                                    document.getElementById('endDate').value = info.dateStr + 'T23:59';
+                                                    document.getElementById('allDay').checked = true;
+                                                }
+                                                ,
+                                                eventClick: function (info) {
+                                                    document.getElementById('editEventId').value = info.event.id;
+                                                    document.getElementById('editTitle').value = info.event.title;
+                                                    document.getElementById('editStartDate').value = info.event.start.toISOString().slice(0, 16);
+                                                    if (info.event.end) {
+                                                        document.getElementById('editEndDate').value = info.event.end.toISOString().slice(0, 16);
+                                                    } else {
+                                                        document.getElementById('editEndDate').value = '';
+                                                    }
+                                                    document.getElementById('editAllDay').checked = info.event.allDay;
+                                                    document.getElementById('editDescription').value = info.event.extendedProps.description || '';
+                                                    openModal('editEventModal');
+                                                }
+                                            });
+                                    calendar.render();
+                                    // Add event listener for the delete button
+                                    document.getElementById('deleteEventBtn').addEventListener('click', function () {
+                                        const eventId = document.getElementById('editEventId').value;
+                                        if (confirm('Bạn có chắc chắn muốn xóa sự kiện này không?')) {
+                                            fetch('admin', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                                },
+                                                body: 'action=deleteCalendarEvent&eventId=' + encodeURIComponent(eventId)
+                                            })
+                                                    .then(response => {
+                                                        if (!response.ok) {
+                                                            throw new Error('Network response was not ok');
+                                                        }
+                                                        return response.text();
+                                                    })
+                                                    .then(data => {
+                                                        // Assuming the server redirects or sends a success message
+                                                        alert('✅ Xóa sự kiện thành công!');
+                                                        const event = calendar.getEventById(eventId);
+                                                        if (event) {
+                                                            event.remove(); // Remove the event from the calendar
+                                                        }
+                                                        closeModal('editEventModal');
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error:', error);
+                                                        alert('❌ Xóa sự kiện thất bại! Lỗi: ' + error.message);
+                                                    });
                                         }
-                                        document.getElementById('editAllDay').checked = info.event.allDay;
-                                        document.getElementById('editDescription').value = info.event.extendedProps.description || '';
-                                        openModal('editEventModal');
-                                        }
-                                });
-                                calendar.render();
-                                // Add event listener for the delete button
-                                document.getElementById('deleteEventBtn').addEventListener('click', function () {
-                                const eventId = document.getElementById('editEventId').value;
-                                if (confirm('Bạn có chắc chắn muốn xóa sự kiện này không?')) {
-                                fetch('admin', {
-                                method: 'POST',
-                                        headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                        },
-                                        body: 'action=deleteCalendarEvent&eventId=' + encodeURIComponent(eventId)
-                                })
-                                        .then(response => {
-                                        if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                        }
-                                        return response.text();
-                                        })
-                                        .then(data => {
-                                        // Assuming the server redirects or sends a success message
-                                        alert('✅ Xóa sự kiện thành công!');
-                                        const event = calendar.getEventById(eventId);
-                                        if (event) {
-                                        event.remove(); // Remove the event from the calendar
-                                        }
-                                        closeModal('editEventModal');
-                                        })
-                                        .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('❌ Xóa sự kiện thất bại! Lỗi: ' + error.message);
-                                        });
+                                    });
                                 }
-                                });
-                                });</script>
+                                );</script>
+                            <script>
 
+
+                                // Client-side validation for the Add Event form
+                                function validateAddEventForm() {
+                                    const title = document.getElementById('title').value.trim();
+                                    const startDate = document.getElementById('startDate').value;
+                                    const endDate = document.getElementById('endDate').value;
+                                    const description = document.getElementById('description').value.trim();
+                                    const currentDate = new Date().toISOString().slice(0, 16);
+                                    // Validate title
+                                    if (!title) {
+                                        alert('Tiêu đề không được để trống!');
+                                        return false;
+                                    }
+                                    if (title.length > 100) {
+                                        alert('Tiêu đề không được dài quá 100 ký tự!');
+                                        return false;
+                                    }
+
+                                    // Validate description
+                                    if (description.length > 500) {
+                                        alert('Mô tả không được dài quá 500 ký tự!');
+                                        return false;
+                                    }
+
+                                    // Validate start date
+                                    if (!startDate) {
+                                        alert('Ngày bắt đầu không được để trống!');
+                                        return false;
+                                    }
+                                    if (startDate < currentDate) {
+                                        alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+                                        return false;
+                                    }
+
+                                    // Validate end date (if provided)
+                                    if (endDate && startDate >= endDate) {
+                                        alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                                        return false;
+                                    }
+
+                                    return true;
+                                }
+
+                                // Client-side validation for the Edit Event form
+                                function validateEditEventForm() {
+                                    const title = document.getElementById('editTitle').value.trim();
+                                    const startDate = document.getElementById('editStartDate').value;
+                                    const endDate = document.getElementById('editEndDate').value;
+                                    const description = document.getElementById('editDescription').value.trim();
+                                    const currentDate = new Date().toISOString().slice(0, 16);
+                                    // Validate title
+                                    if (!title) {
+                                        alert('Tiêu đề không được để trống!');
+                                        return false;
+                                    }
+                                    if (title.length > 100) {
+                                        alert('Tiêu đề không được dài quá 100 ký tự!');
+                                        return false;
+                                    }
+
+                                    // Validate description
+                                    if (description.length > 500) {
+                                        alert('Mô tả không được dài quá 500 ký tự!');
+                                        return false;
+                                    }
+
+                                    // Validate start date
+                                    if (!startDate) {
+                                        alert('Ngày bắt đầu không được để trống!');
+                                        return false;
+                                    }
+                                    if (startDate < currentDate) {
+                                        alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+                                        return false;
+                                    }
+
+                                    // Validate end date (if provided)
+                                    if (endDate && startDate >= endDate) {
+                                        alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                                        return false;
+                                    }
+
+                                    return true;
+                                }
+                            </script>
                         </c:when>
                         <c:when test="${type == 'userauthorization'}">
                             <div class="search-container">

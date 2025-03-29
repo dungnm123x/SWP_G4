@@ -343,6 +343,19 @@ public class DAOAdmin extends DBContext {
         }
     }
 
+    public boolean isUserActive(int userId) throws SQLException {
+        String query = "SELECT Status FROM [User] WHERE UserID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("Status"); // Trả về true nếu Status = 1 (active)
+                }
+                return false; // Trả về false nếu không tìm thấy user hoặc Status = 0 (inactive)
+            }
+        }
+    }
+
     public int getTotalEmployeesCount(String keyword) throws SQLException {
         String query = "SELECT COUNT(*) FROM [User] WHERE RoleID = 2";
         if (keyword != null && !keyword.isEmpty()) {
