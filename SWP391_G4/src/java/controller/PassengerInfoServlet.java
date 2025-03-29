@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-// Đã loại bỏ: import java.util.TimerTask;
-// Đã loại bỏ: import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -337,6 +335,7 @@ public class PassengerInfoServlet extends HttpServlet {
             return;
         }
 
+        
         //=====================================================
         // 3) Khi nhấn "Tiếp tục" => chuyển sang confirm.jsp
         //=====================================================

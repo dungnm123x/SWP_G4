@@ -96,11 +96,14 @@ function confirmAge(modalId, selectId, priceId, discountId, totalId, dayId, mont
     let rate = 0;
 
     if (selectedOption === "Trẻ em") {
-        // Ví dụ: chấp nhận 6..10
-        if (age < 6 || age > 10) {
-            alert("Độ tuổi của trẻ em phải từ 6 đến 10 tuổi.");
-            return;
-        }
+//        // Ví dụ: chấp nhận 6..10
+//        if(age < 6){
+//            alert("Trẻ em dưới 6 tuổi không cần mua vé, hãy xóa vé này đi hoặc đổi đối tượng mua vé");
+//        }
+//        if (age < 6 || age > 10) {
+//            alert("Độ tuổi của trẻ em phải từ 6 đến 10 tuổi.");
+//            return;
+//        }
         rate = 50;
         // Tạo chuỗi DOB => điền vào CCCD
         let dobString = day.padStart(2, '0') + "/" + month.padStart(2, '0') + "/" + year;
@@ -149,29 +152,7 @@ function confirmAge(modalId, selectId, priceId, discountId, totalId, dayId, mont
     updateTotalAmount();
 }
 
-/**
- * 5) Hàm confirmVIP: Khi user nhấn "Xác nhận" modal VIP
- */
-function confirmVIP(modalId, selectId, priceId, discountId, totalId) {
-    closeModal(modalId);
 
-    let vipInputId = 'vipCard' + selectId.replace('passengerType', '');
-    let vipCard = document.getElementById(vipInputId).value.trim();
-    if (vipCard === "") {
-        alert("Vui lòng nhập thông tin thẻ VIP!");
-        return;
-    }
-
-    let basePrice = parseFloat(document.getElementById(priceId).value) || 0;
-    let rate = 10; // VIP => 10%
-    let discountAmount = basePrice * rate / 100;
-    let finalPrice = basePrice - discountAmount + 1000;
-
-    document.getElementById(discountId).innerText = '-10%';
-    document.getElementById(totalId).innerText = finalPrice.toLocaleString() + ' VND';
-
-    updateTotalAmount();
-}
 
 /**
  * 6) Hàm getAge: Tính tuổi dựa trên day, month, year
@@ -228,18 +209,6 @@ function updateTotalAmount() {
     }
 }
 
-// Hàm confirmChildAlone: khi user bấm nút “Xác nhận” trong modal
-function confirmChildAlone() {
-    let code = document.getElementById("adultTicketCodeInput").value.trim();
-    if (!code) {
-        alert("Vui lòng nhập mã vé người lớn.");
-        return;
-    }
-    // Gán vào input hidden
-    document.getElementById("adultTicketCodeHidden").value = code;
-    // Đóng modal
-    closeModal("childAloneModal");
-}
 
 /**
  * 10) Hàm rebindRemoveButtons: Gắn sự kiện xóa vé (AJAX)

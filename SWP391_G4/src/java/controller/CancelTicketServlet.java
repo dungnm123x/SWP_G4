@@ -167,20 +167,17 @@ public class CancelTicketServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
-
         User user = (User) session.getAttribute("user");
-        String[] selectedTicketIDs = request.getParameterValues("selectedTickets");
+        String allSelected = request.getParameter("allSelectedTickets");
+        String[] selectedTicketIDs = (allSelected != null && !allSelected.isEmpty()) ? allSelected.split(",") : null;
 
         TicketDAO ticketDAO = new TicketDAO();
         List<RailwayDTO> allTickets = ticketDAO.getDetailedTicketsByUserID(user.getUserId());
         List<RailwayDTO> availableTickets = new ArrayList<>();
-
-        // Lọc vé chưa sử dụng
         for (RailwayDTO ticket : allTickets) {
             if ("Unused".equals(ticket.getTicketStatus())) {
                 availableTickets.add(ticket);
@@ -189,7 +186,7 @@ public class CancelTicketServlet extends HttpServlet {
 
         if (selectedTicketIDs == null || selectedTicketIDs.length == 0) {
             request.setAttribute("error", "Vui lòng chọn ít nhất một vé để hủy.");
-            restorePagination(request, response, availableTickets); // Gọi hàm khôi phục phân trang
+            restorePagination(request, response, availableTickets);
             return;
         }
 
@@ -202,7 +199,6 @@ public class CancelTicketServlet extends HttpServlet {
                 if (ticket.getTicketID() == Integer.parseInt(ticketID)) {
                     LocalDateTime departureTime = ticket.getDepartureTime().toLocalDateTime();
                     Duration duration = Duration.between(now, departureTime);
-
                     if (now.isAfter(departureTime)) {
                         invalidTickets.add("Vé " + ticketID + " đã quá hạn để hủy.");
                     } else if (duration.toHours() < 12) {
@@ -217,11 +213,10 @@ public class CancelTicketServlet extends HttpServlet {
 
         if (!invalidTickets.isEmpty()) {
             request.setAttribute("error", String.join("<br>", invalidTickets));
-            restorePagination(request, response, availableTickets); // Giữ nguyên phân trang khi có lỗi
+            restorePagination(request, response, availableTickets);
             return;
         }
 
-        // Lưu danh sách vé đang chờ hủy vào session
         session.setAttribute("pendingCancelTickets", cancelableTickets);
         response.sendRedirect("confirm-cancel");
     }

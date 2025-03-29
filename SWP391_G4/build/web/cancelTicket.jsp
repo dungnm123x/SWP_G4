@@ -20,12 +20,10 @@
                 margin-top: 20px;
                 overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
             }
-
             @media (max-width: 768px) {
                 .table-container {
                     padding: 10px;
                 }
-
                 table {
                     font-size: 14px; /* Giảm kích thước chữ trên màn hình nhỏ */
                 }
@@ -65,7 +63,10 @@
                 </div>
             </form>
 
+            <!-- Trường ẩn để gửi toàn bộ danh sách vé đã chọn -->
             <form id="cancelForm" action="cancel-ticket" method="post">
+                <input type="hidden" id="allSelectedTickets" name="allSelectedTickets" value="">
+
                 <div class="table-container">
                     <table class="table table-bordered table-hover text-center">
                         <thead class="bg-dark text-white">
@@ -91,7 +92,9 @@
                                               and (empty param.filterCCCD or fn:trim(param.filterCCCD) == '' or ticket.cccd == fn:trim(param.filterCCCD)) 
                                               and (empty param.filterRoute or fn:trim(param.filterRoute) == '' or fn:containsIgnoreCase(ticket.route, fn:trim(param.filterRoute)))}">
                                       <tr>
-                                          <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
+                                          <td>
+                                              <input type="checkbox" class="ticket-checkbox" name="selectedTickets" value="${ticket.ticketID}">
+                                          </td>
                                           <td>${ticket.ticketID}</td>
                                           <td>${ticket.passengerName}</td>
                                           <td>${ticket.passengerType}</td>
@@ -158,6 +161,61 @@
 
         </div>
 
+        <!-- Thêm mã JavaScript để quản lý checkbox qua localStorage -->
+        <script>
+            const STORAGE_KEY = "selectedTickets";
+
+            // Hàm lấy danh sách ticket đã chọn từ localStorage (dạng mảng các ticketID)
+            function getSelectedTickets() {
+                let selected = localStorage.getItem(STORAGE_KEY);
+                return selected ? JSON.parse(selected) : [];
+            }
+
+            // Hàm lưu danh sách ticket vào localStorage
+            function saveSelectedTickets(tickets) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+            }
+
+            // Khi checkbox được click
+            document.querySelectorAll('.ticket-checkbox').forEach(checkbox => {
+                // Đánh dấu trạng thái checkbox khi load trang
+                let selectedTickets = getSelectedTickets();
+                if (selectedTickets.includes(checkbox.value)) {
+                    checkbox.checked = true;
+                }
+
+                checkbox.addEventListener('change', function () {
+                    let selectedTickets = getSelectedTickets();
+                    if (this.checked) {
+                        if (!selectedTickets.includes(this.value)) {
+                            selectedTickets.push(this.value);
+                        }
+                    } else {
+                        selectedTickets = selectedTickets.filter(id => id !== this.value);
+                    }
+                    saveSelectedTickets(selectedTickets);
+                });
+            });
+
+            // Trước khi submit form, gộp danh sách ticket đã chọn vào input ẩn
+            document.getElementById("cancelForm").addEventListener('submit', function (e) {
+                // Lấy danh sách checkbox trên trang hiện tại để cập nhật lại trạng thái (có thể có sự thay đổi chưa lưu)
+                document.querySelectorAll('.ticket-checkbox').forEach(checkbox => {
+                    let selectedTickets = getSelectedTickets();
+                    if (checkbox.checked && !selectedTickets.includes(checkbox.value)) {
+                        selectedTickets.push(checkbox.value);
+                    } else if (!checkbox.checked && selectedTickets.includes(checkbox.value)) {
+                        selectedTickets = selectedTickets.filter(id => id !== checkbox.value);
+                    }
+                    saveSelectedTickets(selectedTickets);
+                });
+                // Gán vào input ẩn
+                document.getElementById("allSelectedTickets").value = getSelectedTickets().join(",");
+                // Nếu muốn xóa localStorage sau khi submit (tùy chọn):
+                // localStorage.removeItem(STORAGE_KEY);
+            });
+        </script>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
-</html> 
+</html>
