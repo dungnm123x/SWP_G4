@@ -135,6 +135,11 @@
                     <c:if test="${empty tickets}">
                         <p class="no-results text-center">Không có vé nào.</p>
                     </c:if>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger" role="alert">
+                            ${error}
+                        </div>
+                    </c:if>
                 </div>
 
                 <div class="mt-4 p-3 border rounded bg-white">
