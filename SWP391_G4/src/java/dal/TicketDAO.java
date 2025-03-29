@@ -129,10 +129,16 @@ public class TicketDAO extends DBContext {
     }
 
     public int insertTicket(Ticket ticket) throws SQLException {
-        String sql = "INSERT INTO Ticket (PassengerName,passengerType,CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+        // Đảm bảo rằng TicketStatus được đặt là "Booked" nếu chưa có
+        if (ticket.getTicketStatus() == null || ticket.getTicketStatus().trim().isEmpty()) {
+            ticket.setTicketStatus("Booked");
+        }
 
-        // Tạo PreparedStatement có yêu cầu trả về khóa tự sinh
+        // Vì TripID trong ticket đã xác định chuyến và do đó ngày khởi hành,
+        // việc insert vé với TripID này sẽ đảm bảo vé chỉ áp dụng cho đúng chuyến.
+        String sql = "INSERT INTO Ticket (PassengerName, passengerType, CCCD, BookingID, SeatID, TripID, TicketPrice, TicketStatus) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, ticket.getPassengerName());
             ps.setString(2, ticket.getPassengerType());
@@ -143,14 +149,17 @@ public class TicketDAO extends DBContext {
             ps.setDouble(7, ticket.getTicketPrice());
             ps.setString(8, ticket.getTicketStatus());
 
-            ps.executeUpdate(); // Thực thi INSERT
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Inserting ticket failed, no rows affected.");
+            }
 
-            // Lấy ResultSet chứa các khóa tự sinh
+            // Lấy khóa tự sinh của vé vừa được insert
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1); // cột 1 là giá trị của ID vừa sinh
+                    return rs.getInt(1);
                 } else {
-                    throw new SQLException("No generated key returned.");
+                    throw new SQLException("Inserting ticket failed, no generated key obtained.");
                 }
             }
         }

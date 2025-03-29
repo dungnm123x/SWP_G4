@@ -14,22 +14,16 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 import model.Booking;
 import model.CartItem;
 import model.Ticket;
-import model.Trip;
 import model.User;
 
 /**
@@ -38,15 +32,6 @@ import model.User;
  */
 public class ReturnResult extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -65,14 +50,6 @@ public class ReturnResult extends HttpServlet {
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -87,7 +64,6 @@ public class ReturnResult extends HttpServlet {
         }
 
         // 2) Đọc các tham số trả về từ VNPay
-        //    - vnp_TransactionStatus: "00" => thành công
         String vnp_TxnRef = request.getParameter("vnp_TxnRef");
         String vnp_Amount = request.getParameter("vnp_Amount");
         String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
@@ -98,7 +74,7 @@ public class ReturnResult extends HttpServlet {
         String vnp_TransactionStatus = request.getParameter("vnp_TransactionStatus");
         System.out.println("TransactionStatus: " + vnp_TransactionStatus);
 
-        // (Tuỳ chọn) parse thời gian thanh toán
+        // (Tùy chọn) parse thời gian thanh toán
         String vnp_PayDate = "";
         if (vnp_PayDate_raw != null) {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -124,7 +100,6 @@ public class ReturnResult extends HttpServlet {
         // 4) Lấy giỏ vé (cartItems) từ session
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cartItems");
         if (cartItems == null || cartItems.isEmpty()) {
-            // Nếu giỏ trống => không làm gì
             response.sendRedirect("schedule");
             return;
         }
@@ -136,29 +111,15 @@ public class ReturnResult extends HttpServlet {
 
         // 5) Kiểm tra kết quả thanh toán: "00" = thành công
         if ("00".equals(vnp_TransactionStatus)) {
-            ConcurrentHashMap<String, TimerTask> seatTasks = CartServlet.getSeatBookingTasks();
             // A) Tính tổng tiền
-
-            for (CartItem item : cartItems) {
-                String seatID = item.getSeatID();
-                TimerTask task = seatTasks.get(seatID);
-                if (task != null) {
-                    task.cancel();        // Hủy
-                    seatTasks.remove(seatID);
-                    System.out.println("Đã cancel TimerTask cho seat " + seatID);
-                }
-
-            }
-            // Lấy tổng tiền từ session nếu có, nếu không thì sử dụng giá trị từ VNPay
             double totalPrice = 0;
             if (session.getAttribute("totalAmount") != null) {
                 totalPrice = (double) session.getAttribute("totalAmount");
             } else {
                 try {
                     long vnpAmountLong = Long.parseLong(vnp_Amount);
-                    totalPrice = vnpAmountLong / 100.0;  // Chia cho 100 để chuyển đổi đơn vị nếu cần
+                    totalPrice = vnpAmountLong / 100.0;
                 } catch (NumberFormatException e) {
-                    // fallback: tính lại từ giỏ vé
                     for (CartItem item : cartItems) {
                         totalPrice += item.getPrice();
                     }
@@ -186,7 +147,6 @@ public class ReturnResult extends HttpServlet {
                 booking.setTripID(goTripID);
                 booking.setRoundTripTripID(returnTripID);
             } else {
-                // 1 chiều
                 booking.setTripID(cartItems.get(0).getTrip().getTripID());
                 booking.setRoundTripTripID(null);
             }
@@ -210,12 +170,14 @@ public class ReturnResult extends HttpServlet {
 
             // D) Tạo Ticket + update ghế
             TicketDAO ticketDAO = new TicketDAO();
-            // Lấy danh sách CCCD
             List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
             List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
             List<String> typeList = (List<String>) session.getAttribute("typeList");
             List<Double> finalPriceList = (List<Double>) session.getAttribute("finalPriceList");
-            if (idNumberList == null || fullNameList == null || typeList == null ||  idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size() || typeList.size() != cartItems.size()) {
+            if (idNumberList == null || fullNameList == null || typeList == null 
+                    || idNumberList.size() != cartItems.size() 
+                    || fullNameList.size() != cartItems.size() 
+                    || typeList.size() != cartItems.size()) {
                 request.setAttribute("error", "Không khớp số lượng tên/CCCD với số vé trong giỏ!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
@@ -240,7 +202,6 @@ public class ReturnResult extends HttpServlet {
                 ticket.setTicketPrice(ticketPrice);
                 ticket.setTicketStatus("Unused");
 
-
                 try {
                     ticketDAO.insertTicket(ticket);
                     ticketDAO.updateSeatStatus(ticket.getSeatID(), "Booked");
@@ -250,13 +211,12 @@ public class ReturnResult extends HttpServlet {
                     request.getRequestDispatcher("error.jsp").forward(request, response);
                     return;
                 }
-                
             }
 
             // E) Xoá giỏ hàng
             session.removeAttribute("cartItems");
 
-            // F) Forward sang trang thanks/success
+            // F) Forward sang trang success
             request.setAttribute("cartItems", cartItems);
             request.setAttribute("fullNameList", session.getAttribute("fullNameList"));
             request.setAttribute("idNumberList", session.getAttribute("idNumberList"));
@@ -266,6 +226,23 @@ public class ReturnResult extends HttpServlet {
             request.setAttribute("bookingPhone", bookingPhone);
             Object totalAmountValue = session.getAttribute("totalAmount");
             request.setAttribute("totalAmount", totalAmountValue);
+
+            request.getRequestDispatcher("success.jsp").forward(request, response);
+            try {
+                BookingEmailSender.sendBookingSuccessEmail(
+                        user.getEmail(),
+                        bookingName,
+                        cartItems,
+                        fullNameList,
+                        idNumberList,
+                        typeList,
+                        bookingPhone
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Xóa các thuộc tính lưu trong session sau khi đặt vé thành công
             session.removeAttribute("cartItems");
             session.removeAttribute("fullNameList");
             session.removeAttribute("typeList");
@@ -275,29 +252,12 @@ public class ReturnResult extends HttpServlet {
             session.removeAttribute("birthYearList");
             session.removeAttribute("totalAmount");
             session.removeAttribute("bookingCCCD");
-
-            request.getRequestDispatcher("success.jsp").forward(request, response);
-            try {
-                BookingEmailSender.sendBookingSuccessEmail(
-                        user.getEmail(),
-                        bookingName,
-                        cartItems,
-                        (List<String>) session.getAttribute("fullNameList"),
-                        (List<String>) session.getAttribute("idNumberList"),
-                        (List<String>) session.getAttribute("typeList"),
-                        bookingPhone
-                );
-            } catch (Exception e) {
-                e.printStackTrace(); // Ghi log nếu gửi mail thất bại
-            }
-
             System.out.println("Thanh toán thành công");
         } else {
-            // Giao dịch không thành công => có thể về fail.jsp
+            // Giao dịch không thành công => chuyển trang fail.jsp
             System.out.println("Thanh toán KHÔNG thành công hoặc thiếu thông tin");
             request.getRequestDispatcher("failpaymet.jsp").forward(request, response);
         }
-
     }
 
     private static String formatNumber(double number) {
@@ -305,29 +265,14 @@ public class ReturnResult extends HttpServlet {
         return formatter.format(number);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Nếu VNPay gọi phương thức POST => ta vẫn xử lý như GET
         doGet(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
