@@ -53,9 +53,7 @@
                 bạn:
             </p>
 
-            <!-- Vòng lặp hiển thị thông tin vé -->
-            <!-- Vòng lặp hiển thị thông tin vé -->
-            <c:forEach var="item" items="${requestScope.cartItems}" varStatus="status">
+            <c:forEach var="item" items="${cartItems}" varStatus="status">
                 <div class="ticket-info">
                     <h5>Vé ${status.index + 1}</h5>
 
@@ -85,20 +83,25 @@
 
                     <p><strong>Tàu:</strong> ${item.trainName} - ${item.departureDate}</p>
                     <p><strong>Toa:</strong> ${item.carriageNumber} - Chỗ ${item.seatNumber}</p>
+
+                    <!-- Chỉ hiển thị giá của vé hiện tại -->
                     <p>
-                        <strong>Tổng tiền:</strong>
-                        <fmt:formatNumber value="${totalAmount}" pattern="#,##0"/> VND
+                        <strong>Giá vé:</strong>
+                        <fmt:formatNumber value="${item.price}" pattern="#,##0"/> VND
                     </p>
 
-                    <p><strong>Hành khách:</strong> ${requestScope.fullNameList[status.index]}</p>
-                    <p><strong>Số CMND/Hộ chiếu:</strong> ${requestScope.idNumberList[status.index]}</p>
-                    <p><strong>Đối tượng:</strong> ${requestScope.typeList[status.index]}</p>
-
+                    <p><strong>Hành khách:</strong> ${fullNameList[status.index]}</p>
+                    <p><strong>Số CMND/Hộ chiếu:</strong> ${idNumberList[status.index]}</p>
+                    <p><strong>Đối tượng:</strong> ${typeList[status.index]}</p>
                 </div>
             </c:forEach>
 
-            <c:if test="${empty requestScope.cartItems}">
-                <p style="color:red;">🚨 Không có dữ liệu giỏ hàng (cartItems trống)</p>
+            <!-- Nếu muốn hiển thị tổng tiền cả booking (tất cả vé) thì đặt ngoài vòng lặp -->
+            <c:if test="${not empty cartItems}">
+                <p style="margin-top: 20px;">
+                    <strong>Tổng tiền toàn bộ vé:</strong>
+                    <fmt:formatNumber value="${totalAmount}" pattern="#,##0"/> VND
+                </p>
             </c:if>
 
             <h5 class="mt-4">Thông tin người đặt vé</h5>
@@ -106,13 +109,9 @@
             <p><strong>Email:</strong> ${bookingEmail}</p>
             <p><strong>Số điện thoại:</strong> ${bookingPhone}</p>
 
-
-            <p>
-                Vé điện tử đã được gửi đến email của bạn. Vui lòng kiểm tra email để
-                nhận vé.
-            </p>
-
+            <p>Vé điện tử đã được gửi đến email của bạn. Vui lòng kiểm tra email để nhận vé.</p>
             <a href="home" class="btn btn-primary home-link">Về trang chủ</a>
+
         </div>
 
         <!-- Bootstrap JS (nếu cần JavaScript của Bootstrap) -->

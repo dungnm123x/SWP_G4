@@ -205,6 +205,7 @@ public class ReturnResult extends HttpServlet {
                 try {
                     ticketDAO.insertTicket(ticket);
                     ticketDAO.updateSeatStatus(ticket.getSeatID(), "Booked");
+                    item.setPrice(ticketPrice);
                 } catch (SQLException e) {
                     e.printStackTrace();
                     request.setAttribute("error", "Lỗi khi thêm vé: " + e.getMessage());
