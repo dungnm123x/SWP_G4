@@ -85,11 +85,11 @@ public class DashBoardDAO extends DBContext<Object> {
         }
 
         // Truy vấn B: Tổng TotalRefund từ Refund với RefundStatus = 'Complete'
-        String sqlRefund = "SELECT DAY(RefundDate) AS Day, SUM(TotalRefund) AS Total "
+        String sqlRefund = "SELECT DAY(ConfirmRefundDate) AS Day, SUM(TotalRefund) AS Total "
                 + "FROM Refund "
                 + "WHERE RefundStatus = 'Complete' "
-                + "AND YEAR(RefundDate) = ? AND MONTH(RefundDate) = ? "
-                + "GROUP BY DAY(RefundDate)";
+                + "AND YEAR(ConfirmRefundDate) = ? AND MONTH(ConfirmRefundDate) = ? "
+                + "GROUP BY DAY(ConfirmRefundDate)";
 
         try (PreparedStatement stm = getConnection().prepareStatement(sqlRefund)) {
             stm.setInt(1, year);
@@ -144,11 +144,11 @@ public class DashBoardDAO extends DBContext<Object> {
         }
 
         // Truy vấn B: Tổng TotalRefund từ Refund với RefundStatus = 'Complete'
-        String sqlRefund = "SELECT MONTH(RefundDate) AS Month, SUM(TotalRefund) AS Total "
+        String sqlRefund = "SELECT MONTH(ConfirmRefundDate) AS Month, SUM(TotalRefund) AS Total "
                 + "FROM Refund "
                 + "WHERE RefundStatus = 'Complete' "
-                + "AND YEAR(RefundDate) = ? "
-                + "GROUP BY MONTH(RefundDate)";
+                + "AND YEAR(ConfirmRefundDate) = ? "
+                + "GROUP BY MONTH(ConfirmRefundDate)";
 
         try (PreparedStatement stm = getConnection().prepareStatement(sqlRefund)) {
             stm.setInt(1, year);
