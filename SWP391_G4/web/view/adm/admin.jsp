@@ -54,95 +54,7 @@
             return true; // Cho phép gửi form
             }
         </script>
-        <script>
-            function submitRoleForm(userId) {
-            document.getElementById('roleForm' + userId).submit();
-            }
 
-            // Client-side validation for the Add Event form
-            function validateAddEventForm() {
-            const title = document.getElementById('title').value.trim();
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const description = document.getElementById('description').value.trim();
-            const currentDate = new Date().toISOString().slice(0, 16);
-            // Validate title
-            if (!title) {
-            alert('Tiêu đề không được để trống!');
-            return false;
-            }
-            if (title.length > 100) {
-            alert('Tiêu đề không được dài quá 100 ký tự!');
-            return false;
-            }
-
-            // Validate description
-            if (description.length > 500) {
-            alert('Mô tả không được dài quá 500 ký tự!');
-            return false;
-            }
-
-            // Validate start date
-            if (!startDate) {
-            alert('Ngày bắt đầu không được để trống!');
-            return false;
-            }
-            if (startDate < currentDate) {
-            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-            return false;
-            }
-
-            // Validate end date (if provided)
-            if (endDate && startDate >= endDate) {
-            alert('Ngày bắt đầu phải trước ngày kết thúc!');
-            return false;
-            }
-
-            return true;
-            }
-
-            // Client-side validation for the Edit Event form
-            function validateEditEventForm() {
-            const title = document.getElementById('editTitle').value.trim();
-            const startDate = document.getElementById('editStartDate').value;
-            const endDate = document.getElementById('editEndDate').value;
-            const description = document.getElementById('editDescription').value.trim();
-            const currentDate = new Date().toISOString().slice(0, 16);
-            // Validate title
-            if (!title) {
-            alert('Tiêu đề không được để trống!');
-            return false;
-            }
-            if (title.length > 100) {
-            alert('Tiêu đề không được dài quá 100 ký tự!');
-            return false;
-            }
-
-            // Validate description
-            if (description.length > 500) {
-            alert('Mô tả không được dài quá 500 ký tự!');
-            return false;
-            }
-
-            // Validate start date
-            if (!startDate) {
-            alert('Ngày bắt đầu không được để trống!');
-            return false;
-            }
-            if (startDate < currentDate) {
-            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-            return false;
-            }
-
-            // Validate end date (if provided)
-            if (endDate && startDate >= endDate) {
-            alert('Ngày bắt đầu phải trước ngày kết thúc!');
-            return false;
-            }
-
-            return true;
-            }
-        </script>
 
     </head>
     <body>
@@ -181,12 +93,11 @@
                                             <a href="train" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
-                                    <div class="dashboard-item bookings">
-                                        <h3>Thống kê đơn</h3>
-                                        <p>Tổng số đơn: ${totalBookings}</p>
-                                        <p>Tổng số vé: ${totalTickets}</p>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #96B4AA;">
-                                            <a href="order" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                    <div class="dashboard-item trips" style="background-color: #A9DEF9">
+                                        <h3>Thống kê chuyến đi</h3>
+                                        <p>Tổng số chuyến đi: ${totalTrips}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
+                                            <a href="trip" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                     <div class="dashboard-item routes" style="background-color: #DBE1E1">
@@ -197,48 +108,59 @@
                                             <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
-                                    <div class="dashboard-item rules" >
-                                        <h3>Thống kê Quy định</h3>
-                                        <p>Tổng số Quy định: ${totalRules}</p>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
-                                            <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                    <div class="dashboard-item stations" style="background-color: #E0BBE4">
+                                        <h3>Thống kê Ga</h3>
+                                        <p>Tổng số ga: ${totalStations}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #D18AC4;">
+                                            <a href="station" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="dashboard-row">
-                                    <div class="dashboard-item stations" style="background-color: #E0BBE4">
-                                        <h3>Thống kê Ga</h3>
-                                        <p>Tổng số ga: ${totalStations}</p>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #E6C2F5;">
-                                            <a href="station" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+
+                                    <div class="dashboard-item bookings">
+                                        <h3>Thống kê đơn</h3>
+                                        <p>Tổng số đơn: ${totalBookings}</p>
+                                        <p>Tổng số vé: ${totalTickets}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #65917D;">
+                                            <a href="order" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
-                                    <div class="dashboard-item trips" style="background-color: #A9DEF9">
-                                        <h3>Thống kê chuyến đi</h3>
-                                        <p>Tổng số chuyến đi: ${totalTrips}</p>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
-                                            <a href="trip" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                    <div class="dashboard-item refund">
+                                        <h3>Thống kê hoàn tiền</h3>
+                                        <p>Tổng số đơn hoàn tiền: ${totalBookings}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #7A988E;">
+                                            <a href="refund" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                     <div class="dashboard-item category-blogs" style="background-color: #FCE6C9">
                                         <h3>Tiêu đề blog</h3>
                                         <br>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #D9C3A6;">
                                             <a href="category-blog" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
+                                </div>
+                                <div class="dashboard-row">
                                     <div class="dashboard-item blogs" style="background-color: #D4E9B9">
                                         <h3>Thống kê Blog</h3>
                                         <p>Tổng số blog: ${totalBlogs}</p>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #D8B4A9;">
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #B2C697;">
                                             <a href="posts-list" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                     <div class="dashboard-item category-rules" style="background-color: #CDFBBD">
                                         <h3>Tiêu đề quy định:</h3>
                                         <br>
-                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #D8B4A9;">
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A2C888;">
                                             <a href="category-rule" style="text-decoration: none;">More info <span class="arrow">→</span></a>
+                                        </button>
+                                    </div>
+                                    <div class="dashboard-item rules" >
+                                        <h3>Thống kê Quy định</h3>
+                                        <p>Tổng số Quy định: ${totalRules}</p>
+                                        <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #C2B0D8;">
+                                            <a href="manager-rule-list" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                 </div>
@@ -416,7 +338,7 @@
                                         labels: labels,
                                                 datasets: [
                                                 {
-                                                label: 'Doanh thu',
+                                                label: 'Số tiền đã nhận',
                                                         data: bookingRevenue,
                                                         borderColor: 'rgba(255, 99, 132, 1)',
                                                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -432,7 +354,7 @@
                                                         tension: 0.1
                                                 },
                                                 {
-                                                label: 'Số tiền đã nhận',
+                                                label: 'Doanh thu',
                                                         data: netRevenue,
                                                         borderColor: 'rgba(75, 192, 192, 1)',
                                                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -704,8 +626,97 @@
                                 }
                                 });
                                 });</script>
-                            </c:when>
-                            <c:when test="${type == 'userauthorization'}">
+                            <script>
+                                function submitRoleForm(userId) {
+                                document.getElementById('roleForm' + userId).submit();
+                                }
+
+                                // Client-side validation for the Add Event form
+                                function validateAddEventForm() {
+                                const title = document.getElementById('title').value.trim();
+                                const startDate = document.getElementById('startDate').value;
+                                const endDate = document.getElementById('endDate').value;
+                                const description = document.getElementById('description').value.trim();
+                                const currentDate = new Date().toISOString().slice(0, 16);
+                                // Validate title
+                                if (!title) {
+                                alert('Tiêu đề không được để trống!');
+                                return false;
+                                }
+                                if (title.length > 100) {
+                                alert('Tiêu đề không được dài quá 100 ký tự!');
+                                return false;
+                                }
+
+                                // Validate description
+                                if (description.length > 500) {
+                                alert('Mô tả không được dài quá 500 ký tự!');
+                                return false;
+                                }
+
+                                // Validate start date
+                                if (!startDate) {
+                                alert('Ngày bắt đầu không được để trống!');
+                                return false;
+                                }
+                                if (startDate < currentDate) {
+                                alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+                                return false;
+                                }
+
+                                // Validate end date (if provided)
+                                if (endDate && startDate >= endDate) {
+                                alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                                return false;
+                                }
+
+                                return true;
+                                }
+
+                                // Client-side validation for the Edit Event form
+                                function validateEditEventForm() {
+                                const title = document.getElementById('editTitle').value.trim();
+                                const startDate = document.getElementById('editStartDate').value;
+                                const endDate = document.getElementById('editEndDate').value;
+                                const description = document.getElementById('editDescription').value.trim();
+                                const currentDate = new Date().toISOString().slice(0, 16);
+                                // Validate title
+                                if (!title) {
+                                alert('Tiêu đề không được để trống!');
+                                return false;
+                                }
+                                if (title.length > 100) {
+                                alert('Tiêu đề không được dài quá 100 ký tự!');
+                                return false;
+                                }
+
+                                // Validate description
+                                if (description.length > 500) {
+                                alert('Mô tả không được dài quá 500 ký tự!');
+                                return false;
+                                }
+
+                                // Validate start date
+                                if (!startDate) {
+                                alert('Ngày bắt đầu không được để trống!');
+                                return false;
+                                }
+                                if (startDate < currentDate) {
+                                alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+                                return false;
+                                }
+
+                                // Validate end date (if provided)
+                                if (endDate && startDate >= endDate) {
+                                alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                                return false;
+                                }
+
+                                return true;
+                                }
+                            </script>
+                        </c:when>
+                        <c:when test="${type == 'userauthorization'}">
                             <div class="search-container">
                                 <form method="get" action="admin">
                                     <input type="hidden" name="view" value="userauthorization">
