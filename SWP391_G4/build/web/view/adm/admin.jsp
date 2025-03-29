@@ -55,7 +55,95 @@
             }
         </script>
 
+        <script>
+            function submitRoleForm(userId) {
+            document.getElementById('roleForm' + userId).submit();
+            }
 
+            // Client-side validation for the Add Event form
+            function validateAddEventForm() {
+            const title = document.getElementById('title').value.trim();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const description = document.getElementById('description').value.trim();
+            const currentDate = new Date().toISOString().slice(0, 16);
+            // Validate title
+            if (!title) {
+            alert('Tiêu đề không được để trống!');
+            return false;
+            }
+            if (title.length > 100) {
+            alert('Tiêu đề không được dài quá 100 ký tự!');
+            return false;
+            }
+
+            // Validate description
+            if (description.length > 500) {
+            alert('Mô tả không được dài quá 500 ký tự!');
+            return false;
+            }
+
+            // Validate start date
+            if (!startDate) {
+            alert('Ngày bắt đầu không được để trống!');
+            return false;
+            }
+            if (startDate < currentDate) {
+            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+            return false;
+            }
+
+            // Validate end date (if provided)
+            if (endDate && startDate >= endDate) {
+            alert('Ngày bắt đầu phải trước ngày kết thúc!');
+            return false;
+            }
+
+            return true;
+            }
+
+            // Client-side validation for the Edit Event form
+            function validateEditEventForm() {
+            const title = document.getElementById('editTitle').value.trim();
+            const startDate = document.getElementById('editStartDate').value;
+            const endDate = document.getElementById('editEndDate').value;
+            const description = document.getElementById('editDescription').value.trim();
+            const currentDate = new Date().toISOString().slice(0, 16);
+            // Validate title
+            if (!title) {
+            alert('Tiêu đề không được để trống!');
+            return false;
+            }
+            if (title.length > 100) {
+            alert('Tiêu đề không được dài quá 100 ký tự!');
+            return false;
+            }
+
+            // Validate description
+            if (description.length > 500) {
+            alert('Mô tả không được dài quá 500 ký tự!');
+            return false;
+            }
+
+            // Validate start date
+            if (!startDate) {
+            alert('Ngày bắt đầu không được để trống!');
+            return false;
+            }
+            if (startDate < currentDate) {
+            alert('Ngày bắt đầu không được là ngày trong quá khứ!');
+            return false;
+            }
+
+            // Validate end date (if provided)
+            if (endDate && startDate >= endDate) {
+            alert('Ngày bắt đầu phải trước ngày kết thúc!');
+            return false;
+            }
+
+            return true;
+            }
+        </script>
     </head>
     <body>
         <div class="container">
@@ -627,95 +715,7 @@
                                 }
                                 });
                                 });</script>
-                            <script>
-                                function submitRoleForm(userId) {
-                                document.getElementById('roleForm' + userId).submit();
-                                }
 
-                                // Client-side validation for the Add Event form
-                                function validateAddEventForm() {
-                                const title = document.getElementById('title').value.trim();
-                                const startDate = document.getElementById('startDate').value;
-                                const endDate = document.getElementById('endDate').value;
-                                const description = document.getElementById('description').value.trim();
-                                const currentDate = new Date().toISOString().slice(0, 16);
-                                // Validate title
-                                if (!title) {
-                                alert('Tiêu đề không được để trống!');
-                                return false;
-                                }
-                                if (title.length > 100) {
-                                alert('Tiêu đề không được dài quá 100 ký tự!');
-                                return false;
-                                }
-
-                                // Validate description
-                                if (description.length > 500) {
-                                alert('Mô tả không được dài quá 500 ký tự!');
-                                return false;
-                                }
-
-                                // Validate start date
-                                if (!startDate) {
-                                alert('Ngày bắt đầu không được để trống!');
-                                return false;
-                                }
-                                if (startDate < currentDate) {
-                                alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-                                return false;
-                                }
-
-                                // Validate end date (if provided)
-                                if (endDate && startDate >= endDate) {
-                                alert('Ngày bắt đầu phải trước ngày kết thúc!');
-                                return false;
-                                }
-
-                                return true;
-                                }
-
-                                // Client-side validation for the Edit Event form
-                                function validateEditEventForm() {
-                                const title = document.getElementById('editTitle').value.trim();
-                                const startDate = document.getElementById('editStartDate').value;
-                                const endDate = document.getElementById('editEndDate').value;
-                                const description = document.getElementById('editDescription').value.trim();
-                                const currentDate = new Date().toISOString().slice(0, 16);
-                                // Validate title
-                                if (!title) {
-                                alert('Tiêu đề không được để trống!');
-                                return false;
-                                }
-                                if (title.length > 100) {
-                                alert('Tiêu đề không được dài quá 100 ký tự!');
-                                return false;
-                                }
-
-                                // Validate description
-                                if (description.length > 500) {
-                                alert('Mô tả không được dài quá 500 ký tự!');
-                                return false;
-                                }
-
-                                // Validate start date
-                                if (!startDate) {
-                                alert('Ngày bắt đầu không được để trống!');
-                                return false;
-                                }
-                                if (startDate < currentDate) {
-                                alert('Ngày bắt đầu không được là ngày trong quá khứ!');
-                                return false;
-                                }
-
-                                // Validate end date (if provided)
-                                if (endDate && startDate >= endDate) {
-                                alert('Ngày bắt đầu phải trước ngày kết thúc!');
-                                return false;
-                                }
-
-                                return true;
-                                }
-                            </script>
                         </c:when>
                         <c:when test="${type == 'userauthorization'}">
                             <div class="search-container">
