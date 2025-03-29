@@ -107,6 +107,41 @@
             return true;
             }
         </script>
+        <script>
+            function validateSearchForm(form) {
+            const searchInput = form.search.value.trim(); // Get the search input value
+
+            if (searchInput.length === 0) {
+            alert("Vui lòng nhập từ khóa tìm kiếm.");
+            return false; // Prevent form submission
+            }
+
+            // Kiểm tra xem chuỗi có chỉ chứa khoảng trắng hay không
+            if (/^\s*$/.test(searchInput)) {
+            alert("Vui lòng nhập từ khóa tìm kiếm.");
+            return false;
+            }
+
+            if (searchInput.length < 2) { // Minimum length
+            alert("Từ khóa tìm kiếm phải có ít nhất 2 ký tự.");
+            return false;
+            }
+
+            if (searchInput.length > 50) { // Maximum length
+            alert("Từ khóa tìm kiếm không được dài quá 50 ký tự.");
+            return false;
+            }
+
+            // Kiểm tra ký tự cho phép
+            const regex = /^[a-zA-Z0-9\s\u00C0-\u1FFF]*$/; // Cho phép chữ cái, số, khoảng trắng, tiếng Việt
+            if (!regex.test(searchInput)) {
+            alert("Từ khóa tìm kiếm chỉ được chứa chữ cái, số, khoảng trắng và tiếng Việt.");
+            return false;
+            }
+
+            return true; // Cho phép gửi form
+            }
+        </script>
     </head>
     <body>
         <div class="container">
@@ -716,11 +751,11 @@
                             </div>
                             <h2>Phân quyền người dùng</h2>
                             <%-- Display message2 if it exists --%>
-                            <c:if test="${not empty sessionScope.message2}">
+                            <c:if test="${not empty sessionScope.message10}">
                                 <div class="alert alert-info">
-                                    ${sessionScope.message2}
-                                    <% session.removeAttribute("message2"); %> <%-- Clear message after display --%>
+                                    ${sessionScope.message10}
                                 </div>
+                                <c:remove var="message10" scope="session" /> <%-- Use JSTL to remove the attribute --%>
                             </c:if>
                             <table border="1">
                                 <thead>
@@ -784,7 +819,7 @@
                         </c:when>
                         <c:when test="${not empty list}">
                             <div class="search-container">
-                                <form method="get" action="admin">
+                                <form method="get" action="admin" onsubmit="return validateSearchForm(this);">
                                     <input type="hidden" name="view" value="${type}">
                                     <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
                                     <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
@@ -804,6 +839,7 @@
                                     <tr>
                                         <c:choose>
                                             <c:when test="${type == 'employees' || type == 'customers'}">
+
                                                 <th></th>
                                                 <th>Tên người dung</th>
                                                 <th>Họ và tên</th>
@@ -815,39 +851,55 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="item" items="${list}" varStatus="status">
-                                        <tr>
-                                            <c:choose>
-                                                <c:when test="${type == 'employees' || type == 'customers'}">
-                                                    <td>${status.index + 1}</td>
-                                                    <td>${item.username}</td>
-                                                    <td>${item.fullName}</td>
-                                                    <td>${item.email}</td>
-                                                    <td>${item.phoneNumber}</td>
-                                                </c:when>
-                                            </c:choose>
-                                            <td>
-                                                <button class="btn btn-outline-primary btn-sm"
-                                                        onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
-                                                    <i class="bi bi-eye"></i> Chi Tiết
-                                                </button>
-                                                <c:choose>
-                                                    <c:when test="${item.status}">
-                                                        <button class="btn btn-outline-danger btn-sm" style="color: green; border-color: green;"
-                                                                onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
-                                                            <i class="bi bi-check-circle"></i> Đang hoạt động
+                                    <c:choose>
+                                        <c:when test="${empty list}">
+                                            <tr>
+                                                <td colspan="6" align="center">
+                                                    <c:if test="${not empty noResultsMessage}">
+                                                        ${noResultsMessage}
+                                                    </c:if>
+                                                    <c:if test="${empty noResultsMessage}">
+                                                        Không có dữ liệu.
+                                                    </c:if>
+                                                </td>
+                                            </tr>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach var="item" items="${list}" varStatus="status">
+                                                <tr>
+                                                    <c:choose>
+                                                        <c:when test="${type == 'employees' || type == 'customers'}">
+                                                            <td>${status.index + 1}</td>
+                                                            <td>${item.username}</td>
+                                                            <td>${item.fullName}</td>
+                                                            <td>${item.email}</td>
+                                                            <td>${item.phoneNumber}</td>
+                                                        </c:when>
+                                                    </c:choose>
+                                                    <td>
+                                                        <button class="btn btn-outline-primary btn-sm"
+                                                                onclick="location.href = 'admin?view=details&type=${type}&id=${item.userId}'">
+                                                            <i class="bi bi-eye"></i> Chi Tiết
                                                         </button>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <button class="btn btn-outline-success btn-sm" style="color: red; border-color: red;"
-                                                                onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
-                                                            <i class="bi bi-x-circle"></i> Đã tắt hoạt động
-                                                        </button>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
+                                                        <c:choose>
+                                                            <c:when test="${item.status}">
+                                                                <button class="btn btn-outline-danger btn-sm" style="color: green; border-color: green;"
+                                                                        onclick="location.href = 'admin?view=disable&type=${type}&id=${item.userId}'">
+                                                                    <i class="bi bi-check-circle"></i> Đang hoạt động
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <button class="btn btn-outline-success btn-sm" style="color: red; border-color: red;"
+                                                                        onclick="location.href = 'admin?view=restore&type=${type}&id=${item.userId}'">
+                                                                    <i class="bi bi-x-circle"></i> Đã tắt hoạt động
+                                                                </button>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </tbody>
                             </table>
                             <div class="pagination">

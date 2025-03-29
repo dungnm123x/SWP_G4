@@ -4,22 +4,22 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title><c:choose>
-                <c:when test="${type == 'employees'}">
-                    Nhân viên
-                </c:when>
-                <c:when test="${type == 'customers'}">
-                    Khách hàng
-                </c:when>
-                <c:otherwise>
-                    Chi tiết
-                </c:otherwise>
-            </c:choose></title>
+        <title>
+            <c:choose>
+                <c:when test="${type == 'employees'}">Nhân viên</c:when>
+                <c:when test="${type == 'customers'}">Khách hàng</c:when>
+                <c:otherwise>Chi tiết</c:otherwise>
+            </c:choose>
+        </title>
         <link rel="stylesheet" href="css/admin/userDetails.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <style>
             .edit-form {
-                display: none; /* Ẩn form sửa ban đầu */
+                display: none;
+            }
+            .error {
+                color: red;
+                font-size: 0.8em;
             }
         </style>
     </head>
@@ -27,29 +27,24 @@
         <div class="container">
             <div class="main-content">
                 <div class="header">
-                    <h1> Chi tiết <c:choose>
-                            
-                            <c:when test="${type == 'employees'}">
-                                nhân viên
-                            </c:when>
-                            <c:when test="${type == 'customers'}">
-                                khách hàng
-                            </c:when>
-                            <c:otherwise>
-                                Không gì cả
-                            </c:otherwise>
-                        </c:choose></h1>
+                    <h1>Chi tiết
+                        <c:choose>
+                            <c:when test="${type == 'employees'}">nhân viên</c:when>
+                            <c:when test="${type == 'customers'}">khách hàng</c:when>
+                            <c:otherwise>Không gì cả</c:otherwise>
+                        </c:choose>
+                    </h1>
                 </div>
                 <div class="content">
                     <c:if test="${not empty userDetails}">
-                        <form action="admin" method="post" class="view-form">  <%-- Form hiển thị thông tin --%>
-                            <input type="hidden" name="action" value="update"> <%-- Action cho update --%>
-                            <input type="hidden" name="type" value="${type}"> <%-- Lưu type để biết đang sửa employee hay customer --%>
-                            <input type="hidden" name="id" value="${userDetails.userId}"> <%-- ID của user để update --%>
+                        <form action="admin" method="post" class="view-form">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="type" value="${type}">
+                            <input type="hidden" name="id" value="${userDetails.userId}">
 
-                            <p><strong>Username:</strong> ${userDetails.username}</p> <%-- Hiển thị username --%>
+                            <p><strong>Username:</strong> ${userDetails.username}</p>
                             <p><strong>Họ và tên:</strong> ${userDetails.fullName}</p>
-                            <p><strong>Email:</strong> ${userDetails.email}</p> <%-- Hiển thị email --%>
+                            <p><strong>Email:</strong> ${userDetails.email}</p>
                             <p><strong>Số điện thoại:</strong> ${userDetails.phoneNumber}</p>
                             <p><strong>Địa chỉ:</strong> ${userDetails.address}</p>
 
@@ -57,34 +52,30 @@
                             <a href="admin?view=${type}" class="btn btn-secondary">Trở lại</a>
                         </form>
 
-                        <form action="admin" method="post" class="edit-form"> <%-- Form chỉnh sửa --%>
-                            <input type="hidden" name="action" value="save"> <%-- Action cho save --%>
+                        <form action="admin" method="post" class="edit-form" id="editForm">
+                            <input type="hidden" name="action" value="save">
                             <input type="hidden" name="type" value="${type}">
                             <input type="hidden" name="id" value="${userDetails.userId}">
 
                             <div class="mb-3">
-                                <label for="username" class="form-label">Username:</label>
-                                <p>${userDetails.username}</p> <%-- Không cho sửa username --%>
-                            </div>
-                            <div class="mb-3">
                                 <label for="fullName" class="form-label">Họ và tên:</label>
                                 <input type="text" class="form-control" id="fullName" name="fullName" value="${userDetails.fullName}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email:</label>
-                                <p>${userDetails.email}</p> <%-- Không cho sửa email --%>
-                            </div>
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Số điện thoại:</label>
-                                <p>${userDetails.phoneNumber}</p> 
+                                <div id="fullNameError" class="error"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="form-label">Địa chỉ:</label>
                                 <input type="text" class="form-control" id="address" name="address" value="${userDetails.address}" required>
+                                <div id="addressError" class="error"></div>
                             </div>
 
                             <button type="submit" class="btn btn-success">Lưu</button>
                             <button type="button" id="cancelButton" class="btn btn-secondary">Hủy</button>
+                            <c:if test="${not empty sessionScope.messageSave}">
+                                <div class="alert alert-info">
+                                    ${sessionScope.messageSave}
+                                </div>
+                                <c:remove var="messageSave" scope="session" /> <%-- Use JSTL to remove the attribute --%>
+                            </c:if>
                         </form>
                     </c:if>
                 </div>
@@ -95,6 +86,10 @@
             const cancelButton = document.getElementById('cancelButton');
             const viewForm = document.querySelector('.view-form');
             const editForm = document.querySelector('.edit-form');
+            const fullNameInput = document.getElementById('fullName');
+            const addressInput = document.getElementById('address');
+            const fullNameError = document.getElementById('fullNameError');
+            const addressError = document.getElementById('addressError');
 
             editButton.addEventListener('click', () => {
                 viewForm.style.display = 'none';
@@ -105,6 +100,26 @@
                 editForm.style.display = 'none';
                 viewForm.style.display = 'block';
             });
+            editForm.addEventListener('submit', (event) => {
+                let isValid = true;
+                if (fullNameInput.value.trim() === '') {
+                    fullNameError.textContent = 'Họ và tên không được để trống.';
+                    isValid = false;
+                } else {
+                    fullNameError.textContent = '';
+                }
+
+                if (addressInput.value.trim() === '') {
+                    addressError.textContent = 'Địa chỉ không được để trống.';
+                    isValid = false;
+                } else {
+                    addressError.textContent = '';
+                }
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+
         </script>
     </body>
 </html>

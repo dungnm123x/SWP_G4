@@ -136,8 +136,11 @@ public class AdminController extends HttpServlet {
                         List<User> users;
                         int totalUsers;
                         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                            users = dao.searchUsers(searchKeyword, page, pageSize); // Phương thức tìm kiếm mới trong DAO
+                            users = dao.searchUsers(searchKeyword, page, pageSize);
                             totalUsers = dao.countSearchUsers(searchKeyword);
+                            if (users.isEmpty()) {
+                                request.setAttribute("noResultsMessage", "Không có kết quả tìm kiếm.");
+                            }
                         } else {
                             users = dao.getAllUsers(page, pageSize);
                             totalUsers = dao.countAllUsers();
@@ -198,9 +201,9 @@ public class AdminController extends HttpServlet {
                 }
 
                 if (success) {
-                    request.getSession().setAttribute("message2", "✅ Thay đổi trạng thái thành công!");
+                    request.getSession().setAttribute("messageStatus", "✅ Thay đổi trạng thái thành công!");
                 } else {
-                    request.getSession().setAttribute("message2", "❌ Thay đổi trạng thái thất bại!");
+                    request.getSession().setAttribute("messageStatus", "❌ Thay đổi trạng thái thất bại!");
                 }
                 response.sendRedirect("admin?view=" + type);
                 return;
@@ -461,7 +464,7 @@ public class AdminController extends HttpServlet {
                 request.getRequestDispatcher("view/adm/addEmployees.jsp").forward(request, response);
                 return; // Stop processing
             }
-        } else if ("save".equals(action)) { // Lưu thông tin đã chỉnh sửa
+        } else if ("save".equals(action)) {
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
                 String type = request.getParameter("type");
@@ -471,19 +474,31 @@ public class AdminController extends HttpServlet {
                 String phone = request.getParameter("phone");
                 String address = request.getParameter("address");
 
-                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2), true); // Tạo đối tượng User mới
+                if (fullName == null || fullName.trim().isEmpty()) {
+                    request.setAttribute("messageSave", "❌ Họ và tên không được để trống.");
+                    request.getRequestDispatcher("userDetails.jsp").forward(request, response);
+                    return;
+                }
 
-                boolean success = dao.updateUser(updatedUser); // Gọi hàm update trong DAO
+                if (address == null || address.trim().isEmpty()) {
+                    request.setAttribute("messageSave", "❌ Địa chỉ không được để trống.");
+                    request.getRequestDispatcher("userDetails.jsp").forward(request, response);
+                    return;
+                }
+
+                User updatedUser = new User(id, username, null, fullName, email, phone, address, (type.equals("employees") ? 3 : 2), true);
+
+                boolean success = dao.updateUser(updatedUser);
 
                 if (success) {
-                    request.getSession().setAttribute("message2", "✅ Cập nhật thành công!");
+                    request.getSession().setAttribute("messageSave", "✅ Cập nhật thành công!");
                 } else {
-                    request.setAttribute("message2", "❌ Cập nhật thất bại! Vui lòng thử lại.");
+                    request.setAttribute("messageSave", "❌ Cập nhật thất bại! Vui lòng thử lại.");
                 }
-                response.sendRedirect("admin?view=" + type); // Quay lại trang danh sách
+                response.sendRedirect("admin?view=" + type);
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                request.setAttribute("messageSave", "⚠️ Lỗi hệ thống: " + e.getMessage());
                 response.sendRedirect("admin?view=" + request.getParameter("type"));
             }
         } // Action: Đặt Role cho User
@@ -493,20 +508,20 @@ public class AdminController extends HttpServlet {
                 int roleId = Integer.parseInt(request.getParameter("roleId"));
 
                 if (dao.updateUserRole(userId, roleId)) {
-                    request.getSession().setAttribute("message2", "✅ Đặt Role thành công!");
+                    request.getSession().setAttribute("message10", "✅ Đặt Role thành công!");
                 } else {
-                    request.getSession().setAttribute("message2", "❌ Đặt Role thất bại.");
+                    request.getSession().setAttribute("message10", "❌ Đặt Role thất bại.");
                 }
             } catch (SQLException e) {
                 if (e.getMessage().contains("Hệ thống cần ít nhất một Admin")) {
-                    request.getSession().setAttribute("message2", "⚠️ Không thể thay đổi vai trò. Hệ thống cần ít nhất một Admin.");
+                    request.getSession().setAttribute("message10", "⚠️ Không thể thay đổi vai trò. Hệ thống cần ít nhất một Admin.");
                 } else {
                     e.printStackTrace();
-                    request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                    request.getSession().setAttribute("message10", "⚠️ Lỗi hệ thống: " + e.getMessage());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                request.getSession().setAttribute("message2", "⚠️ Lỗi hệ thống: " + e.getMessage());
+                request.getSession().setAttribute("message10", "⚠️ Lỗi hệ thống: " + e.getMessage());
             }
             response.sendRedirect("admin?view=userauthorization");
             return;
