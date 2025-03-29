@@ -239,6 +239,16 @@ public class DashBoardDAO extends DBContext<Object> {
         }
         return tripStats;
     }
+    public int getTotalRoutesCount() throws SQLException {
+    String query = "SELECT COUNT(*) FROM Route";
+    try (PreparedStatement stmt = connection.prepareStatement(query);
+         ResultSet rs = stmt.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    }
+    return 0;
+}
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");
     }

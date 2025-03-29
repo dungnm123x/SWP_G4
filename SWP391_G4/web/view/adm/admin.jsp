@@ -154,7 +154,7 @@
                                     </div>
                                     <div class="dashboard-item routes" style="background-color: #DBE1E1">
                                         <h3>Thống kê tuyến tàu</h3>
-                                        <p>${tripStatistics}</p>
+                                        <p>Tổng số tuyến: ${tripStatistics}</p>
                                         <br>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
                                             <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
