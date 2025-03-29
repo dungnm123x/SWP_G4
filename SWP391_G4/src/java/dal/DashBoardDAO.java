@@ -217,7 +217,28 @@ public class DashBoardDAO extends DBContext<Object> {
         }
         return stations;
     }
+    public int getTotalTickets() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Ticket";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 
+    public Map<String, Integer> getTripStatistics() throws SQLException {
+        Map<String, Integer> tripStats = new HashMap<>();
+        String sql = "SELECT TripStatus, COUNT(*) AS Count FROM Trip GROUP BY TripStatus";
+        try (PreparedStatement stm = getConnection().prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                tripStats.put(rs.getString("TripStatus"), rs.getInt("Count"));
+            }
+        }
+        return tripStats;
+    }
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");
     }

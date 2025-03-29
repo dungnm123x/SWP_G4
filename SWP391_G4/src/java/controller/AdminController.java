@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import model.CalendarEvent;
 import model.Feedback;
 import model.StationWithCoordinates;
@@ -66,6 +67,8 @@ public class AdminController extends HttpServlet {
                 int totalBlogs = dashBoardDAO.getTotalBlogs();
                 int totalRules = dashBoardDAO.getTotalRules();
                 int totalStations = dashBoardDAO.getTotalStations();
+                int totalTickets = dashBoardDAO.getTotalTickets();
+                Map<String, Integer> tripStatistics = dashBoardDAO.getTripStatistics();
                 request.setAttribute("totalUsers", totalUsers);
                 request.setAttribute("totalEmployees", totalEmployees);
                 request.setAttribute("totalCustomers", totalCustomers);
@@ -75,6 +78,8 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalBlogs", totalBlogs);
                 request.setAttribute("totalRules", totalRules);
                 request.setAttribute("totalStations", totalStations);
+                request.setAttribute("totalTickets", totalTickets);
+                request.setAttribute("tripStatistics", tripStatistics);
                 List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
                 request.setAttribute("feedbackList", feedbackList);
                 int[] starDistribution = dashBoardDAO.getStarDistribution();

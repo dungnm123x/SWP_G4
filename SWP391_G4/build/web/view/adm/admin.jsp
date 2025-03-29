@@ -147,13 +147,14 @@
                                     <div class="dashboard-item bookings">
                                         <h3>Thống kê đơn</h3>
                                         <p>Tổng số đơn: ${totalBookings}</p>
-                                        <p>Tổng số vé: </p>
+                                        <p>Tổng số vé: ${totalTickets}</p>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #96B4AA;">
                                             <a href="order" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
                                     </div>
                                     <div class="dashboard-item routes" style="background-color: #DBE1E1">
                                         <h3>Thống kê tuyến tàu</h3>
+                                        <p>${tripStatistics}</p>
                                         <br>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #A9C2D8;">
                                             <a href="route" style="text-decoration: none;">More info <span class="arrow">→</span></a>
