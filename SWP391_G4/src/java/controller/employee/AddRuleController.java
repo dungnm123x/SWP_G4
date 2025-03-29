@@ -101,58 +101,63 @@ public class AddRuleController extends HttpServlet {
             throws ServletException, IOException {
 
         String name = request.getParameter("ruleName");
-    String content = request.getParameter("content");
+        String content = request.getParameter("content");
 
-    Part filePart = request.getPart("img");
-    String img = (filePart != null) ? filePart.getSubmittedFileName() : null;
+        Part filePart = request.getPart("img");
+        String img = (filePart != null) ? filePart.getSubmittedFileName() : null;
 
-    String userIDParam = request.getParameter("userID");
-    String categoryRuleIDParam = request.getParameter("categoryRuleID");
-    String statusParam = request.getParameter("status");
+        String userIDParam = request.getParameter("userID");
+        String categoryRuleIDParam = request.getParameter("categoryRuleID");
+        String statusParam = request.getParameter("status");
 
-    String message = null;
-    String error = null; // Biến lưu lỗi
+        String message = null;
+        String error = null; // Biến lưu lỗi
 
-    try {
-        if (name == null || content == null || userIDParam == null || categoryRuleIDParam == null || statusParam == null) {
-            throw new IllegalArgumentException("Thiếu dữ liệu đầu vào.");
-        }
-
-        int userID = Integer.parseInt(userIDParam);
-        int categoryRuleID = Integer.parseInt(categoryRuleIDParam);
-        boolean status = "1".equals(statusParam);
-
-        RuleDAO ruleDAO = new RuleDAO();
-
-        // Kiểm tra title trùng
-        if (ruleDAO.isTitleExists(name)) {
-            error = "❌ Title đã tồn tại. Vui lòng chọn một title khác!";
-        } else {
-            // Nếu title chưa tồn tại, thêm mới
-            boolean success = ruleDAO.addRule(name, userID, content, img, status, categoryRuleID);
-            if (success) {
-                message = "✅ Thêm quy định thành công!";
-            } else {
-                error = "❌ Thêm quy định thất bại!";
+        try {
+            if (name == null || content == null || userIDParam == null || categoryRuleIDParam == null || statusParam == null) {
+                throw new IllegalArgumentException("Thiếu dữ liệu đầu vào.");
             }
+            if (name.trim().isEmpty() || content.trim().isEmpty()) {
+                error = "❌ Title và nội dung không được để trống hoặc chỉ chứa khoảng trắng!";
+                request.getSession().setAttribute("error", error);
+                response.sendRedirect("add-rule"); // Điều hướng lại trang thêm quy định
+                return;
+            }
+            int userID = Integer.parseInt(userIDParam);
+            int categoryRuleID = Integer.parseInt(categoryRuleIDParam);
+            boolean status = "1".equals(statusParam);
+
+            RuleDAO ruleDAO = new RuleDAO();
+
+            // Kiểm tra title trùng
+            if (ruleDAO.isTitleExists(name)) {
+                error = "❌ Title đã tồn tại. Vui lòng chọn một title khác!";
+            } else {
+                // Nếu title chưa tồn tại, thêm mới
+                boolean success = ruleDAO.addRule(name, userID, content, img, status, categoryRuleID);
+                if (success) {
+                    message = "✅ Thêm quy định thành công!";
+                } else {
+                    error = "❌ Thêm quy định thất bại!";
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            error = "Dữ liệu không hợp lệ!";
+        } catch (SQLException e) {
+            error = "Lỗi cơ sở dữ liệu!";
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            error = "" + e.getMessage();
         }
 
-    } catch (NumberFormatException e) {
-        error = "Dữ liệu không hợp lệ!";
-    } catch (SQLException e) {
-        error = "Lỗi cơ sở dữ liệu!";
-        e.printStackTrace();
-    } catch (IllegalArgumentException e) {
-        error = "" + e.getMessage();
-    }
-
-    // Lấy lại danh sách category trước khi forward về JSP
-    List<CategoryRule> categories = rd.getAllCategories();
+        // Lấy lại danh sách category trước khi forward về JSP
+        List<CategoryRule> categories = rd.getAllCategories();
         request.setAttribute("categories", categories);
 
-    request.setAttribute("error", error);
-    request.setAttribute("message", message);
-    request.getRequestDispatcher("/view/employee/AddRule.jsp").forward(request, response);
+        request.setAttribute("error", error);
+        request.setAttribute("message", message);
+        request.getRequestDispatcher("/view/employee/AddRule.jsp").forward(request, response);
     }
 
     /**

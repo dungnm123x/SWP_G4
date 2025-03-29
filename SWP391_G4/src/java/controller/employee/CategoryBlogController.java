@@ -98,10 +98,14 @@ public class CategoryBlogController extends HttpServlet {
         String action = request.getParameter("action");
 
         try {
-          if ("add".equals(action)) {
+            if ("add".equals(action)) {
                 String name = request.getParameter("name");
                 int status = Integer.parseInt(request.getParameter("status"));
-
+                if (name == null || name.trim().isEmpty()) { // Kiểm tra nếu toàn dấu cách
+                    request.getSession().setAttribute("error", "Tên danh mục không được để trống hoặc chỉ chứa khoảng trắng!");
+                    response.sendRedirect("category-blog");
+                    return;
+                }
                 if (blogDAO.addCategory(name, status)) {
                     request.getSession().setAttribute("message", "Category added successfully!");
                 } else {
@@ -113,7 +117,11 @@ public class CategoryBlogController extends HttpServlet {
                 int id = Integer.parseInt(request.getParameter("id"));
                 String name = request.getParameter("name");
                 int status = Integer.parseInt(request.getParameter("status"));
-
+                if (name == null || name.trim().isEmpty()) { // Kiểm tra nếu toàn dấu cách
+                    request.getSession().setAttribute("error", "Tên danh mục không được để trống hoặc chỉ chứa khoảng trắng!");
+                    response.sendRedirect("category-blog");
+                    return;
+                }
                 if (blogDAO.updateCategory(id, name, status)) {
                     request.getSession().setAttribute("message", "Category updated successfully!");
                 } else {

@@ -66,6 +66,14 @@ public class AddPostController extends HttpServlet {
         Part filePart = request.getPart("thumbnail");
 
         BlogDAO bd = new BlogDAO(); // Khởi tạo BlogDAO
+        if (title == null || title.trim().isEmpty()
+                || briefInfo == null || briefInfo.trim().isEmpty()
+                || content == null || content.trim().isEmpty()) {
+
+            request.getSession().setAttribute("error", "Tiêu đề, Tóm tắt và Nội dung không được để trống hoặc chỉ chứa khoảng trắng!");
+            response.sendRedirect("add-post");
+            return;
+        }
 
         // Kiểm tra tiêu đề có bị trùng không
         if (bd.isTitleExists(title)) {

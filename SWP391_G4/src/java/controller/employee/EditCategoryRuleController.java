@@ -113,7 +113,12 @@ public class EditCategoryRuleController extends HttpServlet {
             String categoryRuleName = request.getParameter("categoryRuleName");
             String content = request.getParameter("content");
             boolean status = request.getParameter("status").equals("1");
-
+            if (categoryRuleName == null || categoryRuleName.trim().isEmpty()
+                    || content == null || content.trim().isEmpty()) {
+                request.getSession().setAttribute("errorMessage", "Tên danh mục và nội dung không được để trống.");
+                response.sendRedirect("edit-categoryRule?categoryRuleID=" + categoryRuleID);
+                return;
+            }
             // Gọi DAO để cập nhật dữ liệu
             RuleDAO ruleDAO = new RuleDAO();
             boolean result = ruleDAO.updateCategory(categoryRuleID, categoryRuleName, content, "", status);

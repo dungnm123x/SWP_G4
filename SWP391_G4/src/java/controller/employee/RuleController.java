@@ -84,7 +84,6 @@ public class RuleController extends HttpServlet {
                 .stream()
                 .filter(CategoryRule::isStatus) // Chỉ giữ CategoryRule có status = true
                 .collect(Collectors.toList());
-
         request.setAttribute("categories", categories);
         request.setAttribute("ruleList", rules);
         request.setAttribute("ruleName", ruleName);

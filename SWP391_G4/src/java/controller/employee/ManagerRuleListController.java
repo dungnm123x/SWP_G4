@@ -71,10 +71,16 @@ public class ManagerRuleListController extends HttpServlet {
         int userID = 0; // Không lọc theo UserID
 
         List<Rule> rules = rd.searchAndPagingRule(ruleName, userID, categoryRuleID, status, sortBy, pageIndex, pageSize);
-        int totalRules = rd.getSizeRule(ruleName,userID, categoryRuleID, status);
+        int totalRules = rd.getSizeRule(ruleName, userID, categoryRuleID, status);
         int totalPages = (int) Math.ceil((double) totalRules / pageSize);
+        boolean isEmpty = (rules == null || rules.isEmpty());
+        request.setAttribute("isEmpty", isEmpty);
+        if (!rules.isEmpty()) {
+            request.removeAttribute("isEmpty");
+        }
 
         request.setAttribute("rules", rules);
+        request.setAttribute("isEmpty", isEmpty);
         request.setAttribute("totalRules", totalRules);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", pageIndex);

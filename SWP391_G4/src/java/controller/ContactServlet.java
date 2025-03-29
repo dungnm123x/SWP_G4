@@ -82,7 +82,15 @@ public class ContactServlet extends HttpServlet {
     String email = request.getParameter("email");
     String subject = request.getParameter("subject");
     String msg = request.getParameter("message");
+    if (name == null || name.trim().isEmpty() || 
+    email == null || email.trim().isEmpty() || 
+    subject == null || subject.trim().isEmpty() || 
+    msg == null || msg.trim().isEmpty()) {
     
+    request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin và không nhập toàn dấu cách.");
+    request.getRequestDispatcher("contact.jsp").forward(request, response);
+    return;
+}
     final String username = "dungnmhe173094@fpt.edu.vn";
     final String password = "iysa hxar fbwc ggsv";
     

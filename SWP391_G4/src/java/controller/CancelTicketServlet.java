@@ -85,26 +85,36 @@ public class CancelTicketServlet extends HttpServlet {
         }
 
         // Lấy thông tin lọc từ request
+        // Lấy thông tin lọc từ request và loại bỏ khoảng trắng
         String filterTicketID = request.getParameter("filterTicketID");
         String filterPassengerName = request.getParameter("filterPassengerName");
         String filterCCCD = request.getParameter("filterCCCD");
         String filterRoute = request.getParameter("filterRoute");
 
-        // 1. Lọc danh sách vé trước khi phân trang
+        System.out.println("Raw filterTicketID: '" + filterTicketID + "'");
+
+// Nếu giá trị null, gán chuỗi rỗng và loại bỏ khoảng trắng thừa
+        filterTicketID = (filterTicketID != null) ? filterTicketID.trim() : "";
+        filterPassengerName = (filterPassengerName != null) ? filterPassengerName.trim() : "";
+        filterCCCD = (filterCCCD != null) ? filterCCCD.trim() : "";
+        filterRoute = (filterRoute != null) ? filterRoute.trim() : "";
+
+        System.out.println("Trimmed filterTicketID: '" + filterTicketID + "'");
+
         List<RailwayDTO> filteredTickets = new ArrayList<>();
         for (RailwayDTO ticket : availableTickets) {
             boolean matches = true;
 
-            if (filterTicketID != null && !filterTicketID.isEmpty() && !String.valueOf(ticket.getTicketID()).contains(filterTicketID)) {
+            if (!filterTicketID.isEmpty() && !String.valueOf(ticket.getTicketID()).contains(filterTicketID)) {
                 matches = false;
             }
-            if (filterPassengerName != null && !filterPassengerName.isEmpty() && !ticket.getPassengerName().toLowerCase().contains(filterPassengerName.toLowerCase())) {
+            if (!filterPassengerName.isEmpty() && !ticket.getPassengerName().toLowerCase().contains(filterPassengerName.toLowerCase())) {
                 matches = false;
             }
-            if (filterCCCD != null && !filterCCCD.isEmpty() && !ticket.getCccd().contains(filterCCCD)) {
+            if (!filterCCCD.isEmpty() && !ticket.getCccd().contains(filterCCCD)) {
                 matches = false;
             }
-            if (filterRoute != null && !filterRoute.isEmpty() && !ticket.getRoute().toLowerCase().contains(filterRoute.toLowerCase())) {
+            if (!filterRoute.isEmpty() && !ticket.getRoute().toLowerCase().contains(filterRoute.toLowerCase())) {
                 matches = false;
             }
 
