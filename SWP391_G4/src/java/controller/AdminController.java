@@ -98,6 +98,8 @@ public class AdminController extends HttpServlet {
                 int totalStations = dashBoardDAO.getTotalStations();
                 int totalTickets = dashBoardDAO.getTotalTickets();
                 int totalRoutes = dashBoardDAO.getTotalRoutesCount();
+                double totalRefundComplete = dashBoardDAO.getTotalRefundComplete();
+                double totalRefundWait = dashBoardDAO.getTotalRefundWait();
                 request.setAttribute("totalUsers", totalUsers);
                 request.setAttribute("totalEmployees", totalEmployees);
                 request.setAttribute("totalCustomers", totalCustomers);
@@ -109,6 +111,8 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("totalStations", totalStations);
                 request.setAttribute("totalTickets", totalTickets);
                 request.setAttribute("tripStatistics", totalRoutes);
+                request.setAttribute("totalRefundComplete", totalRefundComplete);
+                request.setAttribute("totalRefundWait", totalRefundWait);
                 List<Feedback> feedbackList = dashBoardDAO.getLatestFeedbacks();
                 request.setAttribute("feedbackList", feedbackList);
                 int[] starDistribution = dashBoardDAO.getStarDistribution();

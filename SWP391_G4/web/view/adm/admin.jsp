@@ -128,7 +128,8 @@
                                     </div>
                                     <div class="dashboard-item refund">
                                         <h3>Thống kê hoàn tiền</h3>
-                                        <p>Tổng số đơn hoàn tiền: ${totalBookings}</p>
+                                        <p>Tổng số tiền đã hoàn: ${totalRefundComplete}</p>
+                                        <p>Tổng số tiền đợi hoàn: ${totalRefundWait}</p>
                                         <button class="more-info" style="width: 100%; margin-bottom: 0px; background-color: #7A988E;">
                                             <a href="refund" style="text-decoration: none;">More info <span class="arrow">→</span></a>
                                         </button>
@@ -338,10 +339,10 @@
                                         labels: labels,
                                                 datasets: [
                                                 {
-                                                label: 'Số tiền đã nhận',
-                                                        data: bookingRevenue,
-                                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                label: 'Doanh thu',
+                                                        data: netRevenue,
+                                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                                         fill: false,
                                                         tension: 0.1
                                                 },
@@ -354,10 +355,10 @@
                                                         tension: 0.1
                                                 },
                                                 {
-                                                label: 'Doanh thu',
-                                                        data: netRevenue,
-                                                        borderColor: 'rgba(75, 192, 192, 1)',
-                                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                label: 'Số tiền đã nhận',
+                                                        data: bookingRevenue,
+                                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                                         fill: false,
                                                         tension: 0.1
                                                 }
