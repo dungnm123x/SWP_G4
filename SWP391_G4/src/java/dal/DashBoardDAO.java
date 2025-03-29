@@ -268,6 +268,26 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0;
     }
 
+    public double getTotalRefundComplete() throws SQLException {
+        String sql = "SELECT SUM(TotalRefund) AS Total FROM Refund WHERE RefundStatus = 'Complete'";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getDouble("Total");
+            }
+        }
+        return 0.0;
+    }
+
+    public double getTotalRefundWait() throws SQLException {
+        String sql = "SELECT SUM(TotalRefund) AS Total FROM Refund WHERE RefundStatus = 'Wait'";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getDouble("Total");
+            }
+        }
+        return 0.0;
+    }
+
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");
     }

@@ -419,6 +419,9 @@ form {
 .dashboard-item.category-rules {
     background-color: #CDFBBD;
 }
+.dashboard-item.refund{
+    background-color: #96B4AA;
+}
 
 /* Icon styling */
 .dashboard-item::before {
@@ -464,6 +467,9 @@ form {
 
 .dashboard-item.category-rules::before {
     content: "\F26A"; /* bi-file-earmark-ruled-fill */
+}
+.dashboard-item.refund::before{
+    content: "\F116";
 }
 
 .dashboard-item h3 {
