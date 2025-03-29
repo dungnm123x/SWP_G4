@@ -7,6 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import dal.DAOAdmin;
+import dal.DashBoardDAO;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Feedback;
 import model.User; // Import the User class
 
@@ -14,6 +19,7 @@ import model.User; // Import the User class
 public class FeedbackController extends HttpServlet {
 
     private DAOAdmin feedbackDAO = new DAOAdmin();
+    private DashBoardDAO dashboardDAo = new DashBoardDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -23,6 +29,14 @@ public class FeedbackController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        List<Feedback> feedbackList = null;
+        try {
+            feedbackList = dashboardDAo.getLatestFeedbacks(); // Or a method to get *all* feedback
+        } catch (SQLException ex) {
+            Logger.getLogger(FeedbackController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        request.setAttribute("feedbackList", feedbackList);
+
         request.getRequestDispatcher("view/adm/feedbackForm.jsp").forward(request, response);
     }
 
