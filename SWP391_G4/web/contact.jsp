@@ -213,7 +213,11 @@
                                 <%= message %>
                             </div>
                             <% } %>
-
+                            <c:if test="${not empty error}">
+                                <div class="alert alert-danger" role="alert">
+                                    ${error}
+                                </div>
+                            </c:if>
                         </form>
                     </div>
                 </div>

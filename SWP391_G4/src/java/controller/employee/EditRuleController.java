@@ -144,8 +144,22 @@ public class EditRuleController extends HttpServlet {
             }
             int categoryRuleID = Integer.parseInt(categoryRuleIDStr);
 
-            // Lấy dữ liệu từ form
             String title = request.getParameter("title");
+            String content = request.getParameter("content");
+
+            // Kiểm tra title và content không được nhập toàn dấu cách
+            if (title == null || title.trim().isEmpty() || content == null || content.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "❌ Tiêu đề và nội dung không được để trống hoặc chỉ chứa khoảng trắng!");
+
+                // Load lại dữ liệu để hiển thị
+                Rule rule = rb.getRuleByID(ruleID);
+                List<CategoryRule> categories = rb.getAllCategories();
+                request.setAttribute("rule", rule);
+                request.setAttribute("categories", categories);
+
+                request.getRequestDispatcher("/view/employee/EditRule.jsp").forward(request, response);
+                return;
+            }
             if (rb.isTitleExists(title) && !title.equals(rb.getRuleByID(ruleID).getTitle())) {
                 request.setAttribute("errorMessage", "Tiêu đề đã tồn tại, vui lòng chọn tiêu đề khác!");
 
@@ -158,7 +172,6 @@ public class EditRuleController extends HttpServlet {
                 request.getRequestDispatcher("/view/employee/EditRule.jsp").forward(request, response);
                 return;
             }
-            String content = request.getParameter("content");
             boolean status = "1".equals(request.getParameter("status"));
 
             // Debug thông tin đầu vào

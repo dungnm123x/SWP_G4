@@ -139,7 +139,7 @@
 
                 <div class="filter-group">
                     <form action="manager-rule-list" method="GET">
-                        <label class="form-label">Category Name</label>
+                        <label class="form-label">Category Rule</label>
                         <select class="form-select" name="categoryRuleID" onchange="this.form.submit();">
                             <option value="">Find All</option>
                             <c:forEach var="category" items="${categories}">
@@ -252,7 +252,11 @@
                             </tr>
                         </c:forEach>
                     </tbody>
-                </table>
+                </table> 
+                <c:if test="${isEmpty}">
+                    <p class="no-data-message" style="text-align: center; color: red;">Không tìm thấy dữ liệu!</p>
+                </c:if>
+
             </div>
         </div>
 

@@ -70,6 +70,11 @@ public class EditBlogController extends HttpServlet {
             int status = Integer.parseInt(request.getParameter("status"));
 
             Part filePart = request.getPart("thumbnail");
+            if (title.trim().isEmpty() || briefInfor.trim().isEmpty() || content.trim().isEmpty()) {
+                request.getSession().setAttribute("error", "Tiêu đề, Tóm tắt và Nội dung không được để trống hoặc chỉ chứa khoảng trắng!");
+                response.sendRedirect("edit-blog?blog_id=" + blogId);
+                return;
+            }
 
             Blog existingBlog = blogDAO.getBlogByBlogId(blogId);
             if (existingBlog == null) {
@@ -96,7 +101,7 @@ public class EditBlogController extends HttpServlet {
                 thumbnailBase64 = convertImageToBase64(filePart);
             }
 
-            boolean isUpdated = blogDAO.updateBlog(blogId, title, briefInfor, content, categoryId, status ==1, thumbnailBase64);
+            boolean isUpdated = blogDAO.updateBlog(blogId, title, briefInfor, content, categoryId, status == 1, thumbnailBase64);
             if (isUpdated) {
                 request.getSession().setAttribute("success", "Cập nhật blog thành công!");
                 response.sendRedirect("edit-blog?blog_id=" + blogId);

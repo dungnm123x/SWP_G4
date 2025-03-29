@@ -60,7 +60,14 @@
                 font-size: 16px;
                 transition: background-color 0.3s ease
             }
-
+            .no-data-message {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 20px;
+                font-weight: bold;
+                color: #555;
+            }
             .admin-back-button:hover {
                 background-color: #00509E;
             }
@@ -171,7 +178,7 @@
                     <!-- Chọn Danh Mục -->
                     <div class="filter-group">
                         <form action="posts-list" method="GET">
-                            <label class="form-label">Category Name</label>
+                            <label class="form-label">Title</label>
                             <select class="form-select" name="categoryId" onchange="this.form.submit();">
                                 <option value="">Find All</option>
                                 <c:forEach var="category" items="${categories}">
@@ -294,12 +301,10 @@
                             </tbody>
                         </table>
                     </div>
+                    <c:if test="${empty blogs}">
+                        <p class="no-data-message">Không có dữ liệu Blog!</p>
+                    </c:if>
                 </div>
-
-                <c:if test="${empty blogs}">
-                    <p>Không có dữ liệu Blog!</p>
-                </c:if>
-
                 <!-- Phân trang -->
                 <nav aria-label="Page navigation" class="mt-3">
                     <ul class="pagination justify-content-center">

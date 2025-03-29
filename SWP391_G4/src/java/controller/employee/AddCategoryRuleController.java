@@ -69,7 +69,12 @@ public class AddCategoryRuleController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
+        if (name == null || name.trim().isEmpty()
+                || content == null || content.trim().isEmpty()) {
+            request.setAttribute("message", "Tên danh mục, nội dung không được để trống hoặc chỉ chứa dấu cách.");
+            request.getRequestDispatcher("/view/employee/AddCategoryRule.jsp").forward(request, response);
+            return;
+        }
         System.out.println("🔹 Dữ liệu nhận được: " + name + ", " + content + ", " + img + ", " + status);
 
         RuleDAO ruleDAO = new RuleDAO();

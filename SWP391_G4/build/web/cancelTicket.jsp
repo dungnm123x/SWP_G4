@@ -47,7 +47,7 @@
                         <input type="text" class="form-control" name="filterTicketID" value="${param.filterTicketID}">
                     </div>
                     <div class="col-md-3">
-                        <label>Tên:</label>
+                        <label>Tên hành khách:</label>
                         <input type="text" class="form-control" name="filterPassengerName" value="${param.filterPassengerName}">
                     </div>
                     <div class="col-md-3">
@@ -72,7 +72,7 @@
                             <tr>
                                 <th>Chọn</th>
                                 <th>Mã vé</th>
-                                <th>Tên</th>
+                                <th>Tên hành khách</th>
                                 <th>Đối Tượng</th>
                                 <th>CCCD</th>
                                 <th>Hành trình</th>
@@ -86,10 +86,10 @@
                         </thead>
                         <tbody>
                             <c:forEach var="ticket" items="${tickets}">
-                                <c:if test="${(empty param.filterTicketID or fn:contains(ticket.ticketID, param.filterTicketID)) 
-                                              and (empty param.filterPassengerName or fn:containsIgnoreCase(ticket.passengerName, param.filterPassengerName)) 
-                                              and (empty param.filterCCCD or fn:contains(ticket.cccd, param.filterCCCD)) 
-                                              and (empty param.filterRoute or fn:containsIgnoreCase(ticket.route, param.filterRoute))}">
+                                <c:if test="${(empty param.filterTicketID or fn:trim(param.filterTicketID) == '' or ticket.ticketID == fn:trim(param.filterTicketID)) 
+                                              and (empty param.filterPassengerName or fn:trim(param.filterPassengerName) == '' or fn:containsIgnoreCase(ticket.passengerName, fn:trim(param.filterPassengerName))) 
+                                              and (empty param.filterCCCD or fn:trim(param.filterCCCD) == '' or ticket.cccd == fn:trim(param.filterCCCD)) 
+                                              and (empty param.filterRoute or fn:trim(param.filterRoute) == '' or fn:containsIgnoreCase(ticket.route, fn:trim(param.filterRoute)))}">
                                       <tr>
                                           <td><input type="checkbox" name="selectedTickets" value="${ticket.ticketID}"></td>
                                           <td>${ticket.ticketID}</td>

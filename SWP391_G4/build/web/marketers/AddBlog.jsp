@@ -199,7 +199,9 @@
                     </div>
                     <% session.removeAttribute("success"); %>
                 </c:if>
-
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger">${error}</div>
+                </c:if> 
                 <form action="add-post" method="post" enctype="multipart/form-data" class="inner-form">
                     <div class="row">
                         <div class="col-md-8">
