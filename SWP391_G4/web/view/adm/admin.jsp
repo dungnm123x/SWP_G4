@@ -817,11 +817,11 @@
                                 </c:if>
                             </div>
                         </c:when>
-                        <c:when test="${not empty list}">
+                        <c:when test="${not empty list || not empty param.search}">
                             <div class="search-container">
                                 <form method="get" action="admin" onsubmit="return validateSearchForm(this);">
                                     <input type="hidden" name="view" value="${type}">
-                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm...">
+                                    <input type="text" name="search" class="search-input" placeholder="Tìm kiếm..." value="${param.search}">
                                     <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
                                     <a href="admin?view=${type}" class="reset-btn"><i class="bi bi-arrow-counterclockwise"></i></a>
                                 </form>
@@ -830,18 +830,17 @@
                                 <c:when test="${type == 'employees'}">
                                     <h2>Danh sách nhân viên</h2>
                                 </c:when>
-                                <c:otherwise>
+                                <c:when test="${type == 'customers'}">
                                     <h2>Danh sách khách hàng</h2>
-                                </c:otherwise>
+                                </c:when>
                             </c:choose>
                             <table border="1">
                                 <thead>
                                     <tr>
                                         <c:choose>
                                             <c:when test="${type == 'employees' || type == 'customers'}">
-
                                                 <th></th>
-                                                <th>Tên người dung</th>
+                                                <th>Tên người dùng</th>
                                                 <th>Họ và tên</th>
                                                 <th>Email</th>
                                                 <th>SDT</th>
@@ -852,19 +851,7 @@
                                 </thead>
                                 <tbody>
                                     <c:choose>
-                                        <c:when test="${empty list}">
-                                            <tr>
-                                                <td colspan="6" align="center">
-                                                    <c:if test="${not empty noResultsMessage}">
-                                                        ${noResultsMessage}
-                                                    </c:if>
-                                                    <c:if test="${empty noResultsMessage}">
-                                                        Không có dữ liệu.
-                                                    </c:if>
-                                                </td>
-                                            </tr>
-                                        </c:when>
-                                        <c:otherwise>
+                                        <c:when test="${not empty list}">
                                             <c:forEach var="item" items="${list}" varStatus="status">
                                                 <tr>
                                                     <c:choose>
@@ -898,6 +885,11 @@
                                                     </td>
                                                 </tr>
                                             </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="6" style="text-align: center;">Không tìm thấy dữ liệu.</td>
+                                            </tr>
                                         </c:otherwise>
                                     </c:choose>
                                 </tbody>

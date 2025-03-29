@@ -136,11 +136,8 @@ public class AdminController extends HttpServlet {
                         List<User> users;
                         int totalUsers;
                         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                            users = dao.searchUsers(searchKeyword, page, pageSize);
+                            users = dao.searchUsers(searchKeyword, page, pageSize); // Phương thức tìm kiếm mới trong DAO
                             totalUsers = dao.countSearchUsers(searchKeyword);
-                            if (users.isEmpty()) {
-                                request.setAttribute("noResultsMessage", "Không có kết quả tìm kiếm.");
-                            }
                         } else {
                             users = dao.getAllUsers(page, pageSize);
                             totalUsers = dao.countAllUsers();

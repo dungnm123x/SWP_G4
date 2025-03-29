@@ -70,12 +70,7 @@
 
                             <button type="submit" class="btn btn-success">Lưu</button>
                             <button type="button" id="cancelButton" class="btn btn-secondary">Hủy</button>
-                            <c:if test="${not empty sessionScope.messageSave}">
-                                <div class="alert alert-info">
-                                    ${sessionScope.messageSave}
-                                </div>
-                                <c:remove var="messageSave" scope="session" /> <%-- Use JSTL to remove the attribute --%>
-                            </c:if>
+                            
                         </form>
                     </c:if>
                 </div>
