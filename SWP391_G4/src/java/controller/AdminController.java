@@ -42,22 +42,51 @@ public class AdminController extends HttpServlet {
         try {
             if ("dashboard".equals(view)) {
                 DashBoardDAO dashBoardDAO = new DashBoardDAO();
-                String period = request.getParameter("period");
-                if (period == null || period.isEmpty()) {
-                    period = "monthly";
+                // Xử lý dữ liệu doanh thu
+                String viewType = request.getParameter("viewType"); // "monthly" hoặc "yearly"
+                String selectedMonth = request.getParameter("month"); // Ví dụ: "03/2025"
+                String selectedYear = request.getParameter("year"); // Ví dụ: "2025"
+
+                Map<String, double[]> revenueData = null;
+                String[] labels = null;
+                if ("yearly".equals(viewType)) {
+                    int year = selectedYear != null ? Integer.parseInt(selectedYear) : 2025; // Mặc định là 2025
+                    revenueData = dashBoardDAO.getRevenueByYear(year);
+                    labels = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+                    request.setAttribute("viewType", "yearly");
+                    request.setAttribute("selectedYear", year);
+                } else { // Mặc định là monthly
+                    int year = 2025;
+                    int month = 3; // Mặc định là tháng 3/2025
+                    if (selectedMonth != null && selectedMonth.matches("\\d{2}/\\d{4}")) {
+                        String[] parts = selectedMonth.split("/");
+                        month = Integer.parseInt(parts[0]);
+                        year = Integer.parseInt(parts[1]);
+                    }
+                    revenueData = dashBoardDAO.getRevenueByMonth(year, month);
+                    labels = new String[31];
+                    for (int i = 1; i <= 31; i++) {
+                        labels[i - 1] = String.valueOf(i);
+                    }
+                    request.setAttribute("viewType", "monthly");
+                    request.setAttribute("selectedMonth", String.format("%02d/%d", month, year));
                 }
-                String selectedDate = request.getParameter("selectedDate");
-                if (selectedDate == null || selectedDate.isEmpty()) {
-                    selectedDate = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+
+// Chuẩn bị dữ liệu cho biểu đồ
+                double[] bookingRevenue = new double[labels.length];
+                double[] refundAmount = new double[labels.length];
+                double[] netRevenue = new double[labels.length];
+                for (int i = 0; i < labels.length; i++) {
+                    double[] data = revenueData.get(labels[i]);
+                    bookingRevenue[i] = data[0]; // A
+                    refundAmount[i] = data[1];   // B
+                    netRevenue[i] = data[2];     // A - B
                 }
-                List<DashBoardDAO.RevenueData> unusedRevenue = dashBoardDAO.getRevenueData(period, "Unused", selectedDate);
-                List<DashBoardDAO.RevenueData> usedRevenue1 = dashBoardDAO.getRevenueData(period, "Used", selectedDate);
-                List<DashBoardDAO.RevenueData> usedRevenue2 = dashBoardDAO.getRevenueData(period, "Used", selectedDate);
-                request.setAttribute("unusedRevenue", unusedRevenue);
-                request.setAttribute("usedRevenue1", usedRevenue1);
-                request.setAttribute("usedRevenue2", usedRevenue2);
-                request.setAttribute("period", period);
-                request.setAttribute("selectedDate", selectedDate);
+
+                request.setAttribute("labels", labels);
+                request.setAttribute("bookingRevenue", bookingRevenue);
+                request.setAttribute("refundAmount", refundAmount);
+                request.setAttribute("netRevenue", netRevenue);
                 int totalUsers = dashBoardDAO.getTotalUsers();
                 int totalEmployees = dashBoardDAO.getTotalEmployees();
                 int totalCustomers = dashBoardDAO.getTotalCustomers();
@@ -210,11 +239,13 @@ public class AdminController extends HttpServlet {
             throw new ServletException(e);
         }
     }
+
     private void handleCalendarEventError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
             throws ServletException, IOException {
         request.getSession().setAttribute("message11", errorMessage);
         response.sendRedirect("admin?view=calendar");
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

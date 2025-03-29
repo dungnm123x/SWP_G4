@@ -55,103 +55,122 @@ public class DashBoardDAO extends DBContext<Object> {
         return 0;
     }
 
-    public List<RevenueData> getRevenueData(String period, String ticketStatus, String selectedDate) throws SQLException {
-        List<RevenueData> revenueDataList = new ArrayList<>();
-        String sql = "";
-        PreparedStatement stm = null;
+    // Phương thức lấy dữ liệu doanh thu theo ngày trong một tháng
+    public Map<String, double[]> getRevenueByMonth(int year, int month) throws SQLException {
+        Map<String, double[]> revenueData = new HashMap<>();
+        // Khởi tạo dữ liệu cho tất cả các ngày trong tháng (giả sử tối đa 31 ngày)
+        for (int day = 1; day <= 31; day++) {
+            revenueData.put(String.valueOf(day), new double[]{0.0, 0.0, 0.0}); // [A, B, A-B]
+        }
 
-        try {
-            switch (period.toLowerCase()) {
-                case "weekly":
-                    // Lấy doanh thu 7 ngày gần nhất từ ngày được chọn
-                    sql = "SELECT CAST(t.DepartureTime AS DATE) AS TimePeriod, "
-                            + "SUM(ti.TicketPrice) AS TotalRevenue "
-                            + "FROM Ticket ti "
-                            + "JOIN Trip t ON ti.TripID = t.TripID "
-                            + "WHERE ti.TicketStatus = ? "
-                            + "AND t.DepartureTime >= DATEADD(DAY, -6, CAST(? AS DATE)) "
-                            + "AND t.DepartureTime <= CAST(? AS DATE) "
-                            + "GROUP BY CAST(t.DepartureTime AS DATE) "
-                            + "ORDER BY CAST(t.DepartureTime AS DATE)";
-                    stm = getConnection().prepareStatement(sql);
-                    stm.setString(1, ticketStatus);
-                    stm.setString(2, selectedDate);
-                    stm.setString(3, selectedDate);
-                    break;
+        // Truy vấn A: Tổng TotalPrice từ Booking với PaymentStatus = 'Paid'
+        String sqlBooking = "SELECT DAY(BookingDate) AS Day, SUM(TotalPrice) AS Total "
+                + "FROM Booking "
+                + "WHERE PaymentStatus = 'Paid' "
+                + "AND YEAR(BookingDate) = ? AND MONTH(BookingDate) = ? "
+                + "GROUP BY DAY(BookingDate)";
 
-                case "monthly":
-                    // Lấy doanh thu từng ngày trong tháng được chọn
-                    sql = "SELECT DAY(t.DepartureTime) AS TimePeriod, "
-                            + "SUM(ti.TicketPrice) AS TotalRevenue "
-                            + "FROM Ticket ti "
-                            + "JOIN Trip t ON ti.TripID = t.TripID "
-                            + "WHERE ti.TicketStatus = ? "
-                            + "AND YEAR(t.DepartureTime) = YEAR(CAST(? AS DATE)) "
-                            + "AND MONTH(t.DepartureTime) = MONTH(CAST(? AS DATE)) "
-                            + "GROUP BY DAY(t.DepartureTime) "
-                            + "ORDER BY DAY(t.DepartureTime)";
-                    stm = getConnection().prepareStatement(sql);
-                    stm.setString(1, ticketStatus);
-                    stm.setString(2, selectedDate);
-                    stm.setString(3, selectedDate);
-                    break;
-
-                case "yearly":
-                    // Lấy doanh thu 12 tháng trong năm được chọn
-                    sql = "SELECT MONTH(t.DepartureTime) AS TimePeriod, "
-                            + "SUM(ti.TicketPrice) AS TotalRevenue "
-                            + "FROM Ticket ti "
-                            + "JOIN Trip t ON ti.TripID = t.TripID "
-                            + "WHERE ti.TicketStatus = ? "
-                            + "AND YEAR(t.DepartureTime) = ? "
-                            + "GROUP BY MONTH(t.DepartureTime) "
-                            + "ORDER BY MONTH(t.DepartureTime)";
-                    stm = getConnection().prepareStatement(sql);
-                    stm.setString(1, ticketStatus);
-                    stm.setString(2, selectedDate);
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Invalid period: " + period);
-            }
-
+        try (PreparedStatement stm = getConnection().prepareStatement(sqlBooking)) {
+            stm.setInt(1, year);
+            stm.setInt(2, month);
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
-                    RevenueData data = new RevenueData();
-                    data.setTimePeriod(rs.getInt("TimePeriod"));
-                    data.setTotalRevenue(rs.getDouble("TotalRevenue"));
-                    revenueDataList.add(data);
+                    int day = rs.getInt("Day");
+                    double totalBooking = rs.getDouble("Total");
+                    double[] data = revenueData.get(String.valueOf(day));
+                    data[0] = totalBooking; // A
+                    revenueData.put(String.valueOf(day), data);
                 }
             }
-        } finally {
-            if (stm != null) {
-                stm.close();
+        }
+
+        // Truy vấn B: Tổng TotalRefund từ Refund với RefundStatus = 'Complete'
+        String sqlRefund = "SELECT DAY(RefundDate) AS Day, SUM(TotalRefund) AS Total "
+                + "FROM Refund "
+                + "WHERE RefundStatus = 'Complete' "
+                + "AND YEAR(RefundDate) = ? AND MONTH(RefundDate) = ? "
+                + "GROUP BY DAY(RefundDate)";
+
+        try (PreparedStatement stm = getConnection().prepareStatement(sqlRefund)) {
+            stm.setInt(1, year);
+            stm.setInt(2, month);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int day = rs.getInt("Day");
+                    double totalRefund = rs.getDouble("Total");
+                    double[] data = revenueData.get(String.valueOf(day));
+                    data[1] = totalRefund; // B
+                    revenueData.put(String.valueOf(day), data);
+                }
             }
         }
-        return revenueDataList;
+
+        // Tính A - B cho từng ngày
+        for (int day = 1; day <= 31; day++) {
+            double[] data = revenueData.get(String.valueOf(day));
+            data[2] = data[0] - data[1]; // A - B
+            revenueData.put(String.valueOf(day), data);
+        }
+
+        return revenueData;
     }
 
-    // Helper class to store revenue data
-    public static class RevenueData {
-
-        private int timePeriod;
-        private double totalRevenue;
-
-        public int getTimePeriod() {
-            return timePeriod;
+    // Phương thức lấy dữ liệu doanh thu theo tháng trong một năm
+    public Map<String, double[]> getRevenueByYear(int year) throws SQLException {
+        Map<String, double[]> revenueData = new HashMap<>();
+        // Khởi tạo dữ liệu cho tất cả các tháng trong năm
+        for (int month = 1; month <= 12; month++) {
+            revenueData.put(String.valueOf(month), new double[]{0.0, 0.0, 0.0}); // [A, B, A-B]
         }
 
-        public void setTimePeriod(int timePeriod) {
-            this.timePeriod = timePeriod;
+        // Truy vấn A: Tổng TotalPrice từ Booking với PaymentStatus = 'Paid'
+        String sqlBooking = "SELECT MONTH(BookingDate) AS Month, SUM(TotalPrice) AS Total "
+                + "FROM Booking "
+                + "WHERE PaymentStatus = 'Paid' "
+                + "AND YEAR(BookingDate) = ? "
+                + "GROUP BY MONTH(BookingDate)";
+
+        try (PreparedStatement stm = getConnection().prepareStatement(sqlBooking)) {
+            stm.setInt(1, year);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int month = rs.getInt("Month");
+                    double totalBooking = rs.getDouble("Total");
+                    double[] data = revenueData.get(String.valueOf(month));
+                    data[0] = totalBooking; // A
+                    revenueData.put(String.valueOf(month), data);
+                }
+            }
         }
 
-        public double getTotalRevenue() {
-            return totalRevenue;
+        // Truy vấn B: Tổng TotalRefund từ Refund với RefundStatus = 'Complete'
+        String sqlRefund = "SELECT MONTH(RefundDate) AS Month, SUM(TotalRefund) AS Total "
+                + "FROM Refund "
+                + "WHERE RefundStatus = 'Complete' "
+                + "AND YEAR(RefundDate) = ? "
+                + "GROUP BY MONTH(RefundDate)";
+
+        try (PreparedStatement stm = getConnection().prepareStatement(sqlRefund)) {
+            stm.setInt(1, year);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int month = rs.getInt("Month");
+                    double totalRefund = rs.getDouble("Total");
+                    double[] data = revenueData.get(String.valueOf(month));
+                    data[1] = totalRefund; // B
+                    revenueData.put(String.valueOf(month), data);
+                }
+            }
         }
 
-        public void setTotalRevenue(double totalRevenue) {
-            this.totalRevenue = totalRevenue;
+        // Tính A - B cho từng tháng
+        for (int month = 1; month <= 12; month++) {
+            double[] data = revenueData.get(String.valueOf(month));
+            data[2] = data[0] - data[1]; // A - B
+            revenueData.put(String.valueOf(month), data);
         }
+
+        return revenueData;
     }
 
     private int getCount(String sql) throws SQLException {
@@ -217,10 +236,10 @@ public class DashBoardDAO extends DBContext<Object> {
         }
         return stations;
     }
+
     public int getTotalTickets() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Ticket";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -231,24 +250,24 @@ public class DashBoardDAO extends DBContext<Object> {
     public Map<String, Integer> getTripStatistics() throws SQLException {
         Map<String, Integer> tripStats = new HashMap<>();
         String sql = "SELECT TripStatus, COUNT(*) AS Count FROM Trip GROUP BY TripStatus";
-        try (PreparedStatement stm = getConnection().prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = getConnection().prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 tripStats.put(rs.getString("TripStatus"), rs.getInt("Count"));
             }
         }
         return tripStats;
     }
+
     public int getTotalRoutesCount() throws SQLException {
-    String query = "SELECT COUNT(*) FROM Route";
-    try (PreparedStatement stmt = connection.prepareStatement(query);
-         ResultSet rs = stmt.executeQuery()) {
-        if (rs.next()) {
-            return rs.getInt(1);
+        String query = "SELECT COUNT(*) FROM Route";
+        try (PreparedStatement stmt = connection.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         }
+        return 0;
     }
-    return 0;
-}
+
     public int getTotalUsers() throws SQLException {
         return getCount("SELECT COUNT(*) FROM [User]");
     }
