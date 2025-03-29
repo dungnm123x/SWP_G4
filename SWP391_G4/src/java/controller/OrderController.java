@@ -73,15 +73,14 @@ public class OrderController extends HttpServlet {
             case "edit":
                 showEditForm(request, response);
                 break;
-            case "cancel":
-            {
+            case "cancel": {
                 try {
                     cancelOrder(request, response);
                 } catch (SQLException ex) {
                     Logger.getLogger(OrderController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-                break;
+            break;
 
             case "getTrips":
                 getTripsByTrain(request, response); // AJAX handler
@@ -126,9 +125,15 @@ public class OrderController extends HttpServlet {
             }
         }
         // ... (Filtering parameters - ensure routeId is handled) ...
+        //String customerName = request.getParameter("customerName");
+        //String phone = request.getParameter("phone");
+        //String email = request.getParameter("email");
         String customerName = request.getParameter("customerName");
+        customerName = (customerName != null) ? customerName.trim() : "";
         String phone = request.getParameter("phone");
+        phone = (phone != null) ? phone.trim() : "";
         String email = request.getParameter("email");
+        email = (email != null) ? email.trim() : "";
         String status = request.getParameter("status");
         String startDateStr = request.getParameter("startDate");
         String endDateStr = request.getParameter("endDate");
@@ -293,7 +298,7 @@ public class OrderController extends HttpServlet {
     }
 
     private void cancelOrder(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException {
+            throws ServletException, IOException, SQLException {
 
         int bookingID = Integer.parseInt(request.getParameter("id"));
 
@@ -305,11 +310,11 @@ public class OrderController extends HttpServlet {
                 request.setAttribute("error", "Failed to cancel order.");
             }
         } catch (SQLException e) {
-             request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", "Database error: " + e.getMessage());
             e.printStackTrace(); // Log the exception
         }
 
-         response.sendRedirect("order"); // Redirect to order list
+        response.sendRedirect("order"); // Redirect to order list
     }
 
     private void addOrder(HttpServletRequest request, HttpServletResponse response)
