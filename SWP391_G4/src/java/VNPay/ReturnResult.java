@@ -149,14 +149,19 @@ public class ReturnResult extends HttpServlet {
                 }
 
             }
+            // Lấy tổng tiền từ session nếu có, nếu không thì sử dụng giá trị từ VNPay
             double totalPrice = 0;
-            try {
-                long vnpAmountLong = Long.parseLong(vnp_Amount);
-                totalPrice = vnpAmountLong / 100.0;  // Lấy từ tham số VNPay
-            } catch (NumberFormatException e) {
-                // fallback: cộng trực tiếp từ giỏ hàng (lúc này item.getPrice() đã là final)
-                for (CartItem item : cartItems) {
-                    totalPrice += item.getPrice();
+            if (session.getAttribute("totalAmount") != null) {
+                totalPrice = (double) session.getAttribute("totalAmount");
+            } else {
+                try {
+                    long vnpAmountLong = Long.parseLong(vnp_Amount);
+                    totalPrice = vnpAmountLong / 100.0;  // Chia cho 100 để chuyển đổi đơn vị nếu cần
+                } catch (NumberFormatException e) {
+                    // fallback: tính lại từ giỏ vé
+                    for (CartItem item : cartItems) {
+                        totalPrice += item.getPrice();
+                    }
                 }
             }
 
@@ -209,7 +214,8 @@ public class ReturnResult extends HttpServlet {
             List<String> fullNameList = (List<String>) session.getAttribute("fullNameList");
             List<String> idNumberList = (List<String>) session.getAttribute("idNumberList");
             List<String> typeList = (List<String>) session.getAttribute("typeList");
-            if (idNumberList == null || fullNameList == null || typeList == null || idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size() || typeList.size() != cartItems.size()) {
+            List<Double> finalPriceList = (List<Double>) session.getAttribute("finalPriceList");
+            if (idNumberList == null || fullNameList == null || typeList == null ||  idNumberList.size() != cartItems.size() || fullNameList.size() != cartItems.size() || typeList.size() != cartItems.size()) {
                 request.setAttribute("error", "Không khớp số lượng tên/CCCD với số vé trong giỏ!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
@@ -228,8 +234,12 @@ public class ReturnResult extends HttpServlet {
                 ticket.setBookingID(bookingID);
                 ticket.setSeatID(Integer.parseInt(item.getSeatID()));
                 ticket.setTripID(item.getTrip().getTripID());
-                ticket.setTicketPrice(item.getPrice());
+                double ticketPrice = (finalPriceList != null && finalPriceList.size() > i)
+                        ? finalPriceList.get(i)
+                        : item.getPrice();
+                ticket.setTicketPrice(ticketPrice);
                 ticket.setTicketStatus("Unused");
+
 
                 try {
                     ticketDAO.insertTicket(ticket);
@@ -240,6 +250,7 @@ public class ReturnResult extends HttpServlet {
                     request.getRequestDispatcher("error.jsp").forward(request, response);
                     return;
                 }
+                
             }
 
             // E) Xoá giỏ hàng
