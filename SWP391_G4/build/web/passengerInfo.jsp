@@ -81,12 +81,7 @@
                                         </c:if>>
                                     Người cao tuổi
                                 </option>
-                                <option value="VIP"
-                                        <c:if test="${sessionScope.typeList[status.index] == 'VIP'}">
-                                            selected
-                                        </c:if>>
-                                    Hội viên VIP
-                                </option>
+                               
                             </select>
 
                             <input type="text" class="form-control"
@@ -211,33 +206,7 @@
                     </div>
                 </div>
 
-                <!-- Modal VIP -->
-                <div id="vipModal${status.index}" class="modal">
-                    <div class="modal-content">
-                        <h5>Xác nhận thẻ VIP</h5>
-                        <div>
-                            <input type="text"
-                                   id="vipCard${status.index}"
-                                   placeholder="Số thẻ VIP / CMND/CCCD" />
-                        </div>
-                        <div class="mt-3">
-                            <button type="button"
-                                    onclick="closeModal('vipModal${status.index}')"
-                                    class="btn btn-secondary">Hủy</button>
-                            <button type="button"
-                                    onclick="confirmVIP(
-                                                    'vipModal${status.index}',
-                                                    'passengerType${status.index}',
-                                                    'price${status.index}',
-                                                    'discount${status.index}',
-                                                    'displayTotal${status.index}'
-                                                    )"
-                                    class="btn btn-primary">
-                                Xác nhận
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                
 
 
             </c:forEach>
@@ -375,12 +344,7 @@
                                                     </c:if>>
                                                 Người cao tuổi
                                             </option>
-                                            <option value="VIP"
-                                                    <c:if test="${sessionScope.typeList[status.index] == 'VIP'}">
-                                                        selected
-                                                    </c:if>>
-                                                Hội viên VIP
-                                            </option>
+                                            
                                         </select>
 
                                         <input type="text" class="form-control"
@@ -503,37 +467,10 @@
                                             Xác nhận
                                         </button>
                                     </div>
-                                </div>
+                               </div>
                             </div>
 
-                            <!-- Modal VIP -->
-                            <div id="vipModal${status.index}" class="modal">
-                                <div class="modal-content">
-                                    <h5>Xác nhận thẻ VIP</h5>
-                                    <div>
-                                        <input type="text"
-                                               id="vipCard${status.index}"
-                                               name="vipCard${status.index}"
-                                               placeholder="Số thẻ VIP / CMND/CCCD" />
-                                    </div>
-                                    <div class="mt-3">
-                                        <button type="button"
-                                                onclick="closeModal('vipModal${status.index}')"
-                                                class="btn btn-secondary">Hủy</button>
-                                        <button type="button"
-                                                onclick="confirmVIP(
-                                                                'vipModal${status.index}',
-                                                                'passengerType${status.index}',
-                                                                'price${status.index}',
-                                                                'discount${status.index}',
-                                                                'displayTotal${status.index}'
-                                                                )"
-                                                class="btn btn-primary">
-                                            Xác nhận
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>                           
+                                                 
                         </c:forEach>
                         </tbody>
                     </table>
